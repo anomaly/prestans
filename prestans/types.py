@@ -46,6 +46,7 @@ import copy
 import re
 import os
 import base64
+import uuid
 
 from datetime import datetime
 
@@ -397,6 +398,10 @@ class Boolean(DataType):
 #
 class DataURLFile(DataType):
 
+    @classmethod
+    def generate_filename(cls):
+        return uuid.uuid4().hex
+
     ## @brief instantiates a field to support FileReader uploaded base64 encoded contents
     #
     def __init__(self, 
@@ -422,19 +427,24 @@ class DataURLFile(DataType):
 
         final_value = self.__class__()
 
+        #Check conditions for a required parameter
         if self._required and value is None:
-            """ Check conditions for a required parameter """
+            import logging
             raise DataTypeValidationException(ERROR_MESSAGE.REQUIRED_PARAMETER_MISSING)
 
+        #Check for not required starting condition and return before unpack takes place
+        if self._required is False and value is None:
+            return value
+
+        #Try to unpack the data value
         try:
             
             data_url, delimiter, base64_content = value.partition(',')
             final_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
             final_value._file_contents = base64.b64decode(base64_content)
         
-        #Consider perhaps doing some more explicit exception checks here?
-        except:
-            raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % ("Sized " + str(len(value)), 'DataURLFile'))
+        except Exception, err:
+            raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % ("Sized " + str(len(value)), "DataURLFile"))
 
         #Abort if the provided mime type is not acceptable
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 and not final_value._mime_type in self._allowed_mime_types:
@@ -952,8 +962,8 @@ class Model(DataCollection):
 
         for attribute_name, type_instance in model_class_members:
 
+            #Ignore parameters with __ or if they are methods
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
                 continue
 
             if issubclass(type_instance.__class__, DataCollection):
