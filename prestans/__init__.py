@@ -29,7 +29,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['types', 'parsers', 'handlers', 'serializers', 'rest', 'auth', 'cache']
+__all__ = ['types', 'parsers', 'handlers', 'serializers', 'rest', 'auth', 'cache', 'wraps']
 
 ## @package prestans Core prestans package
 #
@@ -41,7 +41,7 @@ __all__ = ['types', 'parsers', 'handlers', 'serializers', 'rest', 'auth', 'cache
 # @defgroup appengine AppEngine Specific Implementation of prestans providers
 #
 
-__version__ = '1.0'
+__version__ = '1.1'
 __authors__ = ['Devraj Mukherjee', 'Bradley Mclain']
 
 ## @brief Constants to produce consistent error messages for all Data Types.
