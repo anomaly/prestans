@@ -190,7 +190,7 @@ class UnauthorizedException(RESTException):
         else:
             self._message = "Unauthorized: %s" % (message)
 
-## @brief Can be raised by a REST Handler for a forbidden resource
+## @brief Can be raised by a REST Handler for a forbidden resource or action
 #
 #  @ingroup exception
 #
@@ -639,7 +639,8 @@ class RESTApplication(object):
 
         except (BadRequestException, 
                 NotFoundException, 
-                UnauthorizedException, 
+                UnauthorizedException,
+                ForbiddenException, 
                 ServiceUnavailableException,
                 ConflictException), exp:
 
