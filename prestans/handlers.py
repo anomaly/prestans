@@ -31,8 +31,9 @@
 
 __all__ = ['RESTRequestHandler', 'NotImplementedException']
 
+import prestans.rest
+
 ## @package prestans.handlers Handlers are called once a request has been parsed and verified
-#
 
 ## @brief Exception thrown when a function has not been overidden 
 #
@@ -107,7 +108,19 @@ class RESTRequestHandler:
         self.request = request
         self.response = response
         self.debug = debug
+
+    ## @brief returns a dictionary of discoverable elements
+    def discover(self):
         
+        blueprint = dict()
+
+        # Request Parser
+
+        # Auth Context
+
+        return blueprint
+
+
     ## @brief Called before the the associated request function is called
     # 
     # Implementing this method in your handler is completely optional, this is 
@@ -172,3 +185,20 @@ class RESTRequestHandler:
     #
     def get_cache_key(self, request_method):
         return None
+
+
+## @brief
+#
+class DiscoveryHandler(RESTRequestHandler):
+
+    ## @brief
+    def __init__(self):
+        pass
+
+    ## @brief 
+    #
+    # @param self the object pointer
+    #
+    def get(self):
+        
+        self.response.status_code = prestans.rest.STATUS.OK

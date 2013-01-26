@@ -40,7 +40,7 @@ from functools import wraps
 # http://www.regularexpressionless.com/?p=8
 # http://stackoverflow.com/questions/7019283/automatically-type-cast-parameters-in-python
 #
-# Updated to use functools.wrpas instead
+# Updated to use functools.wraps instead
 #
 def signature(*sig):
 

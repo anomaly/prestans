@@ -123,8 +123,6 @@ class ReservedWordException(Exception):
 # while ParserRuleSet is responsible for running the parse mechanism.
 #
 class ParameterSet(object):
-
-    #response_field_list = None
     
     ## @brief validate method for %ParameterSet
     #
