@@ -192,10 +192,40 @@ class RESTRequestHandler:
 #
 class DiscoveryHandler(RESTRequestHandler):
 
+
     ## @brief 
     #
     # @param self the object pointer
     #
     def get(self):
         
+        blueprints = []
+
+        # Intterogate each handler
+        for regexp, handler_class in self.parsed_handler_map:
+
+            # Ignore discovery handler
+            if handler_class == self.__class__:
+                continue
+
+            handler_blueprint = dict()
+            handler_blueprint['url'] = regexp.pattern
+            handler_blueprint['class'] = "%s.%s" % (handler_class.__module__, handler_class.__name__)
+            handler_blueprint['description'] = handler_class.__doc__
+
+            blueprints.append(handler_blueprint)
+
         self.response.status_code = prestans.rest.STATUS.OK
+        self.response.set_body_attribute("api", blueprints)
+
+    @property
+    def parsed_handler_map(self):
+        return self._parsed_handler_map
+
+    @parsed_handler_map.setter
+    def parsed_handler_map(self, value):
+        self._parsed_handler_map = value
+
+    @parsed_handler_map.deleter
+    def parsed_handler_map(self):
+        del self._parsed_handler_map

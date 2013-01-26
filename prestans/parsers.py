@@ -136,15 +136,15 @@ class ParameterSet(object):
         
         validated_parameter_set = self.__class__()
 
-        """ Inspects the attributes of a parameter set and tries to validate the input """
+        # Inspects the attributes of a parameter set and tries to validate the input 
         for attribute_name, type_instance in self.__class__.__dict__.iteritems():
             
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
+                # Ignore parameters with __ and if they are methods 
                 continue
 
             if attribute_name == "_response_field_list":
-                """ Prestans reserved word cannot be used """
+                # Prestans reserved word cannot be used
                 raise ReservedWordException("_response_field_list")
 
             if not issubclass(type_instance.__class__, 
@@ -152,15 +152,15 @@ class ParameterSet(object):
                               prestans.types.Float) and not issubclass(type_instance.__class__, 
                               prestans.types.Integer):
                 
-                """ Must be a sub class of DataType """
+                # Must be a sub class of DataType 
                 raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
 
             try:
-                """ Get input from parameters, None type returned if nothing provided """
+                # Get input from parameters, None type returned if nothing provided 
                 validation_input = request.get(attribute_name)
-                """ Validate input based on data type rules, raises DataTypeValidationException if validation fails """
+                # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
                 validation_result = type_instance.validate(validation_input)
-                """ setattr """
+                # setattr 
                 setattr(validated_parameter_set, attribute_name, validation_result)
             except prestans.types.DataTypeValidationException, exp:
                 return None
@@ -245,7 +245,7 @@ class AttributeFilter(object):
                 elif isinstance(value, bool):
                     setattr(evaluated_attribute_filter, template_key, value)
                 elif isinstance(value, self.__class__):
-                    """ Attribute lists sort themselves out, to produce sub Attribute Filters """
+                    # Attribute lists sort themselves out, to produce sub Attribute Filters 
                     template_sub_list = getattr(template_filter, template_key)
                     this_sub_list = getattr(self, template_key)
                     setattr(evaluated_attribute_filter, template_key, this_sub_list._conforms_to_template_filter(template_sub_list))
@@ -263,7 +263,7 @@ class AttributeFilter(object):
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
+                # Ignore parameters with __ and if they are methods
                 continue
 
             keys.append(attribute_name)
@@ -308,14 +308,14 @@ class AttributeFilter(object):
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
+                # Ignore parameters with __ and if they are methods 
                 continue
 
             if isinstance(type_instance, bool) and type_instance == True:
                 return True
             elif isinstance(type_instance, self.__class__) and \
             type_instance.are_all_attributes_visible() == True:
-                """ Serialise attribute filter children to dictioanaries """
+                # Serialise attribute filter children to dictioanaries 
                 return True
 
         return False
@@ -327,13 +327,13 @@ class AttributeFilter(object):
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
+                # Ignore parameters with __ and if they are methods
                 continue
 
             if isinstance(type_instance, bool) and type_instance == False:
                 return False
             elif isinstance(type_instance, self.__class__) and type_instance.are_all_attributes_visible() == False:
-                """ Serialise attribute filter children to dictioanaries """
+                # Serialise attribute filter children to dictioanaries 
                 return False
 
         return True
@@ -347,13 +347,13 @@ class AttributeFilter(object):
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
+                # Ignore parameters with __ and if they are methods 
                 continue
 
             if isinstance(type_instance, bool):
                 output_dictionary[attribute_name] = type_instance
             elif isinstance(type_instance, self.__class__):
-                """ Serialise attribute filter children to dictioanaries """
+                # Serialise attribute filter children to dictioanaries 
                 output_dictionary[attribute_name] = type_instance.as_dict()
 
         return output_dictionary
@@ -372,11 +372,11 @@ class AttributeFilter(object):
         for key, value in from_dictionary.iteritems():
 
             if not isinstance(value, (bool, dict)):
-                """ Check to see we can work with the value """
+                # Check to see we can work with the value 
                 raise TypeError("AttributeFilter input for key %s must be boolean or dict, %s provided" % 
                                 (key, value.__class__.__name__))
 
-            """ Either keep the value of wrap it up with AttributeFilter """
+            # Either keep the value of wrap it up with AttributeFilter 
             if isinstance(value, bool):
                 setattr(self, key, value)
             elif isinstance(value, dict):
@@ -430,7 +430,7 @@ class ParserRuleSet(object):
             self._parameter_sets = None
         else:
             if isinstance(parameter_sets, (list, tuple)):
-                """ Always makes sure that the parameter_set is iterable """
+                # Always makes sure that the parameter_set is iterable 
                 self._parameter_sets = parameter_sets
             else:
                 self._parameter_sets = [parameter_sets]
@@ -447,11 +447,11 @@ class ParserRuleSet(object):
     def _parse_attribute_filter(self, request):
 
         if not self._response_attribute_filter_template:
-            """ Not set hence, ignore this part of the parser """
+            # Not set hence, ignore this part of the parser 
             return None
         
         if not issubclass(self._response_attribute_filter_template.__class__, AttributeFilter):
-            """ Require body_templates to be a DataCollection, which are Models or Arrays """
+            # Require body_templates to be a DataCollection, which are Models or Arrays 
             raise RequiresModelException("ParserRuleSet provided object of type %s as AttributeList, AttributeFitler expected" % 
                                          (self._body_template.__class__.__name__))
 
@@ -504,12 +504,12 @@ class ParserRuleSet(object):
             
         for parameter_set in self._parameter_sets:
             
-            """ Must be a ParameterSet, otherwise raise NotParameterSetObjectException """
+            # Must be a ParameterSet, otherwise raise NotParameterSetObjectException 
             if not issubclass(parameter_set.__class__, ParameterSet):
                 raise NotParameterSetObjectException(ERROR_MESSAGE.NOT_TYPE % 
                                                      (parameter_set.__class__.__name__, prestans.prestans.types.ParameterSet))
 
-            """ Ask parameter set to validate, if successful stop and return """
+            # Ask parameter set to validate, if successful stop and return 
             try:
 
                 validated_parameter_set = parameter_set.validate(request)
@@ -518,10 +518,10 @@ class ParserRuleSet(object):
                     return validated_parameter_set
 
             except prestans.types.DataTypeValidationException, exp:
-                """ Keep trying the others until we have given the others a chance as well """
+                # Keep trying the others until we have given the others a chance as well 
                 continue
                 
-        """ Return None if none of them match, upto the handler to do what suits """
+        # Return None if none of them match, upto the handler to do what suits 
         return None
         
     ## @brief a parsed body of %DataType for a request
@@ -530,15 +530,15 @@ class ParserRuleSet(object):
     # @param environ used by the upload handlers, to be deprecated
     #
     def _parsed_body_for_request(self, request, environ):
-        """ Parses the contents of the body """
+        # Parses the contents of the body 
 
         if not self._body_template:
-            """ Return none if body_template is not set, this means parsing is to be ignored """
+            # Return none if body_template is not set, this means parsing is to be ignored 
             return None
             
         if not issubclass(self._body_template.__class__, 
                           prestans.types.DataCollection):
-            """ Require body_templates to be a DataCollection, which are Models or Arrays """
+            # Require body_templates to be a DataCollection, which are Models or Arrays 
             raise RequiresDataCollectionException(ERROR_MESSAGE.NOT_COLLECTION % 
                                                   (self._body_template.__class__.__name__))
         
@@ -548,9 +548,9 @@ class ParserRuleSet(object):
 
             if issubclass(self._body_template.__class__, prestans.types.DataCollection):
 
-                """ Raises exception on failure caught by __init__ """
+                # Raises exception on failure caught by __init__ 
                 unserialized_body = request.get_unserialized_body()
-                """ Parsed body should be a model which is set into the Request Handler """
+                # Parsed body should be a model which is set into the Request Handler 
                 parsed_body_model_instance = self._body_template.validate(unserialized_body, 
                                                                           self._request_attribute_filter)
                                 

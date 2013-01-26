@@ -524,11 +524,11 @@ class RESTApplication(object):
     #
     def __call__(self, environ, start_response):
 
-        """ Overriden by the implementing class """
+        # Overriden by the implementing class 
         self._request = self.__class__.make_request(environ)
 
         response = self.__class__.make_response()
-        """ Pass a refer to the request for use with as_serializable """
+        # Pass a refer to the request for use with as_serializable 
         response.set_request(self._request)
 
         request_method = self._request.get_request_method()
@@ -537,7 +537,7 @@ class RESTApplication(object):
         current_request_args = ()
 
         for regexp, handler_class in self._parsed_handler_map:
-            """ 1. Determine if we have a handler for the URL, if not spit out an error message """
+            # 1. Determine if we have a handler for the URL, if not spit out an error message 
 
             match = regexp.match(self._request.path)
             if match:
@@ -548,8 +548,8 @@ class RESTApplication(object):
                 
             
         if not rest_handler or not issubclass(rest_handler.__class__, prestans.handlers.RESTRequestHandler):
-            """  Stop if there isn't a rest handler / 404 Not Found """
-            
+
+            # Stop if there isn't a rest handler / 404 Not Found 
             self._log_error('No valid registered REST handler at this URL')
             
             response.http_status = STATUS.NOT_FOUND
@@ -559,7 +559,7 @@ class RESTApplication(object):
             
         if not request_method in ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']:
             
-            """ For non conformed REST requests, send an Internal server error """ 
+            # For non conformed REST requests, send an Internal server error 
             self._log_error('Not a valid HTTP method for a REST API')
 
             return self._send_response(
@@ -569,7 +569,7 @@ class RESTApplication(object):
         
         if self._allow_status_code_override and rest_handler.__class__.status_code_override is not None:
             
-            """ Overrides the status code, used for testing """
+            # Overrides the status code, used for testing 
             overridden_method = rest_handler.__class__.status_code_override.get_method(request_method)
             
             if overridden_method is not None:
@@ -581,7 +581,7 @@ class RESTApplication(object):
 
         if rest_handler.__class__.throttle_provider is not None:
             
-            """ See if the client is throttled """
+            # See if the client is throttled 
             is_throttled = rest_handler.throttle_provider.is_throttled()
             if is_throttled:
                 return self._send_response(
@@ -591,7 +591,7 @@ class RESTApplication(object):
 
         
         if rest_handler.__class__.request_parser:
-            """ 2. Use the Handler's parser to parse the input """
+            # 2. Use the Handler's parser to parse the input 
             request_parser = rest_handler.__class__.request_parser
             try:
             
@@ -614,27 +614,35 @@ class RESTApplication(object):
                                 
         try:
             
-            """ Allows apps to prep an environment that a handler has access to """
+            # Allows apps to prep an environment that a handler has access to
             rest_handler.handler_will_run()
-            
-            """ 3. Execute appropriate method based on the call type """
-            if request_method == METHOD.GET:
+
+            # Exception for Discover handler
+            if rest_handler.__class__ == prestans.handlers.DiscoveryHandler:
+                # Discovery requires a reference to the handler map
+                rest_handler.parsed_handler_map = self._parsed_handler_map
                 response.http_status = STATUS.OK
-                rest_handler.get(*current_request_args)
-            elif request_method == METHOD.POST:
-                response.http_status = STATUS.CREATED
-                rest_handler.post(*current_request_args)
-            elif request_method == METHOD.PATCH:
-                self.http_status = STATUS.ACCEPTED
-                rest_handler.patch(*current_request_args)
-            elif request_method == METHOD.DELETE:
-                self.http_status = STATUS.NO_CONTENT
-                rest_handler.delete(*current_request_args)
-            elif request_method == METHOD.PUT:
-                self.http_status = STATUS.ACCEPTED
-                rest_handler.put(*current_request_args)
+                # Discovery can only respond to GET and accept regrex input
+                rest_handler.get()
+            else:
+                # 3. Execute appropriate method based on the call type
+                if request_method == METHOD.GET:
+                    response.http_status = STATUS.OK
+                    rest_handler.get(*current_request_args)
+                elif request_method == METHOD.POST:
+                    response.http_status = STATUS.CREATED
+                    rest_handler.post(*current_request_args)
+                elif request_method == METHOD.PATCH:
+                    self.http_status = STATUS.ACCEPTED
+                    rest_handler.patch(*current_request_args)
+                elif request_method == METHOD.DELETE:
+                    self.http_status = STATUS.NO_CONTENT
+                    rest_handler.delete(*current_request_args)
+                elif request_method == METHOD.PUT:
+                    self.http_status = STATUS.ACCEPTED
+                    rest_handler.put(*current_request_args)
                 
-            """ Allows users to clean up after the handler has run """
+            # Allows users to clean up after the handler has run
             rest_handler.handler_did_run()
 
         except (BadRequestException, 
