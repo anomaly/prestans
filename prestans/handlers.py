@@ -44,7 +44,7 @@ class NotImplementedException(Exception):
 
 ## @brief 
 #
-class StatusCodeOverride:
+class StatusCodeOverride(object):
 
     GET     = None
     POST    = None
@@ -59,7 +59,7 @@ class StatusCodeOverride:
             
 ## @brief
 #
-class StatusCodeOverrideMethod:
+class StatusCodeOverrideMethod(object):
 
     ## @brief Constructor
     #
@@ -89,7 +89,8 @@ class StatusCodeOverrideMethod:
 # If you do not implement a method, by default the framework throws an expception.
 #
 class RESTRequestHandler:
-    
+    """ This Request Handler does not provide a human readable definition """
+
     request_parser = None
     auth_context = None
     cache_provider = None
@@ -190,10 +191,6 @@ class RESTRequestHandler:
 ## @brief
 #
 class DiscoveryHandler(RESTRequestHandler):
-
-    ## @brief
-    def __init__(self):
-        pass
 
     ## @brief 
     #

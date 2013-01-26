@@ -538,7 +538,7 @@ class RESTApplication(object):
 
         for regexp, handler_class in self._parsed_handler_map:
             """ 1. Determine if we have a handler for the URL, if not spit out an error message """
-            
+
             match = regexp.match(self._request.path)
             if match:
                 rest_handler = handler_class(request=self._request, 
@@ -547,13 +547,13 @@ class RESTApplication(object):
                 current_request_args = match.groups()
                 
             
-        if not rest_handler:
+        if not rest_handler or not issubclass(rest_handler.__class__, prestans.handlers.RESTRequestHandler):
             """  Stop if there isn't a rest handler / 404 Not Found """
             
-            self._log_error('No registered REST handler at this URL')
+            self._log_error('No valid registered REST handler at this URL')
             
             response.http_status = STATUS.NOT_FOUND
-            response.make_default_response(message="Invalid URL for this API")
+            response.make_default_response(message="Invalid valid URL handler registered for this endpoint")
             start_response(STATUS.as_header_string(response.http_status), response.get_headers())
             return [response.serialized_body()]
             
