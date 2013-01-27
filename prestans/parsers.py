@@ -440,6 +440,27 @@ class ParserRuleSet(object):
         self._request_attribute_filter = request_attribute_filter
         self._response_attribute_filter_start_key = response_attribute_filter_start_key
 
+
+    ## @brief generates a blueprint to add to API discovery
+    #
+    def blueprint(self):
+
+        parser_blueprint = dict()
+
+        # Parameter Sets
+
+        # Incoming Body
+        incoming_payload = None
+        if self._body_template is not None:
+            incoming_payload = self._body_template.blueprint()
+        parser_blueprint['incoming_payload'] = incoming_payload
+
+        # Request Attribute Filter
+
+        # Response Attribute Filter Template
+
+        return parser_blueprint
+
     ## @brief parses serialized URL parameter to construct an attribute filter
     #
     # @param request handle to the original request

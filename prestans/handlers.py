@@ -114,7 +114,7 @@ class RESTRequestHandler:
     ## @brief returns a dictionary of discoverable elements
     def blueprint(self):
         
-        blueprint = dict()
+        handler_blueprint = dict()
 
         signature_map = [ prestans.rest.METHOD.GET, \
         prestans.rest.METHOD.POST, \
@@ -141,17 +141,17 @@ class RESTRequestHandler:
             verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
 
             # See if the request parser has something to say
+            parser_rules = None
             if self.__class__.request_parser is not None and \
             getattr(self.__class__.request_parser, http_verb) is not None:
-                
-                verb_blueprint['parser_rules'] = True
+                parser_rule_set = getattr(self.__class__.request_parser, http_verb)
+                parser_rules = parser_rule_set.blueprint()
 
-            else:
-                verb_blueprint['parser_rules'] = None
+            verb_blueprint['parser_rules'] = parser_rules
 
-            blueprint[http_verb] = verb_blueprint
+            handler_blueprint[http_verb] = verb_blueprint
 
-        return blueprint
+        return handler_blueprint
 
 
     ## @brief Called before the the associated request function is called

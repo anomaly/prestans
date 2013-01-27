@@ -170,6 +170,24 @@ class String(DataType):
         self._choices = choices
         self._utf_encoding = utf_encoding
         
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "string"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['min_length'] = self._min_length
+        constraints['max_length'] = self._max_length
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+        constraints['choices'] = self._choices
+        constraints['utf_encoding'] = self._utf_encoding
+
+        blueprint['constraints'] = constraints
+
+        return blueprint
 
     ## @brief String specific validation rules
     #
@@ -243,6 +261,24 @@ class Float(DataType):
         self._maximum = maximum
         self._required = required
         self._choices = choices
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "float"
+
+        return blueprint
+        
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['minimum'] = self._minimum
+        constraints['maximum'] = self._maximum
+        constraints['required'] = self._required
+        constraints['choices'] = self._choices
+
+        blueprint['constraints'] = constraints
+        return blueprint
         
     ## @brief Float specific validation rules
     #
@@ -307,6 +343,22 @@ class Integer(DataType):
         self._required = required
         self._choices = choices
 
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "int"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['minimum'] = self._minimum
+        constraints['maximum'] = self._maximum
+        constraints['required'] = self._required
+        constraints['choices'] = self._choices
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
     ## @brief Integer specific validation rules
     #
     def validate(self, value):
@@ -357,6 +409,19 @@ class Boolean(DataType):
 
         self._default = default
         self._required = required
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "bool"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+
+        blueprint['constraints'] = constraints
+        return blueprint
     
     ## @brief Boolean specific validation
     #
@@ -418,6 +483,20 @@ class DataURLFile(DataType):
         # Set by validate
         self._mime_type = None
         self._file_contents = None
+
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "data_url_file"
+
+        constraints = dict()
+        constraints['required'] = self._required
+        constraints['allowed_mime_types'] = self._allowed_mime_types
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     ## @brief validates a file upload
     #
@@ -492,7 +571,22 @@ class DateTime(DataStructure):
         self._default = default
         self._required = required
         self._format = format
-        
+
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "datetime"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
     ## @brief DateTime Validator
     #
     def validate(self, value):
@@ -566,6 +660,22 @@ class Array(DataCollection):
         self._max_length = max_length
         
         self._array_elements = []
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "array"
+
+        constraints = dict()
+        # constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['min_length'] = self._min_length
+        constraints['max_length'] = self._max_length
+        constraints['element_template'] = self._element_template.blueprint()
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
 
     ## @brief Setter for element template
@@ -744,7 +854,35 @@ class Model(DataCollection):
         self._default = default
         
         self._create_instance_attributes(kwargs)
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "%s.%s" % (self.__module__, self.__class__.__name__)
+
+        constraints = dict()
+        constraints['required'] = self._required
+        blueprint['constraints'] = constraints
+
+        # Fields
+        fields = dict()
+        model_class_members = inspect.getmembers(self.__class__)
     
+        for attribute_name, type_instance in model_class_members:
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                """ Ignore parameters with __ and if they are methods """
+                continue
+
+            if not issubclass(type_instance.__class__, DataType):
+                """ All attributes in the Model class must be of type DataType """
+                raise DataTypeValidationException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.DataType"))
+
+            fields[attribute_name] = type_instance.blueprint()
+
+        blueprint['fields'] = fields
+        return blueprint    
         
     ## @brief returns a list of managed attributes for the Model class
     #
