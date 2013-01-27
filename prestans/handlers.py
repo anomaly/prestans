@@ -123,15 +123,33 @@ class RESTRequestHandler:
         prestans.rest.METHOD.DELETE ]
 
         # Make a list of methods supported by this handler
-        for name in signature_map:
+        for http_verb in signature_map:
 
-            method_name = name.lower()
+            http_verb_name = http_verb.lower()
+            local_function_handle = getattr(self, http_verb_name).__func__
 
             # Ignore if the local signature is the same as the base method
-            if getattr(self, method_name).__func__ is getattr(RESTRequestHandler, method_name).__func__:
+            if local_function_handle is getattr(RESTRequestHandler, http_verb_name).__func__:
                 continue
 
-            blueprint[name] = "Implemented"
+            verb_blueprint = dict()
+
+            # Docstring
+            verb_blueprint['description'] = inspect.getdoc(local_function_handle)
+            
+            # Arguments, get the first set of parameters for the function handle and ignore echoing self
+            verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
+
+            # See if the request parser has something to say
+            if self.__class__.request_parser is not None and \
+            getattr(self.__class__.request_parser, http_verb) is not None:
+                
+                verb_blueprint['parser_rules'] = True
+
+            else:
+                verb_blueprint['parser_rules'] = None
+
+            blueprint[http_verb] = verb_blueprint
 
         return blueprint
 
@@ -204,7 +222,7 @@ class RESTRequestHandler:
 
 ## @brief
 #
-class DiscoveryHandler(RESTRequestHandler):
+class BlueprintHandler(RESTRequestHandler):
 
     ## @brief 
     #

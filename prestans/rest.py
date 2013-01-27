@@ -618,8 +618,8 @@ class RESTApplication(object):
             # Allows apps to prep an environment that a handler has access to
             rest_handler.handler_will_run()
 
-            # Exception for Discover handler
-            if rest_handler.__class__ == prestans.handlers.DiscoveryHandler:
+            # Exception for Blueprint handler
+            if rest_handler.__class__ == prestans.handlers.BlueprintHandler:
                 # Discovery requires a reference to the handler map
                 rest_handler.handler_map = self._url_handler_map
                 response.http_status = STATUS.OK
