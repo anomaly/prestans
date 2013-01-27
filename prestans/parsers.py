@@ -123,7 +123,41 @@ class ReservedWordException(Exception):
 # while ParserRuleSet is responsible for running the parse mechanism.
 #
 class ParameterSet(object):
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "%s.%s" % (self.__module__, self.__class__.__name__)
+
+        # Fields
+        fields = dict()
+        model_class_members = inspect.getmembers(self.__class__)
     
+        # Inspects the attributes of a parameter set and tries to validate the input 
+        for attribute_name, type_instance in self.__class__.__dict__.iteritems():
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                # Ignore parameters with __ and if they are methods 
+                continue
+
+            if attribute_name == "_response_field_list":
+                # Prestans reserved word cannot be used
+                raise ReservedWordException("_response_field_list")
+
+            if not issubclass(type_instance.__class__, 
+                              prestans.types.String) and not issubclass(type_instance.__class__, 
+                              prestans.types.Float) and not issubclass(type_instance.__class__, 
+                              prestans.types.Integer):
+                
+                # Must be a sub class of DataType 
+                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+
+            fields[attribute_name] = type_instance.blueprint()
+
+        blueprint['fields'] = fields
+        return blueprint
+
     ## @brief validate method for %ParameterSet
     #
     # Since the introduction of ResponseFieldListParser, the parameter _response_field_list 
@@ -448,24 +482,29 @@ class ParserRuleSet(object):
         parser_blueprint = dict()
 
         # Parameter Sets
+        parameter_set_blueprints = []
+        if self._parameter_sets is not None and len(self._parameter_sets) > 0:
+            for parameter_set in self._parameter_sets:
+                parameter_set_blueprints.append(parameter_set.blueprint())
+        parser_blueprint['parameter_sets'] = parameter_set_blueprints
 
         # Incoming Body
-        incoming_payload = None
+        incoming_payload_blueprint = None
         if self._body_template is not None:
-            incoming_payload = self._body_template.blueprint()
-        parser_blueprint['incoming_payload'] = incoming_payload
+            incoming_payload_blueprint = self._body_template.blueprint()
+        parser_blueprint['incoming_payload'] = incoming_payload_blueprint
 
         # Request Attribute Filter
-        request_attr_filter = None
+        request_attr_filter_blueprint = None
         if self._request_attribute_filter is not None:
-            request_attr_filter = self._request_attribute_filter.as_dict()
-        parser_blueprint['request_attr_filter'] = request_attr_filter            
+            request_attr_filter_blueprint = self._request_attribute_filter.as_dict()
+        parser_blueprint['request_attr_filter'] = request_attr_filter_blueprint            
 
         # Response Attribute Filter Template
-        response_attr_filter_template = None
+        response_attr_filter_template_blueprint = None
         if self._response_attribute_filter_template is not None:
-            response_attr_filter_template = self._response_attribute_filter_template.as_dict()
-        parser_blueprint['response_attr_filter_template'] = response_attr_filter_template            
+            response_attr_filter_template_blueprint = self._response_attribute_filter_template.as_dict()
+        parser_blueprint['response_attr_filter_template'] = response_attr_filter_template_blueprint            
 
         return parser_blueprint
 
