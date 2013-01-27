@@ -456,8 +456,16 @@ class ParserRuleSet(object):
         parser_blueprint['incoming_payload'] = incoming_payload
 
         # Request Attribute Filter
+        request_attr_filter = None
+        if self._request_attribute_filter is not None:
+            request_attr_filter = self._request_attribute_filter.as_dict()
+        parser_blueprint['request_attr_filter'] = request_attr_filter            
 
         # Response Attribute Filter Template
+        response_attr_filter_template = None
+        if self._response_attribute_filter_template is not None:
+            response_attr_filter_template = self._response_attribute_filter_template.as_dict()
+        parser_blueprint['response_attr_filter_template'] = response_attr_filter_template            
 
         return parser_blueprint
 
