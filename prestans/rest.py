@@ -498,6 +498,7 @@ class RESTApplication(object):
                  debug=False,
                  allow_status_code_override=False):
 
+        self._url_handler_map = url_handler_map
         self._parsed_handler_map = self._init_url_maps(url_handler_map)
         self._application_name = application_name
         self._debug = debug
@@ -620,7 +621,7 @@ class RESTApplication(object):
             # Exception for Discover handler
             if rest_handler.__class__ == prestans.handlers.DiscoveryHandler:
                 # Discovery requires a reference to the handler map
-                rest_handler.parsed_handler_map = self._parsed_handler_map
+                rest_handler.handler_map = self._url_handler_map
                 response.http_status = STATUS.OK
                 # Discovery can only respond to GET and accept regrex input
                 rest_handler.get()

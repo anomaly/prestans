@@ -32,6 +32,7 @@
 __all__ = ['RESTRequestHandler', 'NotImplementedException']
 
 import prestans.rest
+import inspect
 
 ## @package prestans.handlers Handlers are called once a request has been parsed and verified
 
@@ -111,13 +112,26 @@ class RESTRequestHandler:
         self.debug = debug
 
     ## @brief returns a dictionary of discoverable elements
-    def discover(self):
+    def blueprint(self):
         
         blueprint = dict()
 
-        # Request Parser
+        signature_map = [ prestans.rest.METHOD.GET, \
+        prestans.rest.METHOD.POST, \
+        prestans.rest.METHOD.PUT, \
+        prestans.rest.METHOD.PATCH, \
+        prestans.rest.METHOD.DELETE ]
 
-        # Auth Context
+        # Make a list of methods supported by this handler
+        for name in signature_map:
+
+            method_name = name.lower()
+
+            # Ignore if the local signature is the same as the base method
+            if getattr(self, method_name).__func__ is getattr(RESTRequestHandler, method_name).__func__:
+                continue
+
+            blueprint[name] = "Implemented"
 
         return blueprint
 
@@ -192,7 +206,6 @@ class RESTRequestHandler:
 #
 class DiscoveryHandler(RESTRequestHandler):
 
-
     ## @brief 
     #
     # @param self the object pointer
@@ -202,16 +215,17 @@ class DiscoveryHandler(RESTRequestHandler):
         blueprints = []
 
         # Intterogate each handler
-        for regexp, handler_class in self.parsed_handler_map:
+        for regexp, handler_class in self.handler_map:
 
             # Ignore discovery handler
             if handler_class == self.__class__:
                 continue
 
             handler_blueprint = dict()
-            handler_blueprint['url'] = regexp.pattern
-            handler_blueprint['class'] = "%s.%s" % (handler_class.__module__, handler_class.__name__)
-            handler_blueprint['description'] = handler_class.__doc__
+            handler_blueprint['url'] = regexp
+            handler_blueprint['handler_class'] = "%s.%s" % (handler_class.__module__, handler_class.__name__)
+            handler_blueprint['description'] = inspect.getdoc(handler_class)
+            handler_blueprint['supported_methods'] = handler_class().blueprint()
 
             blueprints.append(handler_blueprint)
 
@@ -219,13 +233,13 @@ class DiscoveryHandler(RESTRequestHandler):
         self.response.set_body_attribute("api", blueprints)
 
     @property
-    def parsed_handler_map(self):
-        return self._parsed_handler_map
+    def handler_map(self):
+        return self._handler_map
 
-    @parsed_handler_map.setter
-    def parsed_handler_map(self, value):
-        self._parsed_handler_map = value
+    @handler_map.setter
+    def handler_map(self, value):
+        self._handler_map = value
 
-    @parsed_handler_map.deleter
-    def parsed_handler_map(self):
-        del self._parsed_handler_map
+    @handler_map.deleter
+    def handler_map(self):
+        del self._handler_map
