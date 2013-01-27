@@ -142,8 +142,10 @@ class RESTRequestHandler:
 
             # See if the request parser has something to say
             parser_rules = None
+
             if self.__class__.request_parser is not None and \
             getattr(self.__class__.request_parser, http_verb) is not None:
+
                 parser_rule_set = getattr(self.__class__.request_parser, http_verb)
                 parser_rules = parser_rule_set.blueprint()
 
