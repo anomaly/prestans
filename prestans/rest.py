@@ -619,7 +619,7 @@ class RESTApplication(object):
             rest_handler.handler_will_run()
 
             # Exception for Blueprint handler
-            if rest_handler.__class__ == prestans.handlers.BlueprintHandler:
+            if issubclass(rest_handler.__class__, prestans.handlers.BlueprintHandler):
                 # Discovery requires a reference to the handler map
                 rest_handler.handler_map = self._url_handler_map
                 response.http_status = STATUS.OK

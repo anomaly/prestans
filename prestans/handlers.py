@@ -222,7 +222,7 @@ class RESTRequestHandler:
         return None
 
 
-## @brief
+## @brief provides a base for creating blueprint handlers
 #
 class BlueprintHandler(RESTRequestHandler):
 
@@ -230,15 +230,15 @@ class BlueprintHandler(RESTRequestHandler):
     #
     # @param self the object pointer
     #
-    def get(self):
+    def create_blueprint(self):
         
-        blueprint_groups = dict()``
+        blueprint_groups = dict()
 
         # Intterogate each handler
         for regexp, handler_class in self.handler_map:
 
             # Ignore discovery handler
-            if handler_class == self.__class__:
+            if issubclass(handler_class, BlueprintHandler):
                 continue
 
             handler_blueprint = dict()
@@ -253,8 +253,7 @@ class BlueprintHandler(RESTRequestHandler):
 
             blueprint_groups[handler_class.__module__].append(handler_blueprint)
 
-        self.response.status_code = prestans.rest.STATUS.OK
-        self.response.set_body_attribute("api", blueprint_groups)
+        return blueprint_groups
 
     @property
     def handler_map(self):
