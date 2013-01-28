@@ -3,7 +3,7 @@
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.googlecode.com
 #
-#  Copyright (c) 2012, Eternity Technologies Pty Ltd.
+#  Copyright (c) 2013, Eternity Technologies Pty Ltd.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without

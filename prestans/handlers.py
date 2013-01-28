@@ -3,7 +3,7 @@
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.googlecode.com
 #
-#  Copyright (c) 2012, Eternity Technologies Pty Ltd.
+#  Copyright (c) 2013, Eternity Technologies Pty Ltd.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -243,7 +243,8 @@ class BlueprintHandler(RESTRequestHandler):
 
             handler_blueprint = dict()
             handler_blueprint['url'] = regexp
-            handler_blueprint['handler_class'] = "%s.%s" % (handler_class.__module__, handler_class.__name__)
+            handler_blueprint['handler_module'] = handler_class.__module__
+            handler_blueprint['handler_class'] = handler_class.__name__
             handler_blueprint['description'] = inspect.getdoc(handler_class)
             handler_blueprint['supported_methods'] = handler_class().blueprint()
 
