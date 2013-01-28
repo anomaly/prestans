@@ -232,7 +232,7 @@ class BlueprintHandler(RESTRequestHandler):
     #
     def get(self):
         
-        blueprints = []
+        blueprint_groups = dict()``
 
         # Intterogate each handler
         for regexp, handler_class in self.handler_map:
@@ -243,15 +243,18 @@ class BlueprintHandler(RESTRequestHandler):
 
             handler_blueprint = dict()
             handler_blueprint['url'] = regexp
-            handler_blueprint['handler_module'] = handler_class.__module__
             handler_blueprint['handler_class'] = handler_class.__name__
             handler_blueprint['description'] = inspect.getdoc(handler_class)
             handler_blueprint['supported_methods'] = handler_class().blueprint()
 
-            blueprints.append(handler_blueprint)
+            # Make a new group per module if one doesnt' exist
+            if not handler_class.__module__ in blueprint_groups:
+                blueprint_groups[handler_class.__module__] = []
+
+            blueprint_groups[handler_class.__module__].append(handler_blueprint)
 
         self.response.status_code = prestans.rest.STATUS.OK
-        self.response.set_body_attribute("api", blueprints)
+        self.response.set_body_attribute("api", blueprint_groups)
 
     @property
     def handler_map(self):
