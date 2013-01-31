@@ -554,7 +554,7 @@ class RESTApplication(object):
             self._log_error('No valid registered REST handler at this URL')
             
             response.http_status = STATUS.NOT_FOUND
-            response.make_default_response(message="Invalid valid URL handler registered for this endpoint")
+            response.make_default_response(message="API does not implement this endpoint")
             start_response(STATUS.as_header_string(response.http_status), response.get_headers())
             return [response.serialized_body()]
             
