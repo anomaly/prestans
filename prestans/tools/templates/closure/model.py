@@ -56,7 +56,7 @@ goog.require('prestans.types.Model');
     dependencies = list()
     additional_args = list()
     for ud, cc, ccif, is_model, is_array, model, required, min_length, max_length, minimum, maximum, choices, format, default in attributes:
-        if is_array and model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime":
+        if is_array and model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime" or model == "Date":
             full_path = "prestans.types."+model
         elif is_array and model == CONSTANT.ARRAY_DYNAMIC_ELEMENT_TEMPLATE:
             additional_args.append(ccif)
@@ -103,7 +103,7 @@ ${namespace}.${name} = function(opt_json) {
         else
             this.${ccif}_ = new ${namespace}.${model}(opt_json["${ud}"]);
     %elif is_array:
-        %if model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime":
+        %if model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime" or model == "Date":
         this.${ccif}_ = new prestans.types.Array(prestans.types.${model}, null, opt_json["${ud}"], ${formatter.integer(max_length)}, ${formatter.integer(min_length)});
         %elif model == CONSTANT.ARRAY_DYNAMIC_ELEMENT_TEMPLATE:
         this.${ccif}_ = new prestans.types.Array(this.elementTemplates_.${ccif}, null, opt_json["${ud}"], ${formatter.integer(max_length)}, ${formatter.integer(min_length)});
@@ -124,6 +124,12 @@ ${namespace}.${name} = function(opt_json) {
         %else:
         this.${ccif}_ = new prestans.types.DateTime(opt_json["${ud}"], ${formatter.boolean(required)}, ${formatter.datetime(default)});
         %endif
+    %elif model == "Date":
+        %if default == CONSTANT.DATE_TODAY:
+        this.${ccif}_ = new prestans.types.Date(opt_json["${ud}"], ${formatter.boolean(required)}, prestans.types.Date.TODAY);
+        %else:
+        this.${ccif}_ = new prestans.types.Date(opt_json["${ud}"], ${formatter.boolean(required)}, ${formatter.date(default)});
+        %endif
     %endif
 %endfor
     }
@@ -132,7 +138,7 @@ ${namespace}.${name} = function(opt_json) {
     %if is_model: 
         this.${ccif}_ = new ${namespace}.${model}();
     %elif is_array:
-        %if model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime":
+        %if model == "String" or model == "Integer" or model == "Float" or model == "Boolean" or model == "DateTime" or model == "Date":
         this.${ccif}_ = new prestans.types.Array(prestans.types.${model}, null, null, ${formatter.integer(max_length)}, ${formatter.integer(min_length)});
         %elif model == CONSTANT.ARRAY_DYNAMIC_ELEMENT_TEMPLATE:
         this.${ccif}_ = new prestans.types.Array(this.elementTemplates_.${ccif}, null, null, ${formatter.integer(max_length)}, ${formatter.integer(min_length)});
@@ -152,6 +158,12 @@ ${namespace}.${name} = function(opt_json) {
         this.${ccif}_ = new prestans.types.DateTime(null, ${formatter.boolean(required)}, prestans.types.DateTime.NOW);
         %else:
         this.${ccif}_ = new prestans.types.DateTime(null, ${formatter.boolean(required)}, ${formatter.datetime(default)});
+        %endif
+    %elif model == "Date":
+        %if default == CONSTANT.DATE_TODAY:
+        this.${ccif}_ = new prestans.types.Date(null, ${formatter.boolean(required)}, prestans.types.Date.TODAY);
+        %else:
+        this.${ccif}_ = new prestans.types.Date(null, ${formatter.boolean(required)}, ${formatter.date(default)});
         %endif
     %endif
 %endfor
@@ -181,7 +193,7 @@ ${namespace}.${name}.prototype.get${cc} = function() {
 ${namespace}.${name}.prototype.set${cc} = function(value) {
 %if is_array:
     var previousArray_ = this.${ccif}_;
-    %if model == "Integer" or model == "String" or model == "Float" or model == "Boolean" or model == "DateTime":
+    %if model == "Integer" or model == "String" or model == "Float" or model == "Boolean" or model == "DateTime" or model == "Date":
     if(value instanceof prestans.types.Array && value.getElementTemplate() == prestans.types.${model}) {
     %elif model == CONSTANT.ARRAY_DYNAMIC_ELEMENT_TEMPLATE:
     if(value instanceof prestans.types.Array && value.getElementTemplate() == this.elementTemplates_.${ccif}) {
@@ -254,7 +266,7 @@ ${namespace}.${name}.prototype.getJSONObject = function(opt_filter) {
             jsonifiedObject_["${ud}"] = this.get${cc}().getJSONObject();
     }
 %elif is_array:
-    %if model == "Integer" or model == "String" or model == "Float" or model == "Boolean" or model == "DateTime":
+    %if model == "Integer" or model == "String" or model == "Float" or model == "Boolean" or model == "DateTime" or model == "Date":
     if(goog.isDef(opt_filter) && opt_filter.get${cc}())
         jsonifiedObject_["${ud}"] = this.get${cc}().getJSONObject(opt_filter.get${cc}());
     else if(!goog.isDef(opt_filter))
@@ -266,6 +278,11 @@ ${namespace}.${name}.prototype.getJSONObject = function(opt_filter) {
         jsonifiedObject_["${ud}"] = this.get${cc}().getJSONObject();
     %endif
 %elif model == "DateTime":
+    if(goog.isDef(opt_filter) && opt_filter.get${cc}())
+        jsonifiedObject_["${ud}"] = this.${ccif}_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["${ud}"] = this.${ccif}_.getJSONObject();
+%elif model == "Date":
     if(goog.isDef(opt_filter) && opt_filter.get${cc}())
         jsonifiedObject_["${ud}"] = this.${ccif}_.getJSONObject();
     else if(!goog.isDef(opt_filter))

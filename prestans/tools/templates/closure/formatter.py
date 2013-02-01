@@ -46,6 +46,12 @@ def datetime(value):
     else:
         return value
 
+def date(value):
+    if value is None:
+        return "null"
+    else:
+        return value
+
 def integer(value):
     if value is None:
         return "null"
