@@ -31,8 +31,10 @@
 
 __all__ = ['RESTRequestHandler', 'NotImplementedException']
 
-import prestans.rest
 import inspect
+import sys
+
+import prestans.rest
 
 ## @package prestans.handlers Handlers are called once a request has been parsed and verified
 
