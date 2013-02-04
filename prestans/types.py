@@ -701,15 +701,15 @@ class Date(DataStructure):
         elif type(value) == str or type(value) == unicode:
             """ If its a string we need to parse it """
             try:
-                final_value = date.strptime(value, self._format)
+                final_value = datetime.strptime(value, self._format).date()
             except ValueError, e:
-                raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "DateTime"))
+                raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "Date"))
         else:
-            raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "DateTime"))
+            raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "Date"))
             
         return final_value
 
-    ## @brief serializes a datetime.datetime object into a String
+    ## @brief serializes a datetime.date object into a String
     #
     def as_serializable(self, value):
 
