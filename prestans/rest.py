@@ -564,6 +564,7 @@ class RESTApplication(object):
             self._log_error('Not a valid HTTP method for a REST API')
 
             return self._send_response(
+                start_response=start_response,
                 error_code=STATUS.INTERNAL_SERVER_ERROR, 
                 message="Requested method is not a valid REST method", 
                 response=response)        
@@ -657,6 +658,7 @@ class RESTApplication(object):
             self._log_error(str(exp))
 
             return self._send_response(
+                start_response = start_response,
                 error_code=exp.STATUS, 
                 message=str(exp), 
                 response=response)
@@ -667,6 +669,7 @@ class RESTApplication(object):
             self._log_error(str(exp))
 
             return self._send_response(
+                start_response = start_response,
                 error_code=STATUS.FORBIDDEN, 
                 message=str(exp), 
                 response=response)
@@ -684,7 +687,7 @@ class RESTApplication(object):
 
     ## @brief Wrapper to create response for error codes
     #
-    def _send_response(self, error_code, message, response):
+    def _send_response(self, start_response, error_code, message, response):
         response.http_status = error_code
         response.make_default_response(message=message)
         start_response(STATUS.as_header_string(response.http_status), response.get_headers())
