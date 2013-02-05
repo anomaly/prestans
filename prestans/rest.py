@@ -610,6 +610,7 @@ class RESTApplication(object):
             
                 self._log_error(str(exp))
                 return self._send_response(
+                    start_response=start_response,
                     error_code=STATUS.BAD_REQUEST, 
                     message=str(exp), 
                     response=response)
