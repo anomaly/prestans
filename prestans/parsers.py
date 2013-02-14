@@ -145,13 +145,22 @@ class ParameterSet(object):
                 # Prestans reserved word cannot be used
                 raise ReservedWordException("_response_field_list")
 
-            if not issubclass(type_instance.__class__, 
-                              prestans.types.String) and not issubclass(type_instance.__class__, 
-                              prestans.types.Float) and not issubclass(type_instance.__class__, 
-                              prestans.types.Integer):
-                
-                # Must be a sub class of DataType 
-                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+            # Must be one of the following types
+            if (
+                    not issubclass(type_instance.__class__, prestans.types.String) and
+                    not issubclass(type_instance.__class__, prestans.types.Float) and
+                    not issubclass(type_instance.__class__, prestans.types.Integer) and
+                    not issubclass(type_instance.__class__, prestans.types.Array)
+                ):
+                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+
+            if issubclass(type_instance.__class__, prestans.types.Array):
+                if (
+                        not issubclass(type_instance._element_template.__class__, prestans.types.String) and
+                        not issubclass(type_instance._element_template.__class__, prestans.types.Float) and
+                        not issubclass(type_instance._element_template.__class__, prestans.types.Integer)
+                    ):
+                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
 
             fields[attribute_name] = type_instance.blueprint()
 
@@ -181,20 +190,32 @@ class ParameterSet(object):
                 # Prestans reserved word cannot be used
                 raise ReservedWordException("_response_field_list")
 
-            if not issubclass(type_instance.__class__, 
-                              prestans.types.String) and not issubclass(type_instance.__class__, 
-                              prestans.types.Float) and not issubclass(type_instance.__class__, 
-                              prestans.types.Integer):
-                
-                # Must be a sub class of DataType 
-                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+            #Must be one of the following types
+            if (
+                    not issubclass(type_instance.__class__, prestans.types.String) and
+                    not issubclass(type_instance.__class__, prestans.types.Float) and
+                    not issubclass(type_instance.__class__, prestans.types.Integer) and
+                    not issubclass(type_instance.__class__, prestans.types.Array)
+                ):
+                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+
+            if issubclass(type_instance.__class__, prestans.types.Array):
+                if (
+                        not issubclass(type_instance._element_template.__class__, prestans.types.String) and
+                        not issubclass(type_instance._element_template.__class__, prestans.types.Float) and
+                        not issubclass(type_instance._element_template.__class__, prestans.types.Integer)
+                    ):
+                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
 
             try:
-                # Get input from parameters, None type returned if nothing provided 
-                validation_input = request.get(attribute_name)
+                # Get input from parameters, None type returned if nothing provided
+                if issubclass(type_instance.__class__, prestans.types.Array):
+                    validation_input = request.get_all(attribute_name)
+                else:
+                    validation_input = request.get(attribute_name)
                 # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
                 validation_result = type_instance.validate(validation_input)
-                # setattr 
+                # setattr
                 setattr(validated_parameter_set, attribute_name, validation_result)
             except prestans.types.DataTypeValidationException, exp:
                 return None
