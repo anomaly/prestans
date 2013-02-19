@@ -1,4 +1,4 @@
 prestans
 ========
 
-prestans server side WSGI framework
+WSGI compatible REST micro-framework
