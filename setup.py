@@ -32,10 +32,21 @@
 from distutils.core import setup
 
 setup(name='prestans',
-      version='1.0',
+      version='1.1',
       description='A WSGI compliant REST micro-framework',
+      long_description='',
+      download_url='',
+      license='New BSD',
+      classifiers=[
+      	'Environment :: Web Environment',
+      	'Intended Audience :: Developers',
+      	'Operating System :: MacOS :: MacOS X',
+      	'Operating System :: POSIX',
+      	'Programming Language :: Python'
+      ],
       author='Devraj Mukherjee, Bradley Mclain',
       author_email='devraj@gmail.com',
-      url='http://prestans.googlecode.com/',
+      url='https://github.com/prestans',
       packages=['prestans',],
+      install_requires=['webob==1.2.3',],
      )
