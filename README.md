@@ -12,7 +12,7 @@ Key features:
 * Support for multiple serialization methods
 * Completely extendable by allowing you to write your own Providers
 * Designed for applications with pure Ajax (e.g Gmail) or native mobile clients
-* Extensive and useful documentation, published on [Github](http://github.com/prestans/prestans-docs, "Docs source") and available on [Read The Docs](http://docs.prestans.org "prestans documentation")
+* Extensive and useful documentation, published on [Github](http://github.com/prestans/prestans-docs/, "Docs source") and available on [Read The Docs](http://docs.prestans.org "prestans documentation")
 
 And incase you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
