@@ -50,6 +50,7 @@ import uuid
 
 from datetime import datetime
 from datetime import date
+from datetime import time
 
 from prestans import ERROR_MESSAGE
 
@@ -58,7 +59,7 @@ import prestans.parsers
 ## @brief Provides a list of constants that types can use
 #
 class CONSTANT:
-    
+    TIME_NOW = 'CONSTANT_TIME_NOW'
     DATETIME_NOW = '129a8b5d-376b-4c70-b535-5c89b1b726fb'
     DATE_TODAY = '879864fa-6bfe-11e2-a3a9-3c07546f5fb6'
     ARRAY_DYNAMIC_ELEMENT_TEMPLATE = 'CONSTANT_ARRAY_DYNAMIC_ELEMENT_TEMPLATE'
@@ -715,6 +716,87 @@ class Date(DataStructure):
 
         if not type(value) == date:
             raise DataTypeValidationException(ERROR_MESSAGE.NOT_TYPE % (value, 'datetime.date'))
+            
+        return value.strftime(self._format)
+
+# @brief wrapper for Python date with format based parsing
+#   
+class Time(DataStructure):
+
+    ## @brief instantiates a Time type or a Meta definition 
+    #
+    #  @param default provides a default value for your type, used if one is not provided
+    #  @param required marks that this field must have a value, also see default
+    #  @param format is the Time Format string, defaults to RFC822
+    # 
+    def __init__(self, 
+                 default=None, 
+                 required=True, 
+                 format="%H:%M:%S"):
+
+        self._default = default
+        self._required = required
+        self._format = format
+
+
+    ## @brief blueprint support, returnsn a partial dictionary
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "time"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
+    ## @brief Time Validator
+    #
+    def validate(self, value):
+
+        final_value = None
+        
+        if self._required and self._default is None and value is None:
+            """ Check conditions for a required parameter """
+            raise DataTypeValidationException(ERROR_MESSAGE.REQUIRED_PARAMETER_MISSING)
+        elif self._required and value is None:
+            """ Check to see if NOW """
+            if self._default == CONSTANT.TIME_NOW:
+                value = time.today()
+            else:
+                value = self._default
+        elif not self._required and self._default is None and value is None:
+            """ Check conditions for a non-required parameter """
+            return final_value
+        elif not self._required and value is None:
+            if self._default == CONSTANT.TIME_NOW:
+                value = time.today()
+            else:
+                value = self._default
+        
+        if type(value) == time:
+            """ If it's a time then pass it through """
+            final_value = value
+        elif type(value) == str or type(value) == unicode:
+            """ If its a string we need to parse it """
+            try:
+                final_value = datetime.strptime(value, self._format).time()
+            except ValueError, e:
+                raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "Time"))
+        else:
+            raise DataTypeValidationException(ERROR_MESSAGE.CANT_PARSE_VALUE % (value, "Time"))
+
+        return final_value
+
+    ## @brief serializes a datetime.time object into a String
+    #
+    def as_serializable(self, value):
+
+        if not type(value) == time:
+            raise DataTypeValidationException(ERROR_MESSAGE.NOT_TYPE % (value, 'datetime.time'))
             
         return value.strftime(self._format)
     
