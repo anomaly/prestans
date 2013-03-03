@@ -694,7 +694,7 @@ class RESTApplication(object):
 
     ## @brief Wrapper to create response for error codes
     #
-    def _send_response(self, start_response, error_code, message, response):
+    def _send_response(self, environ, start_response, error_code, message, response):
         response.http_status = error_code
         response.make_default_response(message=message)
         return response(environ, start_response)
