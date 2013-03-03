@@ -403,7 +403,9 @@ class Response(object):
 
     ## @brief Returns a serialized string that can be sent back to the client
     #
-    def serialized_body(self):
+    def __call__(self, environ, start_response):
+
+        start_response(STATUS.as_header_string(self.http_status), self.get_headers())
         
         serializable_body = None
         if issubclass(self._body.__class__, prestans.types.DataCollection):
@@ -555,8 +557,7 @@ class RESTApplication(object):
             
             response.http_status = STATUS.NOT_FOUND
             response.make_default_response(message="API does not implement this endpoint")
-            start_response(STATUS.as_header_string(response.http_status), response.get_headers())
-            return [response.serialized_body()]
+            return response(environ, start_response)
             
         if not request_method in ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']:
             
@@ -564,6 +565,7 @@ class RESTApplication(object):
             self._log_error('Not a valid HTTP method for a REST API')
 
             return self._send_response(
+                environ=environ,
                 start_response=start_response,
                 error_code=STATUS.INTERNAL_SERVER_ERROR, 
                 message="Requested method is not a valid REST method", 
@@ -577,6 +579,8 @@ class RESTApplication(object):
             if overridden_method is not None:
 
                 return self._send_response(
+                    environ=environ,
+                    start_response=start_response,
                     error_code=overridden_method.get_status_code(), 
                     message="prestans status override mode is currently enabled", 
                     response=response)
@@ -610,6 +614,7 @@ class RESTApplication(object):
             
                 self._log_error(str(exp))
                 return self._send_response(
+                    environ=environ,
                     start_response=start_response,
                     error_code=STATUS.BAD_REQUEST, 
                     message=str(exp), 
@@ -659,7 +664,8 @@ class RESTApplication(object):
             self._log_error(str(exp))
 
             return self._send_response(
-                start_response = start_response,
+                environ=environ,
+                start_response=start_response,
                 error_code=exp.STATUS, 
                 message=str(exp), 
                 response=response)
@@ -670,7 +676,8 @@ class RESTApplication(object):
             self._log_error(str(exp))
 
             return self._send_response(
-                start_response = start_response,
+                environ=environ,
+                start_response=start_response,
                 error_code=STATUS.FORBIDDEN, 
                 message=str(exp), 
                 response=response)
@@ -682,8 +689,7 @@ class RESTApplication(object):
             response.http_status = STATUS.OK
             response.make_default_response(message='REST Handler returned no content')
             
-        start_response(STATUS.as_header_string(response.http_status), response.get_headers())
-        return [response.serialized_body()]
+        return response(environ, start_response)
 
 
     ## @brief Wrapper to create response for error codes
@@ -691,8 +697,7 @@ class RESTApplication(object):
     def _send_response(self, start_response, error_code, message, response):
         response.http_status = error_code
         response.make_default_response(message=message)
-        start_response(STATUS.as_header_string(response.http_status), response.get_headers())
-        return [response.serialized_body()]
+        return response(environ, start_response)
 
 
     ## @brief Processes the regular expressions passed in to the Application and reconstructs the handler map.
