@@ -535,7 +535,7 @@ class ParserRuleSet(object):
     #
     def _parse_attribute_filter(self, request):
 
-        if not self._response_attribute_filter_template:
+        if self._response_attribute_filter_template is None:
             # Not set hence, ignore this part of the parser 
             return None
         
@@ -588,7 +588,8 @@ class ParserRuleSet(object):
     # @param request The request object to validate
     #
     def _parameter_set_for_request(self, request):
-        if not self._parameter_sets:
+
+        if self._parameter_sets is None:
             return None
             
         for parameter_set in self._parameter_sets:
@@ -621,7 +622,7 @@ class ParserRuleSet(object):
     def _parsed_body_for_request(self, request, environ):
         # Parses the contents of the body 
 
-        if not self._body_template:
+        if self._body_template is None:
             # Return none if body_template is not set, this means parsing is to be ignored 
             return None
             
