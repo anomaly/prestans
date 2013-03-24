@@ -694,11 +694,11 @@ class RequestParser(object):
         
         parser_rule_set = self.__class__.__dict__[request_method]
 
-        """ Parse the field filter list """
-        response.attribute_filter = parser_rule_set._parse_attribute_filter(request)
-
-        """ Parse parameters or None if nothing matched """
+        #Parse parameters or None if nothing matched
         request.parameter_set = parser_rule_set._parameter_set_for_request(request)
         
-        """ Parse request body """
+        #Parse request body
         request.parsed_body_model = parser_rule_set._parsed_body_for_request(request, environ)
+
+        #Parse the field filter list
+        response.attribute_filter = parser_rule_set._parse_attribute_filter(request)
