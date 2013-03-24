@@ -12,7 +12,7 @@ Key features:
 * Support for multiple serialization methods
 * Completely extendable by allowing you to write your own Providers
 * Designed for applications with pure Ajax (e.g Gmail) or native mobile clients
-* Extensive and useful documentation, published on [Github](http://github.com/prestans/prestans-docs/, "Docs source") and available on [Read The Docs](http://docs.prestans.org "prestans documentation")
+* Extensive and useful documentation, published on [Github](http://github.com/prestans/prestans-docs/ "Docs source") and available on [Read The Docs](http://docs.prestans.org "prestans documentation")
 
 And incase you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
@@ -21,14 +21,14 @@ Getting Help
 
 We recommend the use of our mailing lists as the primary way of getting help
 
-* [Discuss](http://groups.google.com/group/prestans-discuss, "Discuss") used for general discussion.
-* [Announce](http://groups.google.com/group/prestans-announce, "Announce") used for release and security announcements
+* [Discuss](http://groups.google.com/group/prestans-discuss "Discuss") used for general discussion.
+* [Announce](http://groups.google.com/group/prestans-announce "Announce") used for release and security announcements
 
 
 Reporting Issues
 ----------------
 
-We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/prestans/issues, "Issue Tracker"), to triage feature requests, bug reports.
+We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/prestans/issues "Issue Tracker"), to triage feature requests, bug reports.
 
 Before you lodge a lodge a ticket:
 
@@ -49,7 +49,7 @@ Include as much detail as you can about your environment (e.g Server OS, Web Ser
 About the Authors
 -----------------
 
-prestans was developed by [Devraj Mukherjee](http://twitter.com/mdevraj, "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain, "Brad Mclain on Twitter") while building large scale Web applications at Eternity Technologies. These applications run on a Google's App Engine and servers running Apache + mod_wsgi.
+prestans was developed by [Devraj Mukherjee](http://twitter.com/mdevraj "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain "Brad Mclain on Twitter") while building large scale Web applications at Eternity Technologies. These applications run on a Google's App Engine and servers running Apache + mod_wsgi.
 
 We sometimes have things to say on our Twitter streams and are actively involved on our mailing list.
 
