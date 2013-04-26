@@ -3,7 +3,7 @@
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.googlecode.com
 #
-#  Copyright (c) 2012, Eternity Technologies Pty Ltd.
+#  Copyright (c) 2013, Eternity Technologies Pty Ltd.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 from distutils.core import setup
 
 setup(name='prestans',
-      version='1.1',
+      version='2.0',
       description='A WSGI compliant REST micro-framework',
       long_description='',
       download_url='',
@@ -46,7 +46,7 @@ setup(name='prestans',
       ],
       author='Devraj Mukherjee, Bradley Mclain',
       author_email='devraj@gmail.com',
-      url='https://github.com/prestans',
+      url='https://github.com/prestans/prestans',
       packages=['prestans', 'prestans.ext'],
       install_requires=['webob==1.2.3',],
      )
