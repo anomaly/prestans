@@ -32,16 +32,14 @@ We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/p
 
 Before you lodge a lodge a ticket:
 
-Ensure that you ask a question on our list, there might already be answer out there or we might have already acknowledged the issue
-
+* Ensure that you ask a question on our list, there might already be answer out there or we might have already acknowledged the issue
 * Seek wisdom from our beautifully written documentation
 * Google to see that it’s not something to do with your server environment (versions of Web server, WSGI connectors, etc)
 * Check to ensure that you are not lodging a duplicate request.
 
 When reporting issues:
 
-Include as much detail as you can about your environment (e.g Server OS, Web Server Version, WSGI connector)
-
+* Include as much detail as you can about your environment (e.g Server OS, Web Server Version, WSGI connector)
 * Steps that we can use to replicate the bug
 * Share a bit of your application code with us, it goes a long way to replicate issues
 
