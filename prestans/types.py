@@ -29,25 +29,3 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-from distutils.core import setup
-
-setup(name='prestans',
-      version='2.0',
-      description='A WSGI compliant REST micro-framework',
-      long_description='',
-      download_url='',
-      license='New BSD',
-      classifiers=[
-      	'Environment :: Web Environment',
-      	'Intended Audience :: Developers',
-      	'Operating System :: MacOS :: MacOS X',
-      	'Operating System :: POSIX',
-      	'Programming Language :: Python'
-      ],
-      author='Devraj Mukherjee, Bradley Mclain',
-      author_email='devraj@gmail.com',
-      url='https://github.com/prestans/prestans',
-      packages=['prestans', 'prestans.ext'],
-      install_requires=['webob==1.2.3',],
-     )
