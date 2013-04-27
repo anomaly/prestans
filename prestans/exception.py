@@ -30,6 +30,71 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['types', 'router', 'parsers', 'serializers', 'cache', 'throttle']
+class Base(Exception):
+    pass
 
-version = '2.0'
+class DirectUseNotAllowed(Base):
+    pass
+
+class ParseFailed(Base):
+    pass
+
+class InvalidValue(Base):
+    pass
+
+class LessThanMinimum(Base):
+    pass
+
+class MoreThanMaximum(Base):
+    pass
+
+class InvalidLength(Base):
+    pass
+
+class InvalidType(Base):
+    pass
+
+class InvalidCollection(Base):
+    pass
+
+class MissingParameter(Base):
+    pass
+
+class InvalidFormat(Base):
+    pass
+
+class InvalidMetaValue(Base):
+    pass
+
+class UnregisteredAdapter(Base):
+    pass
+
+
+
+
+class RESTOperation(Exception):
+    """
+    Extends from the Base exception to make available a HTTP status code, these
+    are thrown if an unacceptable REST operation is performed. 
+
+    E.g a client attempts to access data they are not allowed to.
+    """
+    pass
+
+class ServiceUnavailable(RESTOperation):
+    pass
+
+class BadRequest(RESTOperation):
+    pass
+
+class Conflict(RESTOperation):
+    pass
+
+class NotFound(RESTOperation):
+    pass
+
+class Unauthorized(RESTOperation):
+    pass
+
+class Forbidden(RESTOperation):
+    pass

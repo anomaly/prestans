@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.org
@@ -29,3 +29,73 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+class AdapterRegistryManager:
+    """
+
+    """
+
+    def __init__(self):
+        self._persistent_map = dict()
+        self._rest_map = dict()
+
+    def register_adapter(self, model_adapter):
+        
+        if not issubclass(model_adapter.__class__, Adapter):
+            raise Exception(ERROR_MESSAGE.NOT_SUBCLASS % (model_adapter.__class__.__name, 'Adapter'))
+        
+        rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
+        persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
+        
+        """ Store references to how a rest model maps to a persistent model and vice versa """
+        self._persistent_map[persistent_class_signature] = model_adapter
+        self._rest_map[rest_class_signature] = model_adapter
+        
+    def get_adapter_for_persistent_model(self, persistent_model):
+        
+        class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
+        
+        if not self._persistent_map.has_key(class_signature):
+            raise Exception(ERROR_MESSAGE.ADAPTER_NOT_REGISTERED % class_signature)
+        return self._persistent_map[class_signature]
+        
+    def get_adapter_for_rest_model(self, rest_model):
+        
+        class_signature = rest_model.__class__.__module__ + "." + rest_model.__class__.__name__
+        
+        if not self._rest_map.has_key(class_signature):
+            raise Exception(ERROR_MESSAGE.ADAPTER_NOT_REGISTERED % class_signature)
+
+        return self._rest_map[class_signature]
+
+
+class Adapter(object):
+    pass
+    
+class ModelAdapter(Adapter):
+    
+    def __init__(self, rest_model_class, persistent_model_class):
+        self._rest_model_class = rest_model_class
+        self._persistent_model_class = persistent_model_class
+        
+    """ Properties """
+
+    def _get_persistent_model_class(self):
+        return self._persistent_model_class
+        
+    persistent_model_class = property(_get_persistent_model_class)
+    
+    def _get_rest_model_class(self):
+        return self._rest_model_class
+        
+    rest_model_class = property(_get_rest_model_class)
+    
+    """ The following methods are stubs, these should be implemented for the specific backends """
+    
+    ## @brief adapts a persistent model to a rest model by inspecting
+    #
+    def adapt_persistent_to_rest(self, persistent_object):
+        raise Exception(ERROR_MESSAGE.NO_DIRECT_USE % ('ModelAdapter'))
+
+
+registry = AdapterRegistryManager()

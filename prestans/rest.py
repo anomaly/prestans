@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.org
@@ -29,3 +29,49 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+import webob
+
+class Request(webob.Request):
+    """
+
+    """
+    pass
+
+class Response(webob.Response):
+    """
+
+    """
+    pass
+
+class RequestHandler(object):
+    """
+    """
+
+    def __init__(self, request=None, response=None, debug=False):
+
+        self.request = request
+        self.response = response
+        self.debug = debug
+
+    def __call__(environ, start_response):
+        pass
+
+    def get(self, *args):
+        pass
+
+    def post(self, *args):
+        pass
+
+    def put(self, *args):
+        pass
+
+    def patch(self, *args):
+        pass
+
+    def delete(self, *args):
+        pass
+
+
+class BlueprintHandler(RequestHandler):
+    pass

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  prestans, a standards based WSGI compliant REST framework for Python
 #  http://prestans.org
