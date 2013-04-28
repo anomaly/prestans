@@ -30,6 +30,6 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['types', 'router', 'parsers', 'serializers', 'cache', 'throttle']
+__all__ = ['types', 'rest', 'parsers', 'serializers', 'cache', 'throttle']
 
 version = '2.0'

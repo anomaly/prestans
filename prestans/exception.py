@@ -30,6 +30,16 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+
+#:
+#: The following Exceptions are used internally by the prestans framework to indicate
+#: parsing, and implemtnation errors.
+#:
+#: Some of them do not produce an error mesasge for the client, instead they write to
+#: the log and terminate the REST application. Those exceptions that terminate the
+#: application should never be shipped.
+#:
+
 class Base(Exception):
     pass
 
@@ -69,8 +79,15 @@ class InvalidMetaValue(Base):
 class UnregisteredAdapter(Base):
     pass
 
+class NotImplemented(Base):
+    pass
 
 
+#:
+#: The following excepetions are used by REST handlers to indicate commonly defined
+#: scenarios when dealing with data. BaseHandler traps these and generates an appropriate
+#: error message for the end user.
+#:
 
 class RESTOperation(Exception):
     """

@@ -31,6 +31,12 @@
 #
 
 import webob
+from .exception import *
+
+#:
+#: Wrappers around Request and Response to handle HTTP requests, these depend on
+#: serializers to write read and write responses
+#:
 
 class Request(webob.Request):
     """
@@ -44,6 +50,31 @@ class Response(webob.Response):
     """
     pass
 
+#:
+#: Router infrastructure code to dispatch requests
+#:
+
+class RequestRouter(object):
+    """
+    Routes
+    """
+
+    def __init__(self, route_map, application_name="prestans", debug=False):
+        pass
+
+    def add_route(self, route, handler_class):
+        pass
+
+    def __call__(self, environ, start_response):
+        pass
+
+#:
+#: RESTHandler defines specific end points, developers subclass this to
+#: implement their end points.
+#:
+#: Also contains Blueprint handler
+#:
+
 class RequestHandler(object):
     """
     """
@@ -54,8 +85,19 @@ class RequestHandler(object):
         self.response = response
         self.debug = debug
 
-    def __call__(environ, start_response):
+    def __call__(self, environ, start_response):
         pass
+
+
+    def handler_will_run(self):
+        """
+        """
+        return None
+
+    def handler_did_run(self):
+        """
+        """
+        return None
 
     def get(self, *args):
         pass
