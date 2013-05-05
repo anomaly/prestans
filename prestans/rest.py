@@ -31,6 +31,8 @@
 #
 
 import webob
+import re
+
 from .exception import *
 
 #:
@@ -59,8 +61,17 @@ class RequestRouter(object):
     Routes
     """
 
-    def __init__(self, route_map, application_name="prestans", debug=False):
-        pass
+    def __init__(self, route_map, serializers, application_name="prestans", debug=False):
+
+        #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
+        self._route_re = re.compile(r"""
+                \<               # The exact character "<"
+                ([a-zA-Z_]\w*)?  # The optional variable name
+                (?:\:([^\>]*))?  # The optional :regex part
+                \>               # The exact character ">"
+                """, re.VERBOSE)
+
+
 
     def add_route(self, route, handler_class):
         pass

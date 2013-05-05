@@ -29,3 +29,90 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+__all__ = [
+    'ParameterSet', 
+    'ParserRuleSet', 
+    'RequestParser', 
+    'NotParserRuleSetObjectException', 
+    'NotParameterSetObjectException']
+
+import inspect
+import string
+
+import .exceptions
+
+#:
+#:
+#:
+
+class ParameterSet(object):
+    pass
+
+
+#:
+#:
+#:
+
+class AttributeFilter(object):
+    pass
+
+#:
+#:
+#:
+
+class ParserRuleSet(object):
+    pass
+
+#:
+#:
+#:
+
+class RequestParser(object):
+    
+    GET     = None
+    POST    = None
+    PUT     = None
+    PATCH   = None
+    DELETE  = None
+
+    def parse(self, request, response, environ):
+        """
+        If the implementing request parser does not specify a parser for a method, None is returned, 
+        this completely bypasses the parsing process.
+        
+        The implementing request parser must assign an instance of %ParserRuleSet for each HTTP method.
+        
+        RequestParser will attempt use those rules to parse the input and assign them to the passed in
+        request object. It returns True or False.
+
+        self The object pointer
+        response object
+        request The request to parse
+
+        """
+        
+        request_method = request.get_request_method()
+
+        if not self.__class__.__dict__.has_key(request_method) or self.__class__.__dict__[request_method] is None:
+            """ 
+            Default rule set is None, ignores parsing for Pameters and Body 
+            """
+            return
+        
+        if not isinstance(self.__class__.__dict__[request_method], ParserRuleSet):
+            """ 
+            Handles the developer not assinging an object of type ParserRuleSet 
+            """
+            raise NotParserRuleSetObjectException(request_method + " does not have a valid ParserRuleSet")
+        
+        parser_rule_set = self.__class__.__dict__[request_method]
+
+        #: Parse parameters or None if nothing matched
+        request.parameter_set = parser_rule_set._parameter_set_for_request(request)
+        
+        #: Parse request body
+        request.parsed_body_model = parser_rule_set._parsed_body_for_request(request, environ)
+
+        #: Parse the field filter list
+        response.attribute_filter = parser_rule_set._parse_attribute_filter(request)

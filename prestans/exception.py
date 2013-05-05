@@ -84,6 +84,43 @@ class NotImplemented(Base):
 
 
 #:
+#: Parser Exception
+#:
+
+class NotParserRuleSet(Exception):
+    pass
+
+class NotParameterSet(Exception):
+    pass
+
+class NoSetMatched(Exception):
+    pass
+
+class InvalidParameterSetAttribute(Exception):
+    pass
+
+class InvalidDataType(Exception):
+    pass
+
+class RequiresDataCollection(Exception):
+    pass
+
+class RequiresModel(Exception):
+    pass
+
+class BodyTemplateParse(Exception):
+    pass
+
+class EmptyBody(Exception):
+    pass
+
+#:
+#: Raised if a prestans reserved word is used in configuring an app level class.
+#:
+class ReservedWord(Exception):
+    pass
+
+#:
 #: The following excepetions are used by REST handlers to indicate commonly defined
 #: scenarios when dealing with data. BaseHandler traps these and generates an appropriate
 #: error message for the end user.

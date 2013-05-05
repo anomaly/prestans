@@ -32,4 +32,5 @@
 
 __all__ = ['types', 'rest', 'parsers', 'serializers', 'cache', 'throttle']
 
-version = '2.0'
+__version_info__ = (2, 0)
+__version__ = '.'.join(str(v) for v in __version_info__)
