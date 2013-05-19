@@ -30,6 +30,16 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#:
+#: Raised if a prestans reserved word is used in configuring an app level class.
+#:
+class ReservedWord(Exception):
+
+    def __init__(self, word):
+        self._word = word
+
+    def __str__(self):
+        return ""
 
 #:
 #: The following Exceptions are used internally by the prestans framework to indicate
@@ -41,7 +51,14 @@
 #:
 
 class Base(Exception):
-    pass
+    """
+
+    """
+    def __init__(self, message, Errors):
+
+        Exception.__init__(self, message)
+        self.Errors = Errors
+
 
 class DirectUseNotAllowed(Base):
     pass
@@ -83,6 +100,9 @@ class NotImplemented(Base):
     pass
 
 
+class SerializationFailed(Base):
+    pass
+
 #:
 #: Parser Exception
 #:
@@ -114,11 +134,6 @@ class BodyTemplateParse(Exception):
 class EmptyBody(Exception):
     pass
 
-#:
-#: Raised if a prestans reserved word is used in configuring an app level class.
-#:
-class ReservedWord(Exception):
-    pass
 
 #:
 #: The following excepetions are used by REST handlers to indicate commonly defined

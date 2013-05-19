@@ -77,7 +77,12 @@ class RequestRouter(object):
         pass
 
     def __call__(self, environ, start_response):
-        pass
+        
+        #: Check if the requested URL has a valid registered handler
+
+        #: Run a request parser        
+
+        return
 
 #:
 #: RESTHandler defines specific end points, developers subclass this to
@@ -92,12 +97,15 @@ class RequestHandler(object):
 
     def __init__(self, request=None, response=None, debug=False):
 
-        self.request = request
-        self.response = response
-        self.debug = debug
+        self._request = request
+        self._response = response
+        self._debug = debug
 
     def __call__(self, environ, start_response):
-        pass
+
+
+
+        return self._response(environ, start_response)
 
 
     def handler_will_run(self):

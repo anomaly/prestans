@@ -32,7 +32,6 @@
 #
 
 import inspect
-import exceptions
 import copy
 import re
 import os
@@ -43,64 +42,43 @@ from datetime import datetime
 from datetime import date
 from datetime import time
 
-import .parsers
+import prestans.parsers
+import prestans.exceptions
 
 
-## @brief DataType is the base type definied in the prestans model chain
-#
 class DataType(object):
+    """
+
+    """
     
-    ## @brief Base validate method, must be overridden by all implementing types
-    #
-    # @throws DataTypeValidationException string representation includes validation failure reason
-    #
-    # @param self The object pointer
-    # @param value The value to validate
-    #
     def validate(self, value):
-        raise DataTypeValidationException(ERROR_MESSAGE.NO_DIRECT_USE % "prestans.types.DataType")
+        """
+            
+        """
+        raise exceptions.DirectUserNotAllowed("prestans.types.DataStructure")
 
-## @brief Wrappers on Python types generally represented as structures e.g DateTime
-#
-#  as_serializable methods signature for %DataStructure is different to that of DataCollection
-#  it requires a value to be passed in, this is because the python type of structures is 
-#  difference to what gets serialized.
-#
-#  E.g DateTime serializes itself as a ISO string
-#
 class DataStructure(DataType):
-    
-    ## @brief serializes values based on the rules
-    #
-    def as_serializable(self, value):
-        raise DataTypeValidationException(ERROR_MESSAGE.NO_DIRECT_USE % "prestans.types.DataStructure")
+    """
+    Wrappers on Python types generally represented as structures e.g DateTime
 
-## @brief represents a Type that has attributes in it like Arrays and Models
-#    
+    as_serializable methods signature for %DataStructure is different to that of DataCollection
+    it requires a value to be passed in, this is because the python type of structures is 
+    difference to what gets serialized.
+
+    E.g DateTime serializes itself as a ISO string
+    """
+    
+    def as_serializable(self, value):
+        raise prestans.exceptions.DirectUserNotAllowed("prestans.types.DataStructure")
+
 class DataCollection(DataType):
 
-    ## @brief Base validate method, must be overridden by all implementing types
-    #
-    # @throws DataTypeValidationException string representation includes validation failure reason
-    #
-    # @param self The object pointer
-    # @param value The value to validate
-    # @param attribute_filter attribute filter to use while 
-    #
     def validate(self, value, attribute_filter=None):
-        raise DataTypeValidationException(ERROR_MESSAGE.NO_DIRECT_USE % "prestans.types.DataType")
+        raise prestans.exceptions.DirectUserNotAllowed("prestans.types.DataCollection")
 
-    ## @brief serializes values based on the rules
-    #
-    # DataCollection serializers should accept 
-    #
     def as_serializable(self, attribute_filter=None):
-        raise DataTypeValidationException(ERROR_MESSAGE.NO_DIRECT_USE % "prestans.types.DataCollection")
+        raise prestans.exceptions.DirectUserNotAllowed("prestans.types.DataCollection")
 
-    ## @brief returns an AttributeFilter representation of an instance
-    #
     def get_attribute_filter(self):
-        raise DataTypeValidationException(ERROR_MESSAGE.NO_DIRECT_USE % "prestans.types.DataCollection")
-
-
-     
+        raise prestans.exceptions.DirectUserNotAllowed("prestans.types.DataCollection")
+        

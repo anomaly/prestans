@@ -40,7 +40,7 @@ __all__ = [
 import inspect
 import string
 
-import .exceptions
+import prestans.exceptions
 
 #:
 #:
