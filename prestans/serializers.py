@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import .exceptions
+import prestans.exceptions
 
 class Serializer(object):
     """
@@ -47,19 +47,20 @@ class Serializer(object):
         """
 
         """
-        raise exceptions.DirectUseNotAllowed()
+        raise prestans.exceptions.DirectUserNotAllowed("loads", self.__class__.__name__)
 
     def dumps(self, serialzable_object):
         """
 
         """
-        raise exceptions.DirectUseNotAllowed()
+        raise prestans.xceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
 
     def content_type(self):
         """
         Returns the content type for the serializer
         """
-        return exceptions.DirectUseNotAllowed()
+        raise prestans.exceptions.DirectUserNotAllowed("content_type", self.__class__.__name__)
+
 
 class JSON(Serializer):
     """
@@ -83,7 +84,7 @@ class JSON(Serializer):
         try:
             parsed_json = json.loads(input_string)
         except Exception, exp:
-            raise exceptions.SerializationFailed('JSON')
+            raise prestans.exceptions.SerializationFailed('JSON')
             
         return parsed_json
         

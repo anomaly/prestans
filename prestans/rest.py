@@ -33,7 +33,7 @@
 import webob
 import re
 
-from .exception import *
+import prestans.exceptions
 
 #:
 #: Wrappers around Request and Response to handle HTTP requests, these depend on
@@ -95,11 +95,12 @@ class RequestHandler(object):
     """
     """
 
-    def __init__(self, request=None, response=None, debug=False):
+    def __init__(self, request=None, response=None, serializers=None, debug=False):
 
         self._request = request
         self._response = response
         self._debug = debug
+        self._serializers = serializers
 
     def __call__(self, environ, start_response):
 
@@ -133,6 +134,12 @@ class RequestHandler(object):
     def delete(self, *args):
         pass
 
+#:
+#:
+#:
+#:
+#:
+#:
 
 class BlueprintHandler(RequestHandler):
     pass
