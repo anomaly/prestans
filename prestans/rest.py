@@ -95,7 +95,7 @@ class RequestHandler(object):
     """
     """
 
-    def __init__(self, request=None, response=None, serializers=None, debug=False):
+    def __init__(self, request=None, response=None, incoming_serializers, outgoing_serializers, debug=False):
 
         self._request = request
         self._response = response
