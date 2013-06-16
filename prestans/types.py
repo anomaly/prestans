@@ -140,7 +140,7 @@ class String(DataType):
             raise prestans.exceptions.InvalidChoice(value, self._choices)
             
         if self._format is not None and re.search(self._format, _validated_value) is None:
-            raise prestans.exceptions.InvalidValue(_validated_value)
+            raise prestans.exceptions.InvalidFormat(_validated_value)
         
         return _validated_value
 
@@ -559,7 +559,7 @@ class Array(DataCollection):
                                      max_length=self._max_length)
         
         if not isinstance(value, (list, tuple)):
-            raise DataTypeValidationException(ERROR_MESSAGE.NOT_ITERABLE)
+            raise prestans.exceptions.InvalidCollection(value)
             
         for array_element in value:
     
@@ -673,34 +673,6 @@ class Model(DataCollection):
         raise KeyError("No key named %s; in instance of type %s " % (key, self.__class__.__name__))
 
     #:
-    #: Returns a list of managed attributes for the Model class
-    #:
-    #: Implemented for use with data adapters, can be used to quickly make a list of the 
-    #: attribute names in a prestans model
-    #:
-    def get_attribute_keys(self):
-
-        _attribute_keys = list()
-        
-        model_class_members = inspect.getmembers(self.__class__)
-        
-        for attribute_name, type_instance in model_class_members:
-            
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
-            
-            if issubclass(type_instance.__class__, DataType):
-                _attribute_keys.append(attribute_name)
-            
-        return _attribute_keys
-
-    def get_attribute_filter(self, default_value=False):
-        pass
-
-    def validate(self, value):
-        pass
-
-    #:
     #: Copies class level attribute templates and makes instance placeholders
     #:
     #: This step is required for direct uses of Model classes. This creates a copy of attribute_names
@@ -727,6 +699,7 @@ class Model(DataCollection):
                 continue
                 
             if issubclass(type_instance.__class__, DataType):
+                
                 try:
                     value = None
                     
@@ -737,6 +710,115 @@ class Model(DataCollection):
 
                 except DataTypeValidationException:
                     self.__dict__[attribute_name] = None
+
+    #:
+    #: Returns a list of managed attributes for the Model class
+    #:
+    #: Implemented for use with data adapters, can be used to quickly make a list of the 
+    #: attribute names in a prestans model
+    #:
+    def get_attribute_keys(self):
+
+        _attribute_keys = list()
+        
+        model_class_members = inspect.getmembers(self.__class__)
+        
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+            
+            if issubclass(type_instance.__class__, DataType):
+                _attribute_keys.append(attribute_name)
+            
+        return _attribute_keys
+
+    def get_attribute_filter(self, default_value=False):
+        pass
+
+    def validate(self, value, attribute_filter=None):
+        
+        if self._required and (value is None or not isinstance(value, dict)):
+            raise prestans.exceptions.RequiredAttribute()
+            
+        if not value and self._default:
+            return self._default
+            
+        if not self._required and not value:
+            return None
+            
+        _model_instance = self.__class__()
+        _model_class_members = inspect.getmembers(self.__class__)
+    
+        for attribute_name, type_instance in _model_class_members:
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if attribute_filter and not attribute_filter.is_attribute_visible(attribute_name):
+                _model_instance.__dict__[attribute_name] = None
+                continue
+
+            if not issubclass(type_instance.__class__, DataType):
+                raise prestans.exceptions.InvalidDataType(attribute_name, "prestans.types.DataType")
+
+            validation_input = None
+            
+            if value.has_key(attribute_name):
+                validation_input = value[attribute_name]
+                
+            try:
+                
+                if issubclass(type_instance.__class__, DataCollection):
+                    sub_attribute_filter = None
+                    if attribute_filter and attribute_filter.has_key(attribute_name):
+                        sub_attribute_filter = getattr(attribute_filter, attribute_name)
+                        
+                    validated_object = type_instance.validate(validation_input, sub_attribute_filter)
+                else:
+                    validated_object = type_instance.validate(validation_input)
+                
+                _model_instance.__dict__[attribute_name] = validated_object
+                    
+            except DataTypeValidationException, exp:
+                raise DataTypeValidationException('Attribute %s, %s' % (attribute_name, str(exp)))
+
+        return _model_instance
+
+    def as_serializable(self, attribute_filter=None):
+        
+        model_dictionary = dict()
+        model_class_members = inspect.getmembers(self.__class__)
+
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if isinstance(attribute_filter, prestans.parsers.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
+                continue
+
+            if not self.__dict__.has_key(attribute_name) or self.__dict__[attribute_name] is None:
+                model_dictionary[attribute_name] = None
+                continue
+
+            if issubclass(type_instance.__class__, DataCollection):
+
+                sub_attribute_filter = None
+                if isinstance(attribute_filter, prestans.parsers.AttributeFilter) and attribute_filter.has_key(attribute_name):
+                    sub_attribute_filter = getattr(attribute_filter, attribute_name)
+
+                model_dictionary[attribute_name] = self.__dict__[attribute_name].as_serializable(sub_attribute_filter)
+
+            elif issubclass(type_instance.__class__, DataStructure):
+                python_value = self.__dict__[attribute_name]
+                serializable_value = type_instance.as_serializable(python_value)
+                model_dictionary[attribute_name] = serializable_value
+
+            else:
+                model_dictionary[attribute_name] = self.__dict__[attribute_name]
+        
+
 
 
 

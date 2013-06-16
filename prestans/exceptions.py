@@ -77,7 +77,9 @@ class InvalidParameterSetAttribute(Configuration):
     pass
 
 class InvalidDataType(Configuration):
-    pass    
+    
+    def __init__(self, attribute_name, expected_type):
+        pass
 
 class RequiresDataCollection(Configuration):
     pass
@@ -129,13 +131,17 @@ class InvalidType(DataValidation):
         pass
 
 class InvalidCollection(DataValidation):
-    pass
+
+    def __init__(self, value):
+        pass
 
 class MissingParameter(DataValidation):
     pass
 
 class InvalidFormat(DataValidation):
-    pass
+    
+    class __init__(self, value):
+        pass
 
 class InvalidMetaValue(DataValidation):
     pass

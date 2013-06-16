@@ -1,6 +1,6 @@
 ## prestans 2.0
 
-A WSGI compliant REST micro-framework
+A WSGI compliant REST micro-framework.
 Official documentation at http://docs.prestans.org/en/2.0
 
 prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. It's mainly aimed towards developers building serious REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
