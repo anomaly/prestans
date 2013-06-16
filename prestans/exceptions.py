@@ -77,7 +77,7 @@ class InvalidParameterSetAttribute(Configuration):
     pass
 
 class InvalidDataType(Configuration):
-    pass
+    pass    
 
 class RequiresDataCollection(Configuration):
     pass

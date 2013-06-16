@@ -349,7 +349,18 @@ class DataURLFile(DataType):
 #:
 
 class DateTime(DataStructure):
-    pass
+    """
+    Default format is the Date Time Format string, defaults to RFC822
+    """
+
+    def __init__(self, 
+                 default=None, 
+                 required=True, 
+                 format="%Y-%m-%d %H:%M:%S"):
+
+        self._default = default
+        self._required = required
+        self._format = format
 
 class Date(DataStructure):
     pass
@@ -362,7 +373,132 @@ class Time(DataStructure):
 #:
 
 class Array(DataCollection):
-    pass
+    
+    def __init__(self, 
+                 default=None, 
+                 required=True, 
+                 element_template=None, 
+                 min_length=None, 
+                 max_length=None):
+        
+        self._default = default
+        self._required = required
+        self._element_template = element_template
+        self._min_length = min_length
+        self._max_length = max_length
+        
+        self._array_elements = []
+
+    @property
+    def element_template(self):
+        return self._element_template
+
+    @element_template.setter
+    def element_template(self, value):
+        self._element_template = value
+
+    def remove(self, value):
+        self._array_elements.remove(value)
+    
+    def __len__(self):
+        return len(self._array_elements)
+        
+    def __iter__(self):
+        #: With a little help from 
+        #: http://johnmc.co/llum/the-easiest-way-to-implement-__iter__-for-a-python-object/
+        for element in self._array_elements:
+            yield element
+
+    def __getitem__(self, index):
+        return self._array_elements[index]
+
+    def validate(self, value, attribute_filter=None):
+        
+        if not self._required and not value:
+            return None
+
+        _validated_value = self.__class__(element_template=self._element_template, 
+                                     min_length=self._min_length, 
+                                     max_length=self._max_length)
+        
+        if not isinstance(value, (list, tuple)):
+            raise DataTypeValidationException(ERROR_MESSAGE.NOT_ITERABLE)
+            
+        for array_element in value:
+    
+            if issubclass(self._element_template.__class__, DataCollection):
+                validated_array_element = self._element_template.validate(array_element, attribute_filter)
+            else:
+                validated_array_element = self._element_template.validate(array_element)
+    
+            _validated_value.append(validated_array_element)
+    
+        if self._min_length is not None and len(_validated_value) < self._min_length:
+            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+
+        if self._max_length is not None and len(_validated_value) > self._max_length:
+            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+
+        return _validated_value
+    
+    def append(self, value):
+        
+        if isinstance(value, (list, tuple)):
+
+            for element in value:
+                self.append(element)
+            return
+        
+        if isinstance(self._element_template.__class__, String.__class__) and \
+        isinstance(value, str):
+            value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template.__class__, String.__class__) and \
+        isinstance(value, unicode):
+            value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template.__class__, Integer.__class__) and \
+        isinstance(value, int):
+            value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template.__class__, Float.__class__) and \
+        isinstance(value, float):
+            value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template.__class__, Boolean.__class__) and \
+        isinstance(value, bool):
+            value = self._element_template.__class__().validate(value)
+        elif not isinstance(value, self._element_template.__class__):
+            raise TypeError("prestans array elements must be of type %s; given %s"
+                            (self._element_template.__class__.__name__, value.__class__.__name__))
+        
+        self._array_elements.append(value)
+            
+    def as_serializable(self, attribute_filter=None):
+        
+        _result_array = list()
+            
+        for array_element in self._array_elements:
+        
+            if isinstance(array_element, str) or \
+            isinstance(array_element, unicode) or \
+            isinstance(array_element, float) or \
+            isinstance(array_element, int) or \
+            isinstance(array_element, bool):
+
+                _result_array.append(array_element)
+            else:
+                _result_array.append(array_element.as_serializable(attribute_filter))
+        
+        return _result_array
+        
+    def get_attribute_filter(self, default_value=False):
+
+        attribute_filter = None
+
+        if issubclass(self._element_template.__class__, DataCollection):
+            attribute_filter = self._element_template.get_attribute_filter(default_value)
+        elif issubclass(self._element_template.__class__, DataType) or \
+            issubclass(self._element_template.__class__, DataStructure):
+            attribute_filter = default_value
+
+        return attribute_filter
 
 #:
 #: Models
