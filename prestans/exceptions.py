@@ -54,7 +54,9 @@ class Configuration(Base):
     pass
 
 class DataValidation(Base):
-    pass
+    
+    def __init__(self, message):
+        pass
 
 
 #:

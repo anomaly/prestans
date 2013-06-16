@@ -734,7 +734,22 @@ class Model(DataCollection):
         return _attribute_keys
 
     def get_attribute_filter(self, default_value=False):
-        pass
+
+        attribute_filter = prestans.parsers.AttributeFilter()
+
+        _model_class_members = inspect.getmembers(self.__class__)
+
+        for attribute_name, type_instance in _model_class_members:
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if issubclass(type_instance.__class__, DataCollection):
+                setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
+            else:
+                setattr(attribute_filter, attribute_name, default_value)
+
+        return attribute_filter
 
     def validate(self, value, attribute_filter=None):
         
@@ -760,7 +775,7 @@ class Model(DataCollection):
                 continue
 
             if not issubclass(type_instance.__class__, DataType):
-                raise prestans.exceptions.InvalidDataType(attribute_name, "prestans.types.DataType")
+                raise prestans.exceptions.InvalidDataType(attribute_name, "DataType")
 
             validation_input = None
             
@@ -780,8 +795,9 @@ class Model(DataCollection):
                 
                 _model_instance.__dict__[attribute_name] = validated_object
                     
-            except DataTypeValidationException, exp:
-                raise DataTypeValidationException('Attribute %s, %s' % (attribute_name, str(exp)))
+            except prestans.exceptions.DataValidation, exp:
+                #: @todo revise this
+                raise prestans.exceptions.DataValidation('%s, %s' % (attribute_name, str(exp)))
 
         return _model_instance
 
@@ -818,7 +834,3 @@ class Model(DataCollection):
             else:
                 model_dictionary[attribute_name] = self.__dict__[attribute_name]
         
-
-
-
-
