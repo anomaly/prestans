@@ -346,12 +346,13 @@ class DataURLFile(DataType):
 
 #:
 #: DataStructures
+#: Default format is the Date Time Format string, defaults to RFC822
 #:
 
 class DateTime(DataStructure):
-    """
-    Default format is the Date Time Format string, defaults to RFC822
-    """
+
+    class CONSTANT:
+        NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
 
     def __init__(self, 
                  default=None, 
@@ -362,11 +363,147 @@ class DateTime(DataStructure):
         self._required = required
         self._format = format
 
+    def validate(self, value):
+
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            if self._default == DateTime.CONSTANT.NOW:
+                value = datetime.now()
+            else:
+                value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            if self._default == DateTime.CONSTANT.NOW:
+                value = datetime.now()
+            else:
+                value = self._default
+        
+        if type(value) == datetime:
+            _validated_value = value
+        elif type(value) == str or type(value) == unicode:
+            try:
+                _validated_value = datetime.strptime(value, self._format)
+            except ValueError, exp:
+                raise prestans.exceptions.ParseFailed(value, 'DateTime')
+        else:
+            raise prestans.exceptions.ParseFailed(value, 'DateTime')
+            
+        return _validated_value
+
+    def as_serializable(self, value):
+
+        if not type(value) == datetime:
+            raise prestans.exceptions.InvalidType(value, 'datetime.datetime')
+            
+        return value.strftime(self._format)
+
 class Date(DataStructure):
-    pass
+
+    class CONSTANT:
+        TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
+    
+    def __init__(self, 
+                 default=None, 
+                 required=True, 
+                 format="%Y-%m-%d"):
+
+        self._default = default
+        self._required = required
+        self._format = format
+
+     def validate(self, value):
+        
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            if self._default == Date.CONSTANT.TODAY:
+                value = date.today()
+            else:
+                value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            if self._default == Date.CONSTANT.TODAY:
+                value = date.today()
+            else:
+                value = self._default
+        
+        if type(value) == date:
+            _validated_value = value
+        elif type(value) == str or type(value) == unicode:
+            try:
+                _validated_value = datetime.strptime(value, self._format).date()
+            except ValueError, exp:
+                raise prestans.exceptions.ParseFailed(value, 'Date')
+        else:
+            raise prestans.exceptions.ParseFailed(value, 'Date')
+            
+        return _validated_value
+
+    def as_serializable(self, value):
+
+        if not type(value) == date:
+            raise prestans.exceptions.InvalidType(value, 'datetime.date')
+            
+        return value.strftime(self._format)
 
 class Time(DataStructure):
-    pass
+
+    class CONSTANT:
+        NOW = '_PRESTANS_CONSTANT_MODEL_TIME_NOW'
+    
+    def __init__(self, 
+                 default=None, 
+                 required=True, 
+                 format="%H:%M:%S"):
+
+        self._default = default
+        self._required = required
+        self._format = format
+
+    def validate(self, value):
+
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            if self._default == Time.CONSTANT.NOW:
+                value = time.today()
+            else:
+                value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            if self._default == Time.CONSTANT.NOW:
+                value = time.today()
+            else:
+                value = self._default
+        
+        if type(value) == time:
+            _validated_value = value
+        elif type(value) == str or type(value) == unicode:
+            try:
+                _validated_value = datetime.strptime(value, self._format).time()
+            except ValueError, exp:
+                raise prestans.exceptions.ParseFailed(value, 'Time')
+        else:
+            raise prestans.exceptions.ParseFailed(value, 'Time')
+
+        return _validated_value
+
+    def as_serializable(self, value):
+
+        if not type(value) == time:
+            raise prestans.exceptions.InvalidType(value, 'datetime.time')
+            
+        return value.strftime(self._format)
 
 #:
 #: Collections
@@ -510,3 +647,96 @@ class Model(DataCollection):
 
         self._required = required
         self._default = default
+
+
+    def __setattr__(self, key, value):
+        
+        if key[0:1] == "_":
+            self.__dict__[key] = value
+            return
+        
+        model_class_members = inspect.getmembers(self.__class__)
+        
+        validator = None
+        for attribute_name,  type_instance in model_class_members:
+            if attribute_name == key:
+                validator = type_instance
+            
+        if validator is not None:
+            if validator.__class__ == value.__class__:
+                self.__dict__[key] = value
+            else:
+                self.__dict__[key] = validator.validate(value)
+            
+            return
+            
+        raise KeyError("No key named %s; in instance of type %s " % (key, self.__class__.__name__))
+
+    #:
+    #: Returns a list of managed attributes for the Model class
+    #:
+    #: Implemented for use with data adapters, can be used to quickly make a list of the 
+    #: attribute names in a prestans model
+    #:
+    def get_attribute_keys(self):
+
+        _attribute_keys = list()
+        
+        model_class_members = inspect.getmembers(self.__class__)
+        
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+            
+            if issubclass(type_instance.__class__, DataType):
+                _attribute_keys.append(attribute_name)
+            
+        return _attribute_keys
+
+    def get_attribute_filter(self, default_value=False):
+        pass
+
+    def validate(self, value):
+        pass
+
+    #:
+    #: Copies class level attribute templates and makes instance placeholders
+    #:
+    #: This step is required for direct uses of Model classes. This creates a copy of attribute_names
+    #: ignores methods and private variables. DataCollection types are deep copied to ignore memory
+    #: reference conflicts.
+    #:
+    #: DataType instances are initialized to None or default value.
+    #:
+    def _create_instance_attributes(self, arguments):
+
+        model_class_members = inspect.getmembers(self.__class__)
+
+        for attribute_name, type_instance in model_class_members:
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if issubclass(type_instance.__class__, DataCollection):
+                self.__dict__[attribute_name] = copy.deepcopy(type_instance)
+                continue
+                
+            if type_instance is None:
+                self.__dict__[attribute_name] = None
+                continue
+                
+            if issubclass(type_instance.__class__, DataType):
+                try:
+                    value = None
+                    
+                    if arguments.has_key(attribute_name):
+                        value = arguments[attribute_name]
+                        
+                    self.__dict__[attribute_name] = type_instance.validate(value)
+
+                except DataTypeValidationException:
+                    self.__dict__[attribute_name] = None
+
+
+

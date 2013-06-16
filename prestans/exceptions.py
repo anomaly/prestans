@@ -124,7 +124,9 @@ class UnacceptableLength(DataValidation):
         pass
 
 class InvalidType(DataValidation):
-    pass
+    
+    def __init__(self, value, type_name):
+        pass
 
 class InvalidCollection(DataValidation):
     pass
