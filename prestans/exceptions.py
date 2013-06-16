@@ -31,17 +31,6 @@
 #
 
 #:
-#: Raised if a prestans reserved word is used in configuring an app level class.
-#:
-class ReservedWord(Exception):
-
-    def __init__(self, word):
-        self._word = word
-
-    def __str__(self):
-        return ""
-
-#:
 #: The following Exceptions are used internally by the prestans framework to indicate
 #: parsing, and implemtnation errors.
 #:
@@ -51,81 +40,118 @@ class ReservedWord(Exception):
 #:
 
 class Base(Exception):
-    """
 
-    """
     def __init__(self, message, Errors):
 
         Exception.__init__(self, message)
         self.Errors = Errors
 
+#:
+#: Configuration
+#:
 
-class DirectUseNotAllowed(Base):
+class Configuration(Base):
     pass
 
-class ParseFailed(Base):
-    pass
-
-class InvalidValue(Base):
-    pass
-
-class LessThanMinimum(Base):
-    pass
-
-class MoreThanMaximum(Base):
-    pass
-
-class InvalidLength(Base):
-    pass
-
-class InvalidType(Base):
-    pass
-
-class InvalidCollection(Base):
-    pass
-
-class MissingParameter(Base):
-    pass
-
-class InvalidFormat(Base):
-    pass
-
-class InvalidMetaValue(Base):
-    pass
-
-class UnregisteredAdapter(Base):
-    pass
-
-class NotImplemented(Base):
+class DataValidation(Base):
     pass
 
 
-class SerializationFailed(Base):
+#:
+#: Configuration
+#:
+
+class DirectUseNotAllowed(Configuration):
+    pass
+
+class ReservedWord(Configuration):
+    pass
+
+class NotParserRuleSet(Configuration):
+    pass
+
+class NotParameterSet(Configuration):
+    pass
+
+class InvalidParameterSetAttribute(Configuration):
+    pass
+
+class InvalidDataType(Configuration):
+    pass
+
+class RequiresDataCollection(Configuration):
+    pass
+
+class RequiresModel(Configuration):
+    pass
+
+
+#:
+#: Data Validation
+#: 
+
+class RequiredAttribute(DataValidation):
+    pass
+
+class ParseFailed(DataValidation):
+    
+    def __init__(self, value, data_type):
+        pass
+
+class InvalidValue(DataValidation):
+    
+    def __init__(self, value):
+        pass
+
+class LessThanMinimum(DataValidation):
+    
+    def __init__(self, value, allowed_min):
+        pass
+
+class MoreThanMaximum(DataValidation):
+
+    def __init__(self, value, allowed_max):
+        pass
+
+class InvalidChoice(DataValidation):
+
+    def __init__(self, value, allowed_choices):
+        pass
+
+class UnacceptableLength(DataValidation):
+    
+    def __init__(self, value, minimum, maximum):
+        pass
+
+class InvalidType(DataValidation):
+    pass
+
+class InvalidCollection(DataValidation):
+    pass
+
+class MissingParameter(DataValidation):
+    pass
+
+class InvalidFormat(DataValidation):
+    pass
+
+class InvalidMetaValue(DataValidation):
+    pass
+
+class UnregisteredAdapter(DataValidation):
+    pass
+
+class NotImplemented(DataValidation):
+    pass
+
+class SerializationFailed(DataValidation):
     pass
 
 #:
 #: Parser Exception
 #:
 
-class NotParserRuleSet(Exception):
-    pass
-
-class NotParameterSet(Exception):
-    pass
-
 class NoSetMatched(Exception):
-    pass
-
-class InvalidParameterSetAttribute(Exception):
-    pass
-
-class InvalidDataType(Exception):
-    pass
-
-class RequiresDataCollection(Exception):
-    pass
-
-class RequiresModel(Exception):
     pass
 
 class BodyTemplateParse(Exception):

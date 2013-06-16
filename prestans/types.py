@@ -108,7 +108,41 @@ class String(DataType):
         self._utf_encoding = utf_encoding
 
     def validate(self, value):
-        return True
+
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            value = self._default
+        
+        try:
+            if isinstance(value, unicode):
+                _validated_value = str(value.decode(self._utf_encoding))
+            else:
+                _validated_value = str(value)
+        except:
+            raise prestans.exceptions.ParseFailed(value, 'String')
+        
+        if not self._required and len(_validated_value) == 0:
+            return _validated_value
+        
+        if _validated_value is not None and self._min_length and len(_validated_value) < self._min_length:
+            raise prestans.exceptions.UnacceptableLength(value, self._min_length, self._max_length)
+        if _validated_value is not None and self._max_length and len(_validated_value) > self._max_length:
+            raise prestans.exceptions.UnacceptableLength(value, self._min_length, self._max_length)
+            
+        if self._choices is not None and not _validated_value in self._choices:
+            raise prestans.exceptions.InvalidChoice(value, self._choices)
+            
+        if self._format is not None and re.search(self._format, _validated_value) is None:
+            raise prestans.exceptions.InvalidValue(_validated_value)
+        
+        return _validated_value
 
 class Integer(DataType):
 
@@ -129,7 +163,32 @@ class Integer(DataType):
         self._choices = choices
 
     def validate(self, value):
-        pass
+
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            value = self._default
+        
+        try:
+            _validated_value = int(value)
+        except:
+            raise prestans.exceptions.ParseFailed(value, 'Integer')
+        
+        if _validated_value and self._minimum is not None and _validated_value < self._minimum:
+            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+        if _validated_value and self._maximum is not None and _validated_value > self._maximum:
+            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+            
+        if self._choices is not None and not _validated_value in self._choices:
+            raise prestans.exceptions.InvalidChoice(value, self._choices)
+        
+        return _validated_value
 
 class Float(DataType):
 
@@ -150,8 +209,34 @@ class Float(DataType):
         self._choices = choices
 
     def validate(self, value):
-        pass
 
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            value = self._default
+        
+        try:
+            _validated_value = float(value)
+        except:
+            raise prestans.exceptions.ParseFailed(value, 'Float')
+        
+        if _validated_value and self._minimum is not None and _validated_value < self._minimum:
+            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+        if _validated_value and self._maximum is not None and _validated_value > self._maximum:
+            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+            
+        if self._choices is not None and not _validated_value in self._choices:
+            raise prestans.exceptions.InvalidChoice(value, self._choices)
+        
+        return _validated_value
+
+        
 class Boolean(DataType):
 
     def __init__(self, 
@@ -163,7 +248,25 @@ class Boolean(DataType):
         self._required = required
 
     def validate(self, value):
-        pass
+
+        _validated_value = None
+        
+        if self._required and self._default is None and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+        elif self._required and value is None:
+            value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            value = self._default
+        
+        try:
+            _validated_value = bool(value)
+        except: 
+            raise prestans.exceptions.ParseFailed(value, 'Boolean')
+        
+        return _validated_value
+
 
 class DataURLFile(DataType):
     """
@@ -190,20 +293,42 @@ class DataURLFile(DataType):
         self._required = required
         self._allowed_mime_types = allowed_mime_types
 
-        #:
-        #: If provided mime type is a string then wrap it into an array
-        #:
         if isinstance(allowed_mime_types, str):
             self._allowed_mime_types = [allowed_mime_types]
 
-        #:
-        #: Set by validate
-        #:
         self._mime_type = None
         self._file_contents = None
 
+    @property
+    def mime_type(self):
+        return self._mime_type
+
+    @property
+    def file_contents(self):
+        return self._file_contents        
+
     def validate(self, value):
-        pass
+
+        _validated_value = self.__class__()
+
+        if self._required and value is None:
+            raise prestans.exceptions.RequiredAttribute()
+
+        if self._required is False and value is None:
+            return value
+
+        try:
+            data_url, delimiter, base64_content = value.partition(',')
+            _validated_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
+            _validated_value._file_contents = base64.b64decode(base64_content)
+        except Exception, err:
+            raise prestans.exceptions.ParseFailed(value, 'DataURLFile')
+
+        if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
+        and not _validated_value._mime_type in self._allowed_mime_types:
+            raise prestans.exceptions.InvalidChoice(_validated_value._mime_type, self._allowed_mime_types)
+
+        return _validated_value
 
     def save(self, path):
         """
@@ -218,14 +343,6 @@ class DataURLFile(DataType):
         file_handle = open(path, 'wb')
         file_handle.write(self._file_contents)
         file_handle.close()
-
-    @property
-    def mime_type(self):
-        return self._mime_type
-
-    @property
-    def file_contents(self):
-        return self._file_contents        
 
 #:
 #: DataStructures
