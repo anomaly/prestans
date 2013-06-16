@@ -35,11 +35,10 @@
 #:
 
 class VERB:
-    """
-    Encapsulates HTTP Verbs supported by the prestans framework in accordance
-    with the REST definition. Each prestans REST handler must supporto at least
-    one HTTP verb.
-    """
+
+    #: Encapsulates HTTP Verbs supported by the prestans framework in accordance
+    #: with the REST definition. Each prestans REST handler must supporto at least
+    #:one HTTP verb.
 
     GET    = "GET"
     POST   = "POST"
@@ -48,10 +47,6 @@ class VERB:
     DELETE = "DELETE"
 
 class STATUS:
-    """
-    List of recommended HTTP status codes that handlers should return. Refer to
-    documentation for appropriate use these status codes for REST responses.
-    """
 
     OK                      = 200
     CREATED                 = 201

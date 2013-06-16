@@ -69,31 +69,21 @@ class AdapterRegistryManager:
         return self._rest_map[class_signature]
 
 
-class Adapter(object):
-    pass
-    
-class ModelAdapter(Adapter):
+class ModelAdapter(object):
     
     def __init__(self, rest_model_class, persistent_model_class):
         self._rest_model_class = rest_model_class
         self._persistent_model_class = persistent_model_class
         
-    """ Properties """
 
-    def _get_persistent_model_class(self):
+    @property
+    def persistent_model_class(self):
         return self._persistent_model_class
-        
-    persistent_model_class = property(_get_persistent_model_class)
     
-    def _get_rest_model_class(self):
+    @property
+    def rest_model_class(self):
         return self._rest_model_class
-        
-    rest_model_class = property(_get_rest_model_class)
-    
-    """ The following methods are stubs, these should be implemented for the specific backends """
-    
-    ## @brief adapts a persistent model to a rest model by inspecting
-    #
+            
     def adapt_persistent_to_rest(self, persistent_object):
         raise Exception(ERROR_MESSAGE.NO_DIRECT_USE % ('ModelAdapter'))
 

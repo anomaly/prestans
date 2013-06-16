@@ -41,10 +41,8 @@
 
 class Base(Exception):
 
-    def __init__(self, message, Errors):
-
-        Exception.__init__(self, message)
-        self.Errors = Errors
+    def __str__(self):
+        return self._message
 
 #:
 #: Configuration
@@ -56,7 +54,7 @@ class Configuration(Base):
 class DataValidation(Base):
     
     def __init__(self, message):
-        pass
+        self._message = message
 
 
 #:
@@ -68,6 +66,11 @@ class DirectUseNotAllowed(Configuration):
 
 class ReservedWord(Configuration):
     pass
+
+class UnimplementedVerb(Configuration):
+
+    def __init__(self, verb_name):
+        pass
 
 class NotParserRuleSet(Configuration):
     pass
@@ -142,7 +145,7 @@ class MissingParameter(DataValidation):
 
 class InvalidFormat(DataValidation):
     
-    class __init__(self, value):
+    def __init__(self, value):
         pass
 
 class InvalidMetaValue(DataValidation):
@@ -178,12 +181,12 @@ class EmptyBody(Exception):
 #:
 
 class RESTOperation(Exception):
-    """
-    Extends from the Base exception to make available a HTTP status code, these
-    are thrown if an unacceptable REST operation is performed. 
-
-    E.g a client attempts to access data they are not allowed to.
-    """
+    #: 
+    #: Extends from the Base exception to make available a HTTP status code, these
+    #: are thrown if an unacceptable REST operation is performed. 
+    #: 
+    #: E.g a client attempts to access data they are not allowed to.
+    #: 
     pass
 
 class ServiceUnavailable(RESTOperation):

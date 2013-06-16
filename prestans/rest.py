@@ -41,10 +41,11 @@ import prestans.exceptions
 #:
 
 class Request(webob.Request):
-    """
 
-    """
-    pass
+    def __init__(self, environ);
+
+        webob.Request.__init__(self, environ)
+
 
 class Response(webob.Response):
     """
@@ -61,7 +62,10 @@ class RequestRouter(object):
     Routes
     """
 
-    def __init__(self, route_map, serializers, application_name="prestans", debug=False):
+    def __init__(self, routes, inflators, deflators, application_name="prestans", debug=False):
+
+        self._application_name = application_name
+        self._debug = debug
 
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
         self._route_re = re.compile(r"""
@@ -71,7 +75,9 @@ class RequestRouter(object):
                 \>               # The exact character ">"
                 """, re.VERBOSE)
 
-
+    @property
+    def debug(self):
+        return self._debug
 
     def add_route(self, route, handler_class):
         pass
@@ -95,16 +101,16 @@ class RequestHandler(object):
     """
     """
 
-    def __init__(self, request=None, response=None, incoming_serializers, outgoing_serializers, debug=False):
+    def __init__(self, request=None, response=None, inflators, deflators, debug=False):
 
         self._request = request
         self._response = response
         self._debug = debug
         self._serializers = serializers
+        self._inflators = inflators
+        self._deflators = deflators
 
     def __call__(self, environ, start_response):
-
-
 
         return self._response(environ, start_response)
 
@@ -120,19 +126,19 @@ class RequestHandler(object):
         return None
 
     def get(self, *args):
-        pass
+        raise prestans.exceptions.UnimplementedVerb('GET')
 
     def post(self, *args):
-        pass
+        raise prestans.exceptions.UnimplementedVerb('POST')
 
     def put(self, *args):
-        pass
+        raise prestans.exceptions.UnimplementedVerb('PUT')
 
     def patch(self, *args):
-        pass
+        raise prestans.exceptions.UnimplementedVerb('PATCH')
 
     def delete(self, *args):
-        pass
+        raise prestans.exceptions.UnimplementedVerb('DELETE')
 
 #:
 #:
