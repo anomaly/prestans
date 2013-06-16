@@ -36,7 +36,6 @@ import copy
 import re
 import os
 import base64
-import uuid
 
 from datetime import datetime
 from datetime import date
@@ -85,7 +84,7 @@ class DataCollection(DataType):
 
 class String(DataType):
     
-     def __init__(self, 
+    def __init__(self, 
                  default=None, 
                  min_length=None, 
                  max_length=None, 
@@ -94,7 +93,6 @@ class String(DataType):
                  choices=None, 
                  utf_encoding='utf-8'):
 
-        
         if min_length and max_length and min_length > max_length:
             pass
 
@@ -110,7 +108,7 @@ class String(DataType):
         self._utf_encoding = utf_encoding
 
     def validate(self, value):
-        pass
+        return True
 
 class Integer(DataType):
 

@@ -29,3 +29,35 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+import unittest
+import prestans.types
+
+class StringTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._string = prestans.types.String(
+            default="orange",
+            min_length=1,
+            max_length=20,
+            choices=['orange','mango','banana'],
+            )
+
+    def test_default(self):
+        pass
+
+    def test_length(self):
+        pass
+
+    def test_regex_format(self):
+        pass
+
+    def test_choics(self):
+        pass
+
+    def test_encoding(self):
+        pass
+
+    def tearDown(self):
+        pass
