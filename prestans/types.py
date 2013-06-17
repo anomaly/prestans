@@ -414,7 +414,7 @@ class Date(DataStructure):
         self._required = required
         self._format = format
 
-     def validate(self, value):
+    def validate(self, value):
         
         _validated_value = None
         
