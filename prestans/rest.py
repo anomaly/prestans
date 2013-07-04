@@ -42,32 +42,91 @@ import prestans.exceptions
 
 class Request(webob.Request):
 
-    def __init__(self, environ);
+    def __init__(self, environ, charset="utf-8"):
 
-        webob.Request.__init__(self, environ)
+        webob.Request.__init__(self, environ=environ, charset=charset)
 
 
 class Response(webob.Response):
-    """
 
-    """
+    def __init__(self):
+        pass
+
+
+#:
+#: RESTHandler defines specific end points, developers subclass this to
+#: implement their end points.
+#:
+#: Also contains Blueprint handler
+#:
+
+class RequestHandler(object):
+
+    def __init__(self, request=None, response=None, inflators, deflators, debug=False):
+
+        self._request = request
+        self._response = response
+        self._debug = debug
+        self._serializers = serializers
+        self._inflators = inflators
+        self._deflators = deflators
+
+    def __call__(self, environ, start_response):
+
+        return self._response(environ, start_response)
+
+
+    def handler_will_run(self):
+        #:
+        #:
+        #:
+        return None
+
+    def handler_did_run(self):
+        #:
+        #:
+        #:
+        return None
+
+    def get(self, *args):
+        raise prestans.exceptions.UnimplementedVerb("GET")
+
+    def post(self, *args):
+        raise prestans.exceptions.UnimplementedVerb("POST")
+
+    def put(self, *args):
+        raise prestans.exceptions.UnimplementedVerb("PUT")
+
+    def patch(self, *args):
+        raise prestans.exceptions.UnimplementedVerb("PATCH")
+
+    def delete(self, *args):
+        raise prestans.exceptions.UnimplementedVerb("DELETE")
+
+
+#:
+#:
+#:
+
+class BlueprintHandler(RequestHandler):
     pass
+
 
 #:
 #: Router infrastructure code to dispatch requests
 #:
 
 class RequestRouter(object):
-    """
-    Routes
-    """
 
-    def __init__(self, routes, inflators, deflators, application_name="prestans", debug=False):
+    def __init__(self, routes, inflators, deflators, charset="utf-8", application_name="prestans", debug=False):
 
         self._application_name = application_name
         self._debug = debug
+        self._charset = charset
 
+        #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
+        #:
         self._route_re = re.compile(r"""
                 \<               # The exact character "<"
                 ([a-zA-Z_]\w*)?  # The optional variable name
@@ -89,63 +148,3 @@ class RequestRouter(object):
         #: Run a request parser        
 
         return
-
-#:
-#: RESTHandler defines specific end points, developers subclass this to
-#: implement their end points.
-#:
-#: Also contains Blueprint handler
-#:
-
-class RequestHandler(object):
-    """
-    """
-
-    def __init__(self, request=None, response=None, inflators, deflators, debug=False):
-
-        self._request = request
-        self._response = response
-        self._debug = debug
-        self._serializers = serializers
-        self._inflators = inflators
-        self._deflators = deflators
-
-    def __call__(self, environ, start_response):
-
-        return self._response(environ, start_response)
-
-
-    def handler_will_run(self):
-        """
-        """
-        return None
-
-    def handler_did_run(self):
-        """
-        """
-        return None
-
-    def get(self, *args):
-        raise prestans.exceptions.UnimplementedVerb('GET')
-
-    def post(self, *args):
-        raise prestans.exceptions.UnimplementedVerb('POST')
-
-    def put(self, *args):
-        raise prestans.exceptions.UnimplementedVerb('PUT')
-
-    def patch(self, *args):
-        raise prestans.exceptions.UnimplementedVerb('PATCH')
-
-    def delete(self, *args):
-        raise prestans.exceptions.UnimplementedVerb('DELETE')
-
-#:
-#:
-#:
-#:
-#:
-#:
-
-class BlueprintHandler(RequestHandler):
-    pass
