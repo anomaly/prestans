@@ -1,0 +1,15 @@
+name: prestans-demo
+port: 8000
+
+
+environ:
+- key: app_config_path
+  value: ./config/app.config
+
+static:
+- url: /assets
+  path: ./asssets
+
+handlers:
+- url: /(.*)
+  script: prestans.demo.application
