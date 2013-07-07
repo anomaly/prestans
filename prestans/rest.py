@@ -62,7 +62,7 @@ class Response(webob.Response):
 
 class RequestHandler(object):
 
-    def __init__(self, request=None, response=None, inflators, deflators, debug=False):
+    def __init__(self, request=None, response=None, serializers, deserializers, debug=False):
 
         self._request = request
         self._response = response
@@ -71,6 +71,14 @@ class RequestHandler(object):
         self._inflators = inflators
         self._deflators = deflators
 
+    @property
+    def request(self):
+        return self._request
+
+    @property
+    def response(self):
+        return self._response
+
     def __call__(self, environ, start_response):
 
         return self._response(environ, start_response)
@@ -78,15 +86,20 @@ class RequestHandler(object):
 
     def handler_will_run(self):
         #:
-        #:
+        #: 
         #:
         return None
 
     def handler_did_run(self):
         #:
-        #:
+        #: 
         #:
         return None
+
+    #:
+    #: Placeholder functions
+    #:
+    #:
 
     def get(self, *args):
         raise prestans.exceptions.UnimplementedVerb("GET")
@@ -118,11 +131,13 @@ class BlueprintHandler(RequestHandler):
 
 class RequestRouter(object):
 
-    def __init__(self, routes, inflators, deflators, charset="utf-8", application_name="prestans", debug=False):
+    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", application_name="prestans", debug=False):
 
         self._application_name = application_name
         self._debug = debug
         self._charset = charset
+        self._serializers = serializers
+        self._deserializers = deserializers
 
         #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py

@@ -31,4 +31,29 @@
 #
 
 
-__all__ = []
+__all__ = ['server']
+
+import argparse
+
+class ArgParserFactory(object):
+
+    def __init__(self):
+
+        arg_parser = argparse.ArgumentParser(
+            description="command line tools to compliment the prestans framework",
+            epilog="pride is distributed by the prestans project <http://github.com/prestans/> under the the New BSD license."
+        )
+
+        subparsers_handle = arg_parser.add_subparsers(dest="sub-commands help")
+
+        self._add_server_sub_commands(subparsers_handle)
+
+        args = arg_parser.parse_args()
+        return args
+
+    def _add_server_sub_commands(self, subparsers_handle):
+
+        subparsers_handle.add_parser(
+            name="server",
+            help="runs a development HTTP REST server for your prestans application"
+            )

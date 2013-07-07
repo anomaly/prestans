@@ -30,5 +30,12 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import yaml
+
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
+
+class DevServer(object):
+
+    def __init__(self, config_path):
+        pass
