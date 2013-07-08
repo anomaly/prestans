@@ -51,7 +51,8 @@ def main():
 
     signal.signal(signal.SIGINT, ctrlc_handler)
 
-    args = prestans.devel.ArgParserFactory()
+    parser_factory = prestans.devel.ArgParserFactory()
+    args = parser_factory.parse()
 
 if __name__ == "__main__":
     main()

@@ -39,21 +39,27 @@ class ArgParserFactory(object):
 
     def __init__(self):
 
-        arg_parser = argparse.ArgumentParser(
+        self._arg_parser = argparse.ArgumentParser(
             description="command line tools to compliment the prestans framework",
             epilog="pride is distributed by the prestans project <http://github.com/prestans/> under the the New BSD license."
         )
 
-        subparsers_handle = arg_parser.add_subparsers(dest="sub-commands help")
+        subparsers_handle = self._arg_parser.add_subparsers(dest="sub-commands help")
 
         self._add_server_sub_commands(subparsers_handle)
 
-        args = arg_parser.parse_args()
-        return args
+    def parse(self):
+        return self._arg_parser.parse_args()
+        
 
     def _add_server_sub_commands(self, subparsers_handle):
 
-        subparsers_handle.add_parser(
+        server_parser = subparsers_handle.add_parser(
             name="server",
             help="runs a development HTTP REST server for your prestans application"
+            )
+
+        server_parser.add_argument(
+            "config",
+            nargs="?",
             )
