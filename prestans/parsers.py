@@ -55,24 +55,23 @@ class ParameterSet(object):
 #:
 
 class AttributeFilter(object):
-    """
-     { 
-       field_name0: true, 
-       field_name1: false, 
-       collection_name0: true, 
-       collection_name1: false,
-       collection_name2: {
-           sub_field_name0: true,
-           sub_field_name1: false 
-       }
-     }
-    """
+    #: 
+    #:  { 
+    #:    field_name0: true, 
+    #:    field_name1: false, 
+    #:    collection_name0: true, 
+    #:    collection_name1: false,
+    #:    collection_name2: {
+    #:        sub_field_name0: true,
+    #:        sub_field_name1: false 
+    #:    }
+    #:  }
 
     @classmethod
     def from_model(self, model_instance, default_value=False):
-        """
-        wrapper for Model's get_attribute_filter
-        """
+        #:
+        #: wrapper for Model's get_attribute_filter
+        #:
 
         if issubclass(model_instance.__class__, prestans.types.DataCollection):
             return model_instance.get_attribute_filter(default_value)
@@ -81,23 +80,23 @@ class AttributeFilter(object):
                         (model_instance.__class__.__name__))
 
     def __init__(self, from_dictionary=None):
-        """
-        Creates an attribute filter object, optionally populates from a 
-        dictionary of booleans
-        """
+        #:
+        #: Creates an attribute filter object, optionally populates from a 
+        #: dictionary of booleans
+        #:
         
         if from_dictionary:
             self._init_from_dictionary(from_dictionary)
 
     def _conforms_to_template_filter(self, template_filter):
-        """
-        Check AttributeFilter conforms to the rules set by the template
-        
-        - If self, has attributes that template_fitler does not contain, throw Exception
-        - If sub list found, perform the first check
-        - If self has a value for an attribute, assign to final AttributeFilter
-        - If not found, assign value from template
-        """       
+        #:
+        #: Check AttributeFilter conforms to the rules set by the template
+        #:
+        #: - If self, has attributes that template_fitler does not contain, throw Exception
+        #: - If sub list found, perform the first check
+        #: - If self has a value for an attribute, assign to final AttributeFilter
+        #:- If not found, assign value from template
+        #:       
 
         if not isinstance(template_filter, self.__class__):
             raise TypeError("AttributeFilter can only check conformance against another template filter, %s provided" % 
@@ -153,9 +152,9 @@ class AttributeFilter(object):
         return evaluated_attribute_filter
         
     def keys(self):
-        """
-        returns a list of usable keys
-        """
+        #: 
+        #: returns a list of usable keys
+        #: 
 
         keys = list()
 
@@ -170,15 +169,15 @@ class AttributeFilter(object):
         return keys
 
     def has_key(self, key):
-        """
-        contains a particular key, wrapper on self.__dict__.key
-        """
+        #: 
+        #: contains a particular key, wrapper on self.__dict__.key
+        #: 
         return self.__dict__.has_key(key)
 
     def is_filter_at_key(self, key):
-        """
-        return True if attribute is a subfilter
-        """
+        #: 
+        #: return True if attribute is a subfilter
+        #: 
 
         if self.has_key(key) and isinstance(attribute_status, self.__class__):
             return True
@@ -186,12 +185,12 @@ class AttributeFilter(object):
         return False
 
     def is_attribute_visible(self, key):
-        """
-        returns True if an attribute is visible
-    
-        If attribute is an instance of AttributeFilter, it returns True if all attributes
-        of the sub filter are visible.
-        """        
+        #: 
+        #: returns True if an attribute is visible
+        #: 
+        #: If attribute is an instance of AttributeFilter, it returns True if all attributes
+        #: of the sub filter are visible.
+        #:         
         if self.has_key(key):
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, bool) and attribute_status == True:
@@ -203,9 +202,9 @@ class AttributeFilter(object):
         return False
 
     def are_any_attributes_visible(self):
-        """
-        checks to see if any attributes are set to true
-        """
+        #: 
+        #: checks to see if any attributes are set to true
+        #: 
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -223,9 +222,9 @@ class AttributeFilter(object):
         return False
 
     def are_all_attributes_visible(self):
-        """
-        checks to see if all attributes are set to true
-        """        
+        #: 
+        #: checks to see if all attributes are set to true
+        #:         
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -242,9 +241,9 @@ class AttributeFilter(object):
         return True
 
     def as_dict(self):
-        """
-        turns attribute filter object into python dictionary
-        """        
+        #: 
+        #: turns attribute filter object into python dictionary
+        #:         
 
         output_dictionary = dict()
 
@@ -264,10 +263,10 @@ class AttributeFilter(object):
 
 
     def _init_from_dictionary(self, from_dictionary):
-        """
-        Private helper to init values from a dictionary, wraps chidlren into 
-        AttributeFilter objects
-        """
+        #: 
+        #: Private helper to init values from a dictionary, wraps chidlren into 
+        #: AttributeFilter objects
+        #: 
 
         if not isinstance(from_dictionary, dict):
             raise TypeError("from_dictionary must be of type dict, %s provided" % 
@@ -288,9 +287,9 @@ class AttributeFilter(object):
 
 
     def __setattr__(self, key, value):
-        """
-        Overrides setattr to allow only booleans or an AttributeFilter
-        """
+        #: 
+        #: Overrides setattr to allow only booleans or an AttributeFilter
+        #: 
 
         # Set internal fields
         if key[0:1] == "_":
@@ -325,33 +324,32 @@ class RequestParser(object):
     DELETE  = None
 
     def parse(self, request, response, environ):
-        """
-        If the implementing request parser does not specify a parser for a method, None is returned, 
-        this completely bypasses the parsing process.
-        
-        The implementing request parser must assign an instance of %ParserRuleSet for each HTTP method.
-        
-        RequestParser will attempt use those rules to parse the input and assign them to the passed in
-        request object. It returns True or False.
-
-        self The object pointer
-        response object
-        request The request to parse
-
-        """
+        #: 
+        #: If the implementing request parser does not specify a parser for a method, None is returned, 
+        #: this completely bypasses the parsing process.
+        #: 
+        #: The implementing request parser must assign an instance of %ParserRuleSet for each HTTP method.
+        #: 
+        #: RequestParser will attempt use those rules to parse the input and assign them to the passed in
+        #: request object. It returns True or False.
+        #: 
+        #: self The object pointer
+        #: response object
+        #: request The request to parse
+        #: 
         
         request_method = request.get_request_method()
 
         if not self.__class__.__dict__.has_key(request_method) or self.__class__.__dict__[request_method] is None:
-            """ 
-            Default rule set is None, ignores parsing for Pameters and Body 
-            """
+            #: 
+            #: Default rule set is None, ignores parsing for Pameters and Body 
+            #: 
             return
         
         if not isinstance(self.__class__.__dict__[request_method], ParserRuleSet):
-            """ 
-            Handles the developer not assinging an object of type ParserRuleSet 
-            """
+            #:  
+            #: Handles the developer not assinging an object of type ParserRuleSet 
+            #: 
             raise NotParserRuleSetObjectException(request_method + " does not have a valid ParserRuleSet")
         
         parser_rule_set = self.__class__.__dict__[request_method]
