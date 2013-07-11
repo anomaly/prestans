@@ -40,12 +40,12 @@ import argparse
 
 import prestans.devel
 
-__version__ = "2.0"
+__version_info__ = (2, 0)
+__version__ = '.'.join(str(v) for v in __version_info__)
 
 def ctrlc_handler(signal, frame):
     print ""
     sys.exit(2)
-
 
 def main():
 
