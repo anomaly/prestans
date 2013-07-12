@@ -37,6 +37,9 @@ import argparse
 
 class ArgParserFactory(object):
 
+    #:
+    #:
+    #:
     def __init__(self):
 
         self._arg_parser = argparse.ArgumentParser(
@@ -46,20 +49,78 @@ class ArgParserFactory(object):
 
         subparsers_handle = self._arg_parser.add_subparsers(dest="sub-commands help")
 
+        self._add_generate_build_commands(subparsers_handle)
+        self._add_generate_sub_commands(subparsers_handle)
         self._add_server_sub_commands(subparsers_handle)
 
+    #:
+    #: public message to fire argparser
+    #:
     def parse(self):
         return self._arg_parser.parse_args()
-        
 
+    #:
+    #: build subcommand
+    #:
+    def _add_generate_build_commands(self, subparsers_handle):
+
+        gen_parser = subparsers_handle.add_parser(
+            name="build",
+            help="builds deployable javascript, css and server"
+            )
+
+        build_sub_parser = gen_parser.add_subparsers(dest="build-sub-commands")
+
+        #:
+        #: Javascript
+        #:
+        build_sub_parser.add_parser(
+            name="js",
+            help="builds distributable javascript"
+            )
+
+        #:
+        #: CSS
+        #:
+        build_sub_parser.add_parser(
+            name="css",
+            help="builds distributable css"
+            )
+
+    #:
+    #: gen subcommand
+    #:
+    def _add_generate_sub_commands(self, subparsers_handle):
+
+        gen_parser = subparsers_handle.add_parser(
+            name="gen",
+            help="generate client side model stubs, filters"
+            )
+        
+        gen_parser.add_argument(
+            "-t",
+            "--template",
+            choices=['closure'],
+            default="closure",
+            help="template to use for client side code generation"
+            )
+
+    #:
+    #: server subcommand
+    #:
+    #: --config path to configuration file
+    #:
     def _add_server_sub_commands(self, subparsers_handle):
 
         server_parser = subparsers_handle.add_parser(
             name="server",
-            help="runs a development HTTP REST server for your prestans application"
+            help="runs a local HTTP WSGI server for your prestans project"
             )
 
         server_parser.add_argument(
-            "config",
-            nargs="?",
+            "-c",
+            "--config",
+            default="./devserver.yaml",
+            help="path to prestans devserver configuration"
             )
+

@@ -32,13 +32,12 @@
 #
 
 import os
+import sys
 import string
 import signal
 import getpass
 import base64
 import argparse
-
-import prestans.devel
 
 __version_info__ = (2, 0)
 __version__ = '.'.join(str(v) for v in __version_info__)
@@ -54,5 +53,24 @@ def main():
     parser_factory = prestans.devel.ArgParserFactory()
     args = parser_factory.parse()
 
+    return 0
+
 if __name__ == "__main__":
-    main()
+
+    prestans_path = os.path.join("..", "..")
+
+    #:
+    #: While in development attempt to import prestans from top dir
+    #:
+    if os.path.isdir(prestans_path):
+    
+        sys.path.insert(0, prestans_path)
+        try:
+            import prestans.devel
+        except:
+            del sys.path[0]
+
+    else:
+        import prestans.devel    
+
+    sys.exit(main())
