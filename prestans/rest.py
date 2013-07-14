@@ -32,8 +32,10 @@
 
 import webob
 import re
+import logging
 
 import prestans.exceptions
+import prestans.serializers
 
 #:
 #: Wrappers around Request and Response to handle HTTP requests, these depend on
@@ -53,6 +55,7 @@ class Response(webob.Response):
         pass
 
 
+
 #:
 #: RESTHandler defines specific end points, developers subclass this to
 #: implement their end points.
@@ -62,14 +65,14 @@ class Response(webob.Response):
 
 class RequestHandler(object):
 
-    def __init__(self, request=None, response=None, serializers, deserializers, debug=False):
+    def __init__(self, request=None, response=None, serializers, deserializers, logger, debug=False):
 
         self._request = request
         self._response = response
         self._debug = debug
+        self._logger = logger
         self._serializers = serializers
-        self._inflators = inflators
-        self._deflators = deflators
+        self._deserializers = deserializers
 
     @property
     def request(self):
@@ -131,13 +134,29 @@ class BlueprintHandler(RequestHandler):
 
 class RequestRouter(object):
 
-    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", application_name="prestans", debug=False):
+    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", application_name="prestans", logger=None, debug=False):
 
         self._application_name = application_name
         self._debug = debug
         self._charset = charset
+
+        #: Are formats prestans handlers can send data back as
         self._serializers = serializers
+        #: Are formats prestans handlers can accept data as
         self._deserializers = deserializers
+
+        #:
+        #: Init the default logger if one's not provided, this allows users to configure their own
+        #: http://www.blog.pythonlibrary.org/2012/08/02/python-101-an-intro-to-logging/
+        #:
+        if logger is None:
+            self._logger = logging.getLogger("prestans.%s" % application_name)
+        else:
+            self._logger = logger
+
+        #: If serializers and deserialers aren't provided, prestans runs as a JSON app
+        
+
 
         #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
@@ -160,6 +179,6 @@ class RequestRouter(object):
         
         #: Check if the requested URL has a valid registered handler
 
-        #: Run a request parser        
+        #: Run a request parser
 
         return

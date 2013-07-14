@@ -1,15 +1,20 @@
 name: prestans-demo
+version: 1.0
+bind: localhost
 port: 8000
 
+append_path:
+- ext/
+- app/
 
 environ:
-- key: app_config_path
-  value: ./config/app.config
+- key: app_config
+  value: config/app.config
 
 static:
-- url: /assets
-  path: ./asssets
+- url: /img
+  directory: static/img
 
 handlers:
-- url: /(.*)
-  script: prestans.demo.application
+- url: /api
+  handler: pdemo.handler.application

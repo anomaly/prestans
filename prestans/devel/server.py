@@ -30,17 +30,27 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import os
 import yaml
 
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
-class ConfigParser(object):
+class Configuration:
 
 	def __init__(self, config_path):
-		pass
+		
+		#: Does configuration file exists
+
+		#: Load and parse YAML
+
+		#: Construct a configuration object
+
 
 class DevServer(object):
 
     def __init__(self, config):
-        pass
+    	self._config = config
+
+    def run(self):
+    	pass

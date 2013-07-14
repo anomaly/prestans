@@ -44,21 +44,12 @@ class Serializer(object):
     """
 
     def loads(self, input_string):
-        """
-
-        """
         raise prestans.exceptions.DirectUserNotAllowed("loads", self.__class__.__name__)
 
     def dumps(self, serialzable_object):
-        """
-
-        """
         raise prestans.xceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
 
     def content_type(self):
-        """
-        Returns the content type for the serializer
-        """
         raise prestans.exceptions.DirectUserNotAllowed("content_type", self.__class__.__name__)
 
 
