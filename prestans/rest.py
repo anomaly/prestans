@@ -36,6 +36,7 @@ import logging
 
 import prestans.exceptions
 import prestans.serializers
+import prestans.deserializers
 
 #:
 #: Wrappers around Request and Response to handle HTTP requests, these depend on
@@ -88,15 +89,9 @@ class RequestHandler(object):
 
 
     def handler_will_run(self):
-        #:
-        #: 
-        #:
         return None
 
     def handler_did_run(self):
-        #:
-        #: 
-        #:
         return None
 
     #:
@@ -156,8 +151,11 @@ class RequestRouter(object):
             self._logger = logger
 
         #: If serializers and deserialers aren't provided, prestans runs as a JSON app
-        
+        if serializers is None:
+            self._serializers = [prestans.serializers.JSON()]
 
+        if deserializers is None:
+            self._deserializers = [prestans.serializers.JSON()]
 
         #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
@@ -173,17 +171,47 @@ class RequestRouter(object):
     def debug(self):
         return self._debug
 
-    def add_route(self, route, handler_class):
-        pass
-
     def __call__(self, environ, start_response):
 
         #: Say hello
-        self._logger.info("%s exposes %i end-points; prestans %s; charset %s" % (
-            self._application_name, len(self._routes), prestans.__version__, self._charset))
-        
+        self._logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % (
+            self._application_name, len(self._routes), prestans.__version__, self._charset, self._debug))
+
+        #: Validate serailziers and deserialzers; are subclasses of prestans.serializers.Serializer
+        _default_outgoing_mime_types = list()
+        for serializer in self._serializers:
+
+            if not isinstance(serializer, prestans.serializers.Serializer):
+                self._logger.error("registered serializer %s.%s does not inherit from prestans.serializers.Serializer" % 
+                    (serializer.__module__, serializer.__class__.__name__))
+
+                #: Throw an error message
+
+            _default_outgoing_mime_types.append(serializer.content_type())
+
+        _default_incoming_mime_types = list()
+        for deserializer in self._deserializers:
+
+            if not isinstance(deserializer, prestans.deserializers.DeSerializer):
+                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializers.Serializer" % 
+                    (deserializer.__module__, deserializer.__class__.__name__))
+
+            _default_incoming_mime_types.append(deserializer.content_type())
+
+        #: Report on the acceptable mime types
+        self._logger.info("generally accepts %s; speaks %s" % 
+            (str(_default_outgoing_mime_types).strip("[]'"), str(_default_incoming_mime_types).strip("[]'")))
+
+        #: Attempt to parse the HTTP request
+        request = Request(environ, self._charset)
+
         #: Check if the requested URL has a valid registered handler
+        # for regexp, handler_class in self._parsed_handler_map:
+        #     pass
 
         #: Run a request parser
-
+    
+        #: Say Goodbye
         return "prestans v2 returns nothing at the moment"
+
+

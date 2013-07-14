@@ -30,37 +30,49 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+
 import prestans.exceptions
 
-class Serializer(object):
+class DeSerializer(object):
 
-    def dumps(self, serialzable_object):
-        raise prestans.xceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
+    def loads(self, input_string):
+        raise prestans.exceptions.DirectUserNotAllowed("loads", self.__class__.__name__)
 
     def content_type(self):
         raise prestans.exceptions.DirectUserNotAllowed("content_type", self.__class__.__name__)
 
 
-class JSON(Serializer):
+class JSON(DeSerializer):
 
-    def dumps(self, serialzable_object):
-        
+    def loads(self, input_string):
+
         import json
-        return json.dumps(serializable_object)
+        parsed_json = None
 
+        try:
+            parsed_json = json.loads(input_string)
+        except Exception, exp:
+            raise prestans.exceptions.SerializationFailed('JSON')
+            
+        return parsed_json
+        
     def content_type(self):
         return 'application/json'
 
 
-class XMLPlist(Serializer):
+class XMLPlist(DeSerializer):
 
-    def dumps(self, serializable_object):
-
+    def loads(self, input_string):
+        
         import plistlib
-        plist_str = plistlib.writePlistToString(serializable_object)
+        unserialized_plist = None
 
-        return plist_str
+        try:
+            unserialized_plist = plistlib.readPlistFromString(input_string)
+        except Exception, exp:
+            raise prestans.exceptions.SerializationFailed("XML/Plist")
+
+        return unserialized_plist
 
     def content_type(self):
         return 'application/xml'
-
