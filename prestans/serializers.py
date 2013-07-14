@@ -33,15 +33,6 @@
 import prestans.exceptions
 
 class Serializer(object):
-    """
-    Base Serializer class, all implementation must inherit from this class and 
-    override the methods defined in this class.
-
-    The request parser will ensure that all serializer inherit from this class.
-
-    If you serializer depends on a Python library to perform the Serialization,
-    ensure you import those libraries in the loads and dumps methods
-    """
 
     def loads(self, input_string):
         raise prestans.exceptions.DirectUserNotAllowed("loads", self.__class__.__name__)
@@ -54,18 +45,6 @@ class Serializer(object):
 
 
 class JSON(Serializer):
-    """
-    Support for JSON, http://json.org
-
-    JSON (JavaScript Object Notation) is a lightweight data-interchange format. 
-    It is easy for humans to read and write. It is easy for machines to parse 
-    and generate. It is based on a subset of the JavaScript Programming Language, 
-    Standard ECMA-262 3rd Edition - December 1999. JSON is a text format that is 
-    completely language independent but uses conventions that are familiar to 
-    programmers of the C-family of languages, including C, C++, C#, Java, JavaScript, 
-    Perl, Python, and many others. These properties make JSON an ideal 
-    data-interchange language.
-    """
 
     def loads(self, input_string):
 
@@ -86,4 +65,29 @@ class JSON(Serializer):
 
     def content_type(self):
         return 'application/json'
+
+
+class XMLPlist(Serializer):
+
+    def loads(self, input_string):
+        
+        import plistlib
+        unserialized_plist = None
+
+        try:
+            unserialized_plist = plistlib.readPlistFromString(input_string)
+        except Exception, exp:
+            raise prestans.exceptions.SerializationFailed("XML/Plist")
+
+        return unserialized_plist
+
+    def dumps(self, serializable_object):
+
+        import plistlib
+        plist_str = plistlib.writePlistToString(serializable_object)
+
+        return plist_str
+
+    def content_type(self):
+        return 'application/xml'
 
