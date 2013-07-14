@@ -65,7 +65,7 @@ class Response(webob.Response):
 
 class RequestHandler(object):
 
-    def __init__(self, request=None, response=None, serializers, deserializers, logger, debug=False):
+    def __init__(self, request, response, serializers, deserializers, logger, debug=False):
 
         self._request = request
         self._response = response
@@ -138,6 +138,7 @@ class RequestRouter(object):
 
         self._application_name = application_name
         self._debug = debug
+        self._routes = routes
         self._charset = charset
 
         #: Are formats prestans handlers can send data back as
@@ -176,9 +177,13 @@ class RequestRouter(object):
         pass
 
     def __call__(self, environ, start_response):
+
+        #: Say hello
+        self._logger.info("%s exposes %i end-points; prestans %s; charset %s" % (
+            self._application_name, len(self._routes), prestans.__version__, self._charset))
         
         #: Check if the requested URL has a valid registered handler
 
         #: Run a request parser
 
-        return
+        return "prestans v2 returns nothing at the moment"
