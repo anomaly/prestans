@@ -47,14 +47,28 @@ class Request(webob.Request):
 
     def __init__(self, environ, charset="utf-8"):
 
-        webob.Request.__init__(self, environ=environ, charset=charset)
+        super(Request, self).__init__(environ=environ, charset=charset)
+
+    @property
+    def attribute_filter(self):
+        #: Return a attribute filter if set in the request header
+        pass
 
 
 class Response(webob.Response):
 
     def __init__(self):
-        pass
+        
+        super(Response, self).__init__()
 
+        #: 
+        #: IETF hash dropped the X- prefix for custom headers
+        #: http://stackoverflow.com/q/3561381 
+        #: http://tools.ietf.org/html/draft-saintandre-xdash-00
+        #:
+        self.headers.add('Prestans-Version', prestans.__version__)
+
+        self.status = 200
 
 
 #:
@@ -159,17 +173,17 @@ class RequestRouter(object):
 
         #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
+        #: http://docs.webob.org/en/latest/do-it-yourself.html#routing
         #:
-        self._route_re = re.compile(r"""
+        self._route_re = r"""
                 \<               # The exact character "<"
                 ([a-zA-Z_]\w*)?  # The optional variable name
                 (?:\:([^\>]*))?  # The optional :regex part
                 \>               # The exact character ">"
-                """, re.VERBOSE)
+                """
 
-    @property
-    def debug(self):
-        return self._debug
+    def _init_route_map(self):
+        pass
 
     def __call__(self, environ, start_response):
 
@@ -204,6 +218,9 @@ class RequestRouter(object):
 
         #: Attempt to parse the HTTP request
         request = Request(environ, self._charset)
+        response = Response()
+
+        response.body = "this si s a"
 
         #: Check if the requested URL has a valid registered handler
         # for regexp, handler_class in self._parsed_handler_map:
@@ -212,6 +229,4 @@ class RequestRouter(object):
         #: Run a request parser
     
         #: Say Goodbye
-        return "prestans v2 returns nothing at the moment"
-
-
+        return response(environ, start_response)
