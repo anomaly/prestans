@@ -45,9 +45,10 @@ import prestans.deserializers
 
 class Request(webob.Request):
 
-    def __init__(self, environ, charset="utf-8"):
+    def __init__(self, environ, charset, deserializers):
 
         super(Request, self).__init__(environ=environ, charset=charset)
+        self._deserializers = deserializers
 
     @property
     def attribute_filter(self):
@@ -57,9 +58,11 @@ class Request(webob.Request):
 
 class Response(webob.Response):
 
-    def __init__(self):
+    def __init__(self, serializers):
         
         super(Response, self).__init__()
+
+        self._serializers = serializers
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -70,6 +73,10 @@ class Response(webob.Response):
 
         self.status = 200
 
+    def __call__(self, environ, start_response):
+
+        #: Run whatever webob.Response had to say
+        return super(Response, self).__call__(environ, start_response)
 
 #:
 #: RESTHandler defines specific end points, developers subclass this to
@@ -143,7 +150,8 @@ class BlueprintHandler(RequestHandler):
 
 class RequestRouter(object):
 
-    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", application_name="prestans", logger=None, debug=False):
+    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", 
+        application_name="prestans", logger=None, debug=False):
 
         self._application_name = application_name
         self._debug = debug
@@ -169,7 +177,7 @@ class RequestRouter(object):
             self._serializers = [prestans.serializers.JSON()]
 
         if deserializers is None:
-            self._deserializers = [prestans.serializers.JSON()]
+            self._deserializers = [prestans.deserializers.JSON()]
 
         #:
         #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
@@ -207,7 +215,7 @@ class RequestRouter(object):
         for deserializer in self._deserializers:
 
             if not isinstance(deserializer, prestans.deserializers.DeSerializer):
-                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializers.Serializer" % 
+                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializers.DeSerializer" % 
                     (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
@@ -217,8 +225,8 @@ class RequestRouter(object):
             (str(_default_outgoing_mime_types).strip("[]'"), str(_default_incoming_mime_types).strip("[]'")))
 
         #: Attempt to parse the HTTP request
-        request = Request(environ, self._charset)
-        response = Response()
+        request = Request(environ=environ, charset=self._charset, deserializers=self._deserializers)
+        response = Response(serializers=self._serializers)
 
         response.body = "this si s a"
 
