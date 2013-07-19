@@ -113,7 +113,7 @@ class ArgParserFactory(object):
     def _add_server_sub_commands(self, subparsers_handle):
 
         server_parser = subparsers_handle.add_parser(
-            name="server",
+            name="serve",
             help="runs a local HTTP WSGI server for your prestans project"
             )
 

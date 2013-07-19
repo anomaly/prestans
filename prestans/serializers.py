@@ -35,7 +35,7 @@ import prestans.exceptions
 class Serializer(object):
 
     def dumps(self, serialzable_object):
-        raise prestans.xceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
+        raise prestans.exceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
 
     def content_type(self):
         raise prestans.exceptions.DirectUserNotAllowed("content_type", self.__class__.__name__)
