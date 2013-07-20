@@ -540,13 +540,18 @@ class Array(DataCollection):
         return len(self._array_elements)
         
     def __iter__(self):
+        #:
         #: With a little help from 
         #: http://johnmc.co/llum/the-easiest-way-to-implement-__iter__-for-a-python-object/
+        #:
         for element in self._array_elements:
             yield element
 
     def __getitem__(self, index):
         return self._array_elements[index]
+
+    def __constains__(self, item):
+        return item in self._array_elements
 
     def validate(self, value, attribute_filter=None):
         

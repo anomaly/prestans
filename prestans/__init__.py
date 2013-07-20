@@ -30,6 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import threading
+
 __all__ = ['http', 'types', 'rest', 'parsers', 'serializers', 'cache', 'throttle', 'exceptions']
 
 __version_info__ = (2, 0)

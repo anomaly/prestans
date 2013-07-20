@@ -34,6 +34,7 @@ import webob
 import re
 import logging
 
+import prestans
 import prestans.exceptions
 import prestans.serializers
 import prestans.deserializers
@@ -45,9 +46,10 @@ import prestans.deserializers
 
 class Request(webob.Request):
 
-    def __init__(self, environ, charset, deserializers):
+    def __init__(self, environ, charset, logger, deserializers):
 
         super(Request, self).__init__(environ=environ, charset=charset)
+        self._logger = logger
         self._deserializers = deserializers
 
     @property
@@ -58,10 +60,11 @@ class Request(webob.Request):
 
 class Response(webob.Response):
 
-    def __init__(self, serializers):
+    def __init__(self, logger, serializers):
         
         super(Response, self).__init__()
 
+        self._logger = logger
         self._serializers = serializers
 
         #: 
@@ -71,6 +74,7 @@ class Response(webob.Response):
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
 
+        #: Default status should be set something sensible per Verb
         self.status = 200
 
     def __call__(self, environ, start_response):
@@ -79,22 +83,19 @@ class Response(webob.Response):
         return super(Response, self).__call__(environ, start_response)
 
 #:
-#: RESTHandler defines specific end points, developers subclass this to
+#: RESTHandler defines specific end points, implementing APIs subclass this to
 #: implement their end points.
-#:
-#: Also contains Blueprint handler
 #:
 
 class RequestHandler(object):
 
-    def __init__(self, request, response, serializers, deserializers, logger, debug=False):
+    def __init__(self, args, request, response, logger, debug=False):
 
+        self._args = args
         self._request = request
         self._response = response
         self._debug = debug
         self._logger = logger
-        self._serializers = serializers
-        self._deserializers = deserializers
 
     @property
     def request(self):
@@ -106,6 +107,22 @@ class RequestHandler(object):
 
     def __call__(self, environ, start_response):
 
+        self._logger.info("handler %s.%s; callable excution start" 
+            %(self.__module__, self.__class__.__name__))
+
+        #: Authentication
+
+        #: Parse body
+
+        #: Parse Parameter Set
+
+        #: Auto set the return serializer based on Accept headers
+
+        self._response.body = "this is us"
+
+        self._logger.info("handler %s.%s; callable excution ends" 
+            %(self.__module__, self.__class__.__name__))
+
         return self._response(environ, start_response)
 
 
@@ -116,8 +133,8 @@ class RequestHandler(object):
         return None
 
     #:
-    #: Placeholder functions
-    #:
+    #: Placeholder functions for HTTP Verb; implementing handlers must override these
+    #: if not overridden prestans returns a Not Implemented error
     #:
 
     def get(self, *args):
@@ -179,19 +196,6 @@ class RequestRouter(object):
         if deserializers is None:
             self._deserializers = [prestans.deserializers.JSON()]
 
-        #:
-        #: line 63, http://code.google.com/p/webapp-improved/source/browse/webapp2.py
-        #: http://docs.webob.org/en/latest/do-it-yourself.html#routing
-        #:
-        self._route_re = r"""
-                \<               # The exact character "<"
-                ([a-zA-Z_]\w*)?  # The optional variable name
-                (?:\:([^\>]*))?  # The optional :regex part
-                \>               # The exact character ">"
-                """
-
-    def _init_route_map(self):
-        pass
 
     def __call__(self, environ, start_response):
 
@@ -225,16 +229,49 @@ class RequestRouter(object):
             (str(_default_outgoing_mime_types).strip("[]'"), str(_default_incoming_mime_types).strip("[]'")))
 
         #: Attempt to parse the HTTP request
-        request = Request(environ=environ, charset=self._charset, deserializers=self._deserializers)
-        response = Response(serializers=self._serializers)
+        request = Request(environ=environ, charset=self._charset, logger=self._logger, deserializers=self._deserializers)
+        response = Response(logger=self._logger, serializers=self._serializers)
 
-        response.body = "this si s a"
+        #: Initialise the Route map
+        route_map = self._init_route_map(self._routes)
 
         #: Check if the requested URL has a valid registered handler
-        # for regexp, handler_class in self._parsed_handler_map:
-        #     pass
+        for regexp, handler_class in route_map:
 
-        #: Run a request parser
+            match = regexp.match(request.path)
+
+            #: If a match is found handler over the handler callable
+            #: which in turn should return the response
+            if match:
+                request_handler = handler_class(args=match.groups(), request=request, response=response, 
+                    logger=self._logger, debug=self._debug)
+                return request_handler(environ, start_response)
+
+        #: No routes match the request; send out a not found
     
         #: Say Goodbye
         return response(environ, start_response)
+
+    #: @todo Update regular expressions to support webapp2 like routes
+    def _init_route_map(self, routes):
+
+        parsed_handler_map = []
+        handler_name = None
+        
+        for regexp, handler in routes:
+
+            try:
+                handler_name = handler.__name__
+            except AttributeError:
+                pass
+
+            #: Patch regular expression if its incomplete 
+            if not regexp.startswith('^'):
+                regexp = '^' + regexp
+            if not regexp.endswith('$'):
+                regexp += '$'
+                
+            compiled_regex = re.compile(regexp)
+            parsed_handler_map.append((compiled_regex, handler))
+            
+        return parsed_handler_map
