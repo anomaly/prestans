@@ -35,6 +35,7 @@ import re
 import logging
 
 import prestans
+import prestans.http
 import prestans.exceptions
 import prestans.serializers
 import prestans.deserializers
@@ -51,6 +52,10 @@ class Request(webob.Request):
         super(Request, self).__init__(environ=environ, charset=charset)
         self._logger = logger
         self._deserializers = deserializers
+
+    @property
+    def method(self):
+        return self.environ['REQUEST_METHOD']
 
     @property
     def attribute_filter(self):
@@ -74,10 +79,12 @@ class Response(webob.Response):
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
 
-        #: Default status should be set something sensible per Verb
-        self.status = 200
-
     def __call__(self, environ, start_response):
+
+        self._logger.info("response; callable execution start")
+
+        self._logger.info("resposne callable exiting; http status %s; content length %i" 
+            % (self.status, self.content_length))
 
         #: Run whatever webob.Response had to say
         return super(Response, self).__call__(environ, start_response)
@@ -105,10 +112,16 @@ class RequestHandler(object):
     def response(self):
         return self._response
 
+    @property
+    def logger(self):
+        return self._logger
+
     def __call__(self, environ, start_response):
 
         self._logger.info("handler %s.%s; callable excution start" 
-            %(self.__module__, self.__class__.__name__))
+            % (self.__module__, self.__class__.__name__))
+
+        #: Ensure we support the HTTP verb
 
         #: Authentication
 
@@ -118,24 +131,41 @@ class RequestHandler(object):
 
         #: Auto set the return serializer based on Accept headers
 
-        self._response.body = "this is us"
+        #: Warm up
+        self.handler_will_run()
+
+        #: See if the handler supports the called method
+        if self.request.method == prestans.http.VERB.GET:
+            self.response.status = prestans.http.STATUS.OK
+            self.get(*self._args)
+        elif self.request.method == prestans.http.VERB.POST:
+            self.response.status = prestans.http.STATUS.CREATED
+            rest_handler.post(*self._args)
+        elif self.request.method == prestans.http.VERB.PATCH:
+            self.response.status = prestans.http.STATUS.ACCEPTED
+            self.patch(*self._args)
+        elif self.request.method == prestans.http.VERB.DELETE:
+            self.response.status = prestans.http.STATUS.NO_CONTENT
+            self.delete(*self._args)
+        elif self.request.method == prestans.http.VERB.PUT:
+            self.response.status = prestans.http.STATUS.ACCEPTED
+            self.put(*self._args)
+
+        #: Tear down
+        self.handler_did_run()
 
         self._logger.info("handler %s.%s; callable excution ends" 
-            %(self.__module__, self.__class__.__name__))
+            % (self.__module__, self.__class__.__name__))
 
         return self._response(environ, start_response)
-
-
-    def handler_will_run(self):
-        return None
-
-    def handler_did_run(self):
-        return None
 
     #:
     #: Placeholder functions for HTTP Verb; implementing handlers must override these
     #: if not overridden prestans returns a Not Implemented error
     #:
+
+    def handler_will_run(self):
+        return None
 
     def get(self, *args):
         raise prestans.exceptions.UnimplementedVerb("GET")
@@ -151,6 +181,9 @@ class RequestHandler(object):
 
     def delete(self, *args):
         raise prestans.exceptions.UnimplementedVerb("DELETE")
+
+    def handler_did_run(self):
+        return None
 
 
 #:
@@ -240,19 +273,20 @@ class RequestRouter(object):
 
             match = regexp.match(request.path)
 
-            #: If a match is found handler over the handler callable
-            #: which in turn should return the response
+            #: If we've found a match; ensure its a handler subclass and return it's callable
             if match:
+
                 request_handler = handler_class(args=match.groups(), request=request, response=response, 
                     logger=self._logger, debug=self._debug)
+
                 return request_handler(environ, start_response)
 
-        #: No routes match the request; send out a not found
-    
-        #: Say Goodbye
-        return response(environ, start_response)
+        #: Request does not have a matched handler
+        return "Request does not have a matched handler"
 
+    
     #: @todo Update regular expressions to support webapp2 like routes
+    #: the followign code was originally taken from webapp
     def _init_route_map(self, routes):
 
         parsed_handler_map = []
