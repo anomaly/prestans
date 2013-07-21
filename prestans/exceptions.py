@@ -164,13 +164,19 @@ class SerializationFailed(DataValidation):
 #: Parser Exception
 #:
 
-class NoSetMatched(Exception):
+class PraserException(Base):
     pass
 
-class BodyTemplateParse(Exception):
+class NoSetMatched(PraserException):
     pass
 
-class EmptyBody(Exception):
+class BodyTemplateParse(PraserException):
+    pass
+
+class EmptyBody(PraserException):
+    pass
+
+class UnsupportedVocabulary(PraserException):
     pass
 
 

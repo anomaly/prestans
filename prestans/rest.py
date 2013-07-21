@@ -54,6 +54,10 @@ class Request(webob.Request):
         self._deserializers = deserializers
 
     @property
+    def supported_mime_types(self):
+        return [deserializer.content_type() for deserializer in self._deserializers]
+
+    @property
     def method(self):
         return self.environ['REQUEST_METHOD']
 
@@ -71,6 +75,7 @@ class Response(webob.Response):
 
         self._logger = logger
         self._serializers = serializers
+        self._selected_serializer = None
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -79,11 +84,57 @@ class Response(webob.Response):
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
 
+    @property
+    def supported_mime_types(self):
+        return [serializer.content_type() for serializer in self._serializers]
+
+    #:
+    #: Overrideen content_type property; adapted from webob.Resposne line 606
+    #:
+
+    def _content_type__get(self):
+        """
+        Get/set the Content-Type header (or None), *without* the
+        charset or any parameters.
+
+        If you include parameters (or ``;`` at all) when setting the
+        content_type, any existing parameters will be deleted;
+        otherwise they will be preserved.
+        """
+        header = self.headers.get('Content-Type')
+        if not header:
+            return None
+        return header.split(';', 1)[0]
+
+    def _content_type__set(self, value):
+
+        #: Check to see if response can support the requested mime type
+        if value not in self.supported_mime_types:
+            raise prestans.exceptions.UnsupportedVocabulary()
+
+        #: Keep a reference to the selected serializer
+
+        if not value:
+            self._content_type__del()
+            return
+        if ';' not in value:
+            header = self.headers.get('Content-Type', '')
+            if ';' in header:
+                params = header.split(';', 1)[1]
+                value += ';' + params
+        self.headers['Content-Type'] = value
+
+    def _content_type__del(self):
+        self.headers.pop('Content-Type', None)
+
+    content_type = property(_content_type__get, _content_type__set,
+                            _content_type__del, doc=_content_type__get.__doc__)
+
     def __call__(self, environ, start_response):
 
         self._logger.info("response; callable execution start")
 
-        self._logger.info("resposne callable exiting; http status %s; content length %i" 
+        self._logger.info("response callable exiting; http status %s; content length %i" 
             % (self.status, self.content_length))
 
         #: Run whatever webob.Response had to say
@@ -118,8 +169,10 @@ class RequestHandler(object):
 
     def __call__(self, environ, start_response):
 
-        self._logger.info("handler %s.%s; callable excution start" 
+        self.logger.info("handler %s.%s; callable excution start" 
             % (self.__module__, self.__class__.__name__))
+
+        self.logger.info("setting default response to %s" % self.request.accept)
 
         #: Ensure we support the HTTP verb
 
@@ -130,6 +183,15 @@ class RequestHandler(object):
         #: Parse Parameter Set
 
         #: Auto set the return serializer based on Accept headers
+        #: http://docs.webob.org/en/latest/reference.html#header-getters
+
+        _supportable_mime_types = set(self.request.accept.best_matches()).intersection(
+            set(self.response.supported_mime_types))
+
+        if not _supportable_mime_types and len(_supportable_mime_types) < 1:
+            self.logger.error("Can't support any mimes")
+
+        self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
 
         #: Warm up
         self.handler_will_run()
@@ -154,7 +216,7 @@ class RequestHandler(object):
         #: Tear down
         self.handler_did_run()
 
-        self._logger.info("handler %s.%s; callable excution ends" 
+        self.logger.info("handler %s.%s; callable excution ends" 
             % (self.__module__, self.__class__.__name__))
 
         return self._response(environ, start_response)
