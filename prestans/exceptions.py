@@ -30,6 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import prestans.http
+
 #:
 #: The following Exceptions are used internally by the prestans framework to indicate
 #: parsing, and implemtnation errors.
@@ -40,6 +42,13 @@
 #:
 
 class Base(Exception):
+
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def http_status(self):
+        return self._http_status
 
     def __str__(self):
         return self._message
@@ -52,10 +61,7 @@ class Configuration(Base):
     pass
 
 class DataValidation(Base):
-    
-    def __init__(self, message):
-        self._message = message
-
+    pass
 
 #:
 #: Configuration
@@ -70,7 +76,8 @@ class ReservedWord(Configuration):
 class UnimplementedVerb(Configuration):
 
     def __init__(self, verb_name):
-        pass
+        self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
+        self._message = "end point does not speak %s" % (verb_name)
 
 class NotParserRuleSet(Configuration):
     pass
@@ -179,11 +186,8 @@ class EmptyBody(ParserException):
 class UnsupportedVocabulary(ParserException):
     
     def __init__(self, mime_type):
-        self._mime_type = mime_type
-        self._http_status = prestans.rest.STATUS.
-
-    def __str__(self):
-
+        self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
+        self._message = "end point does not speak %s" % (mime_type)
 
 
 #:
