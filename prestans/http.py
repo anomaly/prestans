@@ -54,17 +54,60 @@ class STATUS:
     #: The following is a selection of HTTP status codes that are recommended for use 
     #: by REST services. You are welcome to use other available status codes.
     #:
+    #: http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+    #:
 
-    OK                      = 200
-    CREATED                 = 201
-    ACCEPTED                = 202
-    NO_CONTENT              = 204
-    NOT_MODIFIED            = 304
-    BAD_REQUEST             = 400
-    UNAUTHORIZED            = 401
-    FORBIDDEN               = 403
-    NOT_FOUND               = 404
-    CONFLICT                = 409
-    GONE                    = 410
+    #: Informational
+
+    CONTINUE                    = 100
+    SWITCHING_PROTOCOLS         = 101
+
+    #: Success
+
+    OK                          = 200
+    CREATED                     = 201
+    ACCEPTED                    = 202
+    NON_AUTH_INFORMATION        = 203
+    NO_CONTENT                  = 204
+    RESET_CONTENT               = 205
+    PARTIAL_CONTENT             = 206
+
+    #: Redirection
+
+    MULTIPLE_CHOICES            = 300
+    MOVED_PERMANENTLY           = 301
+    FOUND                       = 302
+    SEE_OTHER                   = 303
+    NOT_MODIFIED                = 304
+    USE_PROXY                   = 305
+    SWITCH_PROXY                = 306
+    TEMPORARY_REDIRECT          = 307
+    PERMANENT_REDIRECT          = 308
+
+    #: Client Error
+
+    BAD_REQUEST                 = 400
+    UNAUTHORIZED                = 401
+    PAYMENT_REQUIRED            = 402
+    FORBIDDEN                   = 403
+    NOT_FOUND                   = 404
+    METHOD_NOT_ALLOWED          = 405
+    NOT_ACCEPTABLE              = 406
+    PROXY_AUTH_REQUIRED         = 407
+    REQUEST_TIMEOUT             = 408
+    CONFLICT                    = 409
+    GONE                        = 410
+    LENGTH_REQUIRED             = 411
+    PRECONDITION_FAILED         = 412
+    REQUEST_ENTITY_TOO_LARGE    = 413
+    REQUEST_URI_TOO_LARGE       = 414
+    UNSUPPORTED_MEDIA_TYPE      = 415
+    RANGE_NOT_SERIALIZABLE      = 416
+    EXCEPTION_FAILED            = 417
+    I_M_A_TEAPOT                = 418
+    AUTHENTICATION_TIMEOUT      = 419
+
+    #: Server Error
+    
     INTERNAL_SERVER_ERROR   = 500
     SERVICE_UNAVAILABLE     = 503

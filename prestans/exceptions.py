@@ -164,20 +164,26 @@ class SerializationFailed(DataValidation):
 #: Parser Exception
 #:
 
-class PraserException(Base):
+class ParserException(Base):
     pass
 
-class NoSetMatched(PraserException):
+class NoSetMatched(ParserException):
     pass
 
-class BodyTemplateParse(PraserException):
+class BodyTemplateParse(ParserException):
     pass
 
-class EmptyBody(PraserException):
+class EmptyBody(ParserException):
     pass
 
-class UnsupportedVocabulary(PraserException):
-    pass
+class UnsupportedVocabulary(ParserException):
+    
+    def __init__(self, mime_type):
+        self._mime_type = mime_type
+        self._http_status = prestans.rest.STATUS.
+
+    def __str__(self):
+
 
 
 #:

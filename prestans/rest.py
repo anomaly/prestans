@@ -89,7 +89,7 @@ class Response(webob.Response):
         return [serializer.content_type() for serializer in self._serializers]
 
     #:
-    #: Overrideen content_type property; adapted from webob.Resposne line 606
+    #: Overridden content_type property; adapted from webob.Resposne line 606
     #:
 
     def _content_type__get(self):
@@ -110,7 +110,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exceptions.UnsupportedVocabulary()
+            raise prestans.exceptions.UnsupportedVocabulary(value)
 
         #: Keep a reference to the selected serializer
 
@@ -134,7 +134,7 @@ class Response(webob.Response):
 
         self._logger.info("response; callable execution start")
 
-        self._logger.info("response callable exiting; http status %s; content length %i" 
+        self._logger.info("response; callable execution ends; http status %s; content length %i" 
             % (self.status, self.content_length))
 
         #: Run whatever webob.Response had to say
