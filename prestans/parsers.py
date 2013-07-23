@@ -117,6 +117,139 @@ class ReservedWordException(Exception):
     def __str__(self):
         return "reserved word %s not allowed in request"  % (self._reserved_word)
 
+## @brief Returned by prestans.parsers.FileUploadParser to represent the uploaded file
+#
+#  @ingroup deprecated
+#
+#  Allows you to get information about the uploaded file and provides a wrapper to write
+#  the file to disk.
+#
+#  You can get the raw contents of the file if you wish to store it otherwise.
+#
+class FileInfo(object):
+    
+    ## @brief Used by FileUploadParser to construct a FileInfo, generates UUID
+    #
+    def __init__(self, original_file_name, file_size, buffer_handle, mime_type):
+        self._original_file_name = original_file_name
+        self._file_size = file_size
+        self._buffer_handle = buffer_handle
+        self._mime_type = mime_type
+
+        import uuid
+        self._generated_file_name = uuid.uuid4()
+    
+    ## @brief Returns a handle to the contents StringIO buffer
+    #
+    def get_file_contents_buffer(self):
+        return self._content
+    
+    ## @brief Returns the generated file name, uuid.uui4.hex
+    #
+    def get_file_name(self):
+        return self._generated_file_name.hex
+
+    ## @brief Returns the original file name 
+    #
+    def get_original_file_name(self):
+        return self._original_file_name
+     
+    ## @brief Returns the size of the buffer
+    #   
+    def get_file_size(self):
+        return self._file_size
+        
+    ## @brief Returns the mime type of the file, this has to be one of the accepted prestans.types
+    #
+    def get_mime_type(self):
+        return self._mime_type
+    
+    ## @brief Assists in writing the buffer to disk, if no filename is provided the UUID is used
+    #
+    #  Raises general exceptions if there are issues writing a file, not handled in this method.
+    #
+    def save(self, target_directory, file_name=None):
+
+        if not file_name: file_name = self.get_file_name()
+
+        import os
+        handle = open(os.path.join(target_directory, file_name), 'wb')
+
+        while 1:
+            chunk = self._buffer_handle.read(100000)
+            if not chunk: break
+            handle.write(chunk)
+        handle.close()
+            
+
+## @brief Allows a REST handler to parse multipart file uploads in the body
+#
+#  @ingroup depcrecated
+#
+#  This is an exception to the rule for parsing multipart forms when uploading files.
+#  REST applications often need to handle file uploads, Cloud environments like GAE have
+#  Blobstores that handle this scenario.
+#
+#  The following implementation is to assist mod_wsgi based apps to provide
+#  FileUpload functionality for Ajax apps.
+#
+#  FileUploadParser is user in conjunction with a RESTHandler subclass, and benefits
+#  from all its functionality. Error messages sent in current application messaging protocol.
+#
+#
+class FileUploadParser(object):
+    
+    min_size = 0
+    max_size = 12288
+    allowed_mime_types = None
+    form_field_name = None
+
+    ## @brief Gets a FileStorage object for the upload field, fixes issues with WSGI and CGI
+    #
+    #  With a little help from http://www.wsgi.org/en/latest/specifications/handling_post_forms.html
+    #
+    def _get_post_form(self, environ):
+
+        import cgi
+        input = environ['wsgi.input']
+        post_form = environ.get('wsgi.post_form')
+        if (post_form is not None and post_form[0] is input):
+            return post_form[2]
+
+        # This must be done to avoid a bug in cgi.FieldStorage
+        environ.setdefault('QUERY_STRING', '')
+        fs = cgi.FieldStorage(fp=input, environ=environ, keep_blank_values=1)
+        return fs
+            
+    ## @brief uses CGI parsed form field and validates it matches the upload conditions
+    #
+    def validate(self, environ):
+
+        field_storage = self._get_post_form(environ)
+        
+        if not field_storage:
+            raise prestans.prestans.types.DataTypeValidationException('Form must contain field %s with contents of a file' % self.form_field_name)
+
+        if not self.form_field_name in field_storage or not field_storage[self.form_field_name].file:
+            raise prestans.types.DataTypeValidationException('Form field %s does not contain a binary file' % self.form_field_name)
+
+        file_field = field_storage[self.form_field_name]
+            
+        if file_field.bufsize < self.min_size or file_field.bufsize > self.max_size:
+            raise prestans.types.DataTypeValidationException('Uploaded file is not witin the size limits')
+        
+        
+        #Check to see that mime type is acceptable
+        types = __import__('types', globals(), locals(), [], 0)
+        mime_type_matched = True
+        if type(self.allowed_mime_types) is types.ListType and len(self.allowed_mime_types) > 0: 
+            mime_type_matched = file_field.type in self.allowed_mime_types
+                
+        if not mime_type_matched:
+            raise prestans.types.DataTypeValidationException('Files of type %s not accepted by this service'  % file_field.type)
+        
+        return FileInfo(original_file_name=file_field.filename, file_size=file_field.bufsize, buffer_handle=file_field.file, mime_type=file_field.type)
+
 ## @brief %ParameterSet is a group of Dataprestans.types that are expected as GET parameters
 #
 # %ParameterSet defines rules and patterns in which they are acceptable.
