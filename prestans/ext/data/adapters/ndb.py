@@ -34,7 +34,8 @@
 __all__ = ['QueryResultIterator', 'ModelAdapter']
 
 #:
-#: prestans.ext.data.adapters.datastore Google DataStore specific implementation of Data Adapter
+#: prestans.ext.data.adapters.datastore Google DataStore specific 
+#: implementation of Data Adapter
 #:
 
 from prestans.ext.data import adapters

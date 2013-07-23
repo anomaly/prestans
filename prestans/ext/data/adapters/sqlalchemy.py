@@ -162,5 +162,5 @@ class ModelAdapter(adapters.ModelAdapter):
                 except prestans.types.DataTypeValidationException, exp:
                     raise prestans.types.DataTypeValidationException('Attribute %s, %s' % (attribute_key, str(exp)))
 
-            
         return rest_model_instance
+        

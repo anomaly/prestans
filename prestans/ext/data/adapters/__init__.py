@@ -31,9 +31,6 @@
 #
 
 class AdapterRegistryManager:
-    """
-
-    """
 
     def __init__(self):
         self._persistent_map = dict()
