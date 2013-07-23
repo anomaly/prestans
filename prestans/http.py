@@ -30,6 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+__all__ = ['VERB', 'STATUS']
+
 #:
 #: This file mostly contains constants for HTTP
 #:

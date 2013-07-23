@@ -30,6 +30,48 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+__all__ = [
+    'Base',
+    'Configuration',
+    'DataValidation',
+    'DirectUseNotAllowed',
+    'ReservedWord',
+    'UnimplementedVerb',
+    'NotParserRuleSet',
+    'NotParameterSet',
+    'InvalidParameterSetAttribute',
+    'InvalidDataType',
+    'RequiresDataCollection',
+    'RequiresModel',
+    'RequiredAttribute',
+    'ParseFailed',
+    'InvalidValue',
+    'LessThanMinimum',
+    'MoreThanMaximum',
+    'InvalidChoice',
+    'UnacceptableLength',
+    'InvalidType',
+    'InvalidCollection',
+    'MissingParameter',
+    'InvalidFormat',
+    'InvalidMetaValue',
+    'UnregisteredAdapter',
+    'NotImplemented',
+    'SerializationFailed',
+    'ParserException',
+    'NoSetMatched',
+    'BodyTemplateParse',
+    'EmptyBody',
+    'UnsupportedVocabulary',
+    'RESTOperation',
+    'ServiceUnavailable',
+    'BadRequest',
+    'Conflict',
+    'NotFound',
+    'Unauthorized',
+    'Forbidden'
+]
+
 import prestans.http
 
 #:

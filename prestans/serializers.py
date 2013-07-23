@@ -30,6 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+__all__ = ['Serializer', 'JSON', 'XMLPlist']
+
 import prestans.exceptions
 
 class Serializer(object):
