@@ -324,7 +324,8 @@ class RequestRouter(object):
             (str(_default_outgoing_mime_types).strip("[]'"), str(_default_incoming_mime_types).strip("[]'")))
 
         #: Attempt to parse the HTTP request
-        request = Request(environ=environ, charset=self._charset, logger=self._logger, deserializers=self._deserializers)
+        request = Request(environ=environ, charset=self._charset, logger=self._logger, 
+            deserializers=self._deserializers)
         response = Response(logger=self._logger, serializers=self._serializers)
 
         #: Initialise the Route map

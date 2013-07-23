@@ -238,7 +238,7 @@ class UnsupportedVocabulary(ParserException):
 #: error message for the end user.
 #:
 
-class RESTOperation(Exception):
+class RESTOperation(Base):
     #: 
     #: Extends from the Base exception to make available a HTTP status code, these
     #: are thrown if an unacceptable REST operation is performed. 
