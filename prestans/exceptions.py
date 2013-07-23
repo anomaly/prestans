@@ -85,15 +85,46 @@ import prestans.http
 
 class Base(Exception):
 
-    def __init__(self, message):
-        self._message = message
+    def __init__(self, http_status):
+        self.http_status = http_status
+
+    #:
+    #: HTTP status is used to construct 
+    #:
 
     @property
     def http_status(self):
         return self._http_status
 
+    @http_status.setter
+    def http_status(self, value):
+        self._http_status = value
+
+    #:
+    #:
+    #:
+
+    @property
+    def log_message(self):
+        return self._log_message
+
+    @log_message.setter
+    def log_message(self, value):
+        self._log_message = value
+
+    #:
+    #:
+    #:
+
+    def as_error_response(self):
+        pass
+
+    #:
+    #: Used to log
+    #:
+
     def __str__(self):
-        return self._message
+        return self.log_message
 
 #:
 #: Configuration
@@ -228,7 +259,7 @@ class EmptyBody(ParserException):
 class UnsupportedVocabulary(ParserException):
     
     def __init__(self, mime_type):
-        self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
+        self._http_status = prestans.http.STATUS.NOT_ACCEPTABLE
         self._message = "end point does not speak %s" % (mime_type)
 
 
