@@ -37,12 +37,11 @@ __all__ = ['VERB', 'STATUS']
 #:
 
 class VERB:
-
-    #:
-    #: Encapsulates HTTP Verbs supported by the prestans framework in accordance
-    #: with the REST definition. Each prestans REST handler must supporto at least
-    #: one HTTP verb.
-    #:
+    """ 
+    Encapsulates HTTP Verbs supported by the prestans framework in accordance
+    with the REST definition. Each prestans REST handler must supporto at least
+    one HTTP verb.
+    """
 
     GET    = "GET"
     POST   = "POST"
@@ -51,13 +50,12 @@ class VERB:
     DELETE = "DELETE"
 
 class STATUS:
-
-    #:
-    #: The following is a selection of HTTP status codes that are recommended for use 
-    #: by REST services. You are welcome to use other available status codes.
-    #:
-    #: http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-    #:
+    """
+    The following is a selection of HTTP status codes that are recommended for use 
+    by REST services. You are welcome to use other available status codes.
+    
+    http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+    """
 
     #: Informational
 

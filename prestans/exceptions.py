@@ -31,9 +31,12 @@
 #
 
 __all__ = [
-    'Base',
-    'Configuration',
-    'DataValidation',
+    'ConfigurationException',
+    'DataValidationException',
+    'ParserException',
+    'HandlerException',
+
+    #: Configuration Exceptions
     'DirectUseNotAllowed',
     'ReservedWord',
     'UnimplementedVerb',
@@ -43,6 +46,16 @@ __all__ = [
     'InvalidDataType',
     'RequiresDataCollection',
     'RequiresModel',
+
+    #: Parser Exceptions
+    'NotImplemented',
+    'SerializationFailed',
+    'NoSetMatched',
+    'BodyTemplateParse',
+    'EmptyBody',
+    'UnsupportedVocabulary',
+
+    #: Data Validation
     'RequiredAttribute',
     'ParseFailed',
     'InvalidValue',
@@ -56,14 +69,8 @@ __all__ = [
     'InvalidFormat',
     'InvalidMetaValue',
     'UnregisteredAdapter',
-    'NotImplemented',
-    'SerializationFailed',
-    'ParserException',
-    'NoSetMatched',
-    'BodyTemplateParse',
-    'EmptyBody',
-    'UnsupportedVocabulary',
-    'RESTOperation',
+
+    #: Handler exceptions
     'ServiceUnavailable',
     'BadRequest',
     'Conflict',
@@ -75,177 +82,103 @@ __all__ = [
 import prestans.http
 
 #:
-#: The following Exceptions are used internally by the prestans framework to indicate
-#: parsing, and implemtnation errors.
+#: These are top level exceptions that layout tell prestans how
+#: the resulting messages are written out to the either the client
+#: or the logger
 #:
-#: Some of them do not produce an error mesasge for the client, instead they write to
-#: the log and terminate the REST application. Those exceptions that terminate the
-#: application should never be shipped.
+#: None of these exceptions are used directly
 #:
 
-class Base(Exception):
+class ConfigurationException(Exception):
+    """
+    ConfigurationExceptions are Exceptions raised if prestans was
+    incorrectly configured. These exceptions are completely masked 
+    for the requesting client and written out to error log.
 
-    def __init__(self, http_status):
-        self.http_status = http_status
-
-    #:
-    #: HTTP status is used to construct 
-    #:
-
-    @property
-    def http_status(self):
-        return self._http_status
-
-    @http_status.setter
-    def http_status(self, value):
-        self._http_status = value
-
-    #:
-    #:
-    #:
-
-    @property
-    def log_message(self):
-        return self._log_message
-
-    @log_message.setter
-    def log_message(self, value):
-        self._log_message = value
-
-    #:
-    #:
-    #:
-
-    def as_error_response(self):
+    In production these Exceptions should never be raised. This 
+    exception generally alludes that your API has a bug; prestans 
+    will cease execution of your handler code.
+    """
+    
+    def __init__(self):
         pass
 
-    #:
-    #: Used to log
-    #:
+class DataValidationException(Exception):
+    """
+    DataValidationException are Exceptions raised if prestans fails
+    to validate data inbound or out using rules defined in Models.
 
-    def __str__(self):
-        return self.log_message
+    These contains a stack trace to indicate the depth of the error.
+    E.g Model has Sub Model that has attribute which failed to validate.
+
+    Each exception uses an HTTP status code and is sent to the client.
+    """
+    pass
+
+class ParserException(Exception):
+    """
+
+
+
+    """
+    pass
+
+class HandlerException(Exception):
+    """
+    HandlerExceptions are Exceptions that are raised by handlers of the
+    REST application. REST encourages the use different error codes to
+    denote what the error is.
+
+    E.g Use 404 to denote that a reqeusted doesn't exists on the server.
+
+    If one of these exceptions do not match your user case; you are free
+    construct your own error message and use an error code from outlined
+    in prestans.http
+
+    """
+    pass
+
 
 #:
 #: Configuration
 #:
 
-class Configuration(Base):
+class DirectUseNotAllowed(ConfigurationException):
     pass
 
-class DataValidation(Base):
+class ReservedWord(ConfigurationException):
     pass
 
-#:
-#: Configuration
-#:
-
-class DirectUseNotAllowed(Configuration):
-    pass
-
-class ReservedWord(Configuration):
-    pass
-
-class UnimplementedVerb(Configuration):
+class UnimplementedVerb(ConfigurationException):
 
     def __init__(self, verb_name):
         self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
         self._message = "end point does not speak %s" % (verb_name)
 
-class NotParserRuleSet(Configuration):
+class NotParserRuleSet(ConfigurationException):
     pass
 
-class NotParameterSet(Configuration):
+class NotParameterSet(ConfigurationException):
     pass
 
-class InvalidParameterSetAttribute(Configuration):
+class InvalidParameterSetAttribute(ConfigurationException):
     pass
 
-class InvalidDataType(Configuration):
+class InvalidDataType(ConfigurationException):
     
     def __init__(self, attribute_name, expected_type):
         pass
 
-class RequiresDataCollection(Configuration):
+class RequiresDataCollection(ConfigurationException):
     pass
 
-class RequiresModel(Configuration):
+class RequiresModel(ConfigurationException):
     pass
 
-
-#:
-#: Data Validation
-#: 
-
-class RequiredAttribute(DataValidation):
-    pass
-
-class ParseFailed(DataValidation):
-    
-    def __init__(self, value, data_type):
-        pass
-
-class InvalidValue(DataValidation):
-    
-    def __init__(self, value):
-        pass
-
-class LessThanMinimum(DataValidation):
-    
-    def __init__(self, value, allowed_min):
-        pass
-
-class MoreThanMaximum(DataValidation):
-
-    def __init__(self, value, allowed_max):
-        pass
-
-class InvalidChoice(DataValidation):
-
-    def __init__(self, value, allowed_choices):
-        pass
-
-class UnacceptableLength(DataValidation):
-    
-    def __init__(self, value, minimum, maximum):
-        pass
-
-class InvalidType(DataValidation):
-    
-    def __init__(self, value, type_name):
-        pass
-
-class InvalidCollection(DataValidation):
-
-    def __init__(self, value):
-        pass
-
-class MissingParameter(DataValidation):
-    pass
-
-class InvalidFormat(DataValidation):
-    
-    def __init__(self, value):
-        pass
-
-class InvalidMetaValue(DataValidation):
-    pass
-
-class UnregisteredAdapter(DataValidation):
-    pass
-
-class NotImplemented(DataValidation):
-    pass
-
-class SerializationFailed(DataValidation):
-    pass
 
 #:
 #: Parser Exception
 #:
-
-class ParserException(Base):
-    pass
 
 class NoSetMatched(ParserException):
     pass
@@ -264,34 +197,99 @@ class UnsupportedVocabulary(ParserException):
 
 
 #:
-#: The following excepetions are used by REST handlers to indicate commonly defined
-#: scenarios when dealing with data. BaseHandler traps these and generates an appropriate
-#: error message for the end user.
+#: Data Validation
+#: 
+
+class RequiredAttribute(DataValidationException):
+    pass
+
+class ParseFailed(DataValidationException):
+    
+    def __init__(self, value, data_type):
+        pass
+
+class InvalidValue(DataValidationException):
+    
+    def __init__(self, value):
+        pass
+
+class LessThanMinimum(DataValidationException):
+    
+    def __init__(self, value, allowed_min):
+        pass
+
+class MoreThanMaximum(DataValidationException):
+
+    def __init__(self, value, allowed_max):
+        pass
+
+class InvalidChoice(DataValidationException):
+
+    def __init__(self, value, allowed_choices):
+        pass
+
+class UnacceptableLength(DataValidationException):
+    
+    def __init__(self, value, minimum, maximum):
+        pass
+
+class InvalidType(DataValidationException):
+    
+    def __init__(self, value, type_name):
+        pass
+
+class InvalidCollection(DataValidationException):
+
+    def __init__(self, value):
+        pass
+
+class MissingParameter(DataValidationException):
+    pass
+
+class InvalidFormat(DataValidationException):
+    
+    def __init__(self, value):
+        pass
+
+class InvalidMetaValue(DataValidationException):
+    pass
+
+class UnregisteredAdapter(DataValidationException):
+    pass
+
+class NotImplemented(DataValidationException):
+    pass
+
+class SerializationFailed(DataValidationException):
+    pass
+
+
+#:
+#: The following excepetions are used by REST handlers to indicate 
+#: commonly defined scenarios when dealing with data. BaseHandler traps 
+#: these and generates an appropriate error message for the end user.
 #:
 
-class RESTOperation(Base):
-    #: 
-    #: Extends from the Base exception to make available a HTTP status code, these
-    #: are thrown if an unacceptable REST operation is performed. 
-    #: 
-    #: E.g a client attempts to access data they are not allowed to.
-    #: 
+class ServiceUnavailable(HandlerException):
     pass
 
-class ServiceUnavailable(RESTOperation):
+class BadRequest(HandlerException):
     pass
 
-class BadRequest(RESTOperation):
+class Conflict(HandlerException):
     pass
 
-class Conflict(RESTOperation):
+class NotFound(HandlerException):
     pass
 
-class NotFound(RESTOperation):
+class Unauthorized(HandlerException):
     pass
 
-class Unauthorized(RESTOperation):
+class MovedPermanently(HandlerException):
     pass
 
-class Forbidden(RESTOperation):
+class PaymentRequired(HandlerException):
+    pass
+
+class Forbidden(HandlerException):
     pass
