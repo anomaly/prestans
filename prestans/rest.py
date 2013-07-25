@@ -73,8 +73,8 @@ class Request(webob.Request):
 class Response(webob.Response):
     """
     Response is the writable HTTP response. It inherits and leverages 
-    from WebOb.Response to do the heavy lifiting of HTTP Responses. It adds to
-    WebOb.Response prestans customisations.
+    from webob.Response to do the heavy lifiting of HTTP Responses. It adds to
+    weob.Response prestans customisations.
 
     Overrides content_type property to use prestans' serializers with the set body
     """
@@ -99,7 +99,7 @@ class Response(webob.Response):
         return [serializer.content_type() for serializer in self._serializers]
 
     #:
-    #: Overridden content_type property; adapted from webob.Resposne line 606
+    #: content_type; overrides webob.Resposne line 606
     #:
 
     def _content_type__get(self):
@@ -120,7 +120,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exceptions.UnsupportedVocabulary(value)
+            raise prestans.exceptions.UnsupportedVocabulary()
 
         #: Keep a reference to the selected serializer
 
@@ -140,16 +140,73 @@ class Response(webob.Response):
     content_type = property(_content_type__get, _content_type__set,
                             _content_type__del, doc=_content_type__get.__doc__)
 
-    def __call__(self, environ, start_response):
 
-        self._logger.info("response; callable execution start")
+    #:
+    #: body; overrides webob.Response line 324
+    #:
 
-        self._logger.info("response; callable execution ends; http status %s; content length %i" 
-            % (self.status, self.content_length))
+    def _body__get(self):
+        """
+        The body of the response, as a ``str``.  This will read in the
+        entire app_iter if necessary.
+        """
+        app_iter = self._app_iter
+#         try:
+#             if len(app_iter) == 1:
+#                 return app_iter[0]
+#         except:
+#             pass
+        if isinstance(app_iter, list) and len(app_iter) == 1:
+            return app_iter[0]
+        if app_iter is None:
+            raise AttributeError("No body has been set")
+        try:
+            body = b''.join(app_iter)
+        finally:
+            iter_close(app_iter)
+        if isinstance(body, text_type):
+            raise _error_unicode_in_app_iter(app_iter, body)
+        self._app_iter = [body]
+        if len(body) == 0:
+            # if body-length is zero, we assume it's a HEAD response and
+            # leave content_length alone
+            pass # pragma: no cover (no idea why necessary, it's hit)
+        elif self.content_length is None:
+            self.content_length = len(body)
+        elif self.content_length != len(body):
+            raise AssertionError(
+                "Content-Length is different from actual app_iter length "
+                "(%r!=%r)"
+                % (self.content_length, len(body))
+            )
+        return body
 
-        #: Run whatever webob.Response had to say
-        return super(Response, self).__call__(environ, start_response)
+    def _body__set(self, value=b''):
+        if not isinstance(value, bytes):
+            if isinstance(value, text_type):
+                msg = ("You cannot set Response.body to a text object "
+                       "(use Response.text)")
+            else:
+                msg = ("You can only set the body to a binary type (not %s)" %
+                       type(value))
+            raise TypeError(msg)
+        if self._app_iter is not None:
+            self.content_md5 = None
+        self._app_iter = [value]
+        self.content_length = len(value)
 
+
+    body = property(_body__get, _body__set, _body__set)
+
+
+class ErrorResponse(webob.Response):
+    """
+    ErrorResposne is used by exceptions to return
+
+    """
+    
+    def __init__(self, exception):
+        self._exception = exception
 
 class RequestHandler(object):
     """
@@ -261,12 +318,6 @@ class RequestHandler(object):
         return None
 
 
-class ErrorResponse(webob.Response):
-    """
-
-    """
-    pass
-
 #:
 #:
 #:
@@ -376,34 +427,9 @@ class RequestRouter(object):
             return "No matching handler for this URL"
 
         except prestans.exceptions.UnsupportedVocabulary, exp:
-            return self._unsupported_vocabulary_error_message(environ, start_response)
+            return exp.as_error_response(environ, start_response, 
+                request.accept, _default_outgoing_mime_types)
 
-    #:
-    #: Called if none of the requested vocabularies are supported by the API
-    #: this error message is sent as an HTML document
-    #:
-    def _unsupported_vocabulary_error_message(self, environ, start_response):
-
-        error_response = webob.Response()
-
-        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
-        error_response.content_type = "text/html"
-        error_response.body = """
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <title>prestans %s, unsupported media type</title>
-            </head>
-            <body>
-                <h1>Unsupported media type</h1>
-                <p>
-                    You requested this and we can support this
-                </p>
-            </body>
-        </html>
-        """ % (prestans.__version__)
-
-        return error_response(environ, start_response)
 
     #:    
     #: @todo Update regular expressions to support webapp2 like routes

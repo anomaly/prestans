@@ -79,6 +79,7 @@ __all__ = [
     'Forbidden'
 ]
 
+import prestans
 import prestans.http
 
 #:
@@ -88,6 +89,37 @@ import prestans.http
 #:
 #: None of these exceptions are used directly
 #:
+
+class UnsupportedVocabulary(Exception):
+    """
+    Called if none of the requested vocabularies are supported by the API
+    this error message is sent as an HTML document. This exception is the
+    only one that breaks serialisation rules.
+    """
+    
+    def as_error_response(self, environ, start_response, user_accept_header, supported_mime_types):
+
+        import webob
+        error_response = webob.Response()
+
+        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
+        error_response.content_type = "text/html"
+        error_response.body = """
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>prestans %s, unsupported media type</title>
+            </head>
+            <body>
+                <h1>Unsupported media type</h1>
+                <p>
+                    You requested <span>%s</span> and we can support <span>%s</span>
+                </p>
+            </body>
+        </html>
+        """ % (prestans.__version__, user_accept_header, str(supported_mime_types).strip("[]'"))
+
+        return error_response(environ, start_response)
 
 class ConfigurationException(Exception):
     """
@@ -188,12 +220,6 @@ class BodyTemplateParse(ParserException):
 
 class EmptyBody(ParserException):
     pass
-
-class UnsupportedVocabulary(ParserException):
-    
-    def __init__(self, mime_type):
-        self._http_status = prestans.http.STATUS.NOT_ACCEPTABLE
-        self._message = "end point does not speak %s" % (mime_type)
 
 
 #:
