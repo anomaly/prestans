@@ -40,12 +40,10 @@ import prestans.exceptions
 import prestans.serializers
 import prestans.deserializers
 
-#:
-#: Wrappers around Request and Response to handle HTTP requests, these depend on
-#: serializers to write read and write responses
-#:
-
 class Request(webob.Request):
+    """
+    
+    """
 
     def __init__(self, environ, charset, logger, deserializers):
 
@@ -68,6 +66,9 @@ class Request(webob.Request):
 
 
 class Response(webob.Response):
+    """
+
+    """
 
     def __init__(self, logger, serializers):
         
@@ -140,12 +141,12 @@ class Response(webob.Response):
         #: Run whatever webob.Response had to say
         return super(Response, self).__call__(environ, start_response)
 
-#:
-#: RESTHandler defines specific end points, implementing APIs subclass this to
-#: implement their end points.
-#:
 
 class RequestHandler(object):
+    """
+
+
+    """
 
     def __init__(self, args, request, response, logger, debug=False):
 
@@ -256,11 +257,11 @@ class BlueprintHandler(RequestHandler):
     pass
 
 
-#:
-#: Router infrastructure code to dispatch requests
-#:
-
 class RequestRouter(object):
+    """
+
+
+    """
 
     def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", 
         application_name="prestans", logger=None, debug=False):

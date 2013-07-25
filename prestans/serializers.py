@@ -55,6 +55,10 @@ class JSON(Serializer):
 
 
 class XMLPlist(Serializer):
+    """
+    Uses Apple's Property List format to serialize collections 
+    to XML. Refer to http://docs.python.org/2/library/plistlib.html
+    """
 
     def dumps(self, serializable_object):
 
@@ -65,4 +69,33 @@ class XMLPlist(Serializer):
 
     def content_type(self):
         return 'application/xml'
+
+
+class PDFSerializer(Serializer):
+    """
+    Serializes HTML/CSS to PDF using WeasyPrint; http://weasyprint.org
+
+    Handlers to use headers to set Content-Disposition header; to
+    deliver files inline; or as an attacment with a filename
+
+    headers = self.response.headers
+    headers.add_header('Content-Disposition', 'attachment', filename="name")
+    """
+
+    def dumps(self, serializable_object):
+        
+        import StringIO
+        from weasyprint import HTML, CSS
+
+        output_stream = StringIO.StringIO()
+
+        HTML(string=serializable_object).write_pdf(output_stream)
+
+        output_string = output_stream.getvalue())
+        output_stream.close()
+
+        return output_string
+
+    def content_type(self):
+        return 'application/pdf'
 
