@@ -91,7 +91,7 @@ class PDFSerializer(Serializer):
 
         HTML(string=serializable_object).write_pdf(output_stream)
 
-        output_string = output_stream.getvalue())
+        output_string = output_stream.getvalue()
         output_stream.close()
 
         return output_string

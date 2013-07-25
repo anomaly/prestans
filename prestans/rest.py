@@ -42,7 +42,12 @@ import prestans.deserializers
 
 class Request(webob.Request):
     """
-    
+    Request is parsed REST Request; it's inherits and relies on Webob.Request to
+    do the heavy lifiting of parsing HTTP requests. It adds on top parsing of 
+    REST bodies and parameter sets based on rules set by the prestans app.
+
+    It's responsible for making sense of the prestans headers and making them
+    available to the RequestHandler
     """
 
     def __init__(self, environ, charset, logger, deserializers):
@@ -67,7 +72,11 @@ class Request(webob.Request):
 
 class Response(webob.Response):
     """
+    Response is the writable HTTP response. It inherits and leverages 
+    from WebOb.Response to do the heavy lifiting of HTTP Responses. It adds to
+    WebOb.Response prestans customisations.
 
+    Overrides content_type property to use prestans' serializers with the set body
     """
 
     def __init__(self, logger, serializers):
@@ -144,8 +153,11 @@ class Response(webob.Response):
 
 class RequestHandler(object):
     """
+    RequestHandler is a callable that all API end-points must inherit from. 
+    end-points are instantiated by RequestRouter as a match for a URL.
 
-
+    This class should not be initialised directly. Subclasses should 
+    override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
     def __init__(self, args, request, response, logger, debug=False):
@@ -249,6 +261,12 @@ class RequestHandler(object):
         return None
 
 
+class ErrorResponse(webob.Response):
+    """
+
+    """
+    pass
+
 #:
 #:
 #:
@@ -259,7 +277,14 @@ class BlueprintHandler(RequestHandler):
 
 class RequestRouter(object):
     """
+    RequestRouter is a specialised WSGI router that primarily maps URLs to Handlers. 
+    All registered end-points must inherit from RequestHandler.
 
+    RequestRouter sets the most likely response format based on Accept Headers. If
+    no supported response format is found; RequestRouter sends back an HTML error.
+
+    If the requested URL is not handled with the API; RequestRouter presents the
+    client with a standardised error message.
 
     """
 
@@ -332,25 +357,58 @@ class RequestRouter(object):
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
 
-        #: Check if the requested URL has a valid registered handler
-        for regexp, handler_class in route_map:
+        try:
 
-            match = regexp.match(request.path)
+            #: Check if the requested URL has a valid registered handler
+            for regexp, handler_class in route_map:
 
-            #: If we've found a match; ensure its a handler subclass and return it's callable
-            if match:
+                match = regexp.match(request.path)
 
-                request_handler = handler_class(args=match.groups(), request=request, response=response, 
-                    logger=self._logger, debug=self._debug)
+                #: If we've found a match; ensure its a handler subclass and return it's callable
+                if match:
 
-                return request_handler(environ, start_response)
+                    request_handler = handler_class(args=match.groups(), request=request, response=response, 
+                        logger=self._logger, debug=self._debug)
 
-        #: Request does not have a matched handler
-        return "Request does not have a matched handler"
+                    return request_handler(environ, start_response)
 
-    
+            #: Request does not have a matched handler
+            return "No matching handler for this URL"
+
+        except prestans.exceptions.UnsupportedVocabulary, exp:
+            return self._unsupported_vocabulary_error_message(environ, start_response)
+
+    #:
+    #: Called if none of the requested vocabularies are supported by the API
+    #: this error message is sent as an HTML document
+    #:
+    def _unsupported_vocabulary_error_message(self, environ, start_response):
+
+        error_response = webob.Response()
+
+        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
+        error_response.content_type = "text/html"
+        error_response.body = """
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>prestans %s, unsupported media type</title>
+            </head>
+            <body>
+                <h1>Unsupported media type</h1>
+                <p>
+                    You requested this and we can support this
+                </p>
+            </body>
+        </html>
+        """ % (prestans.__version__)
+
+        return error_response(environ, start_response)
+
+    #:    
     #: @todo Update regular expressions to support webapp2 like routes
     #: the followign code was originally taken from webapp
+    #:
     def _init_route_map(self, routes):
 
         parsed_handler_map = []
