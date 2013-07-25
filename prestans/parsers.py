@@ -760,8 +760,9 @@ class ParserRuleSet(object):
             return None
             
         if not issubclass(self._body_template.__class__, 
-                          prestans.types.DataCollection):
-            # Require body_templates to be a DataCollection, which are Models or Arrays 
+                          prestans.types.DataCollection) and not issubclass(self._body_template.__class__, 
+                          FileUploadParser):
+            """ Require body_templates to be a DataCollection, which are Models or Arrays """
             raise RequiresDataCollectionException(ERROR_MESSAGE.NOT_COLLECTION % 
                                                   (self._body_template.__class__.__name__))
         
@@ -776,7 +777,12 @@ class ParserRuleSet(object):
                 # Parsed body should be a model which is set into the Request Handler 
                 parsed_body_model_instance = self._body_template.validate(unserialized_body, 
                                                                           self._request_attribute_filter)
-                                
+
+            elif issubclass(self._body_template.__class__, FileUploadParser):
+                
+                """ Send in the WebOb request object to parse files out """
+                parsed_body_model_instance = self._body_template.validate(environ)
+                                                
         except prestans.types.DataTypeValidationException, exp:
             raise BodyTemplateParseException(str(exp))
         
