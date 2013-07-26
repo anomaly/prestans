@@ -64,18 +64,18 @@ class DataStructure(DataType):
     """
     
     def as_serializable(self, value):
-        raise prestans.exceptions.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
 
 class DataCollection(DataType):
 
     def validate(self, value, attribute_filter=None):
-        raise prestans.exceptions.DirectUseNotAllowed("validate", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowed("validate", self.__class__.__name__)
 
     def as_serializable(self, attribute_filter=None):
-        raise prestans.exceptions.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
 
     def get_attribute_filter(self):
-        raise prestans.exceptions.DirectUseNotAllowed("get_attribute_fitler", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowed("get_attribute_fitler", self.__class__.__name__)
 
 #:
 #: Basic Types
@@ -111,7 +111,7 @@ class String(DataType):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             value = self._default
         elif not self._required and self._default is None and value is None:
@@ -125,21 +125,21 @@ class String(DataType):
             else:
                 _validated_value = str(value)
         except:
-            raise prestans.exceptions.ParseFailed(value, 'String')
+            raise prestans.exception.ParseFailed(value, 'String')
         
         if not self._required and len(_validated_value) == 0:
             return _validated_value
         
         if _validated_value is not None and self._min_length and len(_validated_value) < self._min_length:
-            raise prestans.exceptions.UnacceptableLength(value, self._min_length, self._max_length)
+            raise prestans.exception.UnacceptableLength(value, self._min_length, self._max_length)
         if _validated_value is not None and self._max_length and len(_validated_value) > self._max_length:
-            raise prestans.exceptions.UnacceptableLength(value, self._min_length, self._max_length)
+            raise prestans.exception.UnacceptableLength(value, self._min_length, self._max_length)
             
         if self._choices is not None and not _validated_value in self._choices:
-            raise prestans.exceptions.InvalidChoice(value, self._choices)
+            raise prestans.exception.InvalidChoice(value, self._choices)
             
         if self._format is not None and re.search(self._format, _validated_value) is None:
-            raise prestans.exceptions.InvalidFormat(_validated_value)
+            raise prestans.exception.InvalidFormat(_validated_value)
         
         return _validated_value
 
@@ -166,7 +166,7 @@ class Integer(DataType):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             value = self._default
         elif not self._required and self._default is None and value is None:
@@ -177,15 +177,15 @@ class Integer(DataType):
         try:
             _validated_value = int(value)
         except:
-            raise prestans.exceptions.ParseFailed(value, 'Integer')
+            raise prestans.exception.ParseFailed(value, 'Integer')
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
-            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+            raise prestans.exception.LessThanMinimum(value, self._minimum)
         if _validated_value and self._maximum is not None and _validated_value > self._maximum:
-            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+            raise prestans.exception.MoreThanMaximum(value, self._maximum)
             
         if self._choices is not None and not _validated_value in self._choices:
-            raise prestans.exceptions.InvalidChoice(value, self._choices)
+            raise prestans.exception.InvalidChoice(value, self._choices)
         
         return _validated_value
 
@@ -212,7 +212,7 @@ class Float(DataType):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             value = self._default
         elif not self._required and self._default is None and value is None:
@@ -223,15 +223,15 @@ class Float(DataType):
         try:
             _validated_value = float(value)
         except:
-            raise prestans.exceptions.ParseFailed(value, 'Float')
+            raise prestans.exception.ParseFailed(value, 'Float')
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
-            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+            raise prestans.exception.LessThanMinimum(value, self._minimum)
         if _validated_value and self._maximum is not None and _validated_value > self._maximum:
-            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+            raise prestans.exception.MoreThanMaximum(value, self._maximum)
             
         if self._choices is not None and not _validated_value in self._choices:
-            raise prestans.exceptions.InvalidChoice(value, self._choices)
+            raise prestans.exception.InvalidChoice(value, self._choices)
         
         return _validated_value
 
@@ -251,7 +251,7 @@ class Boolean(DataType):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             value = self._default
         elif not self._required and self._default is None and value is None:
@@ -262,7 +262,7 @@ class Boolean(DataType):
         try:
             _validated_value = bool(value)
         except: 
-            raise prestans.exceptions.ParseFailed(value, 'Boolean')
+            raise prestans.exception.ParseFailed(value, 'Boolean')
         
         return _validated_value
 
@@ -311,7 +311,7 @@ class DataURLFile(DataType):
         _validated_value = self.__class__()
 
         if self._required and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
 
         if self._required is False and value is None:
             return value
@@ -321,11 +321,11 @@ class DataURLFile(DataType):
             _validated_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
             _validated_value._file_contents = base64.b64decode(base64_content)
         except Exception, err:
-            raise prestans.exceptions.ParseFailed(value, 'DataURLFile')
+            raise prestans.exception.ParseFailed(value, 'DataURLFile')
 
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
         and not _validated_value._mime_type in self._allowed_mime_types:
-            raise prestans.exceptions.InvalidChoice(_validated_value._mime_type, self._allowed_mime_types)
+            raise prestans.exception.InvalidChoice(_validated_value._mime_type, self._allowed_mime_types)
 
         return _validated_value
 
@@ -367,7 +367,7 @@ class DateTime(DataStructure):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             if self._default == DateTime.CONSTANT.NOW:
                 value = datetime.now()
@@ -387,16 +387,16 @@ class DateTime(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError, exp:
-                raise prestans.exceptions.ParseFailed(value, 'DateTime')
+                raise prestans.exception.ParseFailed(value, 'DateTime')
         else:
-            raise prestans.exceptions.ParseFailed(value, 'DateTime')
+            raise prestans.exception.ParseFailed(value, 'DateTime')
             
         return _validated_value
 
     def as_serializable(self, value):
 
         if not type(value) == datetime:
-            raise prestans.exceptions.InvalidType(value, 'datetime.datetime')
+            raise prestans.exception.InvalidType(value, 'datetime.datetime')
             
         return value.strftime(self._format)
 
@@ -419,7 +419,7 @@ class Date(DataStructure):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             if self._default == Date.CONSTANT.TODAY:
                 value = date.today()
@@ -439,16 +439,16 @@ class Date(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).date()
             except ValueError, exp:
-                raise prestans.exceptions.ParseFailed(value, 'Date')
+                raise prestans.exception.ParseFailed(value, 'Date')
         else:
-            raise prestans.exceptions.ParseFailed(value, 'Date')
+            raise prestans.exception.ParseFailed(value, 'Date')
             
         return _validated_value
 
     def as_serializable(self, value):
 
         if not type(value) == date:
-            raise prestans.exceptions.InvalidType(value, 'datetime.date')
+            raise prestans.exception.InvalidType(value, 'datetime.date')
             
         return value.strftime(self._format)
 
@@ -471,7 +471,7 @@ class Time(DataStructure):
         _validated_value = None
         
         if self._required and self._default is None and value is None:
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
         elif self._required and value is None:
             if self._default == Time.CONSTANT.NOW:
                 value = time.today()
@@ -491,16 +491,16 @@ class Time(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError, exp:
-                raise prestans.exceptions.ParseFailed(value, 'Time')
+                raise prestans.exception.ParseFailed(value, 'Time')
         else:
-            raise prestans.exceptions.ParseFailed(value, 'Time')
+            raise prestans.exception.ParseFailed(value, 'Time')
 
         return _validated_value
 
     def as_serializable(self, value):
 
         if not type(value) == time:
-            raise prestans.exceptions.InvalidType(value, 'datetime.time')
+            raise prestans.exception.InvalidType(value, 'datetime.time')
             
         return value.strftime(self._format)
 
@@ -563,7 +563,7 @@ class Array(DataCollection):
                                      max_length=self._max_length)
         
         if not isinstance(value, (list, tuple)):
-            raise prestans.exceptions.InvalidCollection(value)
+            raise prestans.exception.InvalidCollection(value)
             
         for array_element in value:
     
@@ -575,10 +575,10 @@ class Array(DataCollection):
             _validated_value.append(validated_array_element)
     
         if self._min_length is not None and len(_validated_value) < self._min_length:
-            raise prestans.exceptions.LessThanMinimum(value, self._minimum)
+            raise prestans.exception.LessThanMinimum(value, self._minimum)
 
         if self._max_length is not None and len(_validated_value) > self._max_length:
-            raise prestans.exceptions.MoreThanMaximum(value, self._maximum)
+            raise prestans.exception.MoreThanMaximum(value, self._maximum)
 
         return _validated_value
     
@@ -758,7 +758,7 @@ class Model(DataCollection):
     def validate(self, value, attribute_filter=None):
         
         if self._required and (value is None or not isinstance(value, dict)):
-            raise prestans.exceptions.RequiredAttribute()
+            raise prestans.exception.RequiredAttribute()
             
         if not value and self._default:
             return self._default
@@ -779,7 +779,7 @@ class Model(DataCollection):
                 continue
 
             if not issubclass(type_instance.__class__, DataType):
-                raise prestans.exceptions.InvalidDataType(attribute_name, "DataType")
+                raise prestans.exception.InvalidDataType(attribute_name, "DataType")
 
             validation_input = None
             
@@ -799,9 +799,9 @@ class Model(DataCollection):
                 
                 _model_instance.__dict__[attribute_name] = validated_object
                     
-            except prestans.exceptions.DataValidation, exp:
+            except prestans.exception.DataValidation, exp:
                 #: @todo revise this
-                raise prestans.exceptions.DataValidation('%s, %s' % (attribute_name, str(exp)))
+                raise prestans.exception.DataValidation('%s, %s' % (attribute_name, str(exp)))
 
         return _model_instance
 

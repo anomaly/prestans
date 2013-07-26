@@ -120,7 +120,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exceptions.UnsupportedVocabulary()
+            raise prestans.exception.UnsupportedVocabulary()
 
         #: Keep a reference to the selected serializer
 
@@ -218,11 +218,30 @@ class RequestHandler(object):
     """
 
     class CONSTANT:
-        """
-        Supporting constants for RequestHandler callable
-        """
 
         SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+
+
+    __provider_config__ = prestans.provider.Config(
+        authentication = None,
+        throttle = None,
+        cache = None
+    )
+    
+    __parser_config__ = perstans.validation.Config(
+
+        GET = prestans.validation.VerbConfig(
+
+            response_template = None,
+            response_attribute_filter = None,
+
+            parameter_sets = [],
+            request_body_template = None,
+            request_attribute_filter = None
+
+        )
+
+    )
 
     def __init__(self, args, request, response, logger, debug=False):
 
@@ -274,7 +293,7 @@ class RequestHandler(object):
         if not _supportable_mime_types and len(_supportable_mime_types) < 1:
             self.logger.error("unsupported mime type in request; accept header reads %s" % 
                 self.request.accept)
-            raise prestans.exceptions.UnsupportedVocabulary()
+            raise prestans.exception.UnsupportedVocabulary()
 
         #: If content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
@@ -319,19 +338,19 @@ class RequestHandler(object):
         return None
 
     def get(self, *args):
-        raise prestans.exceptions.UnimplementedVerb("GET")
+        raise prestans.exception.UnimplementedVerb("GET")
 
     def post(self, *args):
-        raise prestans.exceptions.UnimplementedVerb("POST")
+        raise prestans.exception.UnimplementedVerb("POST")
 
     def put(self, *args):
-        raise prestans.exceptions.UnimplementedVerb("PUT")
+        raise prestans.exception.UnimplementedVerb("PUT")
 
     def patch(self, *args):
-        raise prestans.exceptions.UnimplementedVerb("PATCH")
+        raise prestans.exception.UnimplementedVerb("PATCH")
 
     def delete(self, *args):
-        raise prestans.exceptions.UnimplementedVerb("DELETE")
+        raise prestans.exception.UnimplementedVerb("DELETE")
 
     def handler_did_run(self):
         return None
@@ -382,10 +401,10 @@ class RequestRouter(object):
 
         #: If serializers and deserialers aren't provided, prestans runs as a JSON app
         if serializers is None:
-            self._serializers = [prestans.serializers.JSON()]
+            self._serializers = [prestans.serializer.JSON()]
 
         if deserializers is None:
-            self._deserializers = [prestans.deserializers.JSON()]
+            self._deserializers = [prestans.deserializer.JSON()]
 
 
     def __call__(self, environ, start_response):
@@ -394,12 +413,12 @@ class RequestRouter(object):
         self._logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % (
             self._application_name, len(self._routes), prestans.__version__, self._charset, self._debug))
 
-        #: Validate serailziers and deserialzers; are subclasses of prestans.serializers.Serializer
+        #: Validate serailziers and deserialzers; are subclasses of prestans.serializer.Serializer
         _default_outgoing_mime_types = list()
         for serializer in self._serializers:
 
-            if not isinstance(serializer, prestans.serializers.Serializer):
-                self._logger.error("registered serializer %s.%s does not inherit from prestans.serializers.Serializer" % 
+            if not isinstance(serializer, prestans.serializer.Serializer):
+                self._logger.error("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
                     (serializer.__module__, serializer.__class__.__name__))
 
                 #: Throw an error message
@@ -409,8 +428,8 @@ class RequestRouter(object):
         _default_incoming_mime_types = list()
         for deserializer in self._deserializers:
 
-            if not isinstance(deserializer, prestans.deserializers.DeSerializer):
-                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializers.DeSerializer" % 
+            if not isinstance(deserializer, prestans.deserializer.DeSerializer):
+                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
                     (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
@@ -445,7 +464,7 @@ class RequestRouter(object):
             #: Request does not have a matched handler
             return "No matching handler for this URL"
 
-        except prestans.exceptions.UnsupportedVocabulary, exp:
+        except prestans.exception.UnsupportedVocabulary, exp:
             return exp.as_error_response(environ, start_response, 
                 request.accept, _default_outgoing_mime_types)
 

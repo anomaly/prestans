@@ -29,3 +29,73 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+__all__ = ['Serializer', 'JSON', 'XMLPlist']
+
+import prestans.exceptions
+
+class Base(object):
+
+    def dumps(self, serialzable_object):
+        raise prestans.exception.DirectUserNotAllowed("dumps", self.__class__.__name__)
+
+    def content_type(self):
+        raise prestans.exception.DirectUserNotAllowed("content_type", self.__class__.__name__)
+
+
+class JSON(Base):
+
+    def dumps(self, serialzable_object):
+        
+        import json
+        return json.dumps(serializable_object)
+
+    def content_type(self):
+        return 'application/json'
+
+
+class XMLPlist(Base):
+    """
+    Uses Apple's Property List format to serialize collections 
+    to XML. Refer to http://docs.python.org/2/library/plistlib.html
+    """
+
+    def dumps(self, serializable_object):
+
+        import plistlib
+        plist_str = plistlib.writePlistToString(serializable_object)
+
+        return plist_str
+
+    def content_type(self):
+        return 'application/xml'
+
+
+class PDFSerializer(Serializer):
+    """
+    Serializes HTML/CSS to PDF using WeasyPrint; http://weasyprint.org
+
+    Handlers to use headers to set Content-Disposition header; to
+    deliver files inline; or as an attacment with a filename
+
+    headers = self.response.headers
+    headers.add_header('Content-Disposition', 'attachment', filename="name")
+    """
+
+    def dumps(self, serializable_object):
+        
+        import StringIO
+        from weasyprint import HTML, CSS
+
+        output_stream = StringIO.StringIO()
+
+        HTML(string=serializable_object).write_pdf(output_stream)
+
+        output_string = output_stream.getvalue()
+        output_stream.close()
+
+        return output_string
+
+    def content_type(self):
+        return 'application/pdf'
+

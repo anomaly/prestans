@@ -30,72 +30,50 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['Serializer', 'JSON', 'XMLPlist']
+__all__ = ['DeSerializer', 'JSON', 'XMLPlist']
 
 import prestans.exceptions
 
-class Serializer(object):
+class Base(object):
 
-    def dumps(self, serialzable_object):
-        raise prestans.exceptions.DirectUserNotAllowed("dumps", self.__class__.__name__)
+    def loads(self, input_string):
+        raise prestans.exception.DirectUserNotAllowed("loads", self.__class__.__name__)
 
     def content_type(self):
-        raise prestans.exceptions.DirectUserNotAllowed("content_type", self.__class__.__name__)
+        raise prestans.exception.DirectUserNotAllowed("content_type", self.__class__.__name__)
 
 
-class JSON(Serializer):
+class JSON(Base):
 
-    def dumps(self, serialzable_object):
-        
+    def loads(self, input_string):
+
         import json
-        return json.dumps(serializable_object)
+        parsed_json = None
 
+        try:
+            parsed_json = json.loads(input_string)
+        except Exception, exp:
+            raise prestans.exception.SerializationFailed('JSON')
+            
+        return parsed_json
+        
     def content_type(self):
         return 'application/json'
 
 
-class XMLPlist(Serializer):
-    """
-    Uses Apple's Property List format to serialize collections 
-    to XML. Refer to http://docs.python.org/2/library/plistlib.html
-    """
+class XMLPlist(Base):
 
-    def dumps(self, serializable_object):
-
+    def loads(self, input_string):
+        
         import plistlib
-        plist_str = plistlib.writePlistToString(serializable_object)
+        unserialized_plist = None
 
-        return plist_str
+        try:
+            unserialized_plist = plistlib.readPlistFromString(input_string)
+        except Exception, exp:
+            raise prestans.exception.SerializationFailed("XML/Plist")
+
+        return unserialized_plist
 
     def content_type(self):
         return 'application/xml'
-
-
-class PDFSerializer(Serializer):
-    """
-    Serializes HTML/CSS to PDF using WeasyPrint; http://weasyprint.org
-
-    Handlers to use headers to set Content-Disposition header; to
-    deliver files inline; or as an attacment with a filename
-
-    headers = self.response.headers
-    headers.add_header('Content-Disposition', 'attachment', filename="name")
-    """
-
-    def dumps(self, serializable_object):
-        
-        import StringIO
-        from weasyprint import HTML, CSS
-
-        output_stream = StringIO.StringIO()
-
-        HTML(string=serializable_object).write_pdf(output_stream)
-
-        output_string = output_stream.getvalue()
-        output_stream.close()
-
-        return output_string
-
-    def content_type(self):
-        return 'application/pdf'
-
