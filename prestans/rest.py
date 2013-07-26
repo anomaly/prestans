@@ -217,6 +217,13 @@ class RequestHandler(object):
     override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
+    class CONSTANT:
+        """
+        Supporting constants for RequestHandler callable
+        """
+
+        SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+
     def __init__(self, args, request, response, logger, debug=False):
 
         self._args = args
@@ -245,6 +252,8 @@ class RequestHandler(object):
         self.logger.info("setting default response to %s" % self.request.accept)
 
         #: Ensure we support the HTTP verb
+        if not self.request.method in RequestHandler.CONSTANT.SUPPORTED_VERBS:
+            pass
 
         #: Authentication
 
@@ -252,21 +261,31 @@ class RequestHandler(object):
 
         #: Parse Parameter Set
 
+        #:
         #: Auto set the return serializer based on Accept headers
         #: http://docs.webob.org/en/latest/reference.html#header-getters
+        #:
 
+        #: Intersection of requested types and supported types tells us if we
+        #: can infact respond in one of the requess formats
         _supportable_mime_types = set(self.request.accept.best_matches()).intersection(
             set(self.response.supported_mime_types))
 
         if not _supportable_mime_types and len(_supportable_mime_types) < 1:
-            self.logger.error("Can't support any mimes")
+            self.logger.error("unsupported mime type in request; accept header reads %s" % 
+                self.request.accept)
+            raise prestans.exceptions.UnsupportedVocabulary()
 
+        #: If content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
 
         #: Warm up
         self.handler_will_run()
 
+        #:
         #: See if the handler supports the called method
+        #: prestans sets a sensible HTTP status code
+        #:
         if self.request.method == prestans.http.VERB.GET:
             self.response.status = prestans.http.STATUS.OK
             self.get(*self._args)
@@ -289,7 +308,7 @@ class RequestHandler(object):
         self.logger.info("handler %s.%s; callable excution ends" 
             % (self.__module__, self.__class__.__name__))
 
-        return self._response(environ, start_response)
+        return self.response(environ, start_response)
 
     #:
     #: Placeholder functions for HTTP Verb; implementing handlers must override these
