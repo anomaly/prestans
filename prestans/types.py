@@ -41,7 +41,7 @@ from datetime import date
 from datetime import time
 
 import prestans.parsers
-import prestans.exceptions
+import prestans.exception
 
 #:
 #: Base type classes

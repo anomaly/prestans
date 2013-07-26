@@ -30,16 +30,25 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = []
+__all__ = ['Config']
 
 import inspect
 import string
 
-import prestans.exceptions
+import prestans.exception
 
 #:
 #:
 #:
+
+class Config(object):
+
+    def __init__(self, GET=None, POST=None, PUT=None, PATCH=None, DELETE=None):
+        self._GET = GET
+        self._POST = POST
+        self._PUT = PUT
+        self._PATCH = PATCH
+        self._DELETE = DELETE
 
 class ParameterSet(object):
     pass

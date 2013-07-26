@@ -31,6 +31,7 @@
 #
 
 __all__ = [
+    'UnsupportedVocabularyError',
     'ConfigurationException',
     'DataValidationException',
     'ParserException',
@@ -53,7 +54,6 @@ __all__ = [
     'NoSetMatched',
     'BodyTemplateParse',
     'EmptyBody',
-    'UnsupportedVocabulary',
 
     #: Data Validation
     'RequiredAttribute',
@@ -87,10 +87,15 @@ import prestans.http
 #: the resulting messages are written out to the either the client
 #: or the logger
 #:
-#: None of these exceptions are used directly
+#: None of these exceptions are used directly, look at the sections
+#: for usable exceptions.
+#:
+#: According to PEP 008 all exceptions that are error should have
+#: the Error suffix e.g UnsupportedVocabularyError
+#: http://www.python.org/dev/peps/pep-0008/#exception-names
 #:
 
-class UnsupportedVocabulary(Exception):
+class UnsupportedVocabularyError(Exception):
     """
     Called if none of the requested vocabularies are supported by the API
     this error message is sent as an HTML document. This exception is the

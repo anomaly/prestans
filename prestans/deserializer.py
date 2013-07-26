@@ -32,7 +32,7 @@
 
 __all__ = ['DeSerializer', 'JSON', 'XMLPlist']
 
-import prestans.exceptions
+import prestans.exception
 
 class Base(object):
 

@@ -30,5 +30,11 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+__all__ = ['Config', 'auth', 'cache', 'throttle']
+
 class Config(object):
-	pass
+	
+	def __init__(self, authentication=None, throttle=None, cache=None):
+		self._authentication = authentication
+		self._throttle = throttle
+		self._cache = cache

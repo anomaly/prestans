@@ -32,7 +32,7 @@
 
 __all__ = ['Serializer', 'JSON', 'XMLPlist']
 
-import prestans.exceptions
+import prestans.exception
 
 class Base(object):
 
@@ -71,7 +71,7 @@ class XMLPlist(Base):
         return 'application/xml'
 
 
-class PDFSerializer(Serializer):
+class PDFSerializer(Base):
     """
     Serializes HTML/CSS to PDF using WeasyPrint; http://weasyprint.org
 
