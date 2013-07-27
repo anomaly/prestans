@@ -260,7 +260,7 @@ class RequestHandler(object):
         self.logger.info("setting default response to %s" % self.request.accept)
 
         #: Ensure we support the HTTP verb
-        if not self.request.method in RequestHandler.CONSTANT.SUPPORTED_VERBS:
+        if not prestans.http.VERB.is_support_verb(self.request.method):
             pass
 
         #:
@@ -285,7 +285,7 @@ class RequestHandler(object):
         self.logger.error(self.__provider_config__.authentication)
 
         #: Parse body
-        if self.request.method is not 'GET' and self.__parser_config__ is not None:
+        if self.request.method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
             pass
 
         #: Parse Parameter Set

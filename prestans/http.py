@@ -49,6 +49,10 @@ class VERB:
     PATCH  = "PATCH"
     DELETE = "DELETE"
 
+    @classmethod
+    def is_support_verb(cls, method):
+        return method in [VERB.GET, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE]
+
 class STATUS:
     """
     The following is a selection of HTTP status codes that are recommended for use 
