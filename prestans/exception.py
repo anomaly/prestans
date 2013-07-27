@@ -38,7 +38,7 @@ __all__ = [
     'HandlerException',
 
     #: Configuration Exceptions
-    'DirectUseNotAllowed',
+    'DirectUseNotAllowedError',
     'ReservedWord',
     'UnimplementedVerb',
     'NotParserRuleSet',

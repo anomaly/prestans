@@ -41,17 +41,20 @@ class VERB:
     Encapsulates HTTP Verbs supported by the prestans framework in accordance
     with the REST definition. Each prestans REST handler must supporto at least
     one HTTP verb.
+
+    HEAD is similar to a GET but it does not return a response.
     """
 
     GET    = "GET"
+    HEAD   = "HEAD"
     POST   = "POST"
     PUT    = "PUT"
     PATCH  = "PATCH"
     DELETE = "DELETE"
 
     @classmethod
-    def is_support_verb(cls, method):
-        return method in [VERB.GET, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE]
+    def is_supported_verb(cls, method):
+        return method in [VERB.GET, VERB.HEAD, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE]
 
 class STATUS:
     """

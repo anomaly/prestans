@@ -35,6 +35,7 @@ __all__ = ['Config']
 import inspect
 import string
 
+import prestans.types
 import prestans.exception
 
 #:
@@ -43,12 +44,47 @@ import prestans.exception
 
 class Config(object):
 
-    def __init__(self, GET=None, POST=None, PUT=None, PATCH=None, DELETE=None):
+    def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None):
+
+        for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
+            if verb is not None and not instance(VerbConfig, prestans.types.DataType):
+                raise TypeError("All Parser configs should be of type prestans.parser.VerbConfig")
+
         self._GET = GET
         self._POST = POST
         self._PUT = PUT
         self._PATCH = PATCH
         self._DELETE = DELETE
+
+class VerbConfig(object):
+
+    def __init__(self, response_template, response_attribute_filter=None, 
+        parameter_sets=[], body_template=None, request_attribute_filter=None):
+        
+        if not isinstance(response_template, prestans.types.DataType):
+            raise TypeError("response_template must an instance of a prestans.types.DataType subclass")
+
+        self._response_template = response_template
+
+    @property
+    def response_template(self):
+        return self._response_template
+
+    @property 
+    def response_attribute_filter(self):
+        return self._response_attribute_filter
+
+    @property
+    def parameter_sets(self):
+        return self._parameter_sets
+
+    @property
+    def body_tempalte(self):
+        return self._body_template
+
+    @property
+    def request_attribute_filter(self):
+        return self._response_attribute_filter
 
 class ParameterSet(object):
     pass

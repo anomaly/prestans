@@ -50,7 +50,7 @@ import prestans.exception
 class DataType(object):
     
     def validate(self, value):
-        raise exceptions.DirectUserNotAllowed("validate", self.__class__.__name__)
+        raise exceptions.DirectUserNotAllowedError("validate", self.__class__.__name__)
 
 class DataStructure(DataType):
     """
@@ -64,18 +64,18 @@ class DataStructure(DataType):
     """
     
     def as_serializable(self, value):
-        raise prestans.exception.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
+        raise prestans.exception.DirectUserNotAllowedError("as_serializable", self.__class__.__name__)
 
 class DataCollection(DataType):
 
     def validate(self, value, attribute_filter=None):
-        raise prestans.exception.DirectUseNotAllowed("validate", self.__class__.__name__)
+        raise prestans.exception.DirectUserNotAllowedError("validate", self.__class__.__name__)
 
     def as_serializable(self, attribute_filter=None):
-        raise prestans.exception.DirectUseNotAllowed("as_serializable", self.__class__.__name__)
+        raise prestans.exception.DirectUserNotAllowedError("as_serializable", self.__class__.__name__)
 
     def get_attribute_filter(self):
-        raise prestans.exception.DirectUseNotAllowed("get_attribute_fitler", self.__class__.__name__)
+        raise prestans.exception.DirectUserNotAllowedError("get_attribute_fitler", self.__class__.__name__)
 
 #:
 #: Basic Types

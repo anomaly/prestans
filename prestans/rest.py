@@ -100,6 +100,14 @@ class Response(webob.Response):
     def supported_mime_types(self):
         return [serializer.content_type() for serializer in self._serializers]
 
+    @property
+    def response_template(self):
+        return self._response_template
+
+    @response_template.setter
+    def response_template(self, value):
+        self._response_template = value
+
     #:
     #: content_type; overrides webob.Resposne line 606
     #:
@@ -219,11 +227,6 @@ class RequestHandler(object):
     override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
-    class CONSTANT:
-
-        SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-
-
     __provider_config__ = prestans.provider.Config(
         authentication = None,
         throttle = None,
@@ -260,7 +263,7 @@ class RequestHandler(object):
         self.logger.info("setting default response to %s" % self.request.accept)
 
         #: Ensure we support the HTTP verb
-        if not prestans.http.VERB.is_support_verb(self.request.method):
+        if not prestans.http.VERB.is_supported_verb(self.request.method):
             pass
 
         #:
@@ -300,6 +303,9 @@ class RequestHandler(object):
         if self.request.method == prestans.http.VERB.GET:
             self.response.status = prestans.http.STATUS.OK
             self.get(*self._args)
+        elif self.request.method == prestans.http.VERB.HEAD:
+            self.response.status = prestans.http.STATUS.NO_CONTENT
+            self.head(*self._args)
         elif self.request.method == prestans.http.VERB.POST:
             self.response.status = prestans.http.STATUS.CREATED
             rest_handler.post(*self._args)
@@ -331,6 +337,9 @@ class RequestHandler(object):
 
     def get(self, *args):
         raise prestans.exception.UnimplementedVerb("GET")
+
+    def head(self, *args):
+        raise prestans.exception.UnimplementedVerb("HEAD")
 
     def post(self, *args):
         raise prestans.exception.UnimplementedVerb("POST")
