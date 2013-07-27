@@ -327,6 +327,7 @@ class RequestHandler(object):
 
         return self.response(environ, start_response)
 
+
     #:
     #: Placeholder functions for HTTP Verb; implementing handlers must override these
     #: if not overridden prestans returns a Not Implemented error

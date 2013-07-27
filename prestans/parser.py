@@ -38,11 +38,14 @@ import string
 import prestans.types
 import prestans.exception
 
-#:
-#:
-#:
-
 class Config(object):
+    """
+    Configuration that's attached to each handler to define rules for each 
+    HTTP Verb. All HTTP verbs in use must have a configuration defined.
+
+    __init__ takes in a VerbConfig instance for each parameter with names
+    adjacent to the HTTP verb.
+    """
 
     def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None):
 
@@ -51,12 +54,46 @@ class Config(object):
                 raise TypeError("All Parser configs should be of type prestans.parser.VerbConfig")
 
         self._GET = GET
+        self._HEAD = HEAD
         self._POST = POST
         self._PUT = PUT
         self._PATCH = PATCH
         self._DELETE = DELETE
 
+    @property
+    def GET(self):
+        return self._GET
+
+    @property
+    def HEAD(self):
+        return self._HEAD
+
+    @property
+    def POST(self):
+        return self._POST
+
+    @property
+    def PUT(self):
+        return self._PUT
+
+    @property
+    def PATCH(self):
+        return self._PATCH
+
+    @property
+    def DELETE(self):
+        return self._DELETE
+                    
 class VerbConfig(object):
+    """
+    VerbConfig sets out rules for each HTTP Verb that your API will make available.
+    These rules are used by prestans to validate requests and responses before
+    handing over execution control to your handler.
+
+    All verbs in use must provide atleast a response_template which should be a
+    subclass of prestans.types.DataType. If you wish not to use a model; consider
+    using prestans.types.String.
+    """
 
     def __init__(self, response_template, response_attribute_filter=None, 
         parameter_sets=[], body_template=None, request_attribute_filter=None):

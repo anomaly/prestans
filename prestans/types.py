@@ -40,7 +40,7 @@ from datetime import datetime
 from datetime import date
 from datetime import time
 
-import prestans.parsers
+import prestans.parser
 import prestans.exception
 
 #:
@@ -739,7 +739,7 @@ class Model(DataCollection):
 
     def get_attribute_filter(self, default_value=False):
 
-        attribute_filter = prestans.parsers.AttributeFilter()
+        attribute_filter = prestans.parser.AttributeFilter()
 
         _model_class_members = inspect.getmembers(self.__class__)
 
@@ -815,7 +815,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if isinstance(attribute_filter, prestans.parsers.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
+            if isinstance(attribute_filter, prestans.parser.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
             if not self.__dict__.has_key(attribute_name) or self.__dict__[attribute_name] is None:
@@ -825,7 +825,7 @@ class Model(DataCollection):
             if issubclass(type_instance.__class__, DataCollection):
 
                 sub_attribute_filter = None
-                if isinstance(attribute_filter, prestans.parsers.AttributeFilter) and attribute_filter.has_key(attribute_name):
+                if isinstance(attribute_filter, prestans.parser.AttributeFilter) and attribute_filter.has_key(attribute_name):
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
                 model_dictionary[attribute_name] = self.__dict__[attribute_name].as_serializable(sub_attribute_filter)
