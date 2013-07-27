@@ -38,3 +38,17 @@ class Config(object):
 		self._authentication = authentication
 		self._throttle = throttle
 		self._cache = cache
+
+	@property
+	def authentication(self):
+		return self._authentication
+
+	@property
+	def throttle(self):
+		return self._throttle
+
+	@property
+	def cache(self):
+		return self._cache
+
+	

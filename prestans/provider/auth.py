@@ -30,5 +30,100 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from functools import wraps
+
+import prestans.exception
+
 class Base(object):
-    pass
+
+    def current_user_has_role(self, role_name):
+        raise prestans.exception.DirectUseNotAllowedError('current_user_has_role', 
+            self.__class__.__name__)
+    
+    def is_authenticated_user(self, handler_reference):
+        raise prestans.exception.DirectUseNotAllowedError('is_authenticated_user', 
+            self.__class__.__name__)
+        
+    def get_current_user(self):
+        raise prestans.exception.DirectUseNotAllowedError('get_current_user', 
+            self.__class__.__name__)
+
+
+
+
+
+def login_required(http_method_handler):
+    """
+    provides a decorator for RESTRequestHandler methods to check for authenticated users
+
+    RESTRequestHandler subclass must have a auth_context instance, refer to prestans.auth
+    for the parent class definition.
+
+    If decorator is used and no auth_context is provided the client will be denied access
+
+    Handler will return a 401 Unauthorized if the user is not logged in, the service does not redirect
+    to login handler page, this is the client's responsibility
+
+    auth_context_handler instance provides a message called get_current_user, use this to obtain a
+    reference to an authenticated user profile.
+
+    If all goes well, the original handler definition is executed.
+
+    """
+    
+    @wraps(http_method_handler)
+    def secure_http_method_handler(self, *args):
+            
+        if not self.__provider_config__.auth:
+            self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
+            self.response.set_body_attribute('message', "Service available to authenticated users only, no auth context provider set in handler")
+            return
+            
+        if not self.auth_context.is_authenticated_user():
+            self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
+            self.response.set_body_attribute('message', "Service available to authenticated users only")
+            return
+
+        http_method_handler(self, *args)
+        
+    return secure_http_method_handler
+    
+def role_required(role_name=None):
+    """
+    Authenticates a HTTP method handler based on a provided role
+
+    With a little help from Peter Cole's Blog
+    http://mrcoles.com/blog/3-decorator-examples-and-awesome-python/
+
+    """
+    
+    def _role_required(http_method_handler):
+
+        def secure_http_method_handler(self, *args):
+    
+            # Reference to prestans HTTP Status codes, instance self.response is not available
+            from prestans.rest import STATUS as PRESTANS_HTTP_STATUS
+
+            # Role name must be provided
+            if not role_name:
+                self.response.http_status = PRESTANS_HTTP_STATUS.BAD_REQUEST
+                self.response.set_body_attribute('message', "role name can't be None for role_required authentication decorator")
+                return
+        
+            # Authentication context must be set
+            if not self.auth_context:
+                self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
+                self.response.set_body_attribute('message', "Service available to authenticated users only, no auth context provider set in handler")
+                return
+            
+            # Check for the role by calling current_user_has_role
+            if not self.auth_context.current_user_has_role(role_name):
+                self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
+                self.response.set_body_attribute('message', "Service available to authenticated users only")
+                return
+
+            http_method_handler(self, *args)
+        
+        return wraps(http_method_handler)(secure_http_method_handler)
+        
+    return _role_required

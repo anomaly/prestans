@@ -93,14 +93,15 @@ class AttributeFilter(object):
             self._init_from_dictionary(from_dictionary)
 
     def _conforms_to_template_filter(self, template_filter):
-        #:
-        #: Check AttributeFilter conforms to the rules set by the template
-        #:
-        #: - If self, has attributes that template_fitler does not contain, throw Exception
-        #: - If sub list found, perform the first check
-        #: - If self has a value for an attribute, assign to final AttributeFilter
-        #:- If not found, assign value from template
-        #:       
+        """
+        Check AttributeFilter conforms to the rules set by the template
+
+         - If self, has attributes that template_fitler does not contain, throw Exception
+         - If sub list found, perform the first check
+         - If self has a value for an attribute, assign to final AttributeFilter
+         - If not found, assign value from template
+                  
+        """     
 
         if not isinstance(template_filter, self.__class__):
             raise TypeError("AttributeFilter can only check conformance against another template filter, %s provided" % 

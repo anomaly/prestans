@@ -37,10 +37,10 @@ import prestans.exception
 class Base(object):
 
     def loads(self, input_string):
-        raise prestans.exception.DirectUserNotAllowed("loads", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowedError("loads", self.__class__.__name__)
 
     def content_type(self):
-        raise prestans.exception.DirectUserNotAllowed("content_type", self.__class__.__name__)
+        raise prestans.exception.DirectUseNotAllowedError("content_type", self.__class__.__name__)
 
 
 class JSON(Base):

@@ -180,11 +180,17 @@ class HandlerException(Exception):
 #: Configuration
 #:
 
-class DirectUseNotAllowed(ConfigurationException):
-    pass
+class DirectUseNotAllowedError(ConfigurationException):
+    
+    def __init__(self, method_name, class_name):
+        self._class_name = class_name
+        self._method_name = method_name
+
 
 class ReservedWord(ConfigurationException):
-    pass
+    
+    def __init__(self, word):
+        self._word = word
 
 class UnimplementedVerb(ConfigurationException):
 

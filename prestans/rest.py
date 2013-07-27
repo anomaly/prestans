@@ -263,12 +263,6 @@ class RequestHandler(object):
         if not self.request.method in RequestHandler.CONSTANT.SUPPORTED_VERBS:
             pass
 
-        #: Authentication
-
-        #: Parse body
-
-        #: Parse Parameter Set
-
         #:
         #: Auto set the return serializer based on Accept headers
         #: http://docs.webob.org/en/latest/reference.html#header-getters
@@ -286,6 +280,15 @@ class RequestHandler(object):
 
         #: If content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
+
+        #: Authentication
+        self.logger.error(self.__provider_config__.authentication)
+
+        #: Parse body
+        if self.request.method is not 'GET' and self.__parser_config__ is not None:
+            pass
+
+        #: Parse Parameter Set
 
         #: Warm up
         self.handler_will_run()
