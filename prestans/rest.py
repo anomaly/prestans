@@ -97,8 +97,27 @@ class Response(webob.Response):
         self.headers.add('Prestans-Version', prestans.__version__)
 
     @property
+    def logger(self):
+        return self._logger
+
+    @property
     def supported_mime_types(self):
         return [serializer.content_type() for serializer in self._serializers]
+
+    #: Used by content_type_set to set get a referencey to the serializer object
+    def _set_serializer_by_mime_type(self, mime_type):
+
+        for serializer in self._serializers:
+            if serializer.content_type() == mime_type:
+                self._selected_serializer = serializer
+                return
+
+        raise prestans.exception.UnsupportedVocabularyError()
+
+    #:
+    #: is an instance of prestans.types.DataType; mostly a subclass of 
+    #: prestans.types.Model
+    #:
 
     @property
     def response_template(self):
@@ -107,6 +126,19 @@ class Response(webob.Response):
     @response_template.setter
     def response_template(self, value):
         self._response_template = value
+
+
+    #:
+    #: Attribute filte rsetup
+    #:
+
+    @property
+    def attribute_filter(self):
+        return self._attribute_filter
+
+    @attribute_filter.setter
+    def attribute_filter(self, value):
+        self._attribute_filter = value
 
     #:
     #: content_type; overrides webob.Resposne line 606
@@ -133,6 +165,7 @@ class Response(webob.Response):
             raise prestans.exception.UnsupportedVocabularyError()
 
         #: Keep a reference to the selected serializer
+        self._set_serializer_by_mime_type(value)
 
         if not value:
             self._content_type__del()
@@ -191,20 +224,22 @@ class Response(webob.Response):
             )
         return body
 
-    def _body__set(self, value=b''):
-        if not isinstance(value, bytes):
-            if isinstance(value, text_type):
-                msg = ("You cannot set Response.body to a text object "
-                       "(use Response.text)")
-            else:
-                msg = ("You can only set the body to a binary type (not %s)" %
-                       type(value))
-            raise TypeError(msg)
-        if self._app_iter is not None:
-            self.content_md5 = None
-        self._app_iter = [value]
-        self.content_length = len(value)
+    def _body__set(self, value):
 
+        #: value should be a subclass prestans.types.DataCollection
+        if not issubclass(value.__class__, prestans.types.DataCollection):
+            raise TypeError("%s is not a prestans.types.DataCollection subclass" % 
+                value.__class__.__name__)
+
+        #: Ensure that it matches the return type template
+
+        #: If it's an array then ensure that element_template matches up
+
+        #: _app_iter assigned to value
+        #: we need to serialize the contents before we know the length
+        #: deffer the content_length property to be set by getter
+
+        self._app_iter = value
 
     body = property(_body__get, _body__set, _body__set)
 
@@ -227,12 +262,7 @@ class RequestHandler(object):
     override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
-    __provider_config__ = prestans.provider.Config(
-        authentication = None,
-        throttle = None,
-        cache = None
-    )
-    
+    __provider_config__ = prestans.provider.Config()    
     __parser_config__ = prestans.parser.Config()
 
     def __init__(self, args, request, response, logger, debug=False):
@@ -240,8 +270,8 @@ class RequestHandler(object):
         self._args = args
         self._request = request
         self._response = response
-        self._debug = debug
         self._logger = logger
+        self._debug = debug
 
     @property
     def request(self):

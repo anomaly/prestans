@@ -37,19 +37,13 @@ import prestans.exception
 class Base(object):
 
     def current_user_has_role(self, role_name):
-        raise prestans.exception.DirectUseNotAllowedError('current_user_has_role', 
-            self.__class__.__name__)
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
     
     def is_authenticated_user(self, handler_reference):
-        raise prestans.exception.DirectUseNotAllowedError('is_authenticated_user', 
-            self.__class__.__name__)
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
         
     def get_current_user(self):
-        raise prestans.exception.DirectUseNotAllowedError('get_current_user', 
-            self.__class__.__name__)
-
-
-
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
 
 def login_required(http_method_handler):

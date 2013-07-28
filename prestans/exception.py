@@ -32,23 +32,12 @@
 
 __all__ = [
     'UnsupportedVocabularyError',
-    'ConfigurationException',
     'DataValidationException',
     'ParserException',
     'HandlerException',
 
-    #: Configuration Exceptions
-    'DirectUseNotAllowedError',
-    'ReservedWord',
-    'UnimplementedVerb',
-    'NotParserRuleSet',
-    'NotParameterSet',
-    'InvalidParameterSetAttribute',
-    'InvalidDataType',
-    'RequiresDataCollection',
-    'RequiresModel',
-
     #: Parser Exceptions
+    'UnimplementedVerb',
     'NotImplemented',
     'SerializationFailed',
     'NoSetMatched',
@@ -126,19 +115,6 @@ class UnsupportedVocabularyError(Exception):
 
         return error_response(environ, start_response)
 
-class ConfigurationException(Exception):
-    """
-    ConfigurationExceptions are Exceptions raised if prestans was
-    incorrectly configured. These exceptions are completely masked 
-    for the requesting client and written out to error log.
-
-    In production these Exceptions should never be raised. This 
-    exception generally alludes that your API has a bug; prestans 
-    will cease execution of your handler code.
-    """
-    
-    def __init__(self):
-        pass
 
 class DataValidationException(Exception):
     """
@@ -177,56 +153,19 @@ class HandlerException(Exception):
 
 
 #:
-#: Configuration
+#: Parser Exception
 #:
 
-class DirectUseNotAllowedError(ConfigurationException):
-    
-    def __init__(self, method_name, class_name):
-        self._class_name = class_name
-        self._method_name = method_name
-
-
-class ReservedWord(ConfigurationException):
-    
-    def __init__(self, word):
-        self._word = word
-
-class UnimplementedVerb(ConfigurationException):
+class UnimplementedVerb(ParserException):
 
     def __init__(self, verb_name):
         self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
         self._message = "end point does not speak %s" % (verb_name)
 
-class NotParserRuleSet(ConfigurationException):
-    pass
-
-class NotParameterSet(ConfigurationException):
-    pass
-
-class InvalidParameterSetAttribute(ConfigurationException):
-    pass
-
-class InvalidDataType(ConfigurationException):
-    
-    def __init__(self, attribute_name, expected_type):
-        pass
-
-class RequiresDataCollection(ConfigurationException):
-    pass
-
-class RequiresModel(ConfigurationException):
-    pass
-
-
-#:
-#: Parser Exception
-#:
-
 class NoSetMatched(ParserException):
     pass
 
-class BodyTemplateParse(ParserException):
+class BodyTemplateParseError(ParserException):
     pass
 
 class EmptyBody(ParserException):
@@ -237,7 +176,7 @@ class EmptyBody(ParserException):
 #: Data Validation
 #: 
 
-class RequiredAttribute(DataValidationException):
+class RequiredAttributeError(DataValidationException):
     pass
 
 class ParseFailed(DataValidationException):
@@ -245,27 +184,27 @@ class ParseFailed(DataValidationException):
     def __init__(self, value, data_type):
         pass
 
-class InvalidValue(DataValidationException):
+class InvalidValueError(DataValidationException):
     
     def __init__(self, value):
         pass
 
-class LessThanMinimum(DataValidationException):
+class LessThanMinimumError(DataValidationException):
     
     def __init__(self, value, allowed_min):
         pass
 
-class MoreThanMaximum(DataValidationException):
+class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
         pass
 
-class InvalidChoice(DataValidationException):
+class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
         pass
 
-class UnacceptableLength(DataValidationException):
+class UnacceptableLengthError(DataValidationException):
     
     def __init__(self, value, minimum, maximum):
         pass
@@ -275,29 +214,32 @@ class InvalidType(DataValidationException):
     def __init__(self, value, type_name):
         pass
 
-class InvalidCollection(DataValidationException):
+class InvalidCollectionError(DataValidationException):
 
     def __init__(self, value):
         pass
 
-class MissingParameter(DataValidationException):
+class MissingParameterError(DataValidationException):
     pass
 
-class InvalidFormat(DataValidationException):
+class InvalidFormatError(DataValidationException):
     
     def __init__(self, value):
         pass
 
-class InvalidMetaValue(DataValidationException):
+class InvalidMetaValueError(DataValidationException):
     pass
 
-class UnregisteredAdapter(DataValidationException):
+class UnregisteredAdapterError(DataValidationException):
     pass
 
-class NotImplemented(DataValidationException):
+class NotImplementedError(DataValidationException):
     pass
 
-class SerializationFailed(DataValidationException):
+class SerializationFailedError(DataValidationException):
+    pass
+
+class DeSerializationFailedError(DataValidationException):
     pass
 
 

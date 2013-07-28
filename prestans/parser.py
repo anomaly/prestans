@@ -91,15 +91,16 @@ class VerbConfig(object):
     handing over execution control to your handler.
 
     All verbs in use must provide atleast a response_template which should be a
-    subclass of prestans.types.DataType. If you wish not to use a model; consider
-    using prestans.types.String.
+    subclass of prestans.types.DataCollection.
     """
 
     def __init__(self, response_template, response_attribute_filter=None, 
         parameter_sets=[], body_template=None, request_attribute_filter=None):
         
-        if not isinstance(response_template, prestans.types.DataType):
-            raise TypeError("response_template must an instance of a prestans.types.DataType subclass")
+        if not isinstance(response_template, prestans.types.DataCollection):
+            raise TypeError("response_template of type %s must an instance of a \
+                prestans.types.DataCollection subclass" % 
+                response_template.__class__.__name__)
 
         self._response_template = response_template
 
