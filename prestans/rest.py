@@ -88,13 +88,14 @@ class Response(webob.Response):
         self._logger = logger
         self._serializers = serializers
         self._selected_serializer = None
+        self._response_template = None
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
         #: http://stackoverflow.com/q/3561381 
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
-        self.headers.add('Prestans-Version', prestans.__version__)
+        self.headers.add('Prestans', prestans.__version__)
 
     @property
     def logger(self):
@@ -189,42 +190,27 @@ class Response(webob.Response):
     #:
 
     def _body__get(self):
-        """
-        The body of the response, as a ``str``.  This will read in the
-        entire app_iter if necessary.
-        """
-        app_iter = self._app_iter
-#         try:
-#             if len(app_iter) == 1:
-#                 return app_iter[0]
-#         except:
-#             pass
-        if isinstance(app_iter, list) and len(app_iter) == 1:
-            return app_iter[0]
-        if app_iter is None:
-            raise AttributeError("No body has been set")
-        try:
-            body = b''.join(app_iter)
-        finally:
-            iter_close(app_iter)
-        if isinstance(body, text_type):
-            raise _error_unicode_in_app_iter(app_iter, body)
-        self._app_iter = [body]
-        if len(body) == 0:
-            # if body-length is zero, we assume it's a HEAD response and
-            # leave content_length alone
-            pass # pragma: no cover (no idea why necessary, it's hit)
-        elif self.content_length is None:
-            self.content_length = len(body)
-        elif self.content_length != len(body):
-            raise AssertionError(
-                "Content-Length is different from actual app_iter length "
-                "(%r!=%r)"
-                % (self.content_length, len(body))
-            )
-        return body
+
+        #: If response_template is null; return an empty iterable
+        if self.response_template is None:
+            return []
+
+        #: Body should be of type DataCollection try; attempt calling
+        #: as_seriable with available attribute_filter
+
+        #: attempt serializing via registered serializer
+
+        #: set content_length
+
+        #: return body
+
 
     def _body__set(self, value):
+
+        #: If not response template; we have to assume its NO_CONTENT
+        #: hence do not allow setting the body
+        if self.response_template is None:
+            raise AssertionError("response_template is None; handler can't return a response")
 
         #: value should be a subclass prestans.types.DataCollection
         if not issubclass(value.__class__, prestans.types.DataCollection):
@@ -232,8 +218,16 @@ class Response(webob.Response):
                 value.__class__.__name__)
 
         #: Ensure that it matches the return type template
+        if not value.__class__ == self.response_template.__class__:
+            raise TypeError("body must of be type %s, given %s" % 
+                (self.response_template.__class__.__name__, value.__class__.__name__))
 
         #: If it's an array then ensure that element_template matches up
+        if isinstance(self.response_template, prestans.types.Array) and \
+        not value.element_template == self.response_template.element_template:
+            raise TypeError("array elements must of be type %s, given %s" % 
+                (self.response_template.element_template.__class__.__name__, 
+                    value.element_template.__class__.__name__))
 
         #: _app_iter assigned to value
         #: we need to serialize the contents before we know the length
@@ -292,6 +286,8 @@ class RequestHandler(object):
 
         self.logger.info("setting default response to %s" % self.request.accept)
 
+        request_method = self.request.method
+
         #: Ensure we support the HTTP verb
         if not prestans.http.VERB.is_supported_verb(self.request.method):
             pass
@@ -317,8 +313,10 @@ class RequestHandler(object):
         #: Authentication
         self.logger.error(self.__provider_config__.authentication)
 
+        verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
+
         #: Parse body
-        if self.request.method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
+        if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
             pass
 
         #: Parse Parameter Set
@@ -330,22 +328,22 @@ class RequestHandler(object):
         #: See if the handler supports the called method
         #: prestans sets a sensible HTTP status code
         #:
-        if self.request.method == prestans.http.VERB.GET:
+        if request_method == prestans.http.VERB.GET:
             self.response.status = prestans.http.STATUS.OK
             self.get(*self._args)
-        elif self.request.method == prestans.http.VERB.HEAD:
+        elif request_method == prestans.http.VERB.HEAD:
             self.response.status = prestans.http.STATUS.NO_CONTENT
             self.head(*self._args)
-        elif self.request.method == prestans.http.VERB.POST:
+        elif request_method == prestans.http.VERB.POST:
             self.response.status = prestans.http.STATUS.CREATED
             rest_handler.post(*self._args)
-        elif self.request.method == prestans.http.VERB.PATCH:
+        elif request_method == prestans.http.VERB.PATCH:
             self.response.status = prestans.http.STATUS.ACCEPTED
             self.patch(*self._args)
-        elif self.request.method == prestans.http.VERB.DELETE:
+        elif request_method == prestans.http.VERB.DELETE:
             self.response.status = prestans.http.STATUS.NO_CONTENT
             self.delete(*self._args)
-        elif self.request.method == prestans.http.VERB.PUT:
+        elif request_method == prestans.http.VERB.PUT:
             self.response.status = prestans.http.STATUS.ACCEPTED
             self.put(*self._args)
 
