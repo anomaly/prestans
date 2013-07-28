@@ -36,7 +36,7 @@ import prestans.exception
 
 class Base(object):
 
-    def dumps(self, serialzable_object):
+    def dumps(self, serializable_object):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
     def content_type(self):
@@ -45,7 +45,7 @@ class Base(object):
 
 class JSON(Base):
 
-    def dumps(self, serialzable_object):
+    def dumps(self, serializable_object):
         
         import json
         return json.dumps(serializable_object)

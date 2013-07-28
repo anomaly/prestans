@@ -89,6 +89,7 @@ class Response(webob.Response):
         self._serializers = serializers
         self._selected_serializer = None
         self._response_template = None
+        self._app_iter = None
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -190,19 +191,20 @@ class Response(webob.Response):
     #:
 
     def _body__get(self):
+        """
+        Overridden response does not support md5, text or json properties. _app_iter
+        is set using rules defined by prestans.
+
+        body getter will return the validated prestans model.
+
+        Webob does the heavy lifiting with headers. 
+        """
 
         #: If response_template is null; return an empty iterable
         if self.response_template is None:
             return []
 
-        #: Body should be of type DataCollection try; attempt calling
-        #: as_seriable with available attribute_filter
-
-        #: attempt serializing via registered serializer
-
-        #: set content_length
-
-        #: return body
+        return self._app_iter
 
 
     def _body__set(self, value):
@@ -232,10 +234,36 @@ class Response(webob.Response):
         #: _app_iter assigned to value
         #: we need to serialize the contents before we know the length
         #: deffer the content_length property to be set by getter
-
         self._app_iter = value
 
     body = property(_body__get, _body__set, _body__set)
+
+    def __call__(self, environ, start_response):
+        """
+        Overridden WSGI application interface
+        """
+
+        #: prestans' equivalent of webob.Response line 1022
+        if self.response_template is None:
+            headerlist = self._abs_headerlist(environ)
+            start_response(self.status, headerlist)
+            return EmptyResponse(self._app_iter)
+
+        #: Body should be of type DataCollection try; attempt calling
+        #: as_seriable with available attribute_filter
+        serializable_body = self._app_iter.as_serializable(attribute_filter=self.attribute_filter)
+
+        #: attempt serializing via registered serializer
+        stringified_body = self._selected_serializer.dumps(serializable_body)
+
+        #: set content_length
+        self.content_length = len(stringified_body)
+
+        #: From webob.Response line 1021
+        headerlist = self._abs_headerlist(environ)
+        start_response(self.status, headerlist)
+
+        return stringified_body
 
 
 class ErrorResponse(webob.Response):
@@ -311,9 +339,14 @@ class RequestHandler(object):
         self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
 
         #: Authentication
-        self.logger.error(self.__provider_config__.authentication)
+        # self.logger.error(self.__provider_config__.authentication)
 
+        #: Configuration as provided by the API or default of a VerbConfig object
         verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
+
+        #: Set the response template and attribute filter
+        self.response.response_template = verb_parser_config.response_template
+        self.response.attribute_filter = verb_parser_config.response_attribute_filter
 
         #: Parse body
         if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:

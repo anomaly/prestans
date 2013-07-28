@@ -837,4 +837,6 @@ class Model(DataCollection):
 
             else:
                 model_dictionary[attribute_name] = self.__dict__[attribute_name]
+
+        return model_dictionary
         
