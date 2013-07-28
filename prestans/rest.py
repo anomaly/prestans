@@ -369,7 +369,7 @@ class RequestHandler(object):
             self.head(*self._args)
         elif request_method == prestans.http.VERB.POST:
             self.response.status = prestans.http.STATUS.CREATED
-            rest_handler.post(*self._args)
+            self.post(*self._args)
         elif request_method == prestans.http.VERB.PATCH:
             self.response.status = prestans.http.STATUS.ACCEPTED
             self.patch(*self._args)
