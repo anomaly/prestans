@@ -71,6 +71,24 @@ class Request(webob.Request):
         #: Return a attribute filter if set in the request header
         pass
 
+class ErrorResponse(webob.Response):
+    """
+    ErrorResponse is used by exceptions to return
+
+    """
+    
+    def __init__(self, exception, logger, serializer):
+        self._exception = exception
+        self._serializer = serializer
+        self._logger = logger
+
+    @property
+    def logger(self):
+        return self._logger
+
+    def __call__(self, environ, start_response):
+
+        
 
 class Response(webob.Response):
     """
@@ -103,6 +121,10 @@ class Response(webob.Response):
         return self._logger
 
     @property
+    def selected_serializer(self):
+        return self._selected_serializer
+
+    @property
     def supported_mime_types(self):
         return [serializer.content_type() for serializer in self._serializers]
 
@@ -131,7 +153,7 @@ class Response(webob.Response):
 
 
     #:
-    #: Attribute filte rsetup
+    #: Attribute filter rsetup
     #:
 
     @property
@@ -266,15 +288,6 @@ class Response(webob.Response):
         return stringified_body
 
 
-class ErrorResponse(webob.Response):
-    """
-    ErrorResposne is used by exceptions to return
-
-    """
-    
-    def __init__(self, exception):
-        self._exception = exception
-
 class RequestHandler(object):
     """
     RequestHandler is a callable that all API end-points must inherit from. 
@@ -391,7 +404,7 @@ class RequestHandler(object):
             return self.response(environ, start_response)
 
         except prestans.exception.UnimplementedVerb, exp:
-
+            return "Not implemented"
 
 
     #:

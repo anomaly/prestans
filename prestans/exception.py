@@ -262,22 +262,33 @@ class DeSerializationFailedError(DataValidationException):
 class ServiceUnavailable(HandlerException):
     
     def __init__(self, service_name):
+        self._http_status = prestans.http.STATUS.SERVICE_UNAVAILABLE
         self._service_name = service_name
 
 class BadRequest(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.BAD_REQUEST
 
 class Conflict(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.CONFLICT
 
 class NotFound(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.NOT_FOUND
 
 class Unauthorized(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.UNAUTHORIZED
 
 class MovedPermanently(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.MOVED_PERMANENTLY
 
 class PaymentRequired(HandlerException):
     pass
