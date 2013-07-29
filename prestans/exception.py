@@ -100,7 +100,7 @@ class UnsupportedVocabularyError(Exception):
         error_response.content_type = "text/html"
         error_response.body = """
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
             <head>
                 <title>prestans %s, unsupported media type</title>
                  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
@@ -115,7 +115,9 @@ class UnsupportedVocabularyError(Exception):
                     <code>%s</code>
                     </p>
                     
-                    <p>prestans %s</p>
+                    <p class="help-block">
+                    <a target="_blank" href="https://github.com/prestans/prestans">prestans</a> 
+                    %s, Copyright &copy 2013 Eternity Technologies</p>
                 </div>
             </body>
         </html>
