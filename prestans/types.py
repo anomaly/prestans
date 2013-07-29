@@ -83,14 +83,8 @@ class DataCollection(DataType):
 
 class String(DataType):
     
-    def __init__(self, 
-                 default=None, 
-                 min_length=None, 
-                 max_length=None, 
-                 required=True, 
-                 format=None, 
-                 choices=None, 
-                 utf_encoding='utf-8'):
+    def __init__(self, default=None, min_length=None, max_length=None, 
+        required=True, format=None, choices=None, utf_encoding='utf-8'):
 
         if min_length and max_length and min_length > max_length:
             pass
@@ -105,6 +99,24 @@ class String(DataType):
         self._format = format
         self._choices = choices
         self._utf_encoding = utf_encoding
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "string"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['min_length'] = self._min_length
+        constraints['max_length'] = self._max_length
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+        constraints['choices'] = self._choices
+        constraints['utf_encoding'] = self._utf_encoding
+
+        blueprint['constraints'] = constraints
+
+        return blueprint
 
     def validate(self, value):
 
@@ -145,12 +157,8 @@ class String(DataType):
 
 class Integer(DataType):
 
-    def __init__(self, 
-                 default=None, 
-                 minimum=None, 
-                 maximum=None, 
-                 required=True, 
-                 choices=None):
+    def __init__(self, default=None, minimum=None, maximum=None, 
+        required=True, choices=None):
 
         if minimum and maximum and minimum > maximum:
             pass
@@ -160,6 +168,24 @@ class Integer(DataType):
         self._maximum = maximum
         self._required = required
         self._choices = choices
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "string"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['min_length'] = self._min_length
+        constraints['max_length'] = self._max_length
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+        constraints['choices'] = self._choices
+        constraints['utf_encoding'] = self._utf_encoding
+
+        blueprint['constraints'] = constraints
+
+        return blueprint
 
     def validate(self, value):
 
@@ -207,6 +233,23 @@ class Float(DataType):
         self._required = required
         self._choices = choices
 
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "float"
+
+        return blueprint
+        
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['minimum'] = self._minimum
+        constraints['maximum'] = self._maximum
+        constraints['required'] = self._required
+        constraints['choices'] = self._choices
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
     def validate(self, value):
 
         _validated_value = None
@@ -238,13 +281,23 @@ class Float(DataType):
         
 class Boolean(DataType):
 
-    def __init__(self, 
-                 default=None, 
-                 required=True):
+    def __init__(self, default=None, required=True):
 
 
         self._default = default
         self._required = required
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "bool"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     def validate(self, value):
 
@@ -285,9 +338,7 @@ class DataURLFile(DataType):
         import uuid
         return uuid.uuid4().hex
 
-    def __init__(self, 
-                 required=True, 
-                 allowed_mime_types=[]):
+    def __init__(self, required=True, allowed_mime_types=[]):
 
         self._required = required
         self._allowed_mime_types = allowed_mime_types
@@ -297,6 +348,18 @@ class DataURLFile(DataType):
 
         self._mime_type = None
         self._file_contents = None
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "data_url_file"
+
+        constraints = dict()
+        constraints['required'] = self._required
+        constraints['allowed_mime_types'] = self._allowed_mime_types
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     @property
     def mime_type(self):
@@ -353,14 +416,24 @@ class DateTime(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
 
-    def __init__(self, 
-                 default=None, 
-                 required=True, 
-                 format="%Y-%m-%d %H:%M:%S"):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S"):
 
         self._default = default
         self._required = required
         self._format = format
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "datetime"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     def validate(self, value):
 
@@ -405,14 +478,24 @@ class Date(DataStructure):
     class CONSTANT:
         TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
     
-    def __init__(self, 
-                 default=None, 
-                 required=True, 
-                 format="%Y-%m-%d"):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d"):
 
         self._default = default
         self._required = required
         self._format = format
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "date"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     def validate(self, value):
         
@@ -457,14 +540,24 @@ class Time(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_TIME_NOW'
     
-    def __init__(self, 
-                 default=None, 
-                 required=True, 
-                 format="%H:%M:%S"):
+    def __init__(self, default=None, required=True, format="%H:%M:%S"):
 
         self._default = default
         self._required = required
         self._format = format
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "time"
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['format'] = self._format
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     def validate(self, value):
 
@@ -510,12 +603,8 @@ class Time(DataStructure):
 
 class Array(DataCollection):
     
-    def __init__(self, 
-                 default=None, 
-                 required=True, 
-                 element_template=None, 
-                 min_length=None, 
-                 max_length=None):
+    def __init__(self, default=None, required=True, element_template=None, 
+        min_length=None, max_length=None):
         
         self._default = default
         self._required = required
@@ -523,7 +612,22 @@ class Array(DataCollection):
         self._min_length = min_length
         self._max_length = max_length
         
-        self._array_elements = []
+        self._array_elements = list()
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "array"
+
+        constraints = dict()
+        # constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['min_length'] = self._min_length
+        constraints['max_length'] = self._max_length
+        constraints['element_template'] = self._element_template.blueprint()
+
+        blueprint['constraints'] = constraints
+        return blueprint
 
     @property
     def element_template(self):
@@ -648,10 +752,48 @@ class Array(DataCollection):
 class Model(DataCollection):
 
     def __init__(self, required=True, default=None, **kwargs):
+        """
+        If you are using the Model constructor to provide Meta data, you can provide it
+        a default dictionary to initialise instance to initalise it from
+
+        Can run _create_instance_attributes to copy attribute tempaltes to the instance,
+        Model instances do not have any configurable options.
+
+        @param required whether or not this model is required when used as an attribute
+        @param default provides a default value for your type, used if one is not provided
+        @param kwargs Named parameters of which to instantiate the model with
+        """
 
         self._required = required
         self._default = default
 
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = "%s.%s" % (self.__module__, self.__class__.__name__)
+
+        constraints = dict()
+        constraints['required'] = self._required
+        blueprint['constraints'] = constraints
+
+        # Fields
+        fields = dict()
+        model_class_members = inspect.getmembers(self.__class__)
+    
+        for attribute_name, type_instance in model_class_members:
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                """ Ignore parameters with __ and if they are methods """
+                continue
+
+            if not issubclass(type_instance.__class__, DataType):
+                """ All attributes in the Model class must be of type DataType """
+                raise DataTypeValidationException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.DataType"))
+
+            fields[attribute_name] = type_instance.blueprint()
+
+        blueprint['fields'] = fields
+        return blueprint
 
     def __setattr__(self, key, value):
         
@@ -675,17 +817,17 @@ class Model(DataCollection):
             return
             
         raise KeyError("No key named %s; in instance of type %s " % (key, self.__class__.__name__))
-
-    #:
-    #: Copies class level attribute templates and makes instance placeholders
-    #:
-    #: This step is required for direct uses of Model classes. This creates a copy of attribute_names
-    #: ignores methods and private variables. DataCollection types are deep copied to ignore memory
-    #: reference conflicts.
-    #:
-    #: DataType instances are initialized to None or default value.
-    #:
+    
     def _create_instance_attributes(self, arguments):
+        """
+        Copies class level attribute templates and makes instance placeholders
+
+        This step is required for direct uses of Model classes. This creates a copy of attribute_names
+        ignores methods and private variables. DataCollection types are deep copied to ignore memory
+        reference conflicts.
+
+        DataType instances are initialized to None or default value.
+        """
 
         model_class_members = inspect.getmembers(self.__class__)
 
@@ -715,13 +857,13 @@ class Model(DataCollection):
                 except DataTypeValidationException:
                     self.__dict__[attribute_name] = None
 
-    #:
-    #: Returns a list of managed attributes for the Model class
-    #:
-    #: Implemented for use with data adapters, can be used to quickly make a list of the 
-    #: attribute names in a prestans model
-    #:
     def get_attribute_keys(self):
+        """
+        Returns a list of managed attributes for the Model class
+
+        Implemented for use with data adapters, can be used to quickly make a list of the 
+        attribute names in a prestans model
+        """
 
         _attribute_keys = list()
         

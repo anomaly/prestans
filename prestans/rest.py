@@ -96,7 +96,7 @@ class Response(webob.Response):
         #: http://stackoverflow.com/q/3561381 
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
-        self.headers.add('Prestans', prestans.__version__)
+        self.headers.add('Prestans-Version', prestans.__version__)
 
     @property
     def logger(self):
@@ -314,79 +314,84 @@ class RequestHandler(object):
 
         self.logger.info("setting default response to %s" % self.request.accept)
 
-        request_method = self.request.method
+        try:
 
-        #: Ensure we support the HTTP verb
-        if not prestans.http.VERB.is_supported_verb(self.request.method):
-            pass
+            request_method = self.request.method
 
-        #:
-        #: Auto set the return serializer based on Accept headers
-        #: http://docs.webob.org/en/latest/reference.html#header-getters
-        #:
+            #: Ensure we support the HTTP verb
+            if not prestans.http.VERB.is_supported_verb(self.request.method):
+                pass
 
-        #: Intersection of requested types and supported types tells us if we
-        #: can infact respond in one of the requess formats
-        _supportable_mime_types = set(self.request.accept.best_matches()).intersection(
-            set(self.response.supported_mime_types))
+            #:
+            #: Auto set the return serializer based on Accept headers
+            #: http://docs.webob.org/en/latest/reference.html#header-getters
+            #:
 
-        if not _supportable_mime_types and len(_supportable_mime_types) < 1:
-            self.logger.error("unsupported mime type in request; accept header reads %s" % 
-                self.request.accept)
-            raise prestans.exception.UnsupportedVocabularyError()
+            #: Intersection of requested types and supported types tells us if we
+            #: can infact respond in one of the requess formats
+            _supportable_mime_types = set(self.request.accept.best_matches()).intersection(
+                set(self.response.supported_mime_types))
 
-        #: If content_type is not acceptable it will raise UnsupportedVocabulary
-        self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
+            if not _supportable_mime_types and len(_supportable_mime_types) < 1:
+                self.logger.error("unsupported mime type in request; accept header reads %s" % 
+                    self.request.accept)
+                raise prestans.exception.UnsupportedVocabularyError()
 
-        #: Authentication
-        # self.logger.error(self.__provider_config__.authentication)
+            #: If content_type is not acceptable it will raise UnsupportedVocabulary
+            self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
 
-        #: Configuration as provided by the API or default of a VerbConfig object
-        verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
+            #: Authentication
+            # self.logger.error(self.__provider_config__.authentication)
 
-        #: Set the response template and attribute filter
-        self.response.response_template = verb_parser_config.response_template
-        self.response.attribute_filter = verb_parser_config.response_attribute_filter
+            #: Configuration as provided by the API or default of a VerbConfig object
+            verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
 
-        #: Parse body
-        if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
-            pass
+            #: Set the response template and attribute filter
+            self.response.response_template = verb_parser_config.response_template
+            self.response.attribute_filter = verb_parser_config.response_attribute_filter
 
-        #: Parse Parameter Set
+            #: Parse body
+            if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
+                pass
 
-        #: Warm up
-        self.handler_will_run()
+            #: Parse Parameter Set
 
-        #:
-        #: See if the handler supports the called method
-        #: prestans sets a sensible HTTP status code
-        #:
-        if request_method == prestans.http.VERB.GET:
-            self.response.status = prestans.http.STATUS.OK
-            self.get(*self._args)
-        elif request_method == prestans.http.VERB.HEAD:
-            self.response.status = prestans.http.STATUS.NO_CONTENT
-            self.head(*self._args)
-        elif request_method == prestans.http.VERB.POST:
-            self.response.status = prestans.http.STATUS.CREATED
-            self.post(*self._args)
-        elif request_method == prestans.http.VERB.PATCH:
-            self.response.status = prestans.http.STATUS.ACCEPTED
-            self.patch(*self._args)
-        elif request_method == prestans.http.VERB.DELETE:
-            self.response.status = prestans.http.STATUS.NO_CONTENT
-            self.delete(*self._args)
-        elif request_method == prestans.http.VERB.PUT:
-            self.response.status = prestans.http.STATUS.ACCEPTED
-            self.put(*self._args)
+            #: Warm up
+            self.handler_will_run()
 
-        #: Tear down
-        self.handler_did_run()
+            #:
+            #: See if the handler supports the called method
+            #: prestans sets a sensible HTTP status code
+            #:
+            if request_method == prestans.http.VERB.GET:
+                self.response.status = prestans.http.STATUS.OK
+                self.get(*self._args)
+            elif request_method == prestans.http.VERB.HEAD:
+                self.response.status = prestans.http.STATUS.NO_CONTENT
+                self.head(*self._args)
+            elif request_method == prestans.http.VERB.POST:
+                self.response.status = prestans.http.STATUS.CREATED
+                self.post(*self._args)
+            elif request_method == prestans.http.VERB.PATCH:
+                self.response.status = prestans.http.STATUS.ACCEPTED
+                self.patch(*self._args)
+            elif request_method == prestans.http.VERB.DELETE:
+                self.response.status = prestans.http.STATUS.NO_CONTENT
+                self.delete(*self._args)
+            elif request_method == prestans.http.VERB.PUT:
+                self.response.status = prestans.http.STATUS.ACCEPTED
+                self.put(*self._args)
 
-        self.logger.info("handler %s.%s; callable excution ends" 
-            % (self.__module__, self.__class__.__name__))
+            #: Tear down
+            self.handler_did_run()
 
-        return self.response(environ, start_response)
+            self.logger.info("handler %s.%s; callable excution ends" 
+                % (self.__module__, self.__class__.__name__))
+
+            return self.response(environ, start_response)
+
+        except prestans.exception.UnimplementedVerb, exp:
+
 
 
     #:

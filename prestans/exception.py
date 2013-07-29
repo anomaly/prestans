@@ -134,7 +134,17 @@ class ParserException(Exception):
 
 
     """
-    pass
+    
+    @property
+    def http_status(self):
+        return self._http_status
+
+    @http_status.setter
+    def http_staths(self, value):
+        self._http_status = value
+
+    def __str__(self):
+        return self._message
 
 class HandlerException(Exception):
     """
@@ -250,7 +260,9 @@ class DeSerializationFailedError(DataValidationException):
 #:
 
 class ServiceUnavailable(HandlerException):
-    pass
+    
+    def __init__(self, service_name):
+        self._service_name = service_name
 
 class BadRequest(HandlerException):
     pass
