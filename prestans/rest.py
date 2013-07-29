@@ -71,23 +71,6 @@ class Request(webob.Request):
         #: Return a attribute filter if set in the request header
         pass
 
-class ErrorResponse(webob.Response):
-    """
-    ErrorResponse is used by exceptions to return
-
-    """
-    
-    def __init__(self, exception, serializer):
-        self._exception = exception
-        self._serializer = serializer
-
-    def __call__(self, environ, start_response):
-
-        #: From webob.Response line 1021
-        headerlist = self._abs_headerlist(environ)
-        start_response(self.status, headerlist)
-
-        return "This will eventually be an error message"
 
 class Response(webob.Response):
     """
@@ -268,7 +251,7 @@ class Response(webob.Response):
         if self.response_template is None:
             headerlist = self._abs_headerlist(environ)
             start_response(self.status, headerlist)
-            return EmptyResponse(self._app_iter)
+            return webob.EmptyResponse(self._app_iter)
 
         #: Body should be of type DataCollection try; attempt calling
         #: as_seriable with available attribute_filter
@@ -285,6 +268,70 @@ class Response(webob.Response):
         start_response(self.status, headerlist)
 
         return stringified_body
+
+
+class ErrorResponse(webob.Response):
+    """
+    ErrorResponse is a specialised webob.Response, its responsible for writing
+    out a message in the following format; using the currently selected serializer
+
+      {
+          "code": 404,
+          "message": "This is an error message",
+          "trace": [
+            {
+                "key": "value"
+            }
+          ]
+      }
+    """
+    
+    def __init__(self, exception, serializer):
+
+        super(ErrorResponse, self).__init__()
+
+        self._exception = exception
+        self._serializer = serializer
+        self._message = str(exception)
+        self._trace = list()
+
+        #: 
+        #: IETF hash dropped the X- prefix for custom headers
+        #: http://stackoverflow.com/q/3561381 
+        #: http://tools.ietf.org/html/draft-saintandre-xdash-00
+        #:
+        self.headers.add('Prestans-Version', prestans.__version__)
+
+        self.content_type = self._serializer.content_type()
+        self.status = exception.http_status
+
+    @property
+    def trace(self):
+        return self._trace
+
+    def append_to_trace(self, trace_entry):
+        """
+        Use this to append to the stack trace
+        """
+        self._trace.append(trace_entry)
+
+    def __call__(self, environ, start_response):
+
+        #: From webob.Response line 1021
+        headerlist = self._abs_headerlist(environ)
+        start_response(self.status, headerlist)
+
+        error_dict = dict()
+
+        error_dict['code'] = self.status
+        error_dict['message'] = self._message
+        error_dict['trace'] = self._trace
+
+        stringified_body = self._serializer.dumps(error_dict)
+        self.content_length = len(stringified_body)
+
+        return stringified_body
+
 
 
 class RequestHandler(object):
@@ -404,6 +451,7 @@ class RequestHandler(object):
 
         except prestans.exception.UnimplementedVerb, exp:
             error_response = ErrorResponse(exp, self.response.selected_serializer)
+            self.logger.error(exp)
             return error_response(environ, start_response)
 
 
