@@ -88,7 +88,7 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
-        
+        pass
 
 class Response(webob.Response):
     """

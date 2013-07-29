@@ -103,15 +103,24 @@ class UnsupportedVocabularyError(Exception):
         <html>
             <head>
                 <title>prestans %s, unsupported media type</title>
+                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
             </head>
             <body>
-                <h1>Unsupported media type</h1>
-                <p>
-                    You requested <span>%s</span> and we can support <span>%s</span>
-                </p>
+                <div class="alert alert-danger alert-block">
+                    <h4>Unsupported media type</h4>
+                    <p>
+                    The request contained an <code>Accept</code> header of
+                    <code>%s</code>
+                    the end-point registered at this URL can speak
+                    <code>%s</code>
+                    </p>
+                    
+                    <p>prestans %s</p>
+                </div>
             </body>
         </html>
-        """ % (prestans.__version__, user_accept_header, str(supported_mime_types).strip("[]'"))
+        """ % (prestans.__version__, user_accept_header, 
+            str(supported_mime_types).strip("[]'"), prestans.__version__)
 
         return error_response(environ, start_response)
 
