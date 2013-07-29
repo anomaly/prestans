@@ -58,6 +58,8 @@ class Request(webob.Request):
         self._logger = logger
         self._deserializers = deserializers
 
+        self.charset = charset
+
     @property
     def supported_mime_types(self):
         return [deserializer.content_type() for deserializer in self._deserializers]
@@ -81,7 +83,7 @@ class Response(webob.Response):
     Overrides content_type property to use prestans' serializers with the set body
     """
 
-    def __init__(self, logger, serializers):
+    def __init__(self, charset, logger, serializers):
         
         super(Response, self).__init__()
 
@@ -570,7 +572,7 @@ class RequestRouter(object):
         #: Attempt to parse the HTTP request
         request = Request(environ=environ, charset=self._charset, logger=self._logger, 
             deserializers=self._deserializers)
-        response = Response(logger=self._logger, serializers=self._serializers)
+        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers)
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
