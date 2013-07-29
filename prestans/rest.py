@@ -77,18 +77,17 @@ class ErrorResponse(webob.Response):
 
     """
     
-    def __init__(self, exception, logger, serializer):
+    def __init__(self, exception, serializer):
         self._exception = exception
         self._serializer = serializer
-        self._logger = logger
-
-    @property
-    def logger(self):
-        return self._logger
 
     def __call__(self, environ, start_response):
 
-        pass
+        #: From webob.Response line 1021
+        headerlist = self._abs_headerlist(environ)
+        start_response(self.status, headerlist)
+
+        return "This will eventually be an error message"
 
 class Response(webob.Response):
     """
@@ -404,7 +403,8 @@ class RequestHandler(object):
             return self.response(environ, start_response)
 
         except prestans.exception.UnimplementedVerb, exp:
-            return "Not implemented"
+            error_response = ErrorResponse(exp, self.response.selected_serializer)
+            return error_response(environ, start_response)
 
 
     #:
