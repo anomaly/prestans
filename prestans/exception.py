@@ -117,7 +117,7 @@ class UnsupportedVocabularyError(Exception):
                     
                     <p class="help-block">
                     <a target="_blank" href="https://github.com/prestans/prestans">prestans</a> 
-                    %s, Copyright &copy 2013 Eternity Technologies</p>
+                    %s, Copyright &copy 2013 <a href="http://etk.com.au">Eternity Technologies</a></p>
                 </div>
             </body>
         </html>
