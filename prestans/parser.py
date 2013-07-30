@@ -37,132 +37,7 @@ import string
 
 import prestans.types
 import prestans.http
-import prestans.exception
-
-class VerbConfig(object):
-    """
-    VerbConfig sets out rules for each HTTP Verb that your API will make available.
-    These rules are used by prestans to validate requests and responses before
-    handing over execution control to your handler.
-
-    All verbs in use must provide atleast a response_template which should be a
-    subclass of prestans.types.DataCollection.
-    """
-
-    def __init__(self, response_template=None, response_attribute_filter=None, 
-        parameter_sets=[], body_template=None, request_attribute_filter=None):
-
-        #: response_template; required parameter        
-        if response_template is not None and not isinstance(response_template, prestans.types.DataCollection):
-            raise TypeError(
-            "response_template of type %s must an instance of a prestans.types.DataCollection subclass" % 
-            response_template.__class__.__name__)
-
-        self._response_template = response_template
-
-        #: response_attribute_filter
-        if response_attribute_filter is not None and not isinstance(response_attribute_filter, AttributeFilter):
-            raise TypeError(
-            "response_attribute_filter of type %s must an instance of prestans.parser.AttributeFilter" % 
-            response_attribute_filter.__class__.__name__)
-
-        self._response_attribute_filter = response_attribute_filter
-
-        #: parameter_sets
-        if not isinstance(parameter_sets, list):
-            parameter_sets = [parameter_sets]
-
-        for parameter_set in parameter_sets:
-            if not isinstance(parameter_set, ParameterSet):
-                raise TypeError(
-                "parameter_set of type %s must be an instance of prestans.parser.ParameterSet" %
-                parameter_set.__class__.__name__)
-
-        self._parameter_sets = parameter_sets
-
-        #: body_template
-
-        #: request_attribute_filter
-        if request_attribute_filter is not None and not isinstance(request_attribute_filter, AttributeFilter):
-            raise TypeError(
-            "request_attribute_filter of type %s must an instance of prestans.parser.AttributeFilter" % 
-            request_attribute_filter.__class__.__name__)
-
-        self._request_attribute_filter = request_attribute_filter
-
-
-    @property
-    def response_template(self):
-        return self._response_template
-
-    @property 
-    def response_attribute_filter(self):
-        return self._response_attribute_filter
-
-    @property
-    def parameter_sets(self):
-        return self._parameter_sets
-
-    @property
-    def body_tempalte(self):
-        return self._body_template
-
-    @property
-    def request_attribute_filter(self):
-        return self._response_attribute_filter
-
-class Config(object):
-    """
-    Configuration that's attached to each handler to define rules for each 
-    HTTP Verb. All HTTP verbs in use must have a configuration defined.
-
-    __init__ takes in a VerbConfig instance for each parameter with names
-    adjacent to the HTTP verb.
-    """
-
-    def __init__(self, GET=VerbConfig(), HEAD=VerbConfig(), POST=VerbConfig(), 
-        PUT=VerbConfig(), PATCH=VerbConfig(), DELETE=VerbConfig()):
-
-        for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
-            if verb is not None and not isinstance(verb, VerbConfig):
-                raise TypeError("All Parser configs should be of type prestans.parser.VerbConfig")
-
-        self._configs = dict()
-
-        self._configs[prestans.http.VERB.GET] = GET
-        self._configs[prestans.http.VERB.HEAD] = HEAD
-        self._configs[prestans.http.VERB.POST] = POST
-        self._configs[prestans.http.VERB.PUT] = PUT
-        self._configs[prestans.http.VERB.PATCH] = PATCH
-        self._configs[prestans.http.VERB.DELETE] = DELETE
-
-    def get_config_for_verb(self, verb):
-        return self._configs[verb]
-
-    @property
-    def GET(self):
-        return self._configs[prestans.http.VERB.GET]
-
-    @property
-    def HEAD(self):
-        return self._configs[prestans.http.VERB.HEAD]
-
-    @property
-    def POST(self):
-        return self._configs[prestans.http.VERB.POST]
-
-    @property
-    def PUT(self):
-        return self._configs[prestans.http.VERB.PUT]
-
-    @property
-    def PATCH(self):
-        return self._configs[prestans.http.VERB.PATCH]
-
-    @property
-    def DELETE(self):
-        return self._configs[prestans.http.VERB.DELETE]
-                    
+import prestans.exception               
 
 class ParameterSet(object):
     pass
@@ -430,54 +305,125 @@ class AttributeFilter(object):
 class ParserRuleSet(object):
     pass
 
-#:
-#:
-#:
 
-class RequestParser(object):
-    
-    GET     = None
-    POST    = None
-    PUT     = None
-    PATCH   = None
-    DELETE  = None
+class VerbConfig(object):
+    """
+    VerbConfig sets out rules for each HTTP Verb that your API will make available.
+    These rules are used by prestans to validate requests and responses before
+    handing over execution control to your handler.
 
-    def parse(self, request, response, environ):
-        #: 
-        #: If the implementing request parser does not specify a parser for a method, None is returned, 
-        #: this completely bypasses the parsing process.
-        #: 
-        #: The implementing request parser must assign an instance of %ParserRuleSet for each HTTP method.
-        #: 
-        #: RequestParser will attempt use those rules to parse the input and assign them to the passed in
-        #: request object. It returns True or False.
-        #: 
-        #: self The object pointer
-        #: response object
-        #: request The request to parse
-        #: 
-        
-        request_method = request.get_request_method()
+    All verbs in use must provide atleast a response_template which should be a
+    subclass of prestans.types.DataCollection.
+    """
 
-        if not self.__class__.__dict__.has_key(request_method) or self.__class__.__dict__[request_method] is None:
-            #: 
-            #: Default rule set is None, ignores parsing for Pameters and Body 
-            #: 
-            return
-        
-        if not isinstance(self.__class__.__dict__[request_method], ParserRuleSet):
-            #:  
-            #: Handles the developer not assinging an object of type ParserRuleSet 
-            #: 
-            raise NotParserRuleSetObjectException(request_method + " does not have a valid ParserRuleSet")
-        
-        parser_rule_set = self.__class__.__dict__[request_method]
+    def __init__(self, response_template=None, response_attribute_filter_default_value=False, 
+        parameter_sets=[], body_template=None, request_attribute_filter=None):
 
-        #: Parse parameters or None if nothing matched
-        request.parameter_set = parser_rule_set._parameter_set_for_request(request)
-        
-        #: Parse request body
-        request.parsed_body_model = parser_rule_set._parsed_body_for_request(request, environ)
+        #: response_template; required parameter        
+        if response_template is not None and not isinstance(response_template, prestans.types.DataCollection):
+            raise TypeError(
+            "response_template of type %s must an instance of a prestans.types.DataCollection subclass" % 
+            response_template.__class__.__name__)
 
-        #: Parse the field filter list
-        response.attribute_filter = parser_rule_set._parse_attribute_filter(request)
+        if response_template is not None:
+            self._response_attribute_filter_template = AttributeFilter.from_model(model_instance=response_template, 
+                default_value=response_attribute_filter_default_value)
+
+        self._response_template = response_template
+
+
+        #: parameter_sets
+        if not isinstance(parameter_sets, list):
+            parameter_sets = [parameter_sets]
+
+        for parameter_set in parameter_sets:
+            if not isinstance(parameter_set, ParameterSet):
+                raise TypeError(
+                "parameter_set of type %s must be an instance of prestans.parser.ParameterSet" %
+                parameter_set.__class__.__name__)
+
+        self._parameter_sets = parameter_sets
+
+        #: body_template
+
+        #: request_attribute_filter
+        if request_attribute_filter is not None and not isinstance(request_attribute_filter, AttributeFilter):
+            raise TypeError(
+            "request_attribute_filter of type %s must an instance of prestans.parser.AttributeFilter" % 
+            request_attribute_filter.__class__.__name__)
+
+        self._request_attribute_filter = request_attribute_filter
+
+
+    @property
+    def response_template(self):
+        return self._response_template
+
+    @property 
+    def response_attribute_filter_template(self):
+        return self._response_attribute_filter_template
+
+    @property
+    def parameter_sets(self):
+        return self._parameter_sets
+
+    @property
+    def body_tempalte(self):
+        return self._body_template
+
+    @property
+    def request_attribute_filter(self):
+        return self._response_attribute_filter
+
+class Config(object):
+    """
+    Configuration that's attached to each handler to define rules for each 
+    HTTP Verb. All HTTP verbs in use must have a configuration defined.
+
+    __init__ takes in a VerbConfig instance for each parameter with names
+    adjacent to the HTTP verb.
+    """
+
+    def __init__(self, GET=VerbConfig(), HEAD=VerbConfig(), POST=VerbConfig(), 
+        PUT=VerbConfig(), PATCH=VerbConfig(), DELETE=VerbConfig()):
+
+        for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
+            if verb is not None and not isinstance(verb, VerbConfig):
+                raise TypeError("All Parser configs should be of type prestans.parser.VerbConfig")
+
+        self._configs = dict()
+
+        self._configs[prestans.http.VERB.GET] = GET
+        self._configs[prestans.http.VERB.HEAD] = HEAD
+        self._configs[prestans.http.VERB.POST] = POST
+        self._configs[prestans.http.VERB.PUT] = PUT
+        self._configs[prestans.http.VERB.PATCH] = PATCH
+        self._configs[prestans.http.VERB.DELETE] = DELETE
+
+    def get_config_for_verb(self, verb):
+        return self._configs[verb]
+
+    @property
+    def GET(self):
+        return self._configs[prestans.http.VERB.GET]
+
+    @property
+    def HEAD(self):
+        return self._configs[prestans.http.VERB.HEAD]
+
+    @property
+    def POST(self):
+        return self._configs[prestans.http.VERB.POST]
+
+    @property
+    def PUT(self):
+        return self._configs[prestans.http.VERB.PUT]
+
+    @property
+    def PATCH(self):
+        return self._configs[prestans.http.VERB.PATCH]
+
+    @property
+    def DELETE(self):
+        return self._configs[prestans.http.VERB.DELETE]
+     

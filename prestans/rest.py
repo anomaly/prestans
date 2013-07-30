@@ -69,8 +69,12 @@ class Request(webob.Request):
         return self.environ['REQUEST_METHOD']
 
     @property
-    def attribute_filter(self):
-        #: Return a attribute filter if set in the request header
+    def response_attribute_filter(self):
+        """
+        Prestans-Response-Attribute-Filter should contain a client's requested 
+        definition for attributes required in the response. This should match
+        the response_attribute_fitler_tempalte? 
+        """
         pass
 
 
@@ -409,7 +413,7 @@ class RequestHandler(object):
 
             #: Set the response template and attribute filter
             self.response.response_template = verb_parser_config.response_template
-            self.response.attribute_filter = verb_parser_config.response_attribute_filter
+            self.response.attribute_filter = verb_parser_config.response_attribute_filter_template
 
             #: Parse body
             if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
