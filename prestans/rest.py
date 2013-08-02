@@ -30,8 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import webob
 import re
+import webob
 import logging
 
 import prestans
@@ -67,6 +67,17 @@ class Request(webob.Request):
     @property
     def method(self):
         return self.environ['REQUEST_METHOD']
+
+    @property
+    def body_template(self):
+        return self._body_template
+
+    @body_template.setter
+    def body_template(self, value):
+        """
+
+        """
+        self._body_template = value 
 
     @property
     def response_attribute_filter(self):
@@ -415,11 +426,16 @@ class RequestHandler(object):
             self.response.response_template = verb_parser_config.response_template
             self.response.attribute_filter = verb_parser_config.response_attribute_filter_template
 
-            #: Parse body
-            if request_method is not prestans.http.VERB.GET and self.__parser_config__ is not None:
+            #: Parameter sets
+            if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
                 pass
 
-            #: Parse Parameter Set
+            #: Parse body
+            if request_method is not prestans.http.VERB.GET and verb_parser_config is not None:
+                self.request.attribute_filter = verb_parser_config.request_attribute_filter
+                #: Setting this runs the parser for the body
+                #: Request will determine which serializer to use based on Content-Type
+                self.request.body_template = verb_parser_config.body_template
 
             #: Warm up
             self.handler_will_run()

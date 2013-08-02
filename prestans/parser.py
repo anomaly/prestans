@@ -322,7 +322,7 @@ class VerbConfig(object):
         #: response_template; required parameter        
         if response_template is not None and not isinstance(response_template, prestans.types.DataCollection):
             raise TypeError(
-            "response_template of type %s must an instance of a prestans.types.DataCollection subclass" % 
+            "response_template of type %s must be an instance of a prestans.types.DataCollection subclass" % 
             response_template.__class__.__name__)
 
         if response_template is not None:
@@ -345,6 +345,12 @@ class VerbConfig(object):
         self._parameter_sets = parameter_sets
 
         #: body_template
+        if body_template is not None and not isinstance(body_template, prestans.types.DataCollection):
+            raise TypeError(
+                "body_template of type %s must be an instance of a prestans.types.DataCollection subclass" %
+                body_template.__class__.__name__)
+
+        self._body_template = body_template
 
         #: request_attribute_filter
         if request_attribute_filter is not None and not isinstance(request_attribute_filter, AttributeFilter):
@@ -368,12 +374,12 @@ class VerbConfig(object):
         return self._parameter_sets
 
     @property
-    def body_tempalte(self):
+    def body_template(self):
         return self._body_template
 
     @property
     def request_attribute_filter(self):
-        return self._response_attribute_filter
+        return self._request_attribute_filter
 
 class Config(object):
     """
