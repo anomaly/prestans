@@ -160,7 +160,7 @@ class Response(webob.Response):
         self._logger = logger
         self._serializers = serializers
         self._selected_serializer = None
-        self._response_template = None
+        self._template = None
         self._app_iter = None
 
         #: 
@@ -198,12 +198,16 @@ class Response(webob.Response):
     #:
 
     @property
-    def response_template(self):
-        return self._response_template
+    def template(self):
+        return self._template
 
-    @response_template.setter
-    def response_template(self, value):
-        self._response_template = value
+    @template.setter
+    def template(self, value):
+
+        if not isinstance(value, prestans.types.DataCollection):
+            raise TypeError("template in response must be of type prestans.types.DataCollection or subclass")
+
+        self._template = value
 
 
     #:
@@ -216,6 +220,10 @@ class Response(webob.Response):
 
     @attribute_filter.setter
     def attribute_filter(self, value):
+
+        if not isinstance(value, prestans.parser.AttributeFilter):
+            raise TypeError("attribue_filter in response must be of type prestans.types.AttributeFilter")
+
         self._attribute_filter = value
 
     #:
@@ -276,8 +284,8 @@ class Response(webob.Response):
         Webob does the heavy lifiting with headers. 
         """
 
-        #: If response_template is null; return an empty iterable
-        if self.response_template is None:
+        #: If template is null; return an empty iterable
+        if self.template is None:
             return []
 
         return self._app_iter
@@ -287,8 +295,8 @@ class Response(webob.Response):
 
         #: If not response template; we have to assume its NO_CONTENT
         #: hence do not allow setting the body
-        if self.response_template is None:
-            raise AssertionError("response_template is None; handler can't return a response")
+        if self.template is None:
+            raise AssertionError("resposne template is None; handler can't return a response")
 
         #: value should be a subclass prestans.types.DataCollection
         if not issubclass(value.__class__, prestans.types.DataCollection):
@@ -296,15 +304,15 @@ class Response(webob.Response):
                 value.__class__.__name__)
 
         #: Ensure that it matches the return type template
-        if not value.__class__ == self.response_template.__class__:
+        if not value.__class__ == self.template.__class__:
             raise TypeError("body must of be type %s, given %s" % 
-                (self.response_template.__class__.__name__, value.__class__.__name__))
+                (self.template.__class__.__name__, value.__class__.__name__))
 
         #: If it's an array then ensure that element_template matches up
-        if isinstance(self.response_template, prestans.types.Array) and \
-        not value.element_template == self.response_template.element_template:
+        if isinstance(self.template, prestans.types.Array) and \
+        not value.element_template == self.template.element_template:
             raise TypeError("array elements must of be type %s, given %s" % 
-                (self.response_template.element_template.__class__.__name__, 
+                (self.template.element_template.__class__.__name__, 
                     value.element_template.__class__.__name__))
 
         #: _app_iter assigned to value
@@ -320,7 +328,7 @@ class Response(webob.Response):
         """
 
         #: prestans' equivalent of webob.Response line 1022
-        if self.response_template is None:
+        if self.template is None:
             headerlist = self._abs_headerlist(environ)
             start_response(self.status, headerlist)
             return webob.EmptyResponse(self._app_iter)
@@ -478,7 +486,7 @@ class RequestHandler(object):
             verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
 
             #: Set the response template and attribute filter
-            self.response.response_template = verb_parser_config.response_template
+            self.response.template = verb_parser_config.response_template
             self.response.attribute_filter = verb_parser_config.response_attribute_filter_template
 
             #: Parameter sets
