@@ -57,16 +57,51 @@ class Request(webob.Request):
         super(Request, self).__init__(environ=environ, charset=charset)
         self._logger = logger
         self._deserializers = deserializers
+        self._attribute_filter = None
 
         self.charset = charset
+
+    @property
+    def method(self):
+        return self.environ['REQUEST_METHOD']
+
+    @property
+    def logger(self):
+        return self._logger
+
+    @property
+    def parsed_body(self):
+        return self._parsed_body
 
     @property
     def supported_mime_types(self):
         return [deserializer.content_type() for deserializer in self._deserializers]
 
     @property
-    def method(self):
-        return self.environ['REQUEST_METHOD']
+    def selected_deserializer(self):
+        return self._selected_deserializer
+        
+    #: Used by content_type_set to set get a referencey to the serializer object
+    def _set_deserializer_by_mime_type(self, mime_type):
+
+        for deserializer in self._deserializers:
+            if deserializer.content_type() == mime_type:
+                self._selected_deserializer = deserializer
+                return
+
+        raise prestans.exception.UnsupportedVocabularyError()
+
+    @property
+    def attribute_filter(self):
+        return self._attribute_filter
+
+    @attribute_filter.setter
+    def attribute_filter(self, value):
+        """
+        Attribute filter that used to parse the request_body. This must be set
+        before the body_template parameter is set
+        """
+        self._response_attribute_filter = value
 
     @property
     def body_template(self):
@@ -75,18 +110,38 @@ class Request(webob.Request):
     @body_template.setter
     def body_template(self, value):
         """
-
+        Must be an instance of a prestans.types.DataCollection subclass; this is
+        generally set during the RequestHandler lifecycle. Setting this spwans the
+        parsing process of the body. If the HTTP verb is GET an AssertionError is
+        thrown. Use with extreme caution.
         """
-        self._body_template = value 
+
+        if self.method == prestans.http.VERB.GET:
+            raise AssertionError("body_template cannot be set for GET requests")
+
+        if not isinstance(value, prestans.types.DataCollection):
+            raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
+
+        self._body_template = value
+
+        #: Get a deserializer based on the Content-Type header
+        self._set_deserializer_by_mime_type(self.content_type)
+
+        #: Parse the body using the deserializer
+        unserialized_body = self.selected_deserializer.loads(self.body)
+
+        #: Parse the body using the remplate and attribute_filter
+        self._parsed_body = value.validate(unserialized_body, self.attribute_filter)
 
     @property
     def response_attribute_filter(self):
         """
-        Prestans-Response-Attribute-Filter should contain a client's requested 
+        Prestans-Response-Attribute-Filter can contain a client's requested 
         definition for attributes required in the response. This should match
         the response_attribute_fitler_tempalte? 
         """
-        pass
+        return None
+
 
 
 class Response(webob.Response):
@@ -120,12 +175,12 @@ class Response(webob.Response):
         return self._logger
 
     @property
-    def selected_serializer(self):
-        return self._selected_serializer
-
-    @property
     def supported_mime_types(self):
         return [serializer.content_type() for serializer in self._serializers]
+
+    @property
+    def selected_serializer(self):
+        return self._selected_serializer
 
     #: Used by content_type_set to set get a referencey to the serializer object
     def _set_serializer_by_mime_type(self, mime_type):
@@ -431,7 +486,7 @@ class RequestHandler(object):
                 pass
 
             #: Parse body
-            if request_method is not prestans.http.VERB.GET and verb_parser_config is not None:
+            if not request_method == prestans.http.VERB.GET and verb_parser_config is not None:
                 self.request.attribute_filter = verb_parser_config.request_attribute_filter
                 #: Setting this runs the parser for the body
                 #: Request will determine which serializer to use based on Content-Type
