@@ -316,7 +316,7 @@ class VerbConfig(object):
     subclass of prestans.types.DataCollection.
     """
 
-    def __init__(self, response_template=None, response_attribute_filter_default_value=False, 
+    def __init__(self, response_template=None, response_attribute_filter_default_value=True, 
         parameter_sets=[], body_template=None, request_attribute_filter=None):
 
         #: response_template; required parameter        
