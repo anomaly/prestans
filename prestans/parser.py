@@ -172,7 +172,7 @@ class AttributeFilter(object):
         if from_dictionary:
             self._init_from_dictionary(from_dictionary)
 
-    def _conforms_to_template_filter(self, template_filter):
+    def conforms_to_template_filter(self, template_filter):
         """
         Check AttributeFilter conforms to the rules set by the template
 
@@ -230,7 +230,7 @@ class AttributeFilter(object):
                     # Attribute lists sort themselves out, to produce sub Attribute Filters 
                     template_sub_list = getattr(template_filter, template_key)
                     this_sub_list = getattr(self, template_key)
-                    setattr(evaluated_attribute_filter, template_key, this_sub_list._conforms_to_template_filter(template_sub_list))
+                    setattr(evaluated_attribute_filter, template_key, this_sub_list.conforms_to_template_filter(template_sub_list))
             else:
                 setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
 

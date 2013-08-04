@@ -183,6 +183,12 @@ class UnimplementedVerb(ParserException):
         self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
         self._message = "API end-point does not implement the %s verb" % (verb_name)
 
+class NoEndpointError(ParserException):
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.NOT_FOUND
+        self._message = "API does not provide this end-point"
+
 class NoSetMatched(ParserException):
     pass
 

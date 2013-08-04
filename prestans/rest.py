@@ -61,6 +61,9 @@ class Request(webob.Request):
 
         self.charset = charset
 
+        #: Get a deserializer based on the Content-Type header
+        self._set_deserializer_by_mime_type(self.content_type)
+
     @property
     def method(self):
         return self.environ['REQUEST_METHOD']
@@ -124,9 +127,6 @@ class Request(webob.Request):
 
         self._body_template = value
 
-        #: Get a deserializer based on the Content-Type header
-        self._set_deserializer_by_mime_type(self.content_type)
-
         #: Parse the body using the deserializer
         unserialized_body = self.selected_deserializer.loads(self.body)
 
@@ -134,12 +134,20 @@ class Request(webob.Request):
         self._parsed_body = value.validate(unserialized_body, self.attribute_filter)
 
     @property
-    def response_attribute_filter(self):
+    def get_response_attribute_filter(self, template_filter):
         """
-        Prestans-Response-Attribute-Filter can contain a client's requested 
+        Prestans-Response-Attribute-List can contain a client's requested 
         definition for attributes required in the response. This should match
         the response_attribute_fitler_tempalte? 
         """
+
+        #: Header not set results in a None
+
+        #: Deserialize the header contents
+
+        #: Construct an AttributeFilter
+
+        #: Check template?
         return None
 
 
@@ -676,11 +684,15 @@ class RequestRouter(object):
                     return request_handler(environ, start_response)
 
             #: Request does not have a matched handler
-            return "No matching handler for this URL"
+            raise prestans.exception.NoEndpointError()
 
         except prestans.exception.UnsupportedVocabularyError, exp:
             return exp.as_error_response(environ, start_response, 
                 request.accept, _default_outgoing_mime_types)
+
+        except prestans.exception.NoEndpointError, exp:
+            # return ErrorResponse(exp, response.selected_serializer)
+            return "Should this be an HTML message as well"
 
 
     #:    
