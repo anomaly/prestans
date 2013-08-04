@@ -694,19 +694,19 @@ class Array(DataCollection):
                 self.append(element)
             return
         
-        if isinstance(self._element_template.__class__, String.__class__) and \
+        if isinstance(self._element_template, String) and \
         isinstance(value, str):
             value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template.__class__, String.__class__) and \
+        elif isinstance(self._element_template, String) and \
         isinstance(value, unicode):
             value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template.__class__, Integer.__class__) and \
+        elif isinstance(self._element_template, Integer) and \
         isinstance(value, int):
             value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template.__class__, Float.__class__) and \
+        elif isinstance(self._element_template, Float) and \
         isinstance(value, float):
             value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template.__class__, Boolean.__class__) and \
+        elif isinstance(self._element_template, Boolean) and \
         isinstance(value, bool):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
@@ -930,7 +930,7 @@ class Model(DataCollection):
                 
             try:
                 
-                if issubclass(type_instance.__class__, DataCollection):
+                if isinstance(type_instance, DataCollection):
                     sub_attribute_filter = None
                     if attribute_filter and attribute_filter.has_key(attribute_name):
                         sub_attribute_filter = getattr(attribute_filter, attribute_name)

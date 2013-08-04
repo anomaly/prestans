@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['Config']
+__all__ = ['Config', 'VerbConfig', 'AttributeFilter']
 
 import inspect
 import string
@@ -40,12 +40,103 @@ import prestans.http
 import prestans.exception               
 
 class ParameterSet(object):
-    pass
+    """
+    ParameterSet is a group of Dataprestans.types that are expected as GET parameters
 
+    ParameterSet defines rules and patterns in which they are acceptable.
+    while ParserRuleSet is responsible for running the parse mechanism.
+    """
 
-#:
-#:
-#:
+    def blueprint(self):
+        """
+        blueprint support, returnsn a partial dictionary
+        """
+
+        blueprint = dict()
+        blueprint['type'] = "%s.%s" % (self.__module__, self.__class__.__name__)
+
+        # Fields
+        fields = dict()
+        model_class_members = inspect.getmembers(self.__class__)
+    
+        # Inspects the attributes of a parameter set and tries to validate the input 
+        for attribute_name, type_instance in self.__class__.__dict__.iteritems():
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                # Ignore parameters with __ and if they are methods 
+                continue
+
+            # Must be one of the following types
+            if not isinstance(type_instance, prestans.types.String) and \
+            not isinstance(type_instance, prestans.types.Float) and \
+            not isinstance(type_instance, prestans.types.Integer) and \
+            not isinstance(type_instance, prestans.types.Array):
+                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+
+            if isinstance(type_instance, prestans.types.Array):
+                if not isinstance(type_instance.element_template, prestans.types.String) and \
+                not isinstance(type_instance.element_template, prestans.types.Float) and \
+                not isinstance(type_instance.element_template, prestans.types.Integer):
+                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+
+            fields[attribute_name] = type_instance.blueprint()
+
+        blueprint['fields'] = fields
+        return blueprint
+    
+    def validate(self, request):
+        """
+        validate method for %ParameterSet
+        
+        Since the introduction of ResponseFieldListParser, the parameter _response_field_list 
+        will be ignore, this is a prestans reserved parameter, and cannot be used by apps.
+        
+        @param self The object pointer
+        @param request The request object to be validated
+        """
+        
+        validated_parameter_set = self.__class__()
+
+        # Inspects the attributes of a parameter set and tries to validate the input 
+        for attribute_name, type_instance in self.__class__.__dict__.iteritems():
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                # Ignore parameters with __ and if they are methods 
+                continue
+
+            #Must be one of the following types
+            if not isinstance(type_instance, prestans.types.String) and \
+            not isinstance(type_instance, prestans.types.Float) and \
+            not isinstance(type_instance, prestans.types.Integer) and \
+            not isinstance(type_instance, prestans.types.Array):
+                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+
+            if issubclass(type_instance.__class__, prestans.types.Array):
+                
+                if not issubclass(type_instance._element_template.__class__, prestans.types.String) and \
+                not issubclass(type_instance._element_template.__class__, prestans.types.Float) and \
+                issubclass(type_instance._element_template.__class__, prestans.types.Integer):
+                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+
+            try:
+
+                # Get input from parameters, None type returned if nothing provided
+                if issubclass(type_instance.__class__, prestans.types.Array):
+                    validation_input = request.get_all(attribute_name)
+                else:
+                    validation_input = request.get(attribute_name)
+
+                # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
+                validation_result = type_instance.validate(validation_input)
+
+                # setattr
+                setattr(validated_parameter_set, attribute_name, validation_result)
+
+            except prestans.types.DataTypeValidationException, exp:
+                return None
+            
+        return validated_parameter_set
+
 
 class AttributeFilter(object):
     #: 
@@ -62,9 +153,9 @@ class AttributeFilter(object):
 
     @classmethod
     def from_model(self, model_instance, default_value=False):
-        #:
-        #: wrapper for Model's get_attribute_filter
-        #:
+        """
+        wrapper for Model's get_attribute_filter
+        """
 
         if issubclass(model_instance.__class__, prestans.types.DataCollection):
             return model_instance.get_attribute_filter(default_value)
@@ -73,10 +164,10 @@ class AttributeFilter(object):
                         (model_instance.__class__.__name__))
 
     def __init__(self, from_dictionary=None):
-        #:
-        #: Creates an attribute filter object, optionally populates from a 
-        #: dictionary of booleans
-        #:
+        """
+        Creates an attribute filter object, optionally populates from a 
+        dictionary of booleans
+        """
         
         if from_dictionary:
             self._init_from_dictionary(from_dictionary)
@@ -297,13 +388,6 @@ class AttributeFilter(object):
 
         raise TypeError("%s name in %s must be of type Boolean or AttributeFilter, given %s" % 
                         (key, self.__class__.__name__, value.__class__.__name__))
-
-#:
-#:
-#:
-
-class ParserRuleSet(object):
-    pass
 
 
 class VerbConfig(object):
