@@ -55,6 +55,6 @@ setup(name='prestans',
       author='Devraj Mukherjee, Bradley Mclain',
       author_email='framework@prestans.org',
       url='https://github.com/prestans/prestans',
-      packages=['prestans', 'prestans.ext', 'prestans.ext.data', 'prestans.ext.data.adapters'],
+      packages=['prestans', 'prestans.provider', 'prestans.ext', 'prestans.ext.data', 'prestans.ext.data.adapters'],
       install_requires=['webob==1.2.3',],
      )
