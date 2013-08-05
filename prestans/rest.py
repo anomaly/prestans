@@ -61,8 +61,9 @@ class Request(webob.Request):
 
         self.charset = charset
 
-        #: Get a deserializer based on the Content-Type header
-        self._set_deserializer_by_mime_type(self.content_type)
+        if not self.method == prestans.http.VERB.GET:
+            #: Get a deserializer based on the Content-Type header
+            self._set_deserializer_by_mime_type(self.content_type)
 
     @property
     def method(self):
@@ -92,7 +93,7 @@ class Request(webob.Request):
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError()
+        raise prestans.exception.UnsupportedContentTypeError(mime_type)
 
     @property
     def attribute_filter(self):

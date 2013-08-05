@@ -126,6 +126,10 @@ class UnsupportedVocabularyError(Exception):
 
         return error_response(environ, start_response)
 
+class UnsupportedContentTypeError(Exception):
+    
+    def __init__(self, mime_type):
+        self._mime_type = mime_type
 
 class DataValidationException(Exception):
     """
@@ -141,9 +145,9 @@ class DataValidationException(Exception):
 
 class ParserException(Exception):
     """
-
-
-
+    ParserException are Exceptions raised if prestans fails to parse
+    a request; these generally revolve around the Content-Types or 
+    missing payload. Specific parsing messages are of type DataValidationException
     """
     
     @property
