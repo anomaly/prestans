@@ -134,7 +134,17 @@ class Request(webob.Request):
         #: Parse the body using the remplate and attribute_filter
         self._parsed_body = value.validate(unserialized_body, self.attribute_filter)
 
-    @property
+    def register_deserializers(self, deserializers):
+
+        for deserializer in self._deserializers:
+
+            if not isinstance(deserializer, prestans.deserializer.Base):
+                raise TypeError("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
+                    (deserializer.__module__, deserializer.__class__.__name__))
+
+        self._deserializers = self._deserializers + deserializers
+
+
     def get_response_attribute_filter(self, template_filter):
         """
         Prestans-Response-Attribute-List can contain a client's requested 
@@ -341,7 +351,7 @@ class Response(webob.Response):
                 raise TypeError("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
                     (serializer.__module__, serializer.__class__.__name__))
 
-        self._serializers.append(serializers)
+        self._serializers = self._serializers + serializers
 
     def __call__(self, environ, start_response):
         """
@@ -476,6 +486,10 @@ class RequestHandler(object):
         self.logger.info("setting default response to %s" % self.request.accept)
 
         try:
+
+            #: Register additional serializers and de-serializers
+            self.request.register_deserializers(self.register_deserializers())
+            self.response.register_serializers(self.register_serializers())
 
             request_method = self.request.method
 
