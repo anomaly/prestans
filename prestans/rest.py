@@ -331,6 +331,18 @@ class Response(webob.Response):
 
     body = property(_body__get, _body__set, _body__set)
 
+    def register_serializers(self, serializers):
+        """
+        Adds extra serializers; generally registered during the handler lifecycle
+        """
+        for serializer in serializers:
+
+            if not isinstance(serializer, prestans.serializer.Base):
+                raise TypeError("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
+                    (serializer.__module__, serializer.__class__.__name__))
+
+        self._serializers.append(serializers)
+
     def __call__(self, environ, start_response):
         """
         Overridden WSGI application interface
@@ -357,6 +369,7 @@ class Response(webob.Response):
         start_response(self.status, headerlist)
 
         return stringified_body
+
 
 
 class ErrorResponse(webob.Response):
@@ -525,15 +538,15 @@ class RequestHandler(object):
             elif request_method == prestans.http.VERB.POST:
                 self.response.status = prestans.http.STATUS.CREATED
                 self.post(*self._args)
+            elif request_method == prestans.http.VERB.PUT:
+                self.response.status = prestans.http.STATUS.ACCEPTED
+                self.put(*self._args)
             elif request_method == prestans.http.VERB.PATCH:
                 self.response.status = prestans.http.STATUS.ACCEPTED
                 self.patch(*self._args)
             elif request_method == prestans.http.VERB.DELETE:
                 self.response.status = prestans.http.STATUS.NO_CONTENT
                 self.delete(*self._args)
-            elif request_method == prestans.http.VERB.PUT:
-                self.response.status = prestans.http.STATUS.ACCEPTED
-                self.put(*self._args)
 
             #: Tear down
             self.handler_did_run()
@@ -554,26 +567,32 @@ class RequestHandler(object):
     #: if not overridden prestans returns a Not Implemented error
     #:
 
+    def register_serializers(self):
+        return []
+
+    def register_deserializers(self):
+        return []
+
     def handler_will_run(self):
         return None
 
     def get(self, *args):
-        raise prestans.exception.UnimplementedVerbError("GET")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.GET)
 
     def head(self, *args):
-        raise prestans.exception.UnimplementedVerbError("HEAD")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.HEAD)
 
     def post(self, *args):
-        raise prestans.exception.UnimplementedVerbError("POST")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.POST)
 
     def put(self, *args):
-        raise prestans.exception.UnimplementedVerbError("PUT")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.PUT)
 
     def patch(self, *args):
-        raise prestans.exception.UnimplementedVerbError("PATCH")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.PATCH)
 
     def delete(self, *args):
-        raise prestans.exception.UnimplementedVerbError("DELETE")
+        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.DELETE)
 
     def handler_did_run(self):
         return None
@@ -641,10 +660,8 @@ class RequestRouter(object):
         for serializer in self._serializers:
 
             if not isinstance(serializer, prestans.serializer.Base):
-                self._logger.error("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
+                raise TypeError("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
                     (serializer.__module__, serializer.__class__.__name__))
-
-                #: Throw an error message
 
             _default_outgoing_mime_types.append(serializer.content_type())
 
@@ -652,7 +669,7 @@ class RequestRouter(object):
         for deserializer in self._deserializers:
 
             if not isinstance(deserializer, prestans.deserializer.Base):
-                self._logger.error("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
+                raise TypeError("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
                     (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
