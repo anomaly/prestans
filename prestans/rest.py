@@ -61,10 +61,6 @@ class Request(webob.Request):
 
         self.charset = charset
 
-        if not self.method == prestans.http.VERB.GET:
-            #: Get a deserializer based on the Content-Type header
-            self._set_deserializer_by_mime_type(self.content_type)
-
     @property
     def method(self):
         return self.environ['REQUEST_METHOD']
@@ -125,6 +121,10 @@ class Request(webob.Request):
 
         if not isinstance(value, prestans.types.DataCollection):
             raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
+
+        #: Get a deserializer based on the Content-Type header
+        #: Do this here so the handler gets a chance to setup extra serializers
+        self._set_deserializer_by_mime_type(self.content_type)
 
         self._body_template = value
 
@@ -199,7 +199,7 @@ class Response(webob.Response):
                 self._selected_serializer = serializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError()
+        raise prestans.exception.UnsupportedVocabularyError(mime_type)
 
     #:
     #: is an instance of prestans.types.DataType; mostly a subclass of 
@@ -257,7 +257,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exception.UnsupportedVocabularyError()
+            raise prestans.exception.UnsupportedVocabularyError(value)
 
         #: Keep a reference to the selected serializer
         self._set_serializer_by_mime_type(value)
@@ -483,7 +483,7 @@ class RequestHandler(object):
             if not _supportable_mime_types and len(_supportable_mime_types) < 1:
                 self.logger.error("unsupported mime type in request; accept header reads %s" % 
                     self.request.accept)
-                raise prestans.exception.UnsupportedVocabularyError()
+                raise prestans.exception.UnsupportedVocabularyError(self.request.accept)
 
             #: If content_type is not acceptable it will raise UnsupportedVocabulary
             self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
@@ -543,7 +543,7 @@ class RequestHandler(object):
 
             return self.response(environ, start_response)
 
-        except prestans.exception.UnimplementedVerb, exp:
+        except prestans.exception.UnimplementedVerbError, exp:
             error_response = ErrorResponse(exp, self.response.selected_serializer)
             self.logger.error(exp)
             return error_response(environ, start_response)
@@ -558,22 +558,22 @@ class RequestHandler(object):
         return None
 
     def get(self, *args):
-        raise prestans.exception.UnimplementedVerb("GET")
+        raise prestans.exception.UnimplementedVerbError("GET")
 
     def head(self, *args):
-        raise prestans.exception.UnimplementedVerb("HEAD")
+        raise prestans.exception.UnimplementedVerbError("HEAD")
 
     def post(self, *args):
-        raise prestans.exception.UnimplementedVerb("POST")
+        raise prestans.exception.UnimplementedVerbError("POST")
 
     def put(self, *args):
-        raise prestans.exception.UnimplementedVerb("PUT")
+        raise prestans.exception.UnimplementedVerbError("PUT")
 
     def patch(self, *args):
-        raise prestans.exception.UnimplementedVerb("PATCH")
+        raise prestans.exception.UnimplementedVerbError("PATCH")
 
     def delete(self, *args):
-        raise prestans.exception.UnimplementedVerb("DELETE")
+        raise prestans.exception.UnimplementedVerbError("DELETE")
 
     def handler_did_run(self):
         return None
@@ -688,12 +688,17 @@ class RequestRouter(object):
             raise prestans.exception.NoEndpointError()
 
         except prestans.exception.UnsupportedVocabularyError, exp:
+            #: Invalid outbound 
             return exp.as_error_response(environ, start_response, 
-                request.accept, _default_outgoing_mime_types)
+                _default_outgoing_mime_types)
+
+        except prestans.exception.UnsupportedContentTypeError, exp:
+            #: Invalid inbound Content-Type
+            return exp.as_error_response(environ, start_response, 
+                _default_incoming_mime_types)
 
         except prestans.exception.NoEndpointError, exp:
-            # return ErrorResponse(exp, response.selected_serializer)
-            return "Should this be an HTML message as well"
+            return "No end point here"
 
 
     #:    

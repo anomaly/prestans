@@ -37,8 +37,7 @@ __all__ = [
     'HandlerException',
 
     #: Parser Exceptions
-    'UnimplementedVerb',
-    'NotImplemented',
+    'NoEndpointError',
     'SerializationFailed',
     'NoSetMatched',
     'BodyTemplateParse',
@@ -90,8 +89,11 @@ class UnsupportedVocabularyError(Exception):
     this error message is sent as an HTML document. This exception is the
     only one that breaks serialisation rules.
     """
+
+    def __init__(self, mime_type):
+        self._mime_type = mime_type
     
-    def as_error_response(self, environ, start_response, user_accept_header, supported_mime_types):
+    def as_error_response(self, environ, start_response, supported_mime_types):
 
         import webob
         error_response = webob.Response()
@@ -121,7 +123,7 @@ class UnsupportedVocabularyError(Exception):
                 </div>
             </body>
         </html>
-        """ % (prestans.__version__, user_accept_header, 
+        """ % (prestans.__version__, self._mime_type,  
             str(supported_mime_types).strip("[]'"), prestans.__version__)
 
         return error_response(environ, start_response)
@@ -130,6 +132,41 @@ class UnsupportedContentTypeError(Exception):
     
     def __init__(self, mime_type):
         self._mime_type = mime_type
+
+    def as_error_response(self, environ, start_response, supported_mime_types):
+
+        import webob
+        error_response = webob.Response()
+
+        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
+        error_response.content_type = "text/html"
+        error_response.body = """
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <title>prestans %s, unsupported media type</title>
+                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
+            </head>
+            <body>
+                <div class="alert alert-danger alert-block">
+                    <h4>Unsupported Content-Type</h4>
+                    <p>
+                    The request contained the <code>Content-Type</code> header of
+                    <code>%s</code>
+                    the end-point registered at this URL can accept
+                    <code>%s</code>
+                    </p>
+                    
+                    <p class="help-block">
+                    <a target="_blank" href="https://github.com/prestans/prestans">prestans</a> 
+                    %s, Copyright &copy 2013 <a href="http://etk.com.au">Eternity Technologies</a></p>
+                </div>
+            </body>
+        </html>
+        """ % (prestans.__version__, self._mime_type, 
+            str(supported_mime_types).strip("[]'"), prestans.__version__)
+
+        return error_response(environ, start_response)
 
 class DataValidationException(Exception):
     """
@@ -181,11 +218,10 @@ class HandlerException(Exception):
 #: Parser Exception
 #:
 
-class UnimplementedVerb(ParserException):
+class UnimplementedVerbError(ParserException):
 
     def __init__(self, verb_name):
-        self._http_status = prestans.http.STATUS.METHOD_NOT_ALLOWED
-        self._message = "API end-point does not implement the %s verb" % (verb_name)
+        pass
 
 class NoEndpointError(ParserException):
 
@@ -262,9 +298,6 @@ class InvalidMetaValueError(DataValidationException):
     pass
 
 class UnregisteredAdapterError(DataValidationException):
-    pass
-
-class NotImplementedError(DataValidationException):
     pass
 
 class SerializationFailedError(DataValidationException):
