@@ -162,7 +162,6 @@ class Request(webob.Request):
         return None
 
 
-
 class Response(webob.Response):
     """
     Response is the writable HTTP response. It inherits and leverages 
@@ -315,7 +314,7 @@ class Response(webob.Response):
         #: If not response template; we have to assume its NO_CONTENT
         #: hence do not allow setting the body
         if self.template is None:
-            raise AssertionError("resposne template is None; handler can't return a response")
+            raise AssertionError("response template is None; handler can't return a response")
 
         #: value should be a subclass prestans.types.DataCollection
         if not issubclass(value.__class__, prestans.types.DataCollection):
@@ -370,6 +369,11 @@ class Response(webob.Response):
 
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(serializable_body)
+
+        if not type(stringified_body) == str:
+            raise TypeError("%s dumps must return a python str not %s" % 
+                (self._selected_serializer.__class__.__name__, 
+                    stringified_body.__class__.__name__))
 
         #: set content_length
         self.content_length = len(stringified_body)
@@ -633,8 +637,9 @@ class RequestRouter(object):
 
     """
 
-    def __init__(self, routes, serializers=None, deserializers=None, charset="utf-8", 
-        application_name="prestans", logger=None, debug=False):
+    def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None, 
+        default_deserializer=None, charset="utf-8", application_name="prestans", 
+        logger=None, debug=False):
 
         self._application_name = application_name
         self._debug = debug
@@ -643,8 +648,10 @@ class RequestRouter(object):
 
         #: Are formats prestans handlers can send data back as
         self._serializers = serializers
+        self._default_serializer = default_serializer
         #: Are formats prestans handlers can accept data as
         self._deserializers = deserializers
+        self._default_deserializer = default_deserializer
 
         #:
         #: Init the default logger if one's not provided, this allows users to configure their own
@@ -659,8 +666,14 @@ class RequestRouter(object):
         if serializers is None:
             self._serializers = [prestans.serializer.JSON()]
 
+        if default_serializer is None:
+            self._default_serializer = prestans.serializer.JSON()
+
         if deserializers is None:
             self._deserializers = [prestans.deserializer.JSON()]
+
+        if default_deserializer is None:
+            self._default_deserializer = prestans.deserializer.JSON()
 
 
     def __call__(self, environ, start_response):
@@ -718,6 +731,9 @@ class RequestRouter(object):
             #: Request does not have a matched handler
             raise prestans.exception.NoEndpointError()
 
+        except prestans.exception.NoEndpointError, exp:
+            return ErrorResponse(exp, response.selected_serializer)
+
         except prestans.exception.UnsupportedVocabularyError, exp:
             #: Invalid outbound 
             return exp.as_error_response(environ, start_response, 
@@ -727,9 +743,6 @@ class RequestRouter(object):
             #: Invalid inbound Content-Type
             return exp.as_error_response(environ, start_response, 
                 _default_incoming_mime_types)
-
-        except prestans.exception.NoEndpointError, exp:
-            return "No end point here"
 
 
     #:    

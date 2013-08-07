@@ -221,7 +221,8 @@ class HandlerException(Exception):
 class UnimplementedVerbError(ParserException):
 
     def __init__(self, verb_name):
-        pass
+        self._http_status = prestans.http.STATUS.NOT_ALLOWED
+        self._message = "End-point doesn't implement %s" % verb_name
 
 class NoEndpointError(ParserException):
 
