@@ -93,80 +93,10 @@ class UnsupportedVocabularyError(Exception):
     def __init__(self, mime_type):
         self._mime_type = mime_type
     
-    def as_error_response(self, environ, start_response, supported_mime_types):
-
-        import webob
-        error_response = webob.Response()
-
-        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
-        error_response.content_type = "text/html"
-        error_response.body = """
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <title>prestans %s, unsupported media type</title>
-                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
-            </head>
-            <body>
-                <div class="alert alert-danger alert-block">
-                    <h4>Unsupported media type</h4>
-                    <p>
-                    The request contained an <code>Accept</code> header of
-                    <code>%s</code>
-                    the end-point registered at this URL can speak
-                    <code>%s</code>
-                    </p>
-                    
-                    <p class="help-block">
-                    <a target="_blank" href="https://github.com/prestans/prestans">prestans</a> 
-                    %s, Copyright &copy 2013 <a href="http://etk.com.au">Eternity Technologies</a></p>
-                </div>
-            </body>
-        </html>
-        """ % (prestans.__version__, self._mime_type,  
-            str(supported_mime_types).strip("[]'"), prestans.__version__)
-
-        return error_response(environ, start_response)
-
 class UnsupportedContentTypeError(Exception):
     
     def __init__(self, mime_type):
         self._mime_type = mime_type
-
-    def as_error_response(self, environ, start_response, supported_mime_types):
-
-        import webob
-        error_response = webob.Response()
-
-        error_response.status = prestans.http.STATUS.UNSUPPORTED_MEDIA_TYPE
-        error_response.content_type = "text/html"
-        error_response.body = """
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <title>prestans %s, unsupported media type</title>
-                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
-            </head>
-            <body>
-                <div class="alert alert-danger alert-block">
-                    <h4>Unsupported Content-Type</h4>
-                    <p>
-                    The request contained the <code>Content-Type</code> header of
-                    <code>%s</code>
-                    the end-point registered at this URL can accept
-                    <code>%s</code>
-                    </p>
-                    
-                    <p class="help-block">
-                    <a target="_blank" href="https://github.com/prestans/prestans">prestans</a> 
-                    %s, Copyright &copy 2013 <a href="http://etk.com.au">Eternity Technologies</a></p>
-                </div>
-            </body>
-        </html>
-        """ % (prestans.__version__, self._mime_type, 
-            str(supported_mime_types).strip("[]'"), prestans.__version__)
-
-        return error_response(environ, start_response)
 
 class DataValidationException(Exception):
     """
