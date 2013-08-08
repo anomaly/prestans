@@ -108,10 +108,34 @@ class ArgParserFactory(object):
         gen_parser.add_argument(
             "-t",
             "--template",
-            choices=['closure'],
-            default="closure",
+            choices=['closure-model', 'closure-filter'],
+            required=True,
             help="template to use for client side code generation"
             )
+
+        gen_parser.add_argument(
+            "-m",
+            "--model",
+            required=True,
+            help="path to models description file"
+            )
+
+
+        gen_parser.add_argument(
+            "-o",
+            "--output",
+            default=".",
+            help="output path for generated code"
+            )
+
+        gen_parser.add_argument(
+            "-n",
+            "--namespace",
+            required=True,
+            help="namespace to use with template e.g prestans.demo.data"
+            )
+
+
 
     #:
     #: server subcommand
