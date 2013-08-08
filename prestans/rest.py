@@ -89,7 +89,7 @@ class Request(webob.Request):
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedContentTypeError(mime_type)
+        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.content_type)
 
     @property
     def attribute_filter(self):
@@ -669,6 +669,11 @@ class RequestRouter(object):
         if default_serializer is None:
             self._default_serializer = prestans.serializer.JSON()
 
+        if isinstance(default_serializer, prestans.serializer.TextSerializer):
+            raise TypeError("default_serializer must be a TextualSerializer")
+
+        #: Deserializers
+        
         if deserializers is None:
             self._deserializers = [prestans.deserializer.JSON()]
 
@@ -731,19 +736,8 @@ class RequestRouter(object):
             #: Request does not have a matched handler
             raise prestans.exception.NoEndpointError()
 
-        except prestans.exception.NoEndpointError, exp:
-            return ErrorResponse(exp, response.selected_serializer)
-
-        except prestans.exception.UnsupportedVocabularyError, exp:
-            #: Invalid outbound 
-            return exp.as_error_response(environ, start_response, 
-                _default_outgoing_mime_types)
-
-        except prestans.exception.UnsupportedContentTypeError, exp:
-            #: Invalid inbound Content-Type
-            return exp.as_error_response(environ, start_response, 
-                _default_incoming_mime_types)
-
+        except prestans.exception.Base, exp:
+            return ErrorResponse(exp, response._default_serializer)
 
     #:    
     #: @todo Update regular expressions to support webapp2 like routes

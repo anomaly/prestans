@@ -39,22 +39,52 @@ class Base(object):
     def dumps(self, serializable_object):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
+    def handler_body_type(self):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
     def content_type(self):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
 
-class JSON(Base):
+class TextSerializer(Base):
+
+    def dumps(self, serializable_object):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+    def handler_body_type(self):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+    def content_type(self):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+
+class BinarySerializer(Base):
+
+    def dumps(self, serializable_object):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+    def handler_body_type(self):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+    def content_type(self):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
+
+class JSON(TextSerializer):
 
     def dumps(self, serializable_object):
         
         import json
         return json.dumps(serializable_object)
 
+    def handler_body_type(self):
+        return prestans.types.DataCollection
+
     def content_type(self):
         return 'application/json'
 
 
-class XMLPlist(Base):
+class XMLPlist(TextSerializer):
     """
     Uses Apple's Property List format to serialize collections 
     to XML. Refer to http://docs.python.org/2/library/plistlib.html
@@ -67,11 +97,14 @@ class XMLPlist(Base):
 
         return plist_str
 
+    def handler_body_type(self):
+        return prestans.types.DataCollection
+
     def content_type(self):
         return 'application/xml'
 
 
-class PDFSerializer(Base):
+class PDFSerializer(BinarySerializer):
     """
     Serializes HTML/CSS to PDF using WeasyPrint; http://weasyprint.org
 
@@ -96,6 +129,8 @@ class PDFSerializer(Base):
 
         return output_string
 
+    def handler_body_type(self):
+        return str
+
     def content_type(self):
         return 'application/pdf'
-
