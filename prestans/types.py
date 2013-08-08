@@ -176,12 +176,10 @@ class Integer(DataType):
 
         constraints = dict()
         constraints['default'] = self._default
-        constraints['min_length'] = self._min_length
-        constraints['max_length'] = self._max_length
+        constraints['minimum'] = self._minimum
+        constraints['maximum'] = self._maximum
         constraints['required'] = self._required
-        constraints['format'] = self._format
         constraints['choices'] = self._choices
-        constraints['utf_encoding'] = self._utf_encoding
 
         blueprint['constraints'] = constraints
 

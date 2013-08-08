@@ -31,7 +31,7 @@
 #
 
 
-__all__ = ['server']
+__all__ = ['gen', 'serve']
 
 import argparse
 
