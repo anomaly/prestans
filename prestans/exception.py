@@ -64,6 +64,8 @@ __all__ = [
     'Conflict',
     'NotFound',
     'Unauthorized',
+    'MovedPermanently',
+    'PaymentRequired',
     'Forbidden'
 ]
 
@@ -73,8 +75,19 @@ import prestans.http
 class Base(Exception):
 
     def __init__(self, http_status, message):
-        pass
+        self._http_status = http_status
+        self._message = message
 
+    @property
+    def http_status(self):
+        return self._http_status
+
+    @http_status.setter
+    def http_staths(self, value):
+        self._http_status = value
+
+    def __str__(self):
+        return self._message
 
 #:
 #: These are top level exceptions that layout tell prestans how
@@ -89,7 +102,7 @@ class Base(Exception):
 #: http://www.python.org/dev/peps/pep-0008/#exception-names
 #:
 
-class UnsupportedVocabularyError(Exception):
+class UnsupportedVocabularyError(Base):
     """
     Called if none of the requested vocabularies are supported by the API
     this error message is sent as an HTML document. This exception is the
@@ -97,14 +110,16 @@ class UnsupportedVocabularyError(Exception):
     """
 
     def __init__(self, mime_type):
+        self._http_status = prestans.http.STATUS.NOT_IMPLEMENTED
         self._mime_type = mime_type
     
-class UnsupportedContentTypeError(Exception):
+class UnsupportedContentTypeError(Base):
     
-    def __init__(self, mime_type):
+    def __init__(self, mime_type, content_type):
+        self._http_status = prestans.http.STATUS.NOT_IMPLEMENTED
         self._mime_type = mime_type
 
-class DataValidationException(Exception):
+class DataValidationException(Base):
     """
     DataValidationException are Exceptions raised if prestans fails
     to validate data inbound or out using rules defined in Models.
@@ -116,7 +131,7 @@ class DataValidationException(Exception):
     """
     pass
 
-class ParserException(Exception):
+class ParserException(Base):
     """
     ParserException are Exceptions raised if prestans fails to parse
     a request; these generally revolve around the Content-Types or 
@@ -134,7 +149,7 @@ class ParserException(Exception):
     def __str__(self):
         return self._message
 
-class HandlerException(Exception):
+class HandlerException(Base):
     """
     HandlerExceptions are Exceptions that are raised by handlers of the
     REST application. REST encourages the use different error codes to
@@ -282,7 +297,11 @@ class MovedPermanently(HandlerException):
         self._http_status = prestans.http.STATUS.MOVED_PERMANENTLY
 
 class PaymentRequired(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.PAYMENT_REQUIRED
 
 class Forbidden(HandlerException):
-    pass
+
+    def __init__(self):
+        self._http_status = prestans.http.STATUS.FORBIDDEN
