@@ -72,6 +72,14 @@ class ArgParserFactory(object):
         build_sub_parser = gen_parser.add_subparsers(dest="build-sub-commands")
 
         #:
+        #:
+        #:
+        build_sub_parser.add_parser(
+            name="dist",
+            help="builds distributable application"
+            )
+
+        #:
         #: Javascript
         #:
         build_sub_parser.add_parser(
