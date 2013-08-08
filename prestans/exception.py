@@ -70,6 +70,12 @@ __all__ = [
 import prestans
 import prestans.http
 
+class Base(Exception):
+
+    def __init__(self, http_status, message):
+        pass
+
+
 #:
 #: These are top level exceptions that layout tell prestans how
 #: the resulting messages are written out to the either the client
