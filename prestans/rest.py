@@ -58,8 +58,13 @@ class Request(webob.Request):
         self._logger = logger
         self._deserializers = deserializers
         self._attribute_filter = None
+        self._selected_deserializer = None
 
         self.charset = charset
+
+        #: Get a deserializer based on the Content-Type header
+        #: Do this here so the handler gets a chance to setup extra serializers
+        self._set_deserializer_by_mime_type(self.content_type)
 
     @property
     def method(self):
@@ -126,10 +131,6 @@ class Request(webob.Request):
         if not isinstance(value, prestans.types.DataCollection):
             raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
 
-        #: Get a deserializer based on the Content-Type header
-        #: Do this here so the handler gets a chance to setup extra serializers
-        self._set_deserializer_by_mime_type(self.content_type)
-
         self._body_template = value
 
         #: Parse the body using the deserializer
@@ -156,14 +157,22 @@ class Request(webob.Request):
         the response_attribute_fitler_tempalte? 
         """
 
-        #: Header not set results in a None
+        if template_filter is None or not 'Prestans-Response-Attribute-List' in self.headers:
+            return None
 
-        #: Deserialize the header contents
+        #: Header not set results in a None
+        attribute_list_str = self.headers['Prestans-Response-Attribute-List']
+
+        #: Deserialize the header contents using the selected header
+        attribute_list_dictionary = self.selected_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
+        attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary)
 
         #: Check template?
-        return None
+        evaluated_filter = template_filter.conforms_to_template_filter(attribute_filter)
+
+        return evaluated_filter
 
 
 class Response(webob.Response):
@@ -248,7 +257,7 @@ class Response(webob.Response):
     @attribute_filter.setter
     def attribute_filter(self, value):
 
-        if not isinstance(value, prestans.parser.AttributeFilter):
+        if value is not None and not isinstance(value, prestans.parser.AttributeFilter):
             raise TypeError("attribue_filter in response must be of type prestans.types.AttributeFilter")
 
         self._attribute_filter = value
@@ -537,7 +546,9 @@ class RequestHandler(object):
 
             #: Set the response template and attribute filter
             self.response.template = verb_parser_config.response_template
-            self.response.attribute_filter = verb_parser_config.response_attribute_filter_template
+
+            response_attr_filter_template = verb_parser_config.response_attribute_filter_template
+            self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template)
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:

@@ -273,10 +273,20 @@ class UnregisteredAdapterError(DataValidationException):
     pass
 
 class SerializationFailedError(DataValidationException):
-    pass
+
+    def __init__(self, format):
+
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "Serialization failed"
+        super(DeSerializationFailedError, self).__init__(_code, _message)
 
 class DeSerializationFailedError(DataValidationException):
-    pass
+    
+    def __init__(self, format):
+
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "DeSerialization failed"
+        super(DeSerializationFailedError, self).__init__(_code, _message)
 
 
 #:

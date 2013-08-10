@@ -53,7 +53,7 @@ class JSON(Base):
         try:
             parsed_json = json.loads(input_string)
         except Exception, exp:
-            raise prestans.exception.SerializationFailed('JSON')
+            raise prestans.exception.DeSerializationFailedError('JSON')
             
         return parsed_json
         
@@ -71,9 +71,10 @@ class XMLPlist(Base):
         try:
             unserialized_plist = plistlib.readPlistFromString(input_string)
         except Exception, exp:
-            raise prestans.exception.SerializationFailed("XML/Plist")
+            raise prestans.exception.DeSerializationFailedError("XML/Plist")
 
         return unserialized_plist
 
     def content_type(self):
         return 'application/xml'
+        
