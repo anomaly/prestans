@@ -184,14 +184,22 @@ class HandlerException(Base):
 class UnimplementedVerbError(ParserException):
 
     def __init__(self, verb_name):
-        self._http_status = prestans.http.STATUS.NOT_ALLOWED
-        self._message = "End-point doesn't implement %s" % verb_name
+
+        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _message = "API does not implement the HTTP Verb"
+        super(UnimplementedVerbError, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'verb': verb_name,
+            })
 
 class NoEndpointError(ParserException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.NOT_FOUND
-        self._message = "API does not provide this end-point"
+
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "API does not provide this end-point"
+        super(NoEndpointError, self).__init__(_code, _message)
 
 class NoSetMatched(ParserException):
     pass
