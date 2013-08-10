@@ -781,12 +781,11 @@ class Model(DataCollection):
         for attribute_name, type_instance in model_class_members:
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                """ Ignore parameters with __ and if they are methods """
                 continue
 
-            if not issubclass(type_instance.__class__, DataType):
-                """ All attributes in the Model class must be of type DataType """
-                raise DataTypeValidationException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.DataType"))
+            if not isinstance(type_instance, DataType):
+                raise DataTypeValidationException(
+                    "%s must be of a DataType subclass" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
 

@@ -78,6 +78,10 @@ class Request(webob.Request):
         return [deserializer.content_type() for deserializer in self._deserializers]
 
     @property
+    def supported_mime_types_str(self):
+        return ''.join(str(mime_type) + ',' for mime_type in self.supported_mime_types)[:-1]
+
+    @property
     def selected_deserializer(self):
         return self._selected_deserializer
         
@@ -89,7 +93,7 @@ class Request(webob.Request):
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.content_type)
+        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.supported_mime_types_str)
 
     @property
     def attribute_filter(self):
@@ -197,6 +201,10 @@ class Response(webob.Response):
         return [serializer.content_type() for serializer in self._serializers]
 
     @property
+    def supported_mime_types_str(self):
+        return ''.join(str(mime_type) + ',' for mime_type in self.supported_mime_types)[:-1]
+
+    @property
     def selected_serializer(self):
         return self._selected_serializer
 
@@ -208,7 +216,8 @@ class Response(webob.Response):
                 self._selected_serializer = serializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError(mime_type)
+        raise prestans.exception.UnsupportedVocabularyError(mime_type, 
+            self.supported_mime_types_str)
 
     #:
     #: is an instance of prestans.types.DataType; mostly a subclass of 
@@ -266,7 +275,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exception.UnsupportedVocabularyError(value)
+            raise prestans.exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
 
         #: Keep a reference to the selected serializer
         self._set_serializer_by_mime_type(value)
@@ -409,7 +418,7 @@ class ErrorResponse(webob.Response):
         self._exception = exception
         self._serializer = serializer
         self._message = str(exception)
-        self._trace = list()
+        self._stack_trace = exception.stack_trace
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -439,9 +448,9 @@ class ErrorResponse(webob.Response):
 
         error_dict = dict()
 
-        error_dict['code'] = self.status
+        error_dict['code'] = self.status_int
         error_dict['message'] = self._message
-        error_dict['trace'] = self._trace
+        error_dict['trace'] = self._stack_trace
 
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
@@ -514,7 +523,8 @@ class RequestHandler(object):
             if not _supportable_mime_types and len(_supportable_mime_types) < 1:
                 self.logger.error("unsupported mime type in request; accept header reads %s" % 
                     self.request.accept)
-                raise prestans.exception.UnsupportedVocabularyError(self.request.accept)
+                raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
+                    self.response.supported_mime_types_str)
 
             #: If content_type is not acceptable it will raise UnsupportedVocabulary
             self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
@@ -737,7 +747,8 @@ class RequestRouter(object):
             raise prestans.exception.NoEndpointError()
 
         except prestans.exception.Base, exp:
-            return ErrorResponse(exp, response._default_serializer)
+            error_response = ErrorResponse(exp, self._default_serializer)
+            return error_response(environ, start_response)
 
     #:    
     #: @todo Update regular expressions to support webapp2 like routes

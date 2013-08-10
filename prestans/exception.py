@@ -77,6 +77,7 @@ class Base(Exception):
     def __init__(self, http_status, message):
         self._http_status = http_status
         self._message = message
+        self._stack_trace = list()
 
     @property
     def http_status(self):
@@ -85,6 +86,13 @@ class Base(Exception):
     @http_status.setter
     def http_staths(self, value):
         self._http_status = value
+
+    @property
+    def stack_trace(self):
+        return self._stack_trace
+
+    def push_trace(self, trace_object):
+        self._stack_trace.append(trace_object)
 
     def __str__(self):
         return self._message
@@ -109,15 +117,29 @@ class UnsupportedVocabularyError(Base):
     only one that breaks serialisation rules.
     """
 
-    def __init__(self, mime_type):
-        self._http_status = prestans.http.STATUS.NOT_IMPLEMENTED
-        self._mime_type = mime_type
+    def __init__(self, accept_header, supported_types):
+
+        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _message = "Unsupported vocabulary in the Accept header"
+        super(UnsupportedVocabularyError, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'accept_header': str(accept_header),
+            'supported_types': supported_types
+            })
     
 class UnsupportedContentTypeError(Base):
     
-    def __init__(self, mime_type, content_type):
-        self._http_status = prestans.http.STATUS.NOT_IMPLEMENTED
-        self._mime_type = mime_type
+    def __init__(self, requested_mime_type, content_type):
+
+        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _message = "Unsupported Content-Type in Request"
+        super(UnsupportedContentTypeError, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'requested_type': requested_mime_type,
+            'supported_types': content_type
+            })
 
 class DataValidationException(Base):
     """
@@ -138,16 +160,6 @@ class ParserException(Base):
     missing payload. Specific parsing messages are of type DataValidationException
     """
     
-    @property
-    def http_status(self):
-        return self._http_status
-
-    @http_status.setter
-    def http_staths(self, value):
-        self._http_status = value
-
-    def __str__(self):
-        return self._message
 
 class HandlerException(Base):
     """
