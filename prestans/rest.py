@@ -170,7 +170,7 @@ class Request(webob.Request):
         attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary)
 
         #: Check template?
-        evaluated_filter = template_filter.conforms_to_template_filter(attribute_filter)
+        evaluated_filter = attribute_filter.conforms_to_template_filter(template_filter)
 
         return evaluated_filter
 
