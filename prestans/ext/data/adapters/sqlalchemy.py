@@ -40,6 +40,7 @@ import inspect
 
 import prestans.types
 import prestans.parsers
+
 from prestans.ext.data import adapters
 
 def QueryResultIterator(collection, target_rest_instance=None, attribute_filter=None):
@@ -73,9 +74,10 @@ def QueryResultIterator(collection, target_rest_instance=None, attribute_filter=
         
     return adapted_models
 
-## @brief Provide a brige between REST models and SQLAlchemy objects
-#   
 class ModelAdapter(adapters.ModelAdapter):
+    """
+    Provide a brige between REST models and SQLAlchemy objects
+    """
     
     ## @brief adapts a persistent model to a rest model by inspecting
     #
@@ -90,7 +92,7 @@ class ModelAdapter(adapters.ModelAdapter):
             if not hasattr(persistent_object, attribute_key):
                 # Don't bother processing if the persistent model doesn't have this attribute
 
-                if issubclass(rest_attr.__class__, prestans.types.Model):
+                if isinstance(rest_attr, prestans.types.Model):
                     #: If the attribute is a Model, then we set it to None otherwise we get a model 
                     #: with default values, which is invalid when constructing responses
                     try:
@@ -113,13 +115,13 @@ class ModelAdapter(adapters.ModelAdapter):
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
                 for collection_element in persistent_attr_value:
-                    if type(rest_attr._element_template) == type(prestans.types.String()):
+                    if isinstance(rest_attr.element_template, prestans.types.String:
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Integer()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Integer):
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Float()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Float):
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Boolean()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Boolean):
                         rest_model_array_handle.append(collection_element)
                     else:
                         element_adapter = adapters.registry.get_adapter_for_rest_model(rest_attr._element_template)
@@ -148,6 +150,7 @@ class ModelAdapter(adapters.ModelAdapter):
                             sub_attribute_filter = getattr(attribute_filter, attribute_key)
 
                         adapted_rest_model = model_adapter.adapt_persistent_to_rest(persistent_attr_value, sub_attribute_filter)
+
                     setattr(rest_model_instance, attribute_key, adapted_rest_model)
                     
                 except prestans.types.DataTypeValidationException, exp:
