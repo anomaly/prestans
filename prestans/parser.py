@@ -139,17 +139,18 @@ class ParameterSet(object):
 
 
 class AttributeFilter(object):
-    #: 
-    #:  { 
-    #:    field_name0: true, 
-    #:    field_name1: false, 
-    #:    collection_name0: true, 
-    #:    collection_name1: false,
-    #:    collection_name2: {
-    #:        sub_field_name0: true,
-    #:        sub_field_name1: false 
-    #:    }
-    #:  }
+    """     
+      { 
+        field_name0: true, 
+        field_name1: false, 
+        collection_name0: true, 
+        collection_name1: false,
+        collection_name2: {
+            sub_field_name0: true,
+            sub_field_name1: false 
+        }
+      }
+    """
 
     @classmethod
     def from_model(self, model_instance, default_value=False):
@@ -237,9 +238,9 @@ class AttributeFilter(object):
         return evaluated_attribute_filter
         
     def keys(self):
-        #: 
-        #: returns a list of usable keys
-        #: 
+        """ 
+        returns a list of usable keys
+        """ 
 
         keys = list()
 
@@ -254,15 +255,15 @@ class AttributeFilter(object):
         return keys
 
     def has_key(self, key):
-        #: 
-        #: contains a particular key, wrapper on self.__dict__.key
-        #: 
+        """
+        contains a particular key, wrapper on self.__dict__.key
+        """ 
         return self.__dict__.has_key(key)
 
     def is_filter_at_key(self, key):
-        #: 
-        #: return True if attribute is a subfilter
-        #: 
+        """ 
+        return True if attribute is a subfilter
+        """
 
         if self.has_key(key) and isinstance(attribute_status, self.__class__):
             return True
@@ -270,12 +271,12 @@ class AttributeFilter(object):
         return False
 
     def is_attribute_visible(self, key):
-        #: 
-        #: returns True if an attribute is visible
-        #: 
-        #: If attribute is an instance of AttributeFilter, it returns True if all attributes
-        #: of the sub filter are visible.
-        #:         
+        """
+        returns True if an attribute is visible
+        
+        If attribute is an instance of AttributeFilter, it returns True if all attributes
+        of the sub filter are visible.
+        """         
         if self.has_key(key):
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, bool) and attribute_status == True:
@@ -287,9 +288,9 @@ class AttributeFilter(object):
         return False
 
     def are_any_attributes_visible(self):
-        #: 
-        #: checks to see if any attributes are set to true
-        #: 
+        """
+        checks to see if any attributes are set to true
+        """ 
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -307,9 +308,9 @@ class AttributeFilter(object):
         return False
 
     def are_all_attributes_visible(self):
-        #: 
-        #: checks to see if all attributes are set to true
-        #:         
+        """
+        checks to see if all attributes are set to true
+        """         
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -326,9 +327,9 @@ class AttributeFilter(object):
         return True
 
     def as_dict(self):
-        #: 
-        #: turns attribute filter object into python dictionary
-        #:         
+        """ 
+        turns attribute filter object into python dictionary
+        """
 
         output_dictionary = dict()
 
@@ -348,10 +349,10 @@ class AttributeFilter(object):
 
 
     def _init_from_dictionary(self, from_dictionary):
-        #: 
-        #: Private helper to init values from a dictionary, wraps chidlren into 
-        #: AttributeFilter objects
-        #: 
+        """ 
+        Private helper to init values from a dictionary, wraps chidlren into 
+        AttributeFilter objects
+        """
 
         if not isinstance(from_dictionary, dict):
             raise TypeError("from_dictionary must be of type dict, %s provided" % 
@@ -372,9 +373,9 @@ class AttributeFilter(object):
 
 
     def __setattr__(self, key, value):
-        #: 
-        #: Overrides setattr to allow only booleans or an AttributeFilter
-        #: 
+        """
+        Overrides setattr to allow only booleans or an AttributeFilter
+        """ 
 
         # Set internal fields
         if key[0:1] == "_":

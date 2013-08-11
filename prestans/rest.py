@@ -52,11 +52,12 @@ class Request(webob.Request):
     available to the RequestHandler
     """
 
-    def __init__(self, environ, charset, logger, deserializers):
+    def __init__(self, environ, charset, logger, deserializers, default_deserializer):
 
         super(Request, self).__init__(environ=environ, charset=charset)
         self._logger = logger
         self._deserializers = deserializers
+        self._default_deserializer = default_deserializer
         self._attribute_filter = None
         self._selected_deserializer = None
 
@@ -64,7 +65,8 @@ class Request(webob.Request):
 
         #: Get a deserializer based on the Content-Type header
         #: Do this here so the handler gets a chance to setup extra serializers
-        self._set_deserializer_by_mime_type(self.content_type)
+        if not self.method == prestans.http.VERB.GET:
+            self.set_deserializer_by_mime_type(self.content_type)
 
     @property
     def method(self):
@@ -91,7 +93,7 @@ class Request(webob.Request):
         return self._selected_deserializer
         
     #: Used by content_type_set to set get a referencey to the serializer object
-    def _set_deserializer_by_mime_type(self, mime_type):
+    def set_deserializer_by_mime_type(self, mime_type):
 
         for deserializer in self._deserializers:
             if deserializer.content_type() == mime_type:
@@ -184,12 +186,13 @@ class Response(webob.Response):
     Overrides content_type property to use prestans' serializers with the set body
     """
 
-    def __init__(self, charset, logger, serializers):
+    def __init__(self, charset, logger, serializers, default_serializer):
         
         super(Response, self).__init__()
 
         self._logger = logger
         self._serializers = serializers
+        self._default_serializer = default_serializer
         self._selected_serializer = None
         self._template = None
         self._app_iter = None
@@ -517,7 +520,7 @@ class RequestHandler(object):
 
             #: Ensure we support the HTTP verb
             if not prestans.http.VERB.is_supported_verb(self.request.method):
-                pass
+                raise prestans.exception.UnimplementedVerbError(self.request.method)
 
             #:
             #: Auto set the return serializer based on Accept headers
@@ -536,7 +539,8 @@ class RequestHandler(object):
                     self.response.supported_mime_types_str)
 
             #: If content_type is not acceptable it will raise UnsupportedVocabulary
-            self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
+            best_accept_match = self.request.accept.best_match(_supportable_mime_types)
+            self.response.content_type = best_accept_match
 
             #: Authentication
             # self.logger.error(self.__provider_config__.authentication)
@@ -733,8 +737,9 @@ class RequestRouter(object):
 
         #: Attempt to parse the HTTP request
         request = Request(environ=environ, charset=self._charset, logger=self._logger, 
-            deserializers=self._deserializers)
-        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers)
+            deserializers=self._deserializers, default_deserializer=self._default_deserializer)
+        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
+            default_serializer=self._default_deserializer)
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
