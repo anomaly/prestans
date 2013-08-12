@@ -1,6 +1,7 @@
-__all__ = ['closure']
+__all__ = ['closure', 'templates']
 
 import inspect
+import jinja2
 import os
 import sys
 
@@ -41,11 +42,18 @@ class Preplate(object):
         self._model_file = model_file
         self._namespace = namespace
         self._output_directory = output_directory
+        loader = jinja2.PackageLoader('prestans', 'devel/gen/templates')
+        self._template_engine = jinja2.Environment(trim_blocks=True, loader=loader)
 
     def run(self):
 
         template = None
-        if self._template_type == "closure-model":
-            template = prestans.devel.gen.closure.Model(model_file=self._model_file)
+        if self._template_type == "closure.model":
+            template = prestans.devel.gen.closure.Model(template_engine=self._template_engine, model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
+        elif self._template_type == "closure.filter":
+            template = prestans.devel.gen.closure.Filter(template_engine=self._template_engine, model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
 
+        if template is None:
+            return 1
+        
         return template.run()

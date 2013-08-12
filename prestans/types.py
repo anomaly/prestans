@@ -103,7 +103,7 @@ class String(DataType):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "string"
+        blueprint['type'] = 'string'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -172,7 +172,7 @@ class Integer(DataType):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "string"
+        blueprint['type'] = 'integer'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -288,7 +288,7 @@ class Boolean(DataType):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "bool"
+        blueprint['type'] = 'boolean'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -350,7 +350,7 @@ class DataURLFile(DataType):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "data_url_file"
+        blueprint['type'] = 'data_url_file'
 
         constraints = dict()
         constraints['required'] = self._required
@@ -423,7 +423,7 @@ class DateTime(DataStructure):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "datetime"
+        blueprint['type'] = 'datetime'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -485,7 +485,7 @@ class Date(DataStructure):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "date"
+        blueprint['type'] = 'date'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -547,7 +547,7 @@ class Time(DataStructure):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "time"
+        blueprint['type'] = 'time'
 
         constraints = dict()
         constraints['default'] = self._default
@@ -615,7 +615,7 @@ class Array(DataCollection):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "array"
+        blueprint['type'] = 'array'
 
         constraints = dict()
         # constraints['default'] = self._default
@@ -768,10 +768,11 @@ class Model(DataCollection):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "%s.%s" % (self.__module__, self.__class__.__name__)
+        blueprint['type'] = 'model'
 
         constraints = dict()
         constraints['required'] = self._required
+        constraints['model_template'] = self.__class__.__name__
         blueprint['constraints'] = constraints
 
         # Fields
