@@ -63,11 +63,6 @@ class Request(webob.Request):
 
         self.charset = charset
 
-        #: Get a deserializer based on the Content-Type header
-        #: Do this here so the handler gets a chance to setup extra serializers
-        if not self.method == prestans.http.VERB.GET:
-            self.set_deserializer_by_mime_type(self.content_type)
-
     @property
     def method(self):
         return self.environ['REQUEST_METHOD']
@@ -134,6 +129,10 @@ class Request(webob.Request):
             raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
 
         self._body_template = value
+
+        #: Get a deserializer based on the Content-Type header
+        #: Do this here so the handler gets a chance to setup extra serializers
+        self.set_deserializer_by_mime_type(self.content_type)
 
         #: Parse the body using the deserializer
         unserialized_body = self.selected_deserializer.loads(self.body)
