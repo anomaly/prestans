@@ -75,7 +75,10 @@ class JSON(TextSerializer):
     def dumps(self, serializable_object):
         
         import json
-        return json.dumps(serializable_object)
+        try:
+            return json.dumps(serializable_object)
+        except:
+            raise prestans.exception.SerializationFailedError('JSON')
 
     def handler_body_type(self):
         return prestans.types.DataCollection
@@ -93,7 +96,11 @@ class XMLPlist(TextSerializer):
     def dumps(self, serializable_object):
 
         import plistlib
-        plist_str = plistlib.writePlistToString(serializable_object)
+
+        try:
+            plist_str = plistlib.writePlistToString(serializable_object)
+        except:
+            raise prestans.exception.SerializationFailedError('XML')
 
         return plist_str
 
@@ -122,11 +129,14 @@ class PDFSerializer(BinarySerializer):
 
         output_stream = StringIO.StringIO()
 
-        HTML(string=serializable_object).write_pdf(output_stream)
+        try:
+            HTML(string=serializable_object).write_pdf(output_stream)
 
-        output_string = output_stream.getvalue()
-        output_stream.close()
-
+            output_string = output_stream.getvalue()
+            output_stream.close()
+        except:
+            raise prestans.exception.SerializationFailedError('WeasyPrint/PDF')
+            
         return output_string
 
     def handler_body_type(self):

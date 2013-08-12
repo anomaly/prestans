@@ -38,9 +38,10 @@ __all__ = ['QueryResultIterator', 'ModelAdapter']
 #: implementation of Data Adapter
 #:
 
-from prestans.ext.data import adapters
-import prestans.types
 import inspect
+
+import prestans.types
+from prestans.ext.data import adapters
 
 #:
 #: base implementation that translates record sets into prestans arrays
@@ -113,13 +114,13 @@ class ModelAdapter(adapters.ModelAdapter):
                 #: and populate the collection in the instance.
                 for collection_element in persistent_attr_value:
                  
-                    if type(rest_attr._element_template) == type(prestans.types.String()):
+                    if isinstance(rest_attr.element_template, prestans.types.String:
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Integer()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Integer):
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Float()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Float):
                         rest_model_array_handle.append(collection_element)
-                    elif type(rest_attr._element_template) == type(prestans.types.Boolean()):
+                    elif isinstance(rest_attr.element_template, prestans.types.Boolean):
                         rest_model_array_handle.append(collection_element)
                     else:
                         element_adapter = adapters.registry.get_adapter_for_rest_model(rest_attr._element_template)

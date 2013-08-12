@@ -52,12 +52,14 @@ class Request(webob.Request):
     available to the RequestHandler
     """
 
-    def __init__(self, environ, charset, logger, deserializers):
+    def __init__(self, environ, charset, logger, deserializers, default_deserializer):
 
         super(Request, self).__init__(environ=environ, charset=charset)
         self._logger = logger
         self._deserializers = deserializers
+        self._default_deserializer = default_deserializer
         self._attribute_filter = None
+        self._selected_deserializer = None
 
         self.charset = charset
 
@@ -78,18 +80,22 @@ class Request(webob.Request):
         return [deserializer.content_type() for deserializer in self._deserializers]
 
     @property
+    def supported_mime_types_str(self):
+        return ''.join(str(mime_type) + ',' for mime_type in self.supported_mime_types)[:-1]
+
+    @property
     def selected_deserializer(self):
         return self._selected_deserializer
         
     #: Used by content_type_set to set get a referencey to the serializer object
-    def _set_deserializer_by_mime_type(self, mime_type):
+    def set_deserializer_by_mime_type(self, mime_type):
 
         for deserializer in self._deserializers:
             if deserializer.content_type() == mime_type:
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.content_type)
+        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.supported_mime_types_str)
 
     @property
     def attribute_filter(self):
@@ -122,11 +128,11 @@ class Request(webob.Request):
         if not isinstance(value, prestans.types.DataCollection):
             raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
 
+        self._body_template = value
+
         #: Get a deserializer based on the Content-Type header
         #: Do this here so the handler gets a chance to setup extra serializers
-        self._set_deserializer_by_mime_type(self.content_type)
-
-        self._body_template = value
+        self.set_deserializer_by_mime_type(self.content_type)
 
         #: Parse the body using the deserializer
         unserialized_body = self.selected_deserializer.loads(self.body)
@@ -152,14 +158,22 @@ class Request(webob.Request):
         the response_attribute_fitler_tempalte? 
         """
 
-        #: Header not set results in a None
+        if template_filter is None or not 'Prestans-Response-Attribute-List' in self.headers:
+            return None
 
-        #: Deserialize the header contents
+        #: Header not set results in a None
+        attribute_list_str = self.headers['Prestans-Response-Attribute-List']
+
+        #: Deserialize the header contents using the selected header
+        attribute_list_dictionary = self.selected_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
+        attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary)
 
         #: Check template?
-        return None
+        evaluated_filter = attribute_filter.conforms_to_template_filter(template_filter)
+
+        return evaluated_filter
 
 
 class Response(webob.Response):
@@ -171,12 +185,13 @@ class Response(webob.Response):
     Overrides content_type property to use prestans' serializers with the set body
     """
 
-    def __init__(self, charset, logger, serializers):
+    def __init__(self, charset, logger, serializers, default_serializer):
         
         super(Response, self).__init__()
 
         self._logger = logger
         self._serializers = serializers
+        self._default_serializer = default_serializer
         self._selected_serializer = None
         self._template = None
         self._app_iter = None
@@ -197,6 +212,10 @@ class Response(webob.Response):
         return [serializer.content_type() for serializer in self._serializers]
 
     @property
+    def supported_mime_types_str(self):
+        return ''.join(str(mime_type) + ',' for mime_type in self.supported_mime_types)[:-1]
+
+    @property
     def selected_serializer(self):
         return self._selected_serializer
 
@@ -208,7 +227,8 @@ class Response(webob.Response):
                 self._selected_serializer = serializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError(mime_type)
+        raise prestans.exception.UnsupportedVocabularyError(mime_type, 
+            self.supported_mime_types_str)
 
     #:
     #: is an instance of prestans.types.DataType; mostly a subclass of 
@@ -239,7 +259,7 @@ class Response(webob.Response):
     @attribute_filter.setter
     def attribute_filter(self, value):
 
-        if not isinstance(value, prestans.parser.AttributeFilter):
+        if value is not None and not isinstance(value, prestans.parser.AttributeFilter):
             raise TypeError("attribue_filter in response must be of type prestans.types.AttributeFilter")
 
         self._attribute_filter = value
@@ -266,7 +286,7 @@ class Response(webob.Response):
 
         #: Check to see if response can support the requested mime type
         if value not in self.supported_mime_types:
-            raise prestans.exception.UnsupportedVocabularyError(value)
+            raise prestans.exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
 
         #: Keep a reference to the selected serializer
         self._set_serializer_by_mime_type(value)
@@ -409,7 +429,7 @@ class ErrorResponse(webob.Response):
         self._exception = exception
         self._serializer = serializer
         self._message = str(exception)
-        self._trace = list()
+        self._stack_trace = exception.stack_trace
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -439,9 +459,9 @@ class ErrorResponse(webob.Response):
 
         error_dict = dict()
 
-        error_dict['code'] = self.status
+        error_dict['code'] = self.status_int
         error_dict['message'] = self._message
-        error_dict['trace'] = self._trace
+        error_dict['trace'] = self._stack_trace
 
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
@@ -499,7 +519,7 @@ class RequestHandler(object):
 
             #: Ensure we support the HTTP verb
             if not prestans.http.VERB.is_supported_verb(self.request.method):
-                pass
+                raise prestans.exception.UnimplementedVerbError(self.request.method)
 
             #:
             #: Auto set the return serializer based on Accept headers
@@ -514,10 +534,12 @@ class RequestHandler(object):
             if not _supportable_mime_types and len(_supportable_mime_types) < 1:
                 self.logger.error("unsupported mime type in request; accept header reads %s" % 
                     self.request.accept)
-                raise prestans.exception.UnsupportedVocabularyError(self.request.accept)
+                raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
+                    self.response.supported_mime_types_str)
 
             #: If content_type is not acceptable it will raise UnsupportedVocabulary
-            self.response.content_type = self.request.accept.best_match(_supportable_mime_types)
+            best_accept_match = self.request.accept.best_match(_supportable_mime_types)
+            self.response.content_type = best_accept_match
 
             #: Authentication
             # self.logger.error(self.__provider_config__.authentication)
@@ -527,7 +549,9 @@ class RequestHandler(object):
 
             #: Set the response template and attribute filter
             self.response.template = verb_parser_config.response_template
-            self.response.attribute_filter = verb_parser_config.response_attribute_filter_template
+
+            response_attr_filter_template = verb_parser_config.response_attribute_filter_template
+            self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template)
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
@@ -712,8 +736,9 @@ class RequestRouter(object):
 
         #: Attempt to parse the HTTP request
         request = Request(environ=environ, charset=self._charset, logger=self._logger, 
-            deserializers=self._deserializers)
-        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers)
+            deserializers=self._deserializers, default_deserializer=self._default_deserializer)
+        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
+            default_serializer=self._default_deserializer)
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
@@ -737,7 +762,8 @@ class RequestRouter(object):
             raise prestans.exception.NoEndpointError()
 
         except prestans.exception.Base, exp:
-            return ErrorResponse(exp, response._default_serializer)
+            error_response = ErrorResponse(exp, self._default_serializer)
+            return error_response(environ, start_response)
 
     #:    
     #: @todo Update regular expressions to support webapp2 like routes

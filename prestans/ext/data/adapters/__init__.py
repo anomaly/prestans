@@ -30,48 +30,11 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-class AdapterRegistryManager:
-
-    def __init__(self):
-        self._persistent_map = dict()
-        self._rest_map = dict()
-
-    def register_adapter(self, model_adapter):
-        
-        if not issubclass(model_adapter.__class__, Adapter):
-            raise Exception(ERROR_MESSAGE.NOT_SUBCLASS % (model_adapter.__class__.__name, 'Adapter'))
-        
-        rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
-        persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
-        
-        """ Store references to how a rest model maps to a persistent model and vice versa """
-        self._persistent_map[persistent_class_signature] = model_adapter
-        self._rest_map[rest_class_signature] = model_adapter
-        
-    def get_adapter_for_persistent_model(self, persistent_model):
-        
-        class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
-        
-        if not self._persistent_map.has_key(class_signature):
-            raise Exception(ERROR_MESSAGE.ADAPTER_NOT_REGISTERED % class_signature)
-        return self._persistent_map[class_signature]
-        
-    def get_adapter_for_rest_model(self, rest_model):
-        
-        class_signature = rest_model.__class__.__module__ + "." + rest_model.__class__.__name__
-        
-        if not self._rest_map.has_key(class_signature):
-            raise Exception(ERROR_MESSAGE.ADAPTER_NOT_REGISTERED % class_signature)
-
-        return self._rest_map[class_signature]
-
-
 class ModelAdapter(object):
     
     def __init__(self, rest_model_class, persistent_model_class):
         self._rest_model_class = rest_model_class
         self._persistent_model_class = persistent_model_class
-        
 
     @property
     def persistent_model_class(self):
@@ -82,7 +45,81 @@ class ModelAdapter(object):
         return self._rest_model_class
             
     def adapt_persistent_to_rest(self, persistent_object):
-        raise Exception(ERROR_MESSAGE.NO_DIRECT_USE % ('ModelAdapter'))
+        raise AssertionError("adapt_persistent_to_rest direct use not allowed")
+
+class AdapterRegistryManager:
+    """
+    AdapterRegistryManager keeps track of rest to persistent model maps
+
+    AdapterRegistryManager should not be instantiated by the applications, a singleton
+    instance supplied by this package.
+    """
+
+    def __init__(self):
+        self._persistent_map = dict()
+        self._rest_map = dict()
+
+    def register_adapter(self, model_adapter):
+        
+        if not isinstance(model_adapter, ModelAdapter):
+            raise TypeError("Registry recd instance of type %s is not a ModelAdapter" 
+                % model_adapter.__class__.__name__)
+        
+        rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
+        persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
+        
+        #:
+        #: Store references to how a rest model maps to a persistent model and vice versa 
+        #:
+        self._persistent_map[persistent_class_signature] = model_adapter
+        self._rest_map[rest_class_signature] = model_adapter
+        
+    def get_adapter_for_persistent_model(self, persistent_model):
+        
+        class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
+        
+        if not self._persistent_map.has_key(class_signature):
+            raise TypeError("No registered Data Adapter for class %s" % class_signature)
+
+        return self._persistent_map[class_signature]
+        
+    def get_adapter_for_rest_model(self, rest_model):
+        
+        class_signature = rest_model.__class__.__module__ + "." + rest_model.__class__.__name__
+        
+        if not self._rest_map.has_key(class_signature):
+            raise TypeError("No registered Data Adapter for class %s" % class_signature)
+
+        return self._rest_map[class_signature]
 
 
+#:
+#: Singleton instantiated if adapeter package is imported
+#:
 registry = AdapterRegistryManager()
+
+
+#:
+#: Helper methods
+#:
+def adapt_persistent_instance(persistent_object, target_rest_instance=None, attribute_filter=None):
+    """
+    Adapts a single persistent instance to a REST model; at present this is a
+    common method for all persistent backends.
+
+    This might be moved to backend specific packages if the need arrises
+
+    Refer to: https://groups.google.com/forum/#!topic/prestans-discuss/dO1yx8f60as
+    for discussion on this feature
+    """
+
+    #: Try and get the adapter and the REST class for the persistent object 
+    if target_rest_instance is None:
+        adapter_instance = registry.get_adapter_for_persistent_model(collection[0])
+    else:
+        if inspect.isclass(target_rest_instance):
+            target_rest_instance = target_rest_instance()
+        
+        adapter_instance = registry.get_adapter_for_rest_model(target_rest_instance)
+
+    return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
