@@ -165,7 +165,8 @@ class Request(webob.Request):
         attribute_list_str = self.headers['Prestans-Response-Attribute-List']
 
         #: Deserialize the header contents using the selected header
-        attribute_list_dictionary = self.selected_deserializer.loads(attribute_list_str)
+        json_deserializer = prestans.deserializer.JSON()
+        attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
         attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary)
