@@ -18,13 +18,60 @@ pdemo.data.filter.StringSample = function(opt_defaultValue) {
         opt_defaultValue = true;
 
     this.stringNotRequired_ = opt_defaultValue;
-    this.integerSample_ = new pdemo.data.filter.(opt_defaultValue);
+    this.integerSample_ = new pdemo.data.filter.IntegerSample(opt_defaultValue);
     this.stringRequired_ = opt_defaultValue;
     this.integerSampleArray_ = opt_defaultValue;
 };
 goog.inherits(pdemo.data.filter.StringSample, prestans.types.Filter);
 
 
-% for attribute in attributes:
-pdemo.data.filter.StringSample.prototype._ = null;
-% endfor
+
+pdemo.data.filter.StringSample.prototype.stringNotRequired_ = null;
+pdemo.data.filter.StringSample.prototype.integerSample_ = null;
+pdemo.data.filter.StringSample.prototype.stringRequired_ = null;
+pdemo.data.filter.StringSample.prototype.integerSampleArray_ = null;
+
+
+
+pdemo.data.filter.StringSample.prototype.enableStringNotRequired = function() {
+	this.stringNotRequired_ = true;
+};
+pdemo.data.filter.StringSample.prototype.enableIntegerSample = function() {
+    this._ = new pdemo.data.filter.IntegerSample(true);
+};
+pdemo.data.filter.StringSample.prototype.enableStringRequired = function() {
+	this.stringRequired_ = true;
+};
+pdemo.data.filter.StringSample.prototype.enableIntegerSampleArray = function() {
+    this.${ccif}_ = new ${namespace}.${attribute.element_template}(true);
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.disableStringNotRequired = function() {
+	this.stringNotRequired_ = false;
+};
+pdemo.data.filter.StringSample.prototype.disableIntegerSample = function() {
+    this.integerSample_ = new pdemo.data.filter.(false);
+};
+pdemo.data.filter.StringSample.prototype.disableStringRequired = function() {
+	this.stringRequired_ = false;
+};
+pdemo.data.filter.StringSample.prototype.disableIntegerSampleArray = function() {
+    this.integerSampleArray_ = new pdemo.data.filter.(false);
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.getStringNotRequired = function() {
+    return this.stringNotRequired_;
+};
+pdemo.data.filter.StringSample.prototype.getIntegerSample = function() {
+    return this.integerSample_;
+};
+pdemo.data.filter.StringSample.prototype.getStringRequired = function() {
+    return this.stringRequired_;
+};
+pdemo.data.filter.StringSample.prototype.getIntegerSampleArray = function() {
+    return this.integerSampleArray_;
+};

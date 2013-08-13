@@ -64,9 +64,17 @@ class AttributeMetaData(object):
     def required(self):
         return self._required
 
-    #array
+    #model
     @property
-    def is_model(self):
+    def model_template(self):
+        return self._model_template
+
+    #array
+    def element_template(self):
+        return self._element_template
+
+    @property
+    def element_template_is_model(self):
         return False
 
 class Model(object):
@@ -110,7 +118,7 @@ class Filter(object):
         self._namespace = namespace
         self._output_directory = output_directory
         self._template_engine = template_engine
-        self._template = self._template_engine.get_template("closure/filter.tpl")
+        self._template = self._template_engine.get_template("closure/filter.jinja")
 
     def run(self):
 

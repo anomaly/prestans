@@ -23,6 +23,33 @@ pdemo.data.filter.IntegerSample = function(opt_defaultValue) {
 goog.inherits(pdemo.data.filter.IntegerSample, prestans.types.Filter);
 
 
-% for attribute in attributes:
-pdemo.data.filter.IntegerSample.prototype._ = null;
-% endfor
+
+pdemo.data.filter.IntegerSample.prototype.integerSample_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerNotRequired_ = null;
+
+
+
+pdemo.data.filter.IntegerSample.prototype.enableIntegerSample = function() {
+	this.integerSample_ = true;
+};
+pdemo.data.filter.IntegerSample.prototype.enableIntegerNotRequired = function() {
+	this.integerNotRequired_ = true;
+};
+
+
+
+pdemo.data.filter.IntegerSample.prototype.disableIntegerSample = function() {
+	this.integerSample_ = false;
+};
+pdemo.data.filter.IntegerSample.prototype.disableIntegerNotRequired = function() {
+	this.integerNotRequired_ = false;
+};
+
+
+
+pdemo.data.filter.IntegerSample.prototype.getIntegerSample = function() {
+    return this.integerSample_;
+};
+pdemo.data.filter.IntegerSample.prototype.getIntegerNotRequired = function() {
+    return this.integerNotRequired_;
+};
