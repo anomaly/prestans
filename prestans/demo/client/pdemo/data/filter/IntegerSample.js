@@ -9,6 +9,8 @@ goog.require('goog.object');
 
 goog.require('prestans.types.Filter');
 
+goog.require('pdemo.data.filter.IntegerSample');
+
 /**
  * @constructor
 */
@@ -52,4 +54,42 @@ pdemo.data.filter.IntegerSample.prototype.getIntegerSample = function() {
 };
 pdemo.data.filter.IntegerSample.prototype.getIntegerNotRequired = function() {
     return this.integerNotRequired_;
+};
+
+
+
+
+
+
+pdemo.data.filter.IntegerSample.prototype.anyFieldsEnabled = function() {
+    return ();
+};
+
+
+
+pdemo.data.filter.IntegerSample.prototype.getJSONObject = function(opt_complete) {
+
+    if(opt_complete != true)
+        opt_complete = false;
+
+    var jsonifiedObject_ = {};
+    
+    if(this.integerSample_ || opt_complete)
+       jsonifiedObject_["integer_sample"] = this.integerSample_;
+
+    if(this.integerNotRequired_ || opt_complete)
+       jsonifiedObject_["integer_not_required"] = this.integerNotRequired_;
+
+
+    return jsonifiedObject_;
+};
+
+
+
+pdemo.data.filter.IntegerSample.prototype.getJSONString = function(opt_complete) {
+
+    if(opt_complete != true)
+        opt_complete = false;
+
+    return goog.json.serialize(this.getJSONObject(opt_complete));
 };

@@ -41,7 +41,16 @@ class AttributeMetaData(object):
             self._model_template = blueprint['constraints']['model_template']
         elif self._type == 'array':
             self._required = blueprint['constraints']['required']
-            self._element_template = blueprint['constraints']['element_template']
+
+            element_template = blueprint['constraints']['element_template']
+
+            if element_template['type'] == 'model':
+                self._element_template_is_model = True
+                self._element_template = element_template['constraints']['model_template']
+                import logging
+                logging.error(self._element_template)
+            else:
+                self._element_template_is_model = False
 
 
     @property
@@ -70,19 +79,34 @@ class AttributeMetaData(object):
         return self._model_template
 
     #array
+    @property
     def element_template(self):
         return self._element_template
 
     @property
     def element_template_is_model(self):
-        return False
+        return self._element_template_is_model
 
-class Model(object):
+class Base(object):
 
-    def __init__(self, model_file, namespace, output_directory):
+    def __init__(self, template_engine, model_file, namespace, output_directory):
+        self._template_engine = template_engine
         self._model_file = model_file
         self._namespace = namespace
         self._output_directory = output_directory
+        self._dependencies = list()
+
+    def add_dependency(self, attribute):
+        if attribute.type == 'model' and attribute.model_template not in self._dependencies:
+            self._dependencies.append(attribute.model_template)
+        elif attribute.type == 'array' and attribute.element_template not in self._dependencies:
+            self._dependencies.append(attribute.element_template)
+
+class Model(Base):
+
+    def __init__(self, template_engine, model_file, namespace, output_directory):
+    
+        Base.__init__(self, template_engine, model_file, namespace, output_directory)
         self._template = prestans.devel.gen.templates.closure.model
 
     def run(self):
@@ -104,20 +128,18 @@ class Model(object):
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes))
+            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
             output_file.close()
 
             print "%-30s -> %-30s" %(model_name, model_name)
 
         return 0
 
-class Filter(object):
+class Filter(Base):
 
     def __init__(self, template_engine, model_file, namespace, output_directory):
-        self._model_file = model_file
-        self._namespace = namespace
-        self._output_directory = output_directory
-        self._template_engine = template_engine
+
+        Base.__init__(self, template_engine, model_file, namespace, output_directory)
         self._template = self._template_engine.get_template("closure/filter.jinja")
 
     def run(self):
@@ -135,11 +157,13 @@ class Filter(object):
                 attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)
                 attributes.append(attribute)
 
+                self.add_dependency(attribute)
+
             #write out template
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes))
+            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
             output_file.close()
 
             print "%-30s -> %s.js" % (model_name, model_name)

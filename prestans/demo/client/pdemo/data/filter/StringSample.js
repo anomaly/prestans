@@ -9,6 +9,8 @@ goog.require('goog.object');
 
 goog.require('prestans.types.Filter');
 
+goog.require('pdemo.data.filter.IntegerSample');
+
 /**
  * @constructor
 */
@@ -20,7 +22,7 @@ pdemo.data.filter.StringSample = function(opt_defaultValue) {
     this.stringNotRequired_ = opt_defaultValue;
     this.integerSample_ = new pdemo.data.filter.IntegerSample(opt_defaultValue);
     this.stringRequired_ = opt_defaultValue;
-    this.integerSampleArray_ = opt_defaultValue;
+    this.integerSampleArray_ = new pdemo.data.filter.IntegerSample(opt_defaultValue);
 };
 goog.inherits(pdemo.data.filter.StringSample, prestans.types.Filter);
 
@@ -43,7 +45,7 @@ pdemo.data.filter.StringSample.prototype.enableStringRequired = function() {
 	this.stringRequired_ = true;
 };
 pdemo.data.filter.StringSample.prototype.enableIntegerSampleArray = function() {
-    this.${ccif}_ = new ${namespace}.${attribute.element_template}(true);
+    this._ = new pdemo.data.filter.IntegerSample(true);
 };
 
 
@@ -52,13 +54,13 @@ pdemo.data.filter.StringSample.prototype.disableStringNotRequired = function() {
 	this.stringNotRequired_ = false;
 };
 pdemo.data.filter.StringSample.prototype.disableIntegerSample = function() {
-    this.integerSample_ = new pdemo.data.filter.(false);
+    this.integerSample_ = new pdemo.data.filter.IntegerSample(false);
 };
 pdemo.data.filter.StringSample.prototype.disableStringRequired = function() {
 	this.stringRequired_ = false;
 };
 pdemo.data.filter.StringSample.prototype.disableIntegerSampleArray = function() {
-    this.integerSampleArray_ = new pdemo.data.filter.(false);
+    this.integerSampleArray_ = new pdemo.data.filter.IntegerSample(false);
 };
 
 
@@ -74,4 +76,66 @@ pdemo.data.filter.StringSample.prototype.getStringRequired = function() {
 };
 pdemo.data.filter.StringSample.prototype.getIntegerSampleArray = function() {
     return this.integerSampleArray_;
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.setIntegerSample = function(integerSample) {
+    if(integerSample instanceof pdemo.data.filter.IntegerSample)
+        this.integerSample_ = integerSample;
+    else
+        throw "integerSample must be of type pdemo.data.filter.IntegerSample";
+};
+pdemo.data.filter.StringSample.prototype.setIntegerSampleArray = function(integerSampleArray) {
+    if(integerSampleArray instanceof pdemo.data.filter.IntegerSample)
+        this.integerSampleArray_ = integerSampleArray;
+    else
+        throw "integerSampleArray must be of type pdemo.data.filter.IntegerSample";
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.anyFieldsEnabled = function() {
+    return ();
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.getJSONObject = function(opt_complete) {
+
+    if(opt_complete != true)
+        opt_complete = false;
+
+    var jsonifiedObject_ = {};
+    
+    if(this.stringNotRequired_ || opt_complete)
+       jsonifiedObject_["string_not_required"] = this.stringNotRequired_;
+
+    if(this.integerSample_ != null && !goog.object.isEmpty(this.integerSample_.getJSONObject(opt_complete)))
+        jsonifiedObject_["integer_sample"] = this.integerSample_.getJSONObject(opt_complete);
+    else if(opt_complete)
+        jsonifiedObject_["integer_sample"] = false;
+
+    if(this.stringRequired_ || opt_complete)
+       jsonifiedObject_["string_required"] = this.stringRequired_;
+
+    if(this.integerSampleArray_ instanceof prestans.types.Filter && opt_complete)
+        jsonifiedObject_["integer_sample_array"] = this.integerSampleArray_.getJSONObject(opt_complete);
+    else if(this.integerSampleArray_ instanceof prestans.types.Filter && !opt_complete && this.integerSampleArray_.anyFieldsEnabled())
+        jsonifiedObject_["integer_sample_array"] = this.integerSampleArray_.getJSONObject();
+    else if(opt_complete)
+        jsonifiedObject_["integer_sample_array"] = false;
+
+
+    return jsonifiedObject_;
+};
+
+
+
+pdemo.data.filter.StringSample.prototype.getJSONString = function(opt_complete) {
+
+    if(opt_complete != true)
+        opt_complete = false;
+
+    return goog.json.serialize(this.getJSONObject(opt_complete));
 };
