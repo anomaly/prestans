@@ -62,7 +62,7 @@ pdemo.data.filter.IntegerSample.prototype.getIntegerNotRequired = function() {
 
 
 pdemo.data.filter.IntegerSample.prototype.anyFieldsEnabled = function() {
-    return ();
+    return (this.stringNotRequired_ || this.integerSample_.anyFieldsEnabled() || this.stringRequired_ || this.integerSampleArray_.anyFieldsEnabled() || this.integerSample_ || this.integerNotRequired_);
 };
 
 

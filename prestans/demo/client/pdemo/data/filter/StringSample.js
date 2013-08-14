@@ -96,7 +96,7 @@ pdemo.data.filter.StringSample.prototype.setIntegerSampleArray = function(intege
 
 
 pdemo.data.filter.StringSample.prototype.anyFieldsEnabled = function() {
-    return ();
+    return (this.stringNotRequired_ || this.integerSample_.anyFieldsEnabled() || this.stringRequired_ || this.integerSampleArray_.anyFieldsEnabled());
 };
 
 

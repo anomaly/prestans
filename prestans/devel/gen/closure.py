@@ -29,6 +29,8 @@ class AttributeMetaData(object):
             self._required = blueprint['constraints']['required']
             self._min_length = blueprint['constraints']['min_length']
             self._max_length = blueprint['constraints']['max_length']
+            self._default = blueprint['constraints']['default']
+            self._choices = blueprint['constraints']['choices']
         elif self._type == 'integer':
             self._required = blueprint['constraints']['required']
         elif self._type == 'float':
@@ -41,14 +43,14 @@ class AttributeMetaData(object):
             self._model_template = blueprint['constraints']['model_template']
         elif self._type == 'array':
             self._required = blueprint['constraints']['required']
+            self._min_length = blueprint['constraints']['min_length']
+            self._max_length = blueprint['constraints']['max_length']
 
             element_template = blueprint['constraints']['element_template']
 
             if element_template['type'] == 'model':
                 self._element_template_is_model = True
                 self._element_template = element_template['constraints']['model_template']
-                import logging
-                logging.error(self._element_template)
             else:
                 self._element_template_is_model = False
 
@@ -71,7 +73,38 @@ class AttributeMetaData(object):
 
     @property
     def required(self):
-        return self._required
+        if self._required:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def default(self):
+        if self._default is None:
+            return "null"
+        elif type(self._default) == str:
+            return "\"%s\"" % (self._default)
+        else:
+            return self._default
+
+    @property
+    def choices(self):
+        return self._choices
+
+    #string and array
+    @property
+    def min_length(self):
+        if self._min_length is None:
+            return "null"
+        else:
+            return self._min_length
+
+    @property
+    def max_length(self):
+        if self._max_length is None:
+            return "null"
+        else:
+            return self._max_length
 
     #model
     @property
@@ -95,19 +128,40 @@ class Base(object):
         self._namespace = namespace
         self._output_directory = output_directory
         self._dependencies = list()
+        self._attribute_string = ""
 
-    def add_dependency(self, attribute):
-        if attribute.type == 'model' and attribute.model_template not in self._dependencies:
-            self._dependencies.append(attribute.model_template)
-        elif attribute.type == 'array' and attribute.element_template not in self._dependencies:
-            self._dependencies.append(attribute.element_template)
+    def add_dependency(self, attribute, is_model=False):
+
+        dependency = None
+        if attribute.type == 'array':
+            dependency = "%s.%s" % (self._namespace, attribute.element_template)
+        elif attribute.type == 'model':
+            dependency = "%s.%s" % (self._namespace, attribute.model_template)
+        elif is_model:
+            dependency = "prestans.types.%s" % (attribute.type.capitalize())
+
+        if dependency is not None and dependency not in self._dependencies:
+            self._dependencies.append(dependency)
+
+    #used in filters
+    def add_attribute_string(self, attribute):
+        if attribute.type == 'model':
+            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
+        elif attribute.type == 'array':
+            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
+        else:
+            self._attribute_string += "this.%s_ || " % (attribute.ccif)
+
+    @property
+    def attribute_string(self):
+        return self._attribute_string[:-4]
 
 class Model(Base):
 
     def __init__(self, template_engine, model_file, namespace, output_directory):
     
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
-        self._template = prestans.devel.gen.templates.closure.model
+        self._template = self._template_engine.get_template("closure/model.jinja")
 
     def run(self):
 
@@ -124,6 +178,8 @@ class Model(Base):
                 attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)
                 attributes.append(attribute)
 
+                self.add_dependency(attribute, True)
+
             #write out template
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
@@ -131,7 +187,7 @@ class Model(Base):
             output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
             output_file.close()
 
-            print "%-30s -> %-30s" %(model_name, model_name)
+            print "%-30s -> %s.%s.js" %(model_name, self._namespace, model_name)
 
         return 0
 
@@ -157,16 +213,17 @@ class Filter(Base):
                 attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)
                 attributes.append(attribute)
 
-                self.add_dependency(attribute)
+                self.add_dependency(attribute, False)
+                self.add_attribute_string(attribute)
 
             #write out template
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
+            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies, attribute_string=self.attribute_string))
             output_file.close()
 
-            print "%-30s -> %s.js" % (model_name, model_name)
+            print "%-30s -> %s.%s.js" % (model_name, self._namespace, model_name)
 
 
 
