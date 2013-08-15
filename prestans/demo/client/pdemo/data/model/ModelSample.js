@@ -24,12 +24,12 @@ pdemo.data.model.ModelSample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
+        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
         this.integerSample_ = new pdemo.data.model.IntegerSample(opt_json["integer_sample"]);
         this.stringSample_ = new pdemo.data.model.StringSample(opt_json["string_sample"]);
     }
     else {
-        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
+        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
         this.integerSample_ = new pdemo.data.model.IntegerSample();
         this.stringSample_ = new pdemo.data.model.StringSample();
     }

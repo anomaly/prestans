@@ -22,22 +22,22 @@ pdemo.data.model.StringSample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.stringNotRequired_ = new prestans.types.String({value: opt_json["string_not_required"], required: false, default: null, maxLength: null, minLength: null, format: , choices: null});
-        this.stringMaxLength_ = new prestans.types.String({value: opt_json["string_max_length"], required: true, default: null, maxLength: 5, minLength: null, format: , choices: null});
-        this.stringRequired_ = new prestans.types.String({value: opt_json["string_required"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
-        this.stringFormat_ = new prestans.types.String({value: opt_json["string_format"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
-        this.stringChoices_ = new prestans.types.String({value: opt_json["string_choices"], required: true, default: null, maxLength: null, minLength: null, format: , choices: ['A', 'B', 'C']});
-        this.stringMinLength_ = new prestans.types.String({value: opt_json["string_min_length"], required: true, default: null, maxLength: null, minLength: 1, format: , choices: null});
-        this.stringDefault_ = new prestans.types.String({value: opt_json["string_default"], required: true, default: "Hello World", maxLength: null, minLength: null, format: , choices: null});
+        this.stringNotRequired_ = new prestans.types.String({value: opt_json["string_not_required"], required: false, default: null, maxLength: null, minLength: null, format: null, choices: null});
+        this.stringMaxLength_ = new prestans.types.String({value: opt_json["string_max_length"], required: true, default: null, maxLength: 5, minLength: null, format: null, choices: null});
+        this.stringRequired_ = new prestans.types.String({value: opt_json["string_required"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
+        this.stringFormat_ = new prestans.types.String({value: opt_json["string_format"], required: true, default: null, maxLength: null, minLength: null, format: "^[0-9]+[a-z]{3}$", choices: null});
+        this.stringChoices_ = new prestans.types.String({value: opt_json["string_choices"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: ['A', 'B', 'C']});
+        this.stringMinLength_ = new prestans.types.String({value: opt_json["string_min_length"], required: true, default: null, maxLength: null, minLength: 1, format: null, choices: null});
+        this.stringDefault_ = new prestans.types.String({value: opt_json["string_default"], required: true, default: "Hello World", maxLength: null, minLength: null, format: null, choices: null});
     }
     else {
-        this.stringNotRequired_ = new prestans.types.String({required: false, default: null, max_length: null, min_length: null, format: , choices: null});
-        this.stringMaxLength_ = new prestans.types.String({required: true, default: null, max_length: 5, min_length: null, format: , choices: null});
-        this.stringRequired_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
-        this.stringFormat_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
-        this.stringChoices_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: ['A', 'B', 'C']});
-        this.stringMinLength_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: 1, format: , choices: null});
-        this.stringDefault_ = new prestans.types.String({required: true, default: "Hello World", max_length: null, min_length: null, format: , choices: null});
+        this.stringNotRequired_ = new prestans.types.String({required: false, default: null, max_length: null, min_length: null, format: null, choices: null});
+        this.stringMaxLength_ = new prestans.types.String({required: true, default: null, max_length: 5, min_length: null, format: null, choices: null});
+        this.stringRequired_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
+        this.stringFormat_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: "^[0-9]+[a-z]{3}$", choices: null});
+        this.stringChoices_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: ['A', 'B', 'C']});
+        this.stringMinLength_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: 1, format: null, choices: null});
+        this.stringDefault_ = new prestans.types.String({required: true, default: "Hello World", max_length: null, min_length: null, format: null, choices: null});
     }
 };
 goog.inherits(pdemo.data.model.StringSample, prestans.types.Model);
@@ -48,6 +48,7 @@ pdemo.data.model.StringSample.prototype.stringNotRequired_ = null;
 pdemo.data.model.StringSample.prototype.stringMaxLength_ = null;
 pdemo.data.model.StringSample.prototype.stringRequired_ = null;
 pdemo.data.model.StringSample.prototype.stringFormat_ = null;
+pdemo.data.model.StringSample.StringFormatStringFormat = new RegExp("^[0-9]+[a-z]{3}$");
 pdemo.data.model.StringSample.prototype.stringChoices_ = null;
 pdemo.data.model.StringSample.StringChoicesChoices = ['A', 'B', 'C'];
 pdemo.data.model.StringSample.prototype.stringMinLength_ = null;

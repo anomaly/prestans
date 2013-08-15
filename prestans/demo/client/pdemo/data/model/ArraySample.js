@@ -24,13 +24,13 @@ pdemo.data.model.ArraySample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
+        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
         this.integerArray_ = new prestans.types.Array({elementTemplate: prestans.types.Integer, opt_json: opt_json["integer_array"], null, null);
         this.stringArray_ = new prestans.types.Array({elementTemplate: prestans.types.String, opt_json: opt_json["string_array"], null, null);
         this.modelArray_ = new prestans.types.Array({elementTemplate: pdemo.data.model.IntegerSample, opt_json: opt_json["model_array"], maxLength: null, minLength: null});
     }
     else {
-        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
+        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
         this.integerArray_ = new prestans.types.Array({elementTemplate: prestans.types.Integer, maxLength: null, minLength: null});
         this.stringArray_ = new prestans.types.Array({elementTemplate: prestans.types.String, maxLength: null, minLength: null});
         this.modelArray_ = new prestans.types.Array({elementTemplate: pdemo.data.model.IntegerSample, maxLength: null, minLength: null});

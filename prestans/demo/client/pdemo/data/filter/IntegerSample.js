@@ -9,7 +9,10 @@ goog.require('goog.object');
 
 goog.require('prestans.types.Filter');
 
+goog.require('pdemo.data.filter.Integer');
+goog.require('pdemo.data.filter.String');
 goog.require('pdemo.data.filter.IntegerSample');
+goog.require('pdemo.data.filter.StringSample');
 
 /**
  * @constructor
@@ -19,20 +22,40 @@ pdemo.data.filter.IntegerSample = function(opt_defaultValue) {
     if(opt_defaultValue != false)
         opt_defaultValue = true;
 
-    this.integerSample_ = opt_defaultValue;
+    this.integerChoices_ = opt_defaultValue;
+    this.integerMaximum_ = opt_defaultValue;
+    this.integerDefault_ = opt_defaultValue;
+    this.integerRequired_ = opt_defaultValue;
+    this.integerMinimum_ = opt_defaultValue;
     this.integerNotRequired_ = opt_defaultValue;
 };
 goog.inherits(pdemo.data.filter.IntegerSample, prestans.types.Filter);
 
 
 
-pdemo.data.filter.IntegerSample.prototype.integerSample_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerChoices_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerMaximum_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerDefault_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerRequired_ = null;
+pdemo.data.filter.IntegerSample.prototype.integerMinimum_ = null;
 pdemo.data.filter.IntegerSample.prototype.integerNotRequired_ = null;
 
 
 
-pdemo.data.filter.IntegerSample.prototype.enableIntegerSample = function() {
-	this.integerSample_ = true;
+pdemo.data.filter.IntegerSample.prototype.enableIntegerChoices = function() {
+	this.integerChoices_ = true;
+};
+pdemo.data.filter.IntegerSample.prototype.enableIntegerMaximum = function() {
+	this.integerMaximum_ = true;
+};
+pdemo.data.filter.IntegerSample.prototype.enableIntegerDefault = function() {
+	this.integerDefault_ = true;
+};
+pdemo.data.filter.IntegerSample.prototype.enableIntegerRequired = function() {
+	this.integerRequired_ = true;
+};
+pdemo.data.filter.IntegerSample.prototype.enableIntegerMinimum = function() {
+	this.integerMinimum_ = true;
 };
 pdemo.data.filter.IntegerSample.prototype.enableIntegerNotRequired = function() {
 	this.integerNotRequired_ = true;
@@ -40,8 +63,20 @@ pdemo.data.filter.IntegerSample.prototype.enableIntegerNotRequired = function() 
 
 
 
-pdemo.data.filter.IntegerSample.prototype.disableIntegerSample = function() {
-	this.integerSample_ = false;
+pdemo.data.filter.IntegerSample.prototype.disableIntegerChoices = function() {
+	this.integerChoices_ = false;
+};
+pdemo.data.filter.IntegerSample.prototype.disableIntegerMaximum = function() {
+	this.integerMaximum_ = false;
+};
+pdemo.data.filter.IntegerSample.prototype.disableIntegerDefault = function() {
+	this.integerDefault_ = false;
+};
+pdemo.data.filter.IntegerSample.prototype.disableIntegerRequired = function() {
+	this.integerRequired_ = false;
+};
+pdemo.data.filter.IntegerSample.prototype.disableIntegerMinimum = function() {
+	this.integerMinimum_ = false;
 };
 pdemo.data.filter.IntegerSample.prototype.disableIntegerNotRequired = function() {
 	this.integerNotRequired_ = false;
@@ -49,8 +84,20 @@ pdemo.data.filter.IntegerSample.prototype.disableIntegerNotRequired = function()
 
 
 
-pdemo.data.filter.IntegerSample.prototype.getIntegerSample = function() {
-    return this.integerSample_;
+pdemo.data.filter.IntegerSample.prototype.getIntegerChoices = function() {
+    return this.integerChoices_;
+};
+pdemo.data.filter.IntegerSample.prototype.getIntegerMaximum = function() {
+    return this.integerMaximum_;
+};
+pdemo.data.filter.IntegerSample.prototype.getIntegerDefault = function() {
+    return this.integerDefault_;
+};
+pdemo.data.filter.IntegerSample.prototype.getIntegerRequired = function() {
+    return this.integerRequired_;
+};
+pdemo.data.filter.IntegerSample.prototype.getIntegerMinimum = function() {
+    return this.integerMinimum_;
 };
 pdemo.data.filter.IntegerSample.prototype.getIntegerNotRequired = function() {
     return this.integerNotRequired_;
@@ -62,7 +109,7 @@ pdemo.data.filter.IntegerSample.prototype.getIntegerNotRequired = function() {
 
 
 pdemo.data.filter.IntegerSample.prototype.anyFieldsEnabled = function() {
-    return (this.stringNotRequired_ || this.integerSample_.anyFieldsEnabled() || this.stringRequired_ || this.integerSampleArray_.anyFieldsEnabled() || this.integerSample_ || this.integerNotRequired_);
+    return (this.datetimeDefaultNow_ || this.datetimeDefaultString_ || this.datetimeNotRequired_ || this.datetimeRequired_ || this.timeDefaultNow_ || this.timeNotRequired_ || this.timeRequired_ || this.floatRequired_ || this.floatMinimum_ || this.floatNotRequired_ || this.floatMaximum_ || this.floatChoices_ || this.floatDefault_ || this.stringTitle_ || this.integerArray_.anyFieldsEnabled() || this.stringArray_.anyFieldsEnabled() || this.modelArray_.anyFieldsEnabled() || this.stringTitle_ || this.integerSample_.anyFieldsEnabled() || this.stringSample_.anyFieldsEnabled() || this.stringNotRequired_ || this.stringMaxLength_ || this.stringRequired_ || this.stringFormat_ || this.stringChoices_ || this.stringMinLength_ || this.stringDefault_ || this.dateRequired_ || this.dateDefaultToday_ || this.dateNotRequired_ || this.dateDefaultString_ || this.integerChoices_ || this.integerMaximum_ || this.integerDefault_ || this.integerRequired_ || this.integerMinimum_ || this.integerNotRequired_);
 };
 
 
@@ -74,8 +121,20 @@ pdemo.data.filter.IntegerSample.prototype.getJSONObject = function(opt_complete)
 
     var jsonifiedObject_ = {};
     
-    if(this.integerSample_ || opt_complete)
-       jsonifiedObject_["integer_sample"] = this.integerSample_;
+    if(this.integerChoices_ || opt_complete)
+       jsonifiedObject_["integer_choices"] = this.integerChoices_;
+
+    if(this.integerMaximum_ || opt_complete)
+       jsonifiedObject_["integer_maximum"] = this.integerMaximum_;
+
+    if(this.integerDefault_ || opt_complete)
+       jsonifiedObject_["integer_default"] = this.integerDefault_;
+
+    if(this.integerRequired_ || opt_complete)
+       jsonifiedObject_["integer_required"] = this.integerRequired_;
+
+    if(this.integerMinimum_ || opt_complete)
+       jsonifiedObject_["integer_minimum"] = this.integerMinimum_;
 
     if(this.integerNotRequired_ || opt_complete)
        jsonifiedObject_["integer_not_required"] = this.integerNotRequired_;

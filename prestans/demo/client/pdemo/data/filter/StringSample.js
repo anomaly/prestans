@@ -9,7 +9,10 @@ goog.require('goog.object');
 
 goog.require('prestans.types.Filter');
 
+goog.require('pdemo.data.filter.Integer');
+goog.require('pdemo.data.filter.String');
 goog.require('pdemo.data.filter.IntegerSample');
+goog.require('pdemo.data.filter.StringSample');
 
 /**
  * @constructor
@@ -20,32 +23,47 @@ pdemo.data.filter.StringSample = function(opt_defaultValue) {
         opt_defaultValue = true;
 
     this.stringNotRequired_ = opt_defaultValue;
-    this.integerSample_ = new pdemo.data.filter.IntegerSample(opt_defaultValue);
+    this.stringMaxLength_ = opt_defaultValue;
     this.stringRequired_ = opt_defaultValue;
-    this.integerSampleArray_ = new pdemo.data.filter.IntegerSample(opt_defaultValue);
+    this.stringFormat_ = opt_defaultValue;
+    this.stringChoices_ = opt_defaultValue;
+    this.stringMinLength_ = opt_defaultValue;
+    this.stringDefault_ = opt_defaultValue;
 };
 goog.inherits(pdemo.data.filter.StringSample, prestans.types.Filter);
 
 
 
 pdemo.data.filter.StringSample.prototype.stringNotRequired_ = null;
-pdemo.data.filter.StringSample.prototype.integerSample_ = null;
+pdemo.data.filter.StringSample.prototype.stringMaxLength_ = null;
 pdemo.data.filter.StringSample.prototype.stringRequired_ = null;
-pdemo.data.filter.StringSample.prototype.integerSampleArray_ = null;
+pdemo.data.filter.StringSample.prototype.stringFormat_ = null;
+pdemo.data.filter.StringSample.prototype.stringChoices_ = null;
+pdemo.data.filter.StringSample.prototype.stringMinLength_ = null;
+pdemo.data.filter.StringSample.prototype.stringDefault_ = null;
 
 
 
 pdemo.data.filter.StringSample.prototype.enableStringNotRequired = function() {
 	this.stringNotRequired_ = true;
 };
-pdemo.data.filter.StringSample.prototype.enableIntegerSample = function() {
-    this._ = new pdemo.data.filter.IntegerSample(true);
+pdemo.data.filter.StringSample.prototype.enableStringMaxLength = function() {
+	this.stringMaxLength_ = true;
 };
 pdemo.data.filter.StringSample.prototype.enableStringRequired = function() {
 	this.stringRequired_ = true;
 };
-pdemo.data.filter.StringSample.prototype.enableIntegerSampleArray = function() {
-    this._ = new pdemo.data.filter.IntegerSample(true);
+pdemo.data.filter.StringSample.prototype.enableStringFormat = function() {
+	this.stringFormat_ = true;
+};
+pdemo.data.filter.StringSample.prototype.enableStringChoices = function() {
+	this.stringChoices_ = true;
+};
+pdemo.data.filter.StringSample.prototype.enableStringMinLength = function() {
+	this.stringMinLength_ = true;
+};
+pdemo.data.filter.StringSample.prototype.enableStringDefault = function() {
+	this.stringDefault_ = true;
 };
 
 
@@ -53,14 +71,23 @@ pdemo.data.filter.StringSample.prototype.enableIntegerSampleArray = function() {
 pdemo.data.filter.StringSample.prototype.disableStringNotRequired = function() {
 	this.stringNotRequired_ = false;
 };
-pdemo.data.filter.StringSample.prototype.disableIntegerSample = function() {
-    this.integerSample_ = new pdemo.data.filter.IntegerSample(false);
+pdemo.data.filter.StringSample.prototype.disableStringMaxLength = function() {
+	this.stringMaxLength_ = false;
 };
 pdemo.data.filter.StringSample.prototype.disableStringRequired = function() {
 	this.stringRequired_ = false;
 };
-pdemo.data.filter.StringSample.prototype.disableIntegerSampleArray = function() {
-    this.integerSampleArray_ = new pdemo.data.filter.IntegerSample(false);
+pdemo.data.filter.StringSample.prototype.disableStringFormat = function() {
+	this.stringFormat_ = false;
+};
+pdemo.data.filter.StringSample.prototype.disableStringChoices = function() {
+	this.stringChoices_ = false;
+};
+pdemo.data.filter.StringSample.prototype.disableStringMinLength = function() {
+	this.stringMinLength_ = false;
+};
+pdemo.data.filter.StringSample.prototype.disableStringDefault = function() {
+	this.stringDefault_ = false;
 };
 
 
@@ -68,35 +95,32 @@ pdemo.data.filter.StringSample.prototype.disableIntegerSampleArray = function() 
 pdemo.data.filter.StringSample.prototype.getStringNotRequired = function() {
     return this.stringNotRequired_;
 };
-pdemo.data.filter.StringSample.prototype.getIntegerSample = function() {
-    return this.integerSample_;
+pdemo.data.filter.StringSample.prototype.getStringMaxLength = function() {
+    return this.stringMaxLength_;
 };
 pdemo.data.filter.StringSample.prototype.getStringRequired = function() {
     return this.stringRequired_;
 };
-pdemo.data.filter.StringSample.prototype.getIntegerSampleArray = function() {
-    return this.integerSampleArray_;
+pdemo.data.filter.StringSample.prototype.getStringFormat = function() {
+    return this.stringFormat_;
+};
+pdemo.data.filter.StringSample.prototype.getStringChoices = function() {
+    return this.stringChoices_;
+};
+pdemo.data.filter.StringSample.prototype.getStringMinLength = function() {
+    return this.stringMinLength_;
+};
+pdemo.data.filter.StringSample.prototype.getStringDefault = function() {
+    return this.stringDefault_;
 };
 
 
 
-pdemo.data.filter.StringSample.prototype.setIntegerSample = function(integerSample) {
-    if(integerSample instanceof pdemo.data.filter.IntegerSample)
-        this.integerSample_ = integerSample;
-    else
-        throw "integerSample must be of type pdemo.data.filter.IntegerSample";
-};
-pdemo.data.filter.StringSample.prototype.setIntegerSampleArray = function(integerSampleArray) {
-    if(integerSampleArray instanceof pdemo.data.filter.IntegerSample)
-        this.integerSampleArray_ = integerSampleArray;
-    else
-        throw "integerSampleArray must be of type pdemo.data.filter.IntegerSample";
-};
 
 
 
 pdemo.data.filter.StringSample.prototype.anyFieldsEnabled = function() {
-    return (this.stringNotRequired_ || this.integerSample_.anyFieldsEnabled() || this.stringRequired_ || this.integerSampleArray_.anyFieldsEnabled());
+    return (this.datetimeDefaultNow_ || this.datetimeDefaultString_ || this.datetimeNotRequired_ || this.datetimeRequired_ || this.timeDefaultNow_ || this.timeNotRequired_ || this.timeRequired_ || this.floatRequired_ || this.floatMinimum_ || this.floatNotRequired_ || this.floatMaximum_ || this.floatChoices_ || this.floatDefault_ || this.stringTitle_ || this.integerArray_.anyFieldsEnabled() || this.stringArray_.anyFieldsEnabled() || this.modelArray_.anyFieldsEnabled() || this.stringTitle_ || this.integerSample_.anyFieldsEnabled() || this.stringSample_.anyFieldsEnabled() || this.stringNotRequired_ || this.stringMaxLength_ || this.stringRequired_ || this.stringFormat_ || this.stringChoices_ || this.stringMinLength_ || this.stringDefault_);
 };
 
 
@@ -111,20 +135,23 @@ pdemo.data.filter.StringSample.prototype.getJSONObject = function(opt_complete) 
     if(this.stringNotRequired_ || opt_complete)
        jsonifiedObject_["string_not_required"] = this.stringNotRequired_;
 
-    if(this.integerSample_ != null && !goog.object.isEmpty(this.integerSample_.getJSONObject(opt_complete)))
-        jsonifiedObject_["integer_sample"] = this.integerSample_.getJSONObject(opt_complete);
-    else if(opt_complete)
-        jsonifiedObject_["integer_sample"] = false;
+    if(this.stringMaxLength_ || opt_complete)
+       jsonifiedObject_["string_max_length"] = this.stringMaxLength_;
 
     if(this.stringRequired_ || opt_complete)
        jsonifiedObject_["string_required"] = this.stringRequired_;
 
-    if(this.integerSampleArray_ instanceof prestans.types.Filter && opt_complete)
-        jsonifiedObject_["integer_sample_array"] = this.integerSampleArray_.getJSONObject(opt_complete);
-    else if(this.integerSampleArray_ instanceof prestans.types.Filter && !opt_complete && this.integerSampleArray_.anyFieldsEnabled())
-        jsonifiedObject_["integer_sample_array"] = this.integerSampleArray_.getJSONObject();
-    else if(opt_complete)
-        jsonifiedObject_["integer_sample_array"] = false;
+    if(this.stringFormat_ || opt_complete)
+       jsonifiedObject_["string_format"] = this.stringFormat_;
+
+    if(this.stringChoices_ || opt_complete)
+       jsonifiedObject_["string_choices"] = this.stringChoices_;
+
+    if(this.stringMinLength_ || opt_complete)
+       jsonifiedObject_["string_min_length"] = this.stringMinLength_;
+
+    if(this.stringDefault_ || opt_complete)
+       jsonifiedObject_["string_default"] = this.stringDefault_;
 
 
     return jsonifiedObject_;

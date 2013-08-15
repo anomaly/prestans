@@ -15,10 +15,6 @@ def udl_to_cc(text, ignoreFirst=False):
 
 class AttributeMetaData(object):
 
-    #used for
-    def __str__(self):
-        return "%s" % (self._name)
-
     def __init__(self, name, blueprint):
         self._name = name
         self._blueprint = blueprint
@@ -29,6 +25,7 @@ class AttributeMetaData(object):
         self._min_length = None
         self._max_length = None
         self._choices = None
+        self._format = None
 
         self._type = blueprint['type']
 
@@ -40,6 +37,7 @@ class AttributeMetaData(object):
             self._default = blueprint['constraints']['default']
             self._choices = blueprint['constraints']['choices']
             self._format = blueprint['constraints']['format']
+
         elif self._type == 'integer':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
@@ -126,6 +124,14 @@ class AttributeMetaData(object):
                 return "false"
         else:
             return self._default
+
+    @property
+    def format(self):
+        if self._format is None:
+            return "null"
+
+        format = self._format.replace("\\", "\\\\")
+        return "\"%s\"" % (format)
 
     @property
     def minimum(self):
