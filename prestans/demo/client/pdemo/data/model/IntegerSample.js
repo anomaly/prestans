@@ -10,8 +10,6 @@ goog.require('prestans.types.Model.AttributeChangedEvent');
 
 goog.require('prestans.types.Model');
 
-goog.require('prestans.types.String');
-goog.require('pdemo.data.model.IntegerSample');
 goog.require('prestans.types.Integer');
 
 /**
@@ -24,17 +22,141 @@ pdemo.data.model.IntegerSample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.integerSample_ = new prestans.types.Integer(opt_json["integer_sample"], true, , , , );
-        this.integerNotRequired_ = new prestans.types.Integer(opt_json["integer_not_required"], false, , , , );
+        this.integerChoices_ = new prestans.types.Integer({value: opt_json["integer_choices"], required: true, default: null, maximum: null, minimum: null, choices: [1, 2, 3]});
+        this.integerMaximum_ = new prestans.types.Integer({value: opt_json["integer_maximum"], required: true, default: null, maximum: 5, minimum: null, choices: []});
+        this.integerDefault_ = new prestans.types.Integer({value: opt_json["integer_default"], required: true, default: 6, maximum: null, minimum: null, choices: []});
+        this.integerRequired_ = new prestans.types.Integer({value: opt_json["integer_required"], required: true, default: null, maximum: null, minimum: null, choices: []});
+        this.integerMinimum_ = new prestans.types.Integer({value: opt_json["integer_minimum"], required: true, default: null, maximum: null, minimum: 1, choices: []});
+        this.integerNotRequired_ = new prestans.types.Integer({value: opt_json["integer_not_required"], required: false, default: null, maximum: null, minimum: null, choices: []});
     }
     else {
-        this.${ccif}_ = new prestans.types.Integer(null, ${formatter.boolean(required)}, ${formatter.string(default)}, ${formatter.integer(maximum)}, ${formatter.integer(minimum)}, ${formatter.choices(choices)});
-        this.${ccif}_ = new prestans.types.Integer(null, ${formatter.boolean(required)}, ${formatter.string(default)}, ${formatter.integer(maximum)}, ${formatter.integer(minimum)}, ${formatter.choices(choices)});
+        this.integerChoices_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: [1, 2, 3]});
+        this.integerMaximum_ = new prestans.types.Integer({required: true, default: null, maximum: 5, minimum: null, choices: []});
+        this.integerDefault_ = new prestans.types.Integer({required: true, default: 6, maximum: null, minimum: null, choices: []});
+        this.integerRequired_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: []});
+        this.integerMinimum_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: 1, choices: []});
+        this.integerNotRequired_ = new prestans.types.Integer({required: false, default: null, maximum: null, minimum: null, choices: []});
     }
 };
 goog.inherits(pdemo.data.model.IntegerSample, prestans.types.Model);
 
 
 
-pdemo.data.model.IntegerSample.prototype.integerSample_ = null;
+pdemo.data.model.IntegerSample.prototype.integerChoices_ = null;
+pdemo.data.model.IntegerSample.IntegerChoicesChoices = [1, 2, 3];
+pdemo.data.model.IntegerSample.prototype.integerMaximum_ = null;
+pdemo.data.model.IntegerSample.prototype.integerDefault_ = null;
+pdemo.data.model.IntegerSample.prototype.integerRequired_ = null;
+pdemo.data.model.IntegerSample.prototype.integerMinimum_ = null;
 pdemo.data.model.IntegerSample.prototype.integerNotRequired_ = null;
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerChoices = function() {
+    return this.integerChoices_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerChoices = function(value) {
+    var previousValue_ = this.integerChoices_.getValue();
+    var success_ = this.integerChoices_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerChoices", previousValue_, this.integerChoices_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerMaximum = function() {
+    return this.integerMaximum_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerMaximum = function(value) {
+    var previousValue_ = this.integerMaximum_.getValue();
+    var success_ = this.integerMaximum_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerMaximum", previousValue_, this.integerMaximum_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerDefault = function() {
+    return this.integerDefault_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerDefault = function(value) {
+    var previousValue_ = this.integerDefault_.getValue();
+    var success_ = this.integerDefault_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerDefault", previousValue_, this.integerDefault_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerRequired = function() {
+    return this.integerRequired_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerRequired = function(value) {
+    var previousValue_ = this.integerRequired_.getValue();
+    var success_ = this.integerRequired_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerRequired", previousValue_, this.integerRequired_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerMinimum = function() {
+    return this.integerMinimum_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerMinimum = function(value) {
+    var previousValue_ = this.integerMinimum_.getValue();
+    var success_ = this.integerMinimum_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerMinimum", previousValue_, this.integerMinimum_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getIntegerNotRequired = function() {
+    return this.integerNotRequired_.getValue();
+};
+
+pdemo.data.model.IntegerSample.prototype.setIntegerNotRequired = function(value) {
+    var previousValue_ = this.integerNotRequired_.getValue();
+    var success_ = this.integerNotRequired_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "integerNotRequired", previousValue_, this.integerNotRequired_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.setValueForKey = function(key, value) {
+
+    var returnVal_ = null;
+
+    switch(key)
+    {
+        case "integerChoices":
+            returnVal_ = this.setIntegerChoices(value);
+            break;
+        case "integerMaximum":
+            returnVal_ = this.setIntegerMaximum(value);
+            break;
+        case "integerDefault":
+            returnVal_ = this.setIntegerDefault(value);
+            break;
+        case "integerRequired":
+            returnVal_ = this.setIntegerRequired(value);
+            break;
+        case "integerMinimum":
+            returnVal_ = this.setIntegerMinimum(value);
+            break;
+        case "integerNotRequired":
+            returnVal_ = this.setIntegerNotRequired(value);
+            break;
+        default:
+            throw "Key: "+key+" not found in model";
+    }
+
+    return returnVal_;
+
+};
