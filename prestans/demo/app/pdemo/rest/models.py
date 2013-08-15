@@ -7,6 +7,7 @@ class StringSample(types.Model):
 	string_min_length = types.String(min_length=1)
 	string_max_length = types.String(max_length=5)
 	string_choices = types.String(choices=["A", "B", "C"])
+	string_format = types.String(format="^[0-9]+[a-z]{3}$")
 
 class IntegerSample(types.Model):
 	integer_required = types.Integer(required=True)

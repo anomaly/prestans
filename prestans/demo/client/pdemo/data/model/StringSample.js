@@ -25,6 +25,7 @@ pdemo.data.model.StringSample = function(opt_json) {
         this.stringNotRequired_ = new prestans.types.String({value: opt_json["string_not_required"], required: false, default: null, maxLength: null, minLength: null, format: , choices: null});
         this.stringMaxLength_ = new prestans.types.String({value: opt_json["string_max_length"], required: true, default: null, maxLength: 5, minLength: null, format: , choices: null});
         this.stringRequired_ = new prestans.types.String({value: opt_json["string_required"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
+        this.stringFormat_ = new prestans.types.String({value: opt_json["string_format"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
         this.stringChoices_ = new prestans.types.String({value: opt_json["string_choices"], required: true, default: null, maxLength: null, minLength: null, format: , choices: ['A', 'B', 'C']});
         this.stringMinLength_ = new prestans.types.String({value: opt_json["string_min_length"], required: true, default: null, maxLength: null, minLength: 1, format: , choices: null});
         this.stringDefault_ = new prestans.types.String({value: opt_json["string_default"], required: true, default: "Hello World", maxLength: null, minLength: null, format: , choices: null});
@@ -33,6 +34,7 @@ pdemo.data.model.StringSample = function(opt_json) {
         this.stringNotRequired_ = new prestans.types.String({required: false, default: null, max_length: null, min_length: null, format: , choices: null});
         this.stringMaxLength_ = new prestans.types.String({required: true, default: null, max_length: 5, min_length: null, format: , choices: null});
         this.stringRequired_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
+        this.stringFormat_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
         this.stringChoices_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: ['A', 'B', 'C']});
         this.stringMinLength_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: 1, format: , choices: null});
         this.stringDefault_ = new prestans.types.String({required: true, default: "Hello World", max_length: null, min_length: null, format: , choices: null});
@@ -45,6 +47,7 @@ goog.inherits(pdemo.data.model.StringSample, prestans.types.Model);
 pdemo.data.model.StringSample.prototype.stringNotRequired_ = null;
 pdemo.data.model.StringSample.prototype.stringMaxLength_ = null;
 pdemo.data.model.StringSample.prototype.stringRequired_ = null;
+pdemo.data.model.StringSample.prototype.stringFormat_ = null;
 pdemo.data.model.StringSample.prototype.stringChoices_ = null;
 pdemo.data.model.StringSample.StringChoicesChoices = ['A', 'B', 'C'];
 pdemo.data.model.StringSample.prototype.stringMinLength_ = null;
@@ -85,6 +88,19 @@ pdemo.data.model.StringSample.prototype.setStringRequired = function(value) {
     var previousValue_ = this.stringRequired_.getValue();
     var success_ = this.stringRequired_.setValue(value);
     this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "stringRequired", previousValue_, this.stringRequired_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.StringSample.prototype.getStringFormat = function() {
+    return this.stringFormat_.getValue();
+};
+
+pdemo.data.model.StringSample.prototype.setStringFormat = function(value) {
+    var previousValue_ = this.stringFormat_.getValue();
+    var success_ = this.stringFormat_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "stringFormat", previousValue_, this.stringFormat_.getValue()));
     return success_;
 };
 
@@ -144,6 +160,9 @@ pdemo.data.model.StringSample.prototype.setValueForKey = function(key, value) {
         case "stringRequired":
             returnVal_ = this.setStringRequired(value);
             break;
+        case "stringFormat":
+            returnVal_ = this.setStringFormat(value);
+            break;
         case "stringChoices":
             returnVal_ = this.setStringChoices(value);
             break;
@@ -179,6 +198,10 @@ pdemo.data.model.StringSample.prototype.getJSONObject = function(opt_filter) {
         jsonifiedObject_["string_required"] = this.getStringRequired()
     else if(!goog.isDef(opt_filter))
         jsonifiedObject_["string_required"] = this.getStringRequired()
+    if(goog.isDef(opt_filter) && opt_filter.getStringFormat())
+        jsonifiedObject_["string_format"] = this.getStringFormat()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["string_format"] = this.getStringFormat()
     if(goog.isDef(opt_filter) && opt_filter.getStringChoices())
         jsonifiedObject_["string_choices"] = this.getStringChoices()
     else if(!goog.isDef(opt_filter))

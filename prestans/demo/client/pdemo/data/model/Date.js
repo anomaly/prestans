@@ -23,13 +23,13 @@ pdemo.data.model.Date = function(opt_json) {
 
     if(goog.isDefAndNotNull(opt_json)) {
         this.dateRequired_ = new prestans.types.Date({value: opt_json["date_required"], required: true, default: null});
-        this.dateDefaultToday_ = new prestans.types.Date({value: opt_json["date_default_today"], required: true, default: "_PRESTANS_CONSTANT_MODEL_DATE_TODAY"});
+        this.dateDefaultToday_ = new prestans.types.Date({value: opt_json["date_default_today"], required: true, default: prestans.types.Date.TODAY});
         this.dateNotRequired_ = new prestans.types.Date({value: opt_json["date_not_required"], required: false, default: null});
         this.dateDefaultString_ = new prestans.types.Date({value: opt_json["date_default_string"], required: true, default: "2013-01-02"});
     }
     else {
         this.dateRequired_ = new prestans.types.Date({required: true, default: null});
-        this.dateDefaultToday_ = new prestans.types.Date({required: true, default: "_PRESTANS_CONSTANT_MODEL_DATE_TODAY"});
+        this.dateDefaultToday_ = new prestans.types.Date({required: true, default: prestans.types.Date.TODAY});
         this.dateNotRequired_ = new prestans.types.Date({required: false, default: null});
         this.dateDefaultString_ = new prestans.types.Date({required: true, default: "2013-01-02"});
     }

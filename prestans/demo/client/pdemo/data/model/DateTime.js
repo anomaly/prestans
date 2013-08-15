@@ -22,13 +22,13 @@ pdemo.data.model.DateTime = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.datetimeDefaultNow_ = new prestans.types.DateTime({value: opt_json["datetime_default_now"], required: true, default: "_PRESTANS_CONSTANT_MODEL_DATETIME_NOW"});
+        this.datetimeDefaultNow_ = new prestans.types.DateTime({value: opt_json["datetime_default_now"], required: true, default: prestans.types.DateTime.NOW});
         this.datetimeDefaultString_ = new prestans.types.DateTime({value: opt_json["datetime_default_string"], required: true, default: "2013-01-01 12:01:34"});
         this.datetimeNotRequired_ = new prestans.types.DateTime({value: opt_json["datetime_not_required"], required: false, default: null});
         this.datetimeRequired_ = new prestans.types.DateTime({value: opt_json["datetime_required"], required: true, default: null});
     }
     else {
-        this.datetimeDefaultNow_ = new prestans.types.DateTime({required: true, default: "_PRESTANS_CONSTANT_MODEL_DATETIME_NOW"});
+        this.datetimeDefaultNow_ = new prestans.types.DateTime({required: true, default: prestans.types.DateTime.NOW});
         this.datetimeDefaultString_ = new prestans.types.DateTime({required: true, default: "2013-01-01 12:01:34"});
         this.datetimeNotRequired_ = new prestans.types.DateTime({required: false, default: null});
         this.datetimeRequired_ = new prestans.types.DateTime({required: true, default: null});

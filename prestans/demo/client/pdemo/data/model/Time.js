@@ -22,12 +22,12 @@ pdemo.data.model.Time = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.timeDefaultNow_ = new prestans.types.Date({value: opt_json["time_default_now"], required: true, default: "_PRESTANS_CONSTANT_MODEL_TIME_NOW"});
+        this.timeDefaultNow_ = new prestans.types.Date({value: opt_json["time_default_now"], required: true, default: prestans.types.Time.NOW});
         this.timeNotRequired_ = new prestans.types.Date({value: opt_json["time_not_required"], required: false, default: null});
         this.timeRequired_ = new prestans.types.Date({value: opt_json["time_required"], required: true, default: null});
     }
     else {
-        this.timeDefaultNow_ = new prestans.types.Date({required: true, default: "_PRESTANS_CONSTANT_MODEL_TIME_NOW"});
+        this.timeDefaultNow_ = new prestans.types.Date({required: true, default: prestans.types.Time.NOW});
         this.timeNotRequired_ = new prestans.types.Date({required: false, default: null});
         this.timeRequired_ = new prestans.types.Date({required: true, default: null});
     }

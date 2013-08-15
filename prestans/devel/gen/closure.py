@@ -108,7 +108,14 @@ class AttributeMetaData(object):
 
     @property
     def default(self):
-        if self._default is None:
+        #dates are check first otherwise string will catch them
+        if self._default == prestans.types.DateTime.CONSTANT.NOW:
+            return "prestans.types.DateTime.NOW"
+        elif self._default == prestans.types.Date.CONSTANT.TODAY:
+            return "prestans.types.Date.TODAY"
+        elif self._default == prestans.types.Time.CONSTANT.NOW:
+            return "prestans.types.Time.NOW"
+        elif self._default is None:
             return "null"
         elif type(self._default) == str:
             return "\"%s\"" % (self._default)
@@ -117,8 +124,6 @@ class AttributeMetaData(object):
                 return "true"
             else:
                 return "false"
-        elif self._default == prestans.types.DateTime.CONSTANT.NOW:
-            return "prestans.types.DateTime.NOW"
         else:
             return self._default
 
