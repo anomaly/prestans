@@ -22,20 +22,20 @@ pdemo.data.model.FloatSample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.floatRequired_ = new prestans.types.Float({value: opt_json["float_required"], required: true, default: null, maximum: null, minimum: null, choices: []});
-        this.floatMinimum_ = new prestans.types.Float({value: opt_json["float_minimum"], required: true, default: null, maximum: null, minimum: 1.0, choices: []});
-        this.floatNotRequired_ = new prestans.types.Float({value: opt_json["float_not_required"], required: false, default: null, maximum: null, minimum: null, choices: []});
-        this.floatMaximum_ = new prestans.types.Float({value: opt_json["float_maximum"], required: true, default: null, maximum: 5.0, minimum: null, choices: []});
+        this.floatRequired_ = new prestans.types.Float({value: opt_json["float_required"], required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.floatMinimum_ = new prestans.types.Float({value: opt_json["float_minimum"], required: true, default: null, maximum: null, minimum: 1.0, choices: null});
+        this.floatNotRequired_ = new prestans.types.Float({value: opt_json["float_not_required"], required: false, default: null, maximum: null, minimum: null, choices: null});
+        this.floatMaximum_ = new prestans.types.Float({value: opt_json["float_maximum"], required: true, default: null, maximum: 5.0, minimum: null, choices: null});
         this.floatChoices_ = new prestans.types.Float({value: opt_json["float_choices"], required: true, default: null, maximum: null, minimum: null, choices: [1.1, 2.2, 3.3]});
-        this.floatDefault_ = new prestans.types.Float({value: opt_json["float_default"], required: true, default: 6.0, maximum: null, minimum: null, choices: []});
+        this.floatDefault_ = new prestans.types.Float({value: opt_json["float_default"], required: true, default: 6.0, maximum: null, minimum: null, choices: null});
     }
     else {
-        this.floatRequired_ = new prestans.types.Float({required: true, default: null, maximum: null, minimum: null, choices: []});
-        this.floatMinimum_ = new prestans.types.Float({required: true, default: null, maximum: null, minimum: 1.0, choices: []});
-        this.floatNotRequired_ = new prestans.types.Float({required: false, default: null, maximum: null, minimum: null, choices: []});
-        this.floatMaximum_ = new prestans.types.Float({required: true, default: null, maximum: 5.0, minimum: null, choices: []});
+        this.floatRequired_ = new prestans.types.Float({required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.floatMinimum_ = new prestans.types.Float({required: true, default: null, maximum: null, minimum: 1.0, choices: null});
+        this.floatNotRequired_ = new prestans.types.Float({required: false, default: null, maximum: null, minimum: null, choices: null});
+        this.floatMaximum_ = new prestans.types.Float({required: true, default: null, maximum: 5.0, minimum: null, choices: null});
         this.floatChoices_ = new prestans.types.Float({required: true, default: null, maximum: null, minimum: null, choices: [1.1, 2.2, 3.3]});
-        this.floatDefault_ = new prestans.types.Float({required: true, default: 6.0, maximum: null, minimum: null, choices: []});
+        this.floatDefault_ = new prestans.types.Float({required: true, default: 6.0, maximum: null, minimum: null, choices: null});
     }
 };
 goog.inherits(pdemo.data.model.FloatSample, prestans.types.Model);
@@ -159,4 +159,42 @@ pdemo.data.model.FloatSample.prototype.setValueForKey = function(key, value) {
 
     return returnVal_;
 
+};
+
+
+
+pdemo.data.model.FloatSample.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getFloatRequired())
+        jsonifiedObject_["float_required"] = this.getFloatRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_required"] = this.getFloatRequired()
+    if(goog.isDef(opt_filter) && opt_filter.getFloatMinimum())
+        jsonifiedObject_["float_minimum"] = this.getFloatMinimum()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_minimum"] = this.getFloatMinimum()
+    if(goog.isDef(opt_filter) && opt_filter.getFloatNotRequired())
+        jsonifiedObject_["float_not_required"] = this.getFloatNotRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_not_required"] = this.getFloatNotRequired()
+    if(goog.isDef(opt_filter) && opt_filter.getFloatMaximum())
+        jsonifiedObject_["float_maximum"] = this.getFloatMaximum()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_maximum"] = this.getFloatMaximum()
+    if(goog.isDef(opt_filter) && opt_filter.getFloatChoices())
+        jsonifiedObject_["float_choices"] = this.getFloatChoices()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_choices"] = this.getFloatChoices()
+    if(goog.isDef(opt_filter) && opt_filter.getFloatDefault())
+        jsonifiedObject_["float_default"] = this.getFloatDefault()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["float_default"] = this.getFloatDefault()
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.FloatSample.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
 };

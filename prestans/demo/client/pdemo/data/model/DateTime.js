@@ -121,3 +121,33 @@ pdemo.data.model.DateTime.prototype.setValueForKey = function(key, value) {
     return returnVal_;
 
 };
+
+
+
+pdemo.data.model.DateTime.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getDatetimeDefaultNow())
+        jsonifiedObject_["datetime_default_now"] = this.datetimeDefaultNow_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["datetime_default_now"] = this.datetimeDefaultNow_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDatetimeDefaultString())
+        jsonifiedObject_["datetime_default_string"] = this.datetimeDefaultString_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["datetime_default_string"] = this.datetimeDefaultString_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDatetimeNotRequired())
+        jsonifiedObject_["datetime_not_required"] = this.datetimeNotRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["datetime_not_required"] = this.datetimeNotRequired_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDatetimeRequired())
+        jsonifiedObject_["datetime_required"] = this.datetimeRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["datetime_required"] = this.datetimeRequired_.getJSONObject();
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.DateTime.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
+};

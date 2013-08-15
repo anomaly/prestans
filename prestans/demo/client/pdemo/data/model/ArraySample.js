@@ -24,13 +24,13 @@ pdemo.data.model.ArraySample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: []});
+        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
         this.integerArray_ = new prestans.types.Array({elementTemplate: prestans.types.Integer, opt_json: opt_json["integer_array"], null, null);
         this.stringArray_ = new prestans.types.Array({elementTemplate: prestans.types.String, opt_json: opt_json["string_array"], null, null);
         this.modelArray_ = new prestans.types.Array({elementTemplate: pdemo.data.model.IntegerSample, opt_json: opt_json["model_array"], maxLength: null, minLength: null});
     }
     else {
-        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: []});
+        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
         this.integerArray_ = new prestans.types.Array({elementTemplate: prestans.types.Integer, maxLength: null, minLength: null});
         this.stringArray_ = new prestans.types.Array({elementTemplate: prestans.types.String, maxLength: null, minLength: null});
         this.modelArray_ = new prestans.types.Array({elementTemplate: pdemo.data.model.IntegerSample, maxLength: null, minLength: null});
@@ -134,4 +134,34 @@ pdemo.data.model.ArraySample.prototype.setValueForKey = function(key, value) {
 
     return returnVal_;
 
+};
+
+
+
+pdemo.data.model.ArraySample.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getStringTitle())
+        jsonifiedObject_["string_title"] = this.getStringTitle()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["string_title"] = this.getStringTitle()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerArray())
+        jsonifiedObject_["integer_array"] = this.getIntegerArray().getJSONObject(opt_filter.getIntegerArray());
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_array"] = this.getIntegerArray().getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getStringArray())
+        jsonifiedObject_["string_array"] = this.getStringArray().getJSONObject(opt_filter.getStringArray());
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["string_array"] = this.getStringArray().getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getModelArray().anyFieldsEnabled())
+        jsonifiedObject_["model_array"] = this.getModelArray().getJSONObject(opt_filter.getModelArray());
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["model_array"] = this.getModelArray().getJSONObject();
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.ArraySample.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
 };

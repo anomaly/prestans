@@ -24,14 +24,14 @@ pdemo.data.model.ModelSample = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: []});
+        this.stringTitle_ = new prestans.types.String({value: opt_json["string_title"], required: true, default: null, maxLength: null, minLength: null, format: , choices: null});
         this.integerSample_ = new pdemo.data.model.IntegerSample(opt_json["integer_sample"]);
         this.stringSample_ = new pdemo.data.model.StringSample(opt_json["string_sample"]);
     }
     else {
-        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: []});
-        this.integerSample_ = new ${namespace}.${model}();
-        this.stringSample_ = new ${namespace}.${model}();
+        this.stringTitle_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: , choices: null});
+        this.integerSample_ = new pdemo.data.model.IntegerSample();
+        this.stringSample_ = new pdemo.data.model.StringSample();
     }
 };
 goog.inherits(pdemo.data.model.ModelSample, prestans.types.Model);
@@ -111,4 +111,46 @@ pdemo.data.model.ModelSample.prototype.setValueForKey = function(key, value) {
 
     return returnVal_;
 
+};
+
+
+
+pdemo.data.model.ModelSample.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getStringTitle())
+        jsonifiedObject_["string_title"] = this.getStringTitle()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["string_title"] = this.getStringTitle()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerSample().anyFieldsEnabled()) {
+        if(this.getIntegerSample() == null)
+            jsonifiedObject_["integer_sample"] = null;
+        else
+            jsonifiedObject_["integer_sample"] = this.getIntegerSample().getJSONObject(opt_filter.getIntegerSample());
+    }
+    else if(!goog.isDef(opt_filter)) {
+        if(this.getIntegerSample() == null)
+            jsonifiedObject_["integer_sample"] = null;
+        else
+            jsonifiedObject_["integer_sample"] = this.getIntegerSample().getJSONObject();
+    }
+    if(goog.isDef(opt_filter) && opt_filter.getStringSample().anyFieldsEnabled()) {
+        if(this.getStringSample() == null)
+            jsonifiedObject_["string_sample"] = null;
+        else
+            jsonifiedObject_["string_sample"] = this.getStringSample().getJSONObject(opt_filter.getStringSample());
+    }
+    else if(!goog.isDef(opt_filter)) {
+        if(this.getStringSample() == null)
+            jsonifiedObject_["string_sample"] = null;
+        else
+            jsonifiedObject_["string_sample"] = this.getStringSample().getJSONObject();
+    }
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.ModelSample.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
 };

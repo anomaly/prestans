@@ -121,3 +121,33 @@ pdemo.data.model.Date.prototype.setValueForKey = function(key, value) {
     return returnVal_;
 
 };
+
+
+
+pdemo.data.model.Date.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getDateRequired())
+        jsonifiedObject_["date_required"] = this.dateRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["date_required"] = this.dateRequired_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDateDefaultToday())
+        jsonifiedObject_["date_default_today"] = this.dateDefaultToday_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["date_default_today"] = this.dateDefaultToday_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDateNotRequired())
+        jsonifiedObject_["date_not_required"] = this.dateNotRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["date_not_required"] = this.dateNotRequired_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getDateDefaultString())
+        jsonifiedObject_["date_default_string"] = this.dateDefaultString_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["date_default_string"] = this.dateDefaultString_.getJSONObject();
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.Date.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
+};

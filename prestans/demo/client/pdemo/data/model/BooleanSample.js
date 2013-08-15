@@ -102,3 +102,29 @@ pdemo.data.model.BooleanSample.prototype.setValueForKey = function(key, value) {
     return returnVal_;
 
 };
+
+
+
+pdemo.data.model.BooleanSample.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getBooleanDefault())
+        jsonifiedObject_["boolean_default"] = this.getBooleanDefault()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["boolean_default"] = this.getBooleanDefault()
+    if(goog.isDef(opt_filter) && opt_filter.getBooleanRequired())
+        jsonifiedObject_["boolean_required"] = this.getBooleanRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["boolean_required"] = this.getBooleanRequired()
+    if(goog.isDef(opt_filter) && opt_filter.getBooleanNotRequired())
+        jsonifiedObject_["boolean_not_required"] = this.getBooleanNotRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["boolean_not_required"] = this.getBooleanNotRequired()
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.BooleanSample.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
+};

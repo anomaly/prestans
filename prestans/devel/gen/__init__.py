@@ -44,6 +44,8 @@ class Preplate(object):
         self._output_directory = output_directory
         loader = jinja2.PackageLoader('prestans', 'devel/gen/templates')
         self._template_engine = jinja2.Environment(trim_blocks=True, loader=loader)
+        self._template_engine.globals["isinstance"] = isinstance
+        self._template_engine.globals["list"] = list
 
     def run(self):
 

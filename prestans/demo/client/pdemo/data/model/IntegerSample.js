@@ -23,19 +23,19 @@ pdemo.data.model.IntegerSample = function(opt_json) {
 
     if(goog.isDefAndNotNull(opt_json)) {
         this.integerChoices_ = new prestans.types.Integer({value: opt_json["integer_choices"], required: true, default: null, maximum: null, minimum: null, choices: [1, 2, 3]});
-        this.integerMaximum_ = new prestans.types.Integer({value: opt_json["integer_maximum"], required: true, default: null, maximum: 5, minimum: null, choices: []});
-        this.integerDefault_ = new prestans.types.Integer({value: opt_json["integer_default"], required: true, default: 6, maximum: null, minimum: null, choices: []});
-        this.integerRequired_ = new prestans.types.Integer({value: opt_json["integer_required"], required: true, default: null, maximum: null, minimum: null, choices: []});
-        this.integerMinimum_ = new prestans.types.Integer({value: opt_json["integer_minimum"], required: true, default: null, maximum: null, minimum: 1, choices: []});
-        this.integerNotRequired_ = new prestans.types.Integer({value: opt_json["integer_not_required"], required: false, default: null, maximum: null, minimum: null, choices: []});
+        this.integerMaximum_ = new prestans.types.Integer({value: opt_json["integer_maximum"], required: true, default: null, maximum: 5, minimum: null, choices: null});
+        this.integerDefault_ = new prestans.types.Integer({value: opt_json["integer_default"], required: true, default: 6, maximum: null, minimum: null, choices: null});
+        this.integerRequired_ = new prestans.types.Integer({value: opt_json["integer_required"], required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.integerMinimum_ = new prestans.types.Integer({value: opt_json["integer_minimum"], required: true, default: null, maximum: null, minimum: 1, choices: null});
+        this.integerNotRequired_ = new prestans.types.Integer({value: opt_json["integer_not_required"], required: false, default: null, maximum: null, minimum: null, choices: null});
     }
     else {
         this.integerChoices_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: [1, 2, 3]});
-        this.integerMaximum_ = new prestans.types.Integer({required: true, default: null, maximum: 5, minimum: null, choices: []});
-        this.integerDefault_ = new prestans.types.Integer({required: true, default: 6, maximum: null, minimum: null, choices: []});
-        this.integerRequired_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: []});
-        this.integerMinimum_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: 1, choices: []});
-        this.integerNotRequired_ = new prestans.types.Integer({required: false, default: null, maximum: null, minimum: null, choices: []});
+        this.integerMaximum_ = new prestans.types.Integer({required: true, default: null, maximum: 5, minimum: null, choices: null});
+        this.integerDefault_ = new prestans.types.Integer({required: true, default: 6, maximum: null, minimum: null, choices: null});
+        this.integerRequired_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.integerMinimum_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: 1, choices: null});
+        this.integerNotRequired_ = new prestans.types.Integer({required: false, default: null, maximum: null, minimum: null, choices: null});
     }
 };
 goog.inherits(pdemo.data.model.IntegerSample, prestans.types.Model);
@@ -159,4 +159,42 @@ pdemo.data.model.IntegerSample.prototype.setValueForKey = function(key, value) {
 
     return returnVal_;
 
+};
+
+
+
+pdemo.data.model.IntegerSample.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerChoices())
+        jsonifiedObject_["integer_choices"] = this.getIntegerChoices()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_choices"] = this.getIntegerChoices()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerMaximum())
+        jsonifiedObject_["integer_maximum"] = this.getIntegerMaximum()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_maximum"] = this.getIntegerMaximum()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerDefault())
+        jsonifiedObject_["integer_default"] = this.getIntegerDefault()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_default"] = this.getIntegerDefault()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerRequired())
+        jsonifiedObject_["integer_required"] = this.getIntegerRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_required"] = this.getIntegerRequired()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerMinimum())
+        jsonifiedObject_["integer_minimum"] = this.getIntegerMinimum()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_minimum"] = this.getIntegerMinimum()
+    if(goog.isDef(opt_filter) && opt_filter.getIntegerNotRequired())
+        jsonifiedObject_["integer_not_required"] = this.getIntegerNotRequired()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["integer_not_required"] = this.getIntegerNotRequired()
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.IntegerSample.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
 };

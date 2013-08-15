@@ -102,3 +102,29 @@ pdemo.data.model.Time.prototype.setValueForKey = function(key, value) {
     return returnVal_;
 
 };
+
+
+
+pdemo.data.model.Time.prototype.getJSONObject = function(opt_filter) {
+
+    var jsonifiedObject_ = {};
+    
+    if(goog.isDef(opt_filter) && opt_filter.getTimeDefaultNow())
+        jsonifiedObject_["time_default_now"] = this.timeDefaultNow_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["time_default_now"] = this.timeDefaultNow_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getTimeNotRequired())
+        jsonifiedObject_["time_not_required"] = this.timeNotRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["time_not_required"] = this.timeNotRequired_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getTimeRequired())
+        jsonifiedObject_["time_required"] = this.timeRequired_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["time_required"] = this.timeRequired_.getJSONObject();
+
+    return jsonifiedObject_;
+};
+
+pdemo.data.model.Time.prototype.getJSONString = function(opt_filter) {
+    return goog.json.serialize(this.getJSONObject(opt_filter));
+};

@@ -139,7 +139,7 @@ class AttributeMetaData(object):
     @property
     def choices(self):
         if self._choices is None:
-            return list()
+            return "null"
         else:
             return self._choices
 
