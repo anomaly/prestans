@@ -179,10 +179,10 @@ class Request(webob.Request):
     @property
     def should_minify_response(self):
 
-        if not 'Prestans-Response-Minification' in self.headers:
+        if not 'Prestans-Minify-Response' in self.headers:
             return False
 
-        return self.headers['Prestans-Response-Minification'].upper() == "TRUE"
+        return self.headers['Prestans-Minify-Response'].upper() == "TRUE"
 
 
 class Response(webob.Response):

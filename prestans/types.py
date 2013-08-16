@@ -1015,11 +1015,7 @@ class Model(DataCollection):
 
             if overflow > 0:
 
-                sublist_length = overflow
-                if sublist_length > 26:
-                    sublist_length = 26
-
-                sublist = self._generate_minfied_keys(sublist_length, generated_char)
+                sublist = self._generate_minfied_keys(overflow, generated_char)
                 minified_keys = minified_keys + sublist
                 overflow = overflow - len(sublist)
 
