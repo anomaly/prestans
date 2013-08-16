@@ -11,7 +11,7 @@ Key features:
 * Inbuilt URL handler so you use prestans directly on top of WSGI
 * Wel defined handler lifecycle, mapped to HTTP verbs with pre and post execution hooks
 * Strong reusable validation rules for incoming and outoging data payloads
-* Easy integration (e.g Authentication, Caching, Throttling ) with existing WSGI framework and middleware by introducing a pattern of providers
+* Easy integration (e.g Authentication, Caching, Throttling) with existing WSGI framework and middleware by introducing a pattern of providers
 * Support for multiple serialization methods
 * Completely extendable by allowing you to write your own Providers
 * Designed for applications with pure Ajax (e.g Gmail) or native mobile clients
