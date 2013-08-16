@@ -712,7 +712,7 @@ class Array(DataCollection):
         
         self._array_elements.append(value)
             
-    def as_serializable(self, attribute_filter=None):
+    def as_serializable(self, attribute_filter=None, minified=False):
         
         _result_array = list()
             
@@ -726,7 +726,7 @@ class Array(DataCollection):
 
                 _result_array.append(array_element)
             else:
-                _result_array.append(array_element.as_serializable(attribute_filter))
+                _result_array.append(array_element.as_serializable(attribute_filter, minified))
         
         return _result_array
         
@@ -1045,8 +1045,12 @@ class Model(DataCollection):
         model_dictionary = dict()
         model_class_members = inspect.getmembers(self.__class__)
 
+        rewrite_map = self.attribute_rewrite_map()
+
         for attribute_name, type_instance in model_class_members:
-            
+
+            serialized_attribute_name = attribute_name
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1054,8 +1058,12 @@ class Model(DataCollection):
              not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
+            #: Support minification
+            if minified is True:
+                serialized_attribute_name = rewrite_map[attribute_name]
+
             if not self.__dict__.has_key(attribute_name) or self.__dict__[attribute_name] is None:
-                model_dictionary[attribute_name] = None
+                model_dictionary[serialized_attribute_name] = None
                 continue
 
             if isinstance(type_instance, DataCollection):
@@ -1065,15 +1073,16 @@ class Model(DataCollection):
                  attribute_filter.has_key(attribute_name):
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
-                model_dictionary[attribute_name] = self.__dict__[attribute_name].as_serializable(sub_attribute_filter)
+                model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name].\
+                as_serializable(sub_attribute_filter, minified)
 
             elif isinstance(type_instance, DataStructure):
                 python_value = self.__dict__[attribute_name]
                 serializable_value = type_instance.as_serializable(python_value)
-                model_dictionary[attribute_name] = serializable_value
+                model_dictionary[serialized_attribute_name] = serializable_value
 
             elif isinstance(type_instance, DataType):
-                model_dictionary[attribute_name] = self.__dict__[attribute_name]
+                model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name]
 
         return model_dictionary
         
