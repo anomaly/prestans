@@ -30,10 +30,11 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import inspect
-import copy
 import re
 import os
+import copy
+import string
+import inspect
 import base64
 
 from datetime import datetime
@@ -945,7 +946,103 @@ class Model(DataCollection):
 
         return _model_instance
 
-    def as_serializable(self, attribute_filter=None):
+    #: 
+    #: Rewrite map generation
+    #:
+
+    def attribute_rewrite_map(self):
+
+        rewrite_map = dict()
+        model_class_members = inspect.getmembers(self.__class__)
+
+        token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
+
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if isinstance(type_instance, DataType):
+                attribute_tokens = attribute_name.split('_')
+
+                rewritten_attribute_name = ''
+                for token in attribute_tokens:
+                    rewritten_attribute_name += token_rewrite_map[token] + "_"
+                #: Remove the trailing underscore
+                rewritten_attribute_name = rewritten_attribute_name[:-1]
+
+                rewrite_map[attribute_name] = rewritten_attribute_name
+
+        return rewrite_map
+
+    def _generate_attribute_token_rewrite_map(self, model_class_members):
+
+        rewrite_tokens = self._generate_attribute_tokens(model_class_members)
+        minified_tokens = self._generate_minfied_keys(len(rewrite_tokens))
+
+        return dict(zip(rewrite_tokens, minified_tokens))
+
+    def _generate_attribute_tokens(self, model_class_members):
+
+        rewrite_tokens = list()
+
+        #: Create a list of tokens
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if isinstance(type_instance, DataType):
+                rewrite_tokens = rewrite_tokens + attribute_name.split('_')
+
+        #: Remove duplicated; sort alphabetically for the algorithm to work 
+        rewrite_tokens = list(set(rewrite_tokens))
+        rewrite_tokens.sort()
+
+        return rewrite_tokens
+
+    def _generate_minfied_keys(self, length=26, prefix=''):
+
+        minified_keys = list()
+
+        overflow = 0
+        if length > 26:
+            overflow = length - 26
+            length = 26
+
+        for index in range(0, length):
+
+            generated_char = self._generate_attribute_key(index)
+            minified_keys.append(prefix + generated_char)
+
+            if overflow > 0:
+
+                sublist_length = overflow
+                if sublist_length > 26:
+                    sublist_length = 26
+
+                sublist = self._generate_minfied_keys(sublist_length, generated_char)
+                minified_keys = minified_keys + sublist
+                overflow = overflow - len(sublist)
+
+        return minified_keys
+
+
+    def _generate_attribute_key(self, val):
+        return string.lowercase[val%26]*(val/26+1)
+
+    #:
+    #: Serialization
+    #:
+
+    def as_serializable(self, attribute_filter=None, minified=False):
+        """
+        Returns a dictionary with attributes and pure python representation of 
+        the data instances. If an attribute filter is provided as_serializable
+        will respect the visibility.
+
+        The response is used by serializers to return data to client
+        """
         
         model_dictionary = dict()
         model_class_members = inspect.getmembers(self.__class__)
@@ -955,27 +1052,29 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if isinstance(attribute_filter, prestans.parser.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
+            if isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
+             not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
             if not self.__dict__.has_key(attribute_name) or self.__dict__[attribute_name] is None:
                 model_dictionary[attribute_name] = None
                 continue
 
-            if issubclass(type_instance.__class__, DataCollection):
+            if isinstance(type_instance, DataCollection):
 
                 sub_attribute_filter = None
-                if isinstance(attribute_filter, prestans.parser.AttributeFilter) and attribute_filter.has_key(attribute_name):
+                if isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
+                 attribute_filter.has_key(attribute_name):
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
                 model_dictionary[attribute_name] = self.__dict__[attribute_name].as_serializable(sub_attribute_filter)
 
-            elif issubclass(type_instance.__class__, DataStructure):
+            elif isinstance(type_instance, DataStructure):
                 python_value = self.__dict__[attribute_name]
                 serializable_value = type_instance.as_serializable(python_value)
                 model_dictionary[attribute_name] = serializable_value
 
-            else:
+            elif isinstance(type_instance, DataType):
                 model_dictionary[attribute_name] = self.__dict__[attribute_name]
 
         return model_dictionary
