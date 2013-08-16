@@ -201,7 +201,7 @@ class AttributeFilter(object):
         unwanted_keys = set(this_filter_keys) - set(template_filter_keys)
         if len(unwanted_keys) > 0:
             keys_string = string.join(unwanted_keys, " ")
-            raise InvalidDataTypeException("_response_field_list has attributes (%s) that are not part of the template model" % keys_string)
+            raise InvalidDataTypeException("AttributeFilter has attributes (%s) that are not part of the template model" % keys_string)
 
         #:
         #: 2. Make a attribute_filter that we send back
