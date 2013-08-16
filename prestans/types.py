@@ -235,9 +235,7 @@ class Float(DataType):
     def blueprint(self):
 
         blueprint = dict()
-        blueprint['type'] = "float"
-
-        return blueprint
+        blueprint['type'] = 'float'
         
         constraints = dict()
         constraints['default'] = self._default
