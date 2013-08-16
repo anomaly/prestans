@@ -176,6 +176,14 @@ class Request(webob.Request):
 
         return evaluated_filter
 
+    @property
+    def should_minify_response(self):
+
+        if not 'Prestans-Response-Minification' in self.headers:
+            return False
+
+        return self.headers['Prestans-Response-Minification'].upper() == "TRUE"
+
 
 class Response(webob.Response):
     """
@@ -196,6 +204,7 @@ class Response(webob.Response):
         self._selected_serializer = None
         self._template = None
         self._app_iter = None
+        self._minify = False
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
@@ -203,6 +212,14 @@ class Response(webob.Response):
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
+
+    @property
+    def minify(self):
+        return self._minify
+
+    @minify.setter
+    def minify(self, value):
+        self._minify = value
 
     @property
     def logger(self):
@@ -386,7 +403,7 @@ class Response(webob.Response):
 
         #: Body should be of type DataCollection try; attempt calling
         #: as_seriable with available attribute_filter
-        serializable_body = self._app_iter.as_serializable(attribute_filter=self.attribute_filter)
+        serializable_body = self._app_iter.as_serializable(self.attribute_filter, self.minify)
 
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(serializable_body)
@@ -740,6 +757,8 @@ class RequestRouter(object):
             deserializers=self._deserializers, default_deserializer=self._default_deserializer)
         response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
             default_serializer=self._default_deserializer)
+
+        response.minify = request.should_minify_response
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
