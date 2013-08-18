@@ -151,7 +151,16 @@ class DataValidationException(Base):
 
     Each exception uses an HTTP status code and is sent to the client.
     """
-    pass
+    def __init__(self, requested_mime_type, content_type):
+
+        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _message = "Unsupported Content-Type in Request"
+        super(UnsupportedContentTypeError, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'requested_type': requested_mime_type,
+            'supported_types': content_type
+            })
 
 class ParserException(Base):
     """
@@ -159,7 +168,8 @@ class ParserException(Base):
     a request; these generally revolve around the Content-Types or 
     missing payload. Specific parsing messages are of type DataValidationException
     """
-    
+    def __init__(self, code, message):
+        super(HandlerException, self).__init__(code, message)
 
 class HandlerException(Base):
     """
@@ -172,10 +182,9 @@ class HandlerException(Base):
     If one of these exceptions do not match your user case; you are free
     construct your own error message and use an error code from outlined
     in prestans.http
-
     """
-    pass
-
+    def __init__(self, code, message):
+        super(HandlerException, self).__init__(code, message)
 
 #:
 #: Parser Exception
@@ -201,6 +210,14 @@ class NoEndpointError(ParserException):
         _message = "API does not provide this end-point"
         super(NoEndpointError, self).__init__(_code, _message)
 
+class AuthenticationError(ParserException):
+
+    def __init__(self):
+
+        _code = prestans.http.STATUS.UNAUTHORIZED
+        _message = "Authentication Error; user not allowed"
+        super(AuthenticationError, self).__init__(_code, _message)
+
 class NoSetMatched(ParserException):
     pass
 
@@ -216,7 +233,9 @@ class EmptyBody(ParserException):
 #: 
 
 class RequiredAttributeError(DataValidationException):
-    pass
+
+    def __init__(self, attribute_name):
+        pass
 
 class ParseFailed(DataValidationException):
     
@@ -298,40 +317,55 @@ class DeSerializationFailedError(DataValidationException):
 class ServiceUnavailable(HandlerException):
     
     def __init__(self, service_name):
-        self._http_status = prestans.http.STATUS.SERVICE_UNAVAILABLE
-        self._service_name = service_name
+        _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
+        _message = "DeSerialization failed"
+        super(ServiceUnavailable, self).__init__(_code, _message)
 
 class BadRequest(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.BAD_REQUEST
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "DeSerialization failed"
+        super(BadRequest, self).__init__(_code, _message)
 
 class Conflict(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.CONFLICT
+        _code = prestans.http.STATUS.CONFLICT
+        _message = "DeSerialization failed"
+        super(Conflict, self).__init__(_code, _message)
 
 class NotFound(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.NOT_FOUND
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "DeSerialization failed"
+        super(NotFound, self).__init__(_code, _message)
 
 class Unauthorized(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.UNAUTHORIZED
+        _code = prestans.http.STATUS.UNAUTHORIZED
+        _message = "DeSerialization failed"
+        super(Unauthorized, self).__init__(_code, _message)
 
 class MovedPermanently(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.MOVED_PERMANENTLY
+        _code = prestans.http.STATUS.MOVED_PERMANENTLY
+        _message = "DeSerialization failed"
+        super(MovedPermanently, self).__init__(_code, _message)
 
 class PaymentRequired(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.PAYMENT_REQUIRED
+        _code = prestans.http.STATUS.PAYMENT_REQUIRED
+        _message = "DeSerialization failed"
+        super(PaymentRequired, self).__init__(_code, _message)
 
 class Forbidden(HandlerException):
 
     def __init__(self):
-        self._http_status = prestans.http.STATUS.FORBIDDEN
+        _code = prestans.http.STATUS.FORBIDDEN
+        _message = "DeSerialization failed"
+        super(Forbidden, self).__init__(_code, _message)

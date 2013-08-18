@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  prestans, a standards based WSGI compliant REST framework for Python
@@ -30,50 +29,3 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-import os
-import sys
-import string
-import signal
-import getpass
-import base64
-import argparse
-
-__version_info__ = (2, 0)
-__version__ = '.'.join(str(v) for v in __version_info__)
-
-def ctrlc_handler(signal, frame):
-    print ""
-    sys.exit(2)
-
-def main():
-
-    signal.signal(signal.SIGINT, ctrlc_handler)
-
-    #: Parse the command 
-    parser_factory = prestans.devel.ArgParserFactory()
-    args = parser_factory.parse()
-
-    #: Dispatch the command to the right module
-    command_dispatcher = prestans.devel.CommandDispatcher(args)
-    return command_dispatcher.dispatch()
-
-if __name__ == "__main__":
-
-    prestans_path = os.path.join("..", "..")
-
-    #:
-    #: While in development attempt to import prestans from top dir
-    #:
-    if os.path.isdir(prestans_path):
-    
-        sys.path.insert(0, prestans_path)
-        try:
-            import prestans.devel
-        except:
-            del sys.path[0]
-
-    else:
-        import prestans.devel    
-
-    sys.exit(main())

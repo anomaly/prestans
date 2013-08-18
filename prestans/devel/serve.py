@@ -31,21 +31,32 @@
 #
 
 import os
+import sys
 import yaml
+
+from blessings import Terminal
+from voluptuous import Schema
 
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
 class Configuration:
 
+	_SCHEMA = {
+		'name': str,
+		'version': float,
+		'bind': str,
+		'port': int,
+		'append_path': str,
+		'environ': str,
+		'static': str,
+		'handlers': str
+	}
+
 	def __init__(self, config_path):
 		
-		#: Does configuration file exists
-
-		#: Load and parse YAML
-
-		#: Construct a configuration object
-
+		config_path = yaml.load(file(config_path))
+		schema = Schema(Configuration._SCHEMA)
 
 class DevServer(object):
 
@@ -53,4 +64,27 @@ class DevServer(object):
     	self._config = config
 
     def run(self):
-    	pass
+    	print "development server running; http://localhost:8000"
+
+
+# sys.path.append('ext/')
+# sys.path.append('app/')
+
+# from werkzeug.serving import run_simple
+# from werkzeug.wsgi import DispatcherMiddleware
+
+# def application(environ, start_response):
+
+# 	environ['gridlet_config'] = 'conf/app_devel.cfg'
+
+# 	import entry
+
+# 	dispatched_application = DispatcherMiddleware(entry.frontend_wsgi_app, {
+# 	    '/api': entry.backend_wsgi_app
+# 	})
+
+# 	return dispatched_application(environ, start_response)
+
+# if __name__ == "__main__":
+# 	run_simple('localhost', 8000, application, static_files= {'/assets': 'static/assets'},
+#                use_reloader=True, use_debugger=True, use_evalex=True)

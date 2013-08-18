@@ -35,6 +35,8 @@ __all__ = ['gen', 'serve']
 
 import argparse
 
+import serve
+
 class ArgParserFactory(object):
 
     #:
@@ -47,7 +49,7 @@ class ArgParserFactory(object):
             epilog="pride is distributed by the prestans project <http://github.com/prestans/> under the the New BSD license."
         )
 
-        subparsers_handle = self._arg_parser.add_subparsers(dest="sub-commands help")
+        subparsers_handle = self._arg_parser.add_subparsers(dest="sub_command")
 
         self._add_generate_build_commands(subparsers_handle)
         self._add_generate_sub_commands(subparsers_handle)
@@ -72,7 +74,7 @@ class ArgParserFactory(object):
         build_sub_parser = gen_parser.add_subparsers(dest="build-sub-commands")
 
         #:
-        #:
+        #: build a distribution
         #:
         build_sub_parser.add_parser(
             name="dist",
@@ -109,7 +111,9 @@ class ArgParserFactory(object):
             "-t",
             "--template",
             choices=['closure-model', 'closure-filter'],
+            default='closure-model',
             required=True,
+            dest="template",
             help="template to use for client side code generation"
             )
 
@@ -117,6 +121,7 @@ class ArgParserFactory(object):
             "-m",
             "--model",
             required=True,
+            dest="model_path",
             help="path to models description file"
             )
 
@@ -125,6 +130,7 @@ class ArgParserFactory(object):
             "-o",
             "--output",
             default=".",
+            dest="output",
             help="output path for generated code"
             )
 
@@ -132,6 +138,7 @@ class ArgParserFactory(object):
             "-n",
             "--namespace",
             required=True,
+            dest="namespace",
             help="namespace to use with template e.g prestans.demo.data"
             )
 
@@ -153,6 +160,38 @@ class ArgParserFactory(object):
             "-c",
             "--config",
             default="./devserver.yaml",
+            dest="config_path",
             help="path to prestans devserver configuration"
             )
+
+
+class CommandDispatcher:
+
+    def __init__(self, args):
+        self._args = args
+
+    def dispatch(self):
+        
+        if self._args.sub_command == "gen":
+            self._dispatch_gen()
+        elif self._args.sub_command == "build":
+            self._dispatch_build()
+        elif self._args.sub_command == "serve":
+            self._dispatch_serve()
+
+    def _dispatch_gen(self):
+        print self._args
+
+    def _dispatch_build(self):
+        print self._args
+
+    def _dispatch_serve(self):
+        server_config = serve.Configuration(self._args.config_path)
+        dev_server = serve.DevServer(server_config)
+        dev_server.run()
+
+
+
+
+
 
