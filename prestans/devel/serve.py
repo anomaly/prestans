@@ -55,16 +55,37 @@ class Configuration:
 
 	def __init__(self, config_path):
 		
-		config_path = yaml.load(file(config_path))
+		parsed_config = yaml.load(file(config_path))
 		schema = Schema(Configuration._SCHEMA)
+
+		self.name = parsed_config['name']
+		self.version = parsed_config['version']
+		self.bind = parsed_config['bind']
+		self.port = parsed_config['port']
 
 class DevServer(object):
 
     def __init__(self, config):
     	self._config = config
+    	self._terminal = Terminal()
 
     def run(self):
-    	print "development server running; http://localhost:8000"
+
+    	print "{t.bold}%s{t.normal} ({t.bold}%s{t.normal}) prestans dev server running at; {t.bold}http://%s:%i{t.normal}"\
+    	.format(t=self._terminal) \
+    	% (self._config.name, self._config.version, self._config.bind, self._config.port)
+
+    def _append_paths(self):
+    	pass
+
+    def _create_static_map(self):
+    	pass
+
+    def _add_environment_vars(self):
+    	pass
+
+    def _add_handlers(self):
+    	pass
 
 
 # sys.path.append('ext/')
