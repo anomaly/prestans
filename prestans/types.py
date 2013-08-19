@@ -1023,6 +1023,9 @@ class Model(DataCollection):
                 minified_keys = minified_keys + sublist
                 overflow = overflow - len(sublist)
 
+        if prefix == '':
+            minified_keys.sort(key=len, reverse=False)
+
         return minified_keys
 
 
