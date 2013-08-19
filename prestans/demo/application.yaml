@@ -13,8 +13,8 @@ environ:
 
 static:
 - url: /img
-  directory: static/img
+  path: static/img
 
 handlers:
 - url: /api
-  handler: pdemo.handler.application
+  module: pdemo.handler.application

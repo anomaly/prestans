@@ -47,10 +47,19 @@ class Configuration:
 		'version': float,
 		'bind': str,
 		'port': int,
-		'append_path': str,
-		'environ': str,
-		'static': str,
-		'handlers': str
+		'append_path': [str],
+		'environ': [{
+			'key': str,
+			'value': str
+		}],
+		'static': [{
+			'url': str,
+			'path': str
+		}],
+		'handlers': [{
+			'url': str,
+			'module': str
+		}],
 	}
 
 	def __init__(self, config_path):
