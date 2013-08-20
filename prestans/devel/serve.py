@@ -40,6 +40,8 @@ from voluptuous import Schema
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
+import prestans.devel.exceptions
+
 class Configuration:
 
 	_SCHEMA = {
@@ -64,7 +66,11 @@ class Configuration:
 
 	def __init__(self, config_path):
 		
-		parsed_config = yaml.load(file(config_path))
+		try:
+			parsed_config = yaml.load(file(config_path))
+		except IOError, exp:
+			raise prestans.devel.exceptions.Base("unable to read configuration at %s" % config_path)
+
 		schema = Schema(Configuration._SCHEMA)
 
 		self.name = parsed_config['name']

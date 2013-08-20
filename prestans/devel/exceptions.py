@@ -29,3 +29,16 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+class Base(Exception):
+
+	def __init__(self, message, error_code=2):
+		self._error_code = error_code
+		self._message = message
+
+	@property
+	def error_code(self):
+		return self._error_code
+
+	def __str__(self):
+		return self._message

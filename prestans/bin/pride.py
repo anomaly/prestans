@@ -54,9 +54,14 @@ def main():
     parser_factory = prestans.devel.ArgParserFactory()
     args = parser_factory.parse()
 
-    #: Dispatch the command to the right module
-    command_dispatcher = prestans.devel.CommandDispatcher(args)
-    return command_dispatcher.dispatch()
+    try:
+        #: Dispatch the command to the right module
+        command_dispatcher = prestans.devel.CommandDispatcher(args)
+        return command_dispatcher.dispatch()
+    except prestans.devel.exceptions.Base, exp:
+        print (exp)
+        return exp.error_code
+
 
 if __name__ == "__main__":
 
@@ -70,10 +75,12 @@ if __name__ == "__main__":
         sys.path.insert(0, prestans_path)
         try:
             import prestans.devel
+            import prestans.devel.exceptions
         except:
             del sys.path[0]
 
     else:
-        import prestans.devel    
+        import prestans.devel
+        import prestans.devel.exceptions
 
     sys.exit(main())
