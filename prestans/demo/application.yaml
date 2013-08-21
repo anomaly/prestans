@@ -16,5 +16,6 @@ static:
   path: static/img
 
 handlers:
+
 - url: /api
   module: pdemo.handler.application

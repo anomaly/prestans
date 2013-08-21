@@ -71,16 +71,9 @@ if __name__ == "__main__":
     #: While in development attempt to import prestans from top dir
     #:
     if os.path.isdir(prestans_path):
-    
         sys.path.insert(0, prestans_path)
-        try:
-            import prestans.devel
-            import prestans.devel.exceptions
-        except:
-            del sys.path[0]
 
-    else:
-        import prestans.devel
-        import prestans.devel.exceptions
+    import prestans.devel
+    import prestans.devel.exceptions
 
     sys.exit(main())
