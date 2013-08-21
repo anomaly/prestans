@@ -59,7 +59,7 @@ def main():
         command_dispatcher = prestans.devel.CommandDispatcher(args)
         return command_dispatcher.dispatch()
     except prestans.devel.exceptions.Base, exp:
-        print (exp)
+        print ("%s\n"  % exp)
         return exp.error_code
 
 

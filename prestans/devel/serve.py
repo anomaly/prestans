@@ -34,8 +34,9 @@ import os
 import sys
 import yaml
 
-from blessings import Terminal
-from voluptuous import Schema
+import blessings
+
+from voluptuous import Schema, Required, All, Length, Range, MultipleInvalid
 
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
@@ -45,23 +46,23 @@ import prestans.devel.exceptions
 class Configuration:
 
 	_SCHEMA = {
-		'name': str,
-		'version': float,
-		'bind': str,
-		'port': int,
+		Required('name'): str,
+		Required('version'): float,
+		Required('bind'): str,
+		Required('port'): int,
 		'append_path': [str],
 		'environ': [{
-			'key': str,
-			'value': str
+			Required('key'): str,
+			Required('value'): str
 		}],
 		'static': [{
-			'url': str,
-			'path': str
+			Required('url'): str,
+			Required('path'): str
 		}],
-		'handlers': [{
-			'url': str,
-			'module': str
-		}],
+		Required('handlers'): All([{
+			Required('url'): str,
+			Required('module'): str
+		}], Length(min=1)),
 	}
 
 	def __init__(self, config_path):
@@ -69,20 +70,31 @@ class Configuration:
 		try:
 			parsed_config = yaml.load(file(config_path))
 		except IOError, exp:
-			raise prestans.devel.exceptions.Base("unable to read configuration at %s" % config_path)
+			raise prestans.devel.exceptions.Base("[error] unable to read configuration at %s" % config_path)
 
-		schema = Schema(Configuration._SCHEMA)
+		try:
+			schema = Schema(Configuration._SCHEMA)
+			validated_config = schema(parsed_config)
+		except MultipleInvalid, exp:
+			raise prestans.devel.exceptions.Base("[error/config] %s" % str(exp), 2)
 
-		self.name = parsed_config['name']
-		self.version = parsed_config['version']
-		self.bind = parsed_config['bind']
-		self.port = parsed_config['port']
+		#: Make configuration vars into instance vars
+
+		self.name = validated_config['name']
+		self.version = validated_config['version']
+		self.bind = validated_config['bind']
+		self.port = validated_config['port']
+
+		self.append_path = validated_config['append_path']
+		self.environ = validated_config['environ']
+		self.static = validated_config['static']
+		self.handlers = validated_config['handlers']
 
 class DevServer(object):
 
     def __init__(self, config):
     	self._config = config
-    	self._terminal = Terminal()
+    	self._terminal = blessings.Terminal()
 
     def run(self):
 
