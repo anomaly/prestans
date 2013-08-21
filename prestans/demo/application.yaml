@@ -18,4 +18,4 @@ static:
 handlers:
 
 - url: /api
-  module: pdemo.handler.application
+  module: pdemo.rest.handlers.application

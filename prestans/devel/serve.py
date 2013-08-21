@@ -98,11 +98,11 @@ class DevServer(object):
         self._terminal = blessings.Terminal()
 
         #: Append paths
-        self.paths = self._append_paths()
-        self.envs = self._add_environment_vars()
+        self._append_paths()
+        self._add_environment_vars()
 
-        self.static_file_map = self._create_static_map()
-        self.application = self._add_handlers()
+        self._static_file_map = self._create_static_map()
+        self._wsgi_application = self._add_handlers()
 
     def run(self):
 
@@ -111,11 +111,11 @@ class DevServer(object):
         .format(t=self._terminal) \
         % (self._config.name, self._config.version, self._config.bind, self._config.port)
 
-        #: This is a test
-        run_simple(self._config.bind, self._config.port, self.application,\
-         static_files=self.static_file_map, use_reloader=True, use_debugger=True, use_evalex=True)
+        #: handover to werkzeug
+        run_simple(self._config.bind, self._config.port, self._wsgi_application,\
+         static_files=self._static_file_map, use_reloader=True, use_debugger=True, use_evalex=True)
 
-    def _append_paths(self):
+    def _append_paths(self):    
 
         for path in self._config.append_path:
 
@@ -153,13 +153,21 @@ class DevServer(object):
             print "[{t.yellow}path{t.normal}] map %s = %s".format(t=self._terminal)\
              % (url, path)
 
-
         return static_map
 
     def _add_handlers(self):
 
+        for entry in self._config.handlers:
+            
+            url = entry['url']
+            module = entry['module']
+
+            package_name, module_name = module.rsplit(".", 1)
+
+            __import__(package_name)
+
         def application(environ, start_response):
-            pass
+            return "test"
 
         dispatched_application = DispatcherMiddleware(application)
         
