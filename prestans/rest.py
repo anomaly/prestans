@@ -138,7 +138,7 @@ class Request(webob.Request):
         unserialized_body = self.selected_deserializer.loads(self.body)
 
         #: Parse the body using the remplate and attribute_filter
-        self._parsed_body = value.validate(unserialized_body, self.attribute_filter)
+        self._parsed_body = value.validate(unserialized_body, self.attribute_filter, self.is_minified)
 
     def register_deserializers(self, deserializers):
 
@@ -177,7 +177,7 @@ class Request(webob.Request):
         return evaluated_filter
 
     @property
-    def minification(self):
+    def is_minified(self):
 
         if not 'Prestans-Minification' in self.headers:
             return False
@@ -758,7 +758,7 @@ class RequestRouter(object):
         response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
             default_serializer=self._default_deserializer)
 
-        response.minify = request.minification
+        response.minify = request.is_minified
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)

@@ -654,7 +654,7 @@ class Array(DataCollection):
     def __constains__(self, item):
         return item in self._array_elements
 
-    def validate(self, value, attribute_filter=None):
+    def validate(self, value, attribute_filter=None, minified=False):
         
         if not self._required and not value:
             return None
@@ -907,7 +907,9 @@ class Model(DataCollection):
             
         _model_instance = self.__class__()
         _model_class_members = inspect.getmembers(self.__class__)
-    
+
+        rewrite_map = self.attribute_rewrite_map()
+
         for attribute_name, type_instance in _model_class_members:
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
@@ -918,12 +920,18 @@ class Model(DataCollection):
                 continue
 
             if not issubclass(type_instance.__class__, DataType):
-                raise prestans.exception.InvalidDataTypeError(attribute_name, "DataType")
+                raise TypeError("%s must be a subclass of prestans.types.DataType" % attribute_name)
 
             validation_input = None
+
+            input_value_key = attribute_name
+
+            #: Minification support
+            if minified is True:
+                input_value_key = rewrite_map[attribute_name]
             
-            if value.has_key(attribute_name):
-                validation_input = value[attribute_name]
+            if value.has_key(input_value_key):
+                validation_input = value[input_value_key]
                 
             try:
                 
@@ -932,7 +940,7 @@ class Model(DataCollection):
                     if attribute_filter and attribute_filter.has_key(attribute_name):
                         sub_attribute_filter = getattr(attribute_filter, attribute_name)
                         
-                    validated_object = type_instance.validate(validation_input, sub_attribute_filter)
+                    validated_object = type_instance.validate(validation_input, sub_attribute_filter, minified)
                 else:
                     validated_object = type_instance.validate(validation_input)
                 
@@ -970,6 +978,31 @@ class Model(DataCollection):
                 rewritten_attribute_name = rewritten_attribute_name[:-1]
 
                 rewrite_map[attribute_name] = rewritten_attribute_name
+
+        return rewrite_map
+
+    def attribute_rewrite_reverse_map(self):
+
+        rewrite_map = dict()
+        model_class_members = inspect.getmembers(self.__class__)
+
+        token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
+
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            if isinstance(type_instance, DataType):
+                attribute_tokens = attribute_name.split('_')
+
+                rewritten_attribute_name = ''
+                for token in attribute_tokens:
+                    rewritten_attribute_name += token_rewrite_map[token] + "_"
+                #: Remove the trailing underscore
+                rewritten_attribute_name = rewritten_attribute_name[:-1]
+
+                rewrite_map[rewritten_attribute_name] = attribute_name
 
         return rewrite_map
 
