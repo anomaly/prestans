@@ -17,5 +17,5 @@ static:
 
 handlers:
 
-- url: /api
-  module: pdemo.rest.handlers.application
+- url: /
+  module: entry.frontend

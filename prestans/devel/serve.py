@@ -33,6 +33,7 @@
 import os
 import sys
 import yaml
+import importlib
 
 import blessings
 
@@ -101,10 +102,9 @@ class DevServer(object):
         self._append_paths()
         self._add_environment_vars()
 
-        self._static_file_map = self._create_static_map()
-        self._wsgi_application = self._add_handlers()
-
     def run(self):
+
+        _static_file_map = self._create_static_map()
 
         #: Run the server
         print "[{t.green}run {t.normal}] %s/%s dev server running at; http://%s:%i"\
@@ -112,8 +112,8 @@ class DevServer(object):
         % (self._config.name, self._config.version, self._config.bind, self._config.port)
 
         #: handover to werkzeug
-        run_simple(self._config.bind, self._config.port, self._wsgi_application,\
-         static_files=self._static_file_map, use_reloader=True, use_debugger=True, use_evalex=True)
+        run_simple(self._config.bind, self._config.port, self._add_handlers(),\
+         static_files=_static_file_map, use_reloader=True, use_debugger=True, use_evalex=True)
 
     def _append_paths(self):    
 
@@ -157,18 +157,23 @@ class DevServer(object):
 
     def _add_handlers(self):
 
+        sub_maps = dict()
+        default_application = None
+
         for entry in self._config.handlers:
             
             url = entry['url']
             module = entry['module']
 
-            package_name, module_name = module.rsplit(".", 1)
+            module_name, wsgi_app = module.rsplit(".", 1)
 
-            __import__(package_name)
+            imported_module = importlib.import_module(module_name)
 
-        def application(environ, start_response):
-            return "test"
+            if url == "/":
+                default_application = getattr(imported_module, wsgi_app)
+            else:
+                sub_maps[url] = getattr(imported_module, wsgi_app)
 
-        dispatched_application = DispatcherMiddleware(application)
-        
+        dispatched_application = DispatcherMiddleware(default_application, sub_maps)
+
         return dispatched_application

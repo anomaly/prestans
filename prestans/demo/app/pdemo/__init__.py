@@ -30,3 +30,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+__all__ = ['page', 'rest']
+
+__version_info__ = (2, 0)
+__version__ = '.'.join(str(v) for v in __version_info__)

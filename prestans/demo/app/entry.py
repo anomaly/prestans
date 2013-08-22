@@ -33,10 +33,8 @@
 
 import webapp2
 
-class Base(webapp2.RequestHandler):
-	pass
+import pdemo.page.handlers
 
-class Index(Base):
-
-	def get(self):
-		self.response.out.write("hello world")
+frontend = webapp2.WSGIApplication([
+	(r'/', pdemo.page.handlers.Index)
+], debug=True)
