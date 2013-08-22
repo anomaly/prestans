@@ -39,4 +39,4 @@ class Base(webapp2.RequestHandler):
 class Index(Base):
 
 	def get(self):
-		self.response.out.write("hello world")
+		self.response.out.write("hello world test")

@@ -105,14 +105,10 @@ class DevServer(object):
     def run(self):
 
         _static_file_map = self._create_static_map()
-
-        #: Run the server
-        print "[{t.green}run {t.normal}] %s/%s dev server running at; http://%s:%i"\
-        .format(t=self._terminal) \
-        % (self._config.name, self._config.version, self._config.bind, self._config.port)
+        _handlers = self._add_handlers()
 
         #: handover to werkzeug
-        run_simple(self._config.bind, self._config.port, self._add_handlers(),\
+        run_simple(self._config.bind, self._config.port, _handlers,\
          static_files=_static_file_map, use_reloader=True, use_debugger=True, use_evalex=True)
 
     def _append_paths(self):    
@@ -122,8 +118,6 @@ class DevServer(object):
             module_path = os.path.join(self._config.base_path, path)
 
             if os.path.exists(module_path):
-                print "[{t.yellow}path{t.normal}] adding python path %s".format(t=self._terminal)\
-                 % module_path
                 sys.path.append(module_path)
             else:
                 print "[{t.red}path{t.normal}] ignoring non-existant include path %s".format(t=self._terminal)\
@@ -136,9 +130,6 @@ class DevServer(object):
             key = entry['key']
             value = entry['value']
 
-            print "[{t.yellow}env {t.normal}] set %s = %s".format(t=self._terminal)\
-             % (key, value)
-
             os.environ[key] = value
 
     def _create_static_map(self):
@@ -149,9 +140,6 @@ class DevServer(object):
 
             url = entry['url']
             path = entry['path']
-
-            print "[{t.yellow}path{t.normal}] map %s = %s".format(t=self._terminal)\
-             % (url, path)
 
         return static_map
 
@@ -169,10 +157,15 @@ class DevServer(object):
 
             imported_module = importlib.import_module(module_name)
 
-            if url == "/":
-                default_application = getattr(imported_module, wsgi_app)
-            else:
-                sub_maps[url] = getattr(imported_module, wsgi_app)
+            try:
+
+                if url == "/":
+                    default_application = getattr(imported_module, wsgi_app)
+                else:
+                    sub_maps[url] = getattr(imported_module, wsgi_app)
+
+            except AttributeError, exp:
+                raise prestans.devel.exceptions.Base("[error] module %s doesn't exists" % entry)
 
         dispatched_application = DispatcherMiddleware(default_application, sub_maps)
 
