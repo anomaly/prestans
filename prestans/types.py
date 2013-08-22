@@ -894,7 +894,7 @@ class Model(DataCollection):
 
         return attribute_filter
 
-    def validate(self, value, attribute_filter=None):
+    def validate(self, value, attribute_filter=None, minified=False):
         
         if self._required and (value is None or not isinstance(value, dict)):
             raise prestans.exception.RequiredAttributeError()

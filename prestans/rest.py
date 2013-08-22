@@ -177,12 +177,12 @@ class Request(webob.Request):
         return evaluated_filter
 
     @property
-    def should_minify_response(self):
+    def minification(self):
 
-        if not 'Prestans-Minify-Response' in self.headers:
+        if not 'Prestans-Minification' in self.headers:
             return False
 
-        return self.headers['Prestans-Minify-Response'].upper() == "TRUE"
+        return self.headers['Prestans-Minification'].upper() == "ON"
 
 
 class Response(webob.Response):
@@ -758,7 +758,7 @@ class RequestRouter(object):
         response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
             default_serializer=self._default_deserializer)
 
-        response.minify = request.should_minify_response
+        response.minify = request.minification
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
