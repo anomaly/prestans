@@ -151,7 +151,7 @@ class Request(webob.Request):
         self._deserializers = self._deserializers + deserializers
 
 
-    def get_response_attribute_filter(self, template_filter):
+    def get_response_attribute_filter(self, template_filter, rewrite_map=None):
         """
         Prestans-Response-Attribute-List can contain a client's requested 
         definition for attributes required in the response. This should match
@@ -169,7 +169,8 @@ class Request(webob.Request):
         attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
-        attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary)
+        attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary, 
+            rewrite_map=rewrite_map)
 
         #: Check template?
         evaluated_filter = attribute_filter.conforms_to_template_filter(template_filter)
@@ -569,7 +570,14 @@ class RequestHandler(object):
             self.response.template = verb_parser_config.response_template
 
             response_attr_filter_template = verb_parser_config.response_attribute_filter_template
-            self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template)
+
+            #: Minification support for response attribute filters
+            rewrite_map = None
+            if self.request.is_minified is True:
+                rewrite_map = self.response.template.attribute_rewrite_reverse_map()
+
+            self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template, 
+                rewrite_map)
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:

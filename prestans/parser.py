@@ -164,14 +164,14 @@ class AttributeFilter(object):
         raise TypeError("model_instance must be a sublcass of presatans.types.DataCollection, %s given" % 
                         (model_instance.__class__.__name__))
 
-    def __init__(self, from_dictionary=None):
+    def __init__(self, from_dictionary=None, rewrite_map=None):
         """
         Creates an attribute filter object, optionally populates from a 
         dictionary of booleans
         """
         
         if from_dictionary:
-            self._init_from_dictionary(from_dictionary)
+            self._init_from_dictionary(from_dictionary, rewrite_map)
 
     def conforms_to_template_filter(self, template_filter):
         """
@@ -348,7 +348,7 @@ class AttributeFilter(object):
         return output_dictionary
 
 
-    def _init_from_dictionary(self, from_dictionary):
+    def _init_from_dictionary(self, from_dictionary, rewrite_map=None):
         """ 
         Private helper to init values from a dictionary, wraps chidlren into 
         AttributeFilter objects
@@ -359,6 +359,10 @@ class AttributeFilter(object):
                             (from_dictionary.__class__.__name__))
 
         for key, value in from_dictionary.iteritems():
+
+            #: Minification support
+            if rewrite_map is not None:
+                key = rewrite_map[key]
 
             if not isinstance(value, (bool, dict)):
                 # Check to see we can work with the value 
