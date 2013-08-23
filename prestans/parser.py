@@ -71,13 +71,13 @@ class ParameterSet(object):
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
 
             if isinstance(type_instance, prestans.types.Array):
                 if not isinstance(type_instance.element_template, prestans.types.String) and \
                 not isinstance(type_instance.element_template, prestans.types.Float) and \
                 not isinstance(type_instance.element_template, prestans.types.Integer):
-                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+                    raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
 
@@ -109,14 +109,14 @@ class ParameterSet(object):
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float/Array"))
+                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
 
             if issubclass(type_instance.__class__, prestans.types.Array):
                 
                 if not issubclass(type_instance._element_template.__class__, prestans.types.String) and \
                 not issubclass(type_instance._element_template.__class__, prestans.types.Float) and \
                 issubclass(type_instance._element_template.__class__, prestans.types.Integer):
-                    raise InvalidDataTypeException(ERROR_MESSAGE.NOT_SUBCLASS % (attribute_name, "prestans.types.String/Integer/Float"))
+                    raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
 
             try:
 
