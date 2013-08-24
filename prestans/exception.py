@@ -235,61 +235,94 @@ class EmptyBody(ParserException):
 class RequiredAttributeError(DataValidationException):
 
     def __init__(self, attribute_name):
-        pass
+
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(RequiredAttributeError, self).__init__(_code, _message)
 
 class ParseFailed(DataValidationException):
     
     def __init__(self, value, data_type):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(ParseFailed, self).__init__(_code, _message)
 
 class InvalidValueError(DataValidationException):
     
     def __init__(self, value):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidValueError, self).__init__(_code, _message)
 
 class LessThanMinimumError(DataValidationException):
     
     def __init__(self, value, allowed_min):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(LessThanMinimumError, self).__init__(_code, _message)
 
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(MoreThanMaximumError, self).__init__(_code, _message)
 
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidChoiceError, self).__init__(_code, _message)
 
 class UnacceptableLengthError(DataValidationException):
     
     def __init__(self, value, minimum, maximum):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(UnacceptableLengthError, self).__init__(_code, _message)
 
 class InvalidType(DataValidationException):
     
     def __init__(self, value, type_name):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidType, self).__init__(_code, _message)
 
 class InvalidCollectionError(DataValidationException):
 
     def __init__(self, value):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidCollectionError, self).__init__(_code, _message)
 
 class MissingParameterError(DataValidationException):
-    pass
+
+    def __init__(self):
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(MissingParameterError, self).__init__(_code, _message)
 
 class InvalidFormatError(DataValidationException):
     
     def __init__(self, value):
-        pass
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidFormatError, self).__init__(_code, _message)
 
 class InvalidMetaValueError(DataValidationException):
-    pass
+
+    def __init__(self):
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(InvalidMetaValueError, self).__init__(_code, _message)
 
 class UnregisteredAdapterError(DataValidationException):
-    pass
+
+    def __init__(self):
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "message goes in here"
+        super(UnregisteredAdapterError, self).__init__(_code, _message)
 
 class SerializationFailedError(DataValidationException):
 
