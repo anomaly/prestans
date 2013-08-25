@@ -36,6 +36,17 @@ import prestans.exception
 
 class Base(object):
 
+    def __init__(self):
+        self._debug = False
+
+    @property
+    def debug(self):
+        return self._debug
+
+    @debug.setter
+    def debug(self, value):
+        self._debug = value
+
     def current_user_has_role(self, role_name):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
     
