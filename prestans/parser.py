@@ -153,18 +153,27 @@ class AttributeFilter(object):
     """
 
     @classmethod
-    def from_model(self, model_instance, default_value=False):
+    def from_model(self, model_instance, default_value=False, **kwargs):
         """
         wrapper for Model's get_attribute_filter
         """
 
-        if issubclass(model_instance.__class__, prestans.types.DataCollection):
-            return model_instance.get_attribute_filter(default_value)
+        if not issubclass(model_instance.__class__, prestans.types.DataCollection):
+            raise TypeError("model_instance must be a sublcass of presatans.types.DataCollection, %s given" % 
+                            (model_instance.__class__.__name__))
 
-        raise TypeError("model_instance must be a sublcass of presatans.types.DataCollection, %s given" % 
-                        (model_instance.__class__.__name__))
+        attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
-    def __init__(self, from_dictionary=None, rewrite_map=None):
+        #: kwargs support
+        for name, value in kwargs.iteritems():
+            if attribute_filter_instance.__dict__.has_key(name):
+                setattr(attribute_filter_instance, name, value)
+            else:
+                raise KeyError(name)
+
+        return attribute_filter_instance            
+
+    def __init__(self, from_dictionary=None, rewrite_map=None, **kwargs):
         """
         Creates an attribute filter object, optionally populates from a 
         dictionary of booleans
@@ -172,6 +181,14 @@ class AttributeFilter(object):
         
         if from_dictionary:
             self._init_from_dictionary(from_dictionary, rewrite_map)
+
+        #: kwargs support
+        for name, value in kwargs.iteritems():
+            if self.__dict__.has_key(name):
+                setattr(self, name, value)
+            else:
+                raise KeyError(name)
+
 
     def conforms_to_template_filter(self, template_filter):
         """

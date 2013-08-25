@@ -764,7 +764,7 @@ class Model(DataCollection):
         self._required = required
         self._default = default
 
-        for name, value in kawrgs.iteritems():
+        for name, value in kwargs.iteritems():
             if self.__class__.__dict__.has_key(name):
                 setattr(self, name, value)
             else:
