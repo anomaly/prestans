@@ -69,14 +69,11 @@ def login_required(http_method_handler):
     def secure_http_method_handler(self, *args):
             
         if not self.__provider_config__.auth:
-            self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
-            self.response.set_body_attribute('message', "Service available to authenticated users only, no auth context provider set in handler")
-            return
+            _message = "Service available to authenticated users only, no auth context provider set in handler"
+            raise prestans.exception.AuthenticationError(_message)
             
         if not self.auth_context.is_authenticated_user():
-            self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
-            self.response.set_body_attribute('message', "Service available to authenticated users only")
-            return
+            raise prestans.exception.AuthenticationError()
 
         http_method_handler(self, *args)
         
@@ -99,22 +96,17 @@ def role_required(role_name=None):
             from prestans.rest import STATUS as PRESTANS_HTTP_STATUS
 
             # Role name must be provided
-            if not role_name:
-                self.response.http_status = PRESTANS_HTTP_STATUS.BAD_REQUEST
-                self.response.set_body_attribute('message', "role name can't be None for role_required authentication decorator")
-                return
+            if role_name is None:
+                raise prestans.exception.AuthorizationError("None")
         
             # Authentication context must be set
             if not self.auth_context:
-                self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
-                self.response.set_body_attribute('message', "Service available to authenticated users only, no auth context provider set in handler")
-                return
+                _message = "Service available to authenticated users only, no auth context provider set in handler"
+                raise prestans.exception.AuthenticationError(_message)
             
             # Check for the role by calling current_user_has_role
             if not self.auth_context.current_user_has_role(role_name):
-                self.response.http_status = PRESTANS_HTTP_STATUS.UNAUTHORIZED
-                self.response.set_body_attribute('message', "Service available to authenticated users only")
-                return
+                raise prestans.exception.AuthorizationError(role_name)
 
             http_method_handler(self, *args)
         

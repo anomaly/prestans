@@ -32,6 +32,7 @@
 
 __all__ = [
     'UnsupportedVocabularyError',
+    'UnsupportedContentTypeError',
     'DataValidationException',
     'ParserException',
     'HandlerException',
@@ -212,11 +213,23 @@ class NoEndpointError(ParserException):
 
 class AuthenticationError(ParserException):
 
-    def __init__(self):
+    def __init__(self, message=None):
 
         _code = prestans.http.STATUS.UNAUTHORIZED
-        _message = "Authentication Error; user not allowed"
+    
+        _message = message
+        if _message is None:
+            _message = "Authentication Error; service is only available to authenticated"
+    
         super(AuthenticationError, self).__init__(_code, _message)
+
+class AuthorizationError(ParserException):
+
+    def __init__(self, role_name):
+
+        _code = prestans.http.STATUS.FORBIDDEN
+        _message = "%s is not allowed to access this resource"
+        super(AuthorizationError, self).__init__(_code, _message)
 
 class NoSetMatched(ParserException):
     pass
@@ -349,56 +362,48 @@ class DeSerializationFailedError(DataValidationException):
 
 class ServiceUnavailable(HandlerException):
     
-    def __init__(self, service_name):
+    def __init__(self, message):
         _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
-        _message = "DeSerialization failed"
-        super(ServiceUnavailable, self).__init__(_code, _message)
+        super(ServiceUnavailable, self).__init__(_code, message)
 
 class BadRequest(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "DeSerialization failed"
-        super(BadRequest, self).__init__(_code, _message)
+        super(BadRequest, self).__init__(_code, message)
 
 class Conflict(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.CONFLICT
-        _message = "DeSerialization failed"
-        super(Conflict, self).__init__(_code, _message)
+        super(Conflict, self).__init__(_code, message)
 
 class NotFound(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.NOT_FOUND
-        _message = "DeSerialization failed"
-        super(NotFound, self).__init__(_code, _message)
+        super(NotFound, self).__init__(_code, message)
 
 class Unauthorized(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.UNAUTHORIZED
-        _message = "DeSerialization failed"
-        super(Unauthorized, self).__init__(_code, _message)
+        super(Unauthorized, self).__init__(_code, message)
 
 class MovedPermanently(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.MOVED_PERMANENTLY
-        _message = "DeSerialization failed"
-        super(MovedPermanently, self).__init__(_code, _message)
+        super(MovedPermanently, self).__init__(_code, message)
 
 class PaymentRequired(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.PAYMENT_REQUIRED
-        _message = "DeSerialization failed"
-        super(PaymentRequired, self).__init__(_code, _message)
+        super(PaymentRequired, self).__init__(_code, message)
 
 class Forbidden(HandlerException):
 
-    def __init__(self):
+    def __init__(self, message):
         _code = prestans.http.STATUS.FORBIDDEN
-        _message = "DeSerialization failed"
-        super(Forbidden, self).__init__(_code, _message)
+        super(Forbidden, self).__init__(_code, message)

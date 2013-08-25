@@ -37,9 +37,9 @@ __all__ = ['AppEngineAuthContextProvider', 'AppEngineCacheProvider']
 # appengine is not imported as part of "all", this has to be explicity imported by the user.
 #
 
-from prestans import auth
-from prestans import cache
-from prestans import throttle
+from prestans.provider import auth
+from prestans.provider import cache
+from prestans.provider import throttle
 
 from google.appengine.api import oauth
 from google.appengine.api import users
@@ -58,7 +58,7 @@ _IS_DEVELOPMENT_SERVER = os.environ.get('SERVER_SOFTWARE', '').startswith('Devel
 #:
 #: Refer to decorators in handlers package for more information.
 #:
-class AppEngineAuthContextProvider(auth.AuthContextProvider):
+class AppEngineAuthContextProvider(auth.Base):
     
     #:
     #: Overriden is_authenticated_user for Google AppEngine
@@ -85,7 +85,7 @@ class AppEngineAuthContextProvider(auth.AuthContextProvider):
 #:      
 #: Provides a wrapper on AppEngine's memcache implementation 
 #:
-class AppEngineMemcacheProvider(cache.CacheProvider):
+class AppEngineMemcacheProvider(cache.Base):
     
     def __init__(self, key_provider=None):
         self.key_provider = key_provider

@@ -111,7 +111,7 @@ class STATUS:
     UNSUPPORTED_MEDIA_TYPE      = 415
     RANGE_NOT_SERIALIZABLE      = 416
     EXCEPTION_FAILED            = 417
-    I_M_A_TEAPOT                = 418
+    TEAPOT                      = 418
     AUTHENTICATION_TIMEOUT      = 419
 
     #: Server Error
