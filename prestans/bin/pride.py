@@ -58,7 +58,7 @@ def main():
         #: Dispatch the command to the right module
         command_dispatcher = prestans.devel.CommandDispatcher(args)
         return command_dispatcher.dispatch()
-    except prestans.devel.exceptions.Base, exp:
+    except prestans.devel.exception.Base, exp:
         print ("%s\n"  % exp)
         return exp.error_code
 
@@ -74,6 +74,6 @@ if __name__ == "__main__":
         sys.path.insert(0, prestans_path)
 
     import prestans.devel
-    import prestans.devel.exceptions
+    import prestans.devel.exception
 
     sys.exit(main())

@@ -42,7 +42,7 @@ from voluptuous import Schema, Required, All, Length, Range, MultipleInvalid
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
-import prestans.devel.exceptions
+import prestans.devel.exception
 
 class Configuration:
 
@@ -72,13 +72,13 @@ class Configuration:
             self.base_path = os.path.dirname(config_path)
             parsed_config = yaml.load(file(config_path))
         except IOError, exp:
-            raise prestans.devel.exceptions.Base("[error] unable to read configuration at %s" % config_path)
+            raise prestans.devel.exception.Base("[error] unable to read configuration at %s" % config_path)
 
         try:
             schema = Schema(Configuration._SCHEMA)
             validated_config = schema(parsed_config)
         except MultipleInvalid, exp:
-            raise prestans.devel.exceptions.Base("[error/config] %s" % str(exp), 2)
+            raise prestans.devel.exception.Base("[error/config] %s" % str(exp), 2)
 
         #: Make configuration vars into instance vars
 
@@ -165,7 +165,7 @@ class DevServer(object):
                     sub_maps[url] = getattr(imported_module, wsgi_app)
 
             except AttributeError, exp:
-                raise prestans.devel.exceptions.Base("[error] module %s doesn't exists" % entry)
+                raise prestans.devel.exception.Base("[error] module %s doesn't exists" % entry)
 
         dispatched_application = DispatcherMiddleware(default_application, sub_maps)
 
