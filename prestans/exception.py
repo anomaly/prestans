@@ -170,7 +170,7 @@ class ParserException(Base):
     missing payload. Specific parsing messages are of type DataValidationException
     """
     def __init__(self, code, message):
-        super(HandlerException, self).__init__(code, message)
+        super(ParserException, self).__init__(code, message)
 
 class HandlerException(Base):
     """
