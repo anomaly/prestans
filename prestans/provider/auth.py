@@ -103,9 +103,6 @@ def role_required(role_name=None):
 
         def secure_http_method_handler(self, *args):
     
-            # Reference to prestans HTTP Status codes, instance self.response is not available
-            from prestans.rest import STATUS as PRESTANS_HTTP_STATUS
-
             # Role name must be provided
             if role_name is None:
                 raise prestans.exception.AuthorizationError("None")

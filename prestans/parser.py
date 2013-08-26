@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['Config', 'VerbConfig', 'AttributeFilter']
+__all__ = ['Config', 'VerbConfig', 'AttributeFilter', 'ParameterSet']
 
 import inspect
 import string
