@@ -60,7 +60,8 @@ class Configuration:
             Required('url'): str,
             Required('path'): str
         }],
-        Required('handlers'): All([{
+        Required('default_app'): str,
+        Required('sub_modules'): All([{
             Required('url'): str,
             Required('module'): str,
         }], Length(min=1)),
@@ -90,7 +91,8 @@ class Configuration:
         self.append_path = validated_config['append_path']
         self.environ = validated_config['environ']
         self.static = validated_config['static']
-        self.handlers = validated_config['handlers']
+        self.default_app = validated_config['default_app']
+        self.handlers = validated_config['sub_modules']
 
 class DevServer(object):
 
@@ -148,22 +150,26 @@ class DevServer(object):
         sub_maps = dict()
         default_application = None
 
+        #: Default application
+        default_module = self._config.default_app
+        try:
+            module_name, wsgi_app = default_module.rsplit(".", 1)
+            imported_module = importlib.import_module(module_name)
+            default_application = getattr(imported_module, wsgi_app)
+        except:
+            raise prestans.devel.exception.Base("[error] default_app module %s doesn't exists" % default_module)
+
+        #: Sub modules
         for entry in self._config.handlers:
             
             url = entry['url']
             module = entry['module']
 
             module_name, wsgi_app = module.rsplit(".", 1)
-
             imported_module = importlib.import_module(module_name)
 
             try:
-
-                if url == "/":
-                    default_application = getattr(imported_module, wsgi_app)
-                else:
-                    sub_maps[url] = getattr(imported_module, wsgi_app)
-
+                sub_maps[url] = getattr(imported_module, wsgi_app)
             except AttributeError, exp:
                 raise prestans.devel.exception.Base("[error] module %s doesn't exists" % entry)
 

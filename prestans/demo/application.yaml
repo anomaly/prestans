@@ -4,7 +4,6 @@ bind: localhost
 port: 8000
 
 append_path:
-- ext/
 - app/
 
 environ:
@@ -15,7 +14,9 @@ static:
 - url: /img
   path: static/img
 
-handlers:
+default_app: entry.frontend
 
-- url: /
-  module: entry.frontend
+sub_modules:
+
+- url: /api
+  module: entry.api
