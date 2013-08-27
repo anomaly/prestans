@@ -9,7 +9,7 @@ append_path:
 
 environ:
 - key: app_config
-  value: config/app.config
+  value: config/pdemo.cfg
 
 static:
 - url: /img

@@ -32,3 +32,36 @@
 #
 
 __all__ = ['handlers']
+
+import os
+import webapp2
+
+from jinja2 import Environment, FileSystemLoader, Template
+
+from pdemo import config
+
+## @brief incompasses basic required functionality for all static handlers
+class Base(webapp2.RequestHandler):
+
+    # def commit(self):
+    #     try:
+    #         self.db_session.commit()
+    #     except:
+    #         self.db_session.rollback()
+
+    ## @brief override dispatch to ensure SQL Alchemy session creation
+    # def dispatch(self):
+    #     self.db_session = yours2take.db.Session()
+    #     super(BaseHandler, self).dispatch()
+    #     yours2take.db.Session.remove()
+
+    ## @brief Uses the Jinja2 environment to render a tempalte with values
+    def render_template(self, template_name, template_values=[]):
+        template_env = self.get_template_env()
+        template = template_env.get_template("%s.html" % template_name)
+        self.response.out.write(template.render(template_values))
+    
+    ## @brief Jinja templates, consider using webapp2 jinja utilities for this
+    def get_template_env(self):
+        template_path = os.path.join(config.get('pdemo', 'base_path'), config.get('pdemo', 'template_path'))
+        return Environment(loader=FileSystemLoader(template_path))

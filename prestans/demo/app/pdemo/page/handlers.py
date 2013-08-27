@@ -33,10 +33,9 @@
 
 import webapp2
 
-class Base(webapp2.RequestHandler):
-	pass
+import pdemo.page
 
-class Index(Base):
+class Index(pdemo.page.Base):
 
 	def get(self):
-		self.response.out.write("hello world test")
+		self.render_template("app", {})

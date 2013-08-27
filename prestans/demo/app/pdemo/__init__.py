@@ -33,5 +33,12 @@
 
 __all__ = ['page', 'rest']
 
+import ConfigParser
+import os
+
 __version_info__ = (2, 0)
 __version__ = '.'.join(str(v) for v in __version_info__)
+
+# Configuration used by application
+config = ConfigParser.ConfigParser()
+config.readfp(open(os.environ.get('app_config')))
