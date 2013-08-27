@@ -13,18 +13,21 @@ The teams will be of two types:
 * National: Can select current test match players for a selected nation.
 * International: Can select current test match players from all nations.
 
- Additional future types could include:
- * National All Star: Any player from test match history for a selected nation.
- * International All Star: Any player from test match histroy from all nations.
+Additional future types could include:
+* National All Star: Any player from test match history for a selected nation.
+* International All Star: Any player from test match histroy from all nations.
 
- Included nations:
- * Australia
- * Bandladesh
- * England
- * India
- * New Zealand
- * Pakistan
- * South Africa
- * Sri Lanka
- * West Indies
- * Zimbabwe
+Included nations:
+1. Australia
+1. Bandladesh
+1. England
+1. India
+1. New Zealand
+1. Pakistan
+1. South Africa
+1. Sri Lanka
+1. West Indies
+1. Zimbabwe
+
+Running the Demo
+-----------------
