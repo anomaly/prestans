@@ -19,15 +19,15 @@ Additional future types could include:
 
 Included nations:
 1. Australia
-1. Bandladesh
-1. England
-1. India
-1. New Zealand
-1. Pakistan
-1. South Africa
-1. Sri Lanka
-1. West Indies
-1. Zimbabwe
+2. Bandladesh
+3. England
+4. India
+5. New Zealand
+6. Pakistan
+7. South Africa
+8. Sri Lanka
+9. West Indies
+10. Zimbabwe
 
 Running the Demo
 -----------------
