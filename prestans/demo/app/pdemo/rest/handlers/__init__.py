@@ -31,7 +31,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import prestans.handlers
+import prestans.rest
 
-class Base(prestans.handlers.RESTRequestHandler):
+class Base(prestans.rest.RequestHandler):
 	pass
