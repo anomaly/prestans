@@ -39,6 +39,10 @@ import os
 __version_info__ = (2, 0)
 __version__ = '.'.join(str(v) for v in __version_info__)
 
+#: Configuration path
+script_path = os.path.abspath(os.path.dirname(__file__))
+config_path = os.path.join(script_path, "..", "..", os.environ.get('app_config'))
+
 # Configuration used by application
 config = ConfigParser.ConfigParser()
-config.readfp(open(os.environ.get('app_config')))
+config.readfp(open(config_path))
