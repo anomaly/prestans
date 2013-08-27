@@ -421,7 +421,7 @@ class Response(webob.Response):
         headerlist = self._abs_headerlist(environ)
         start_response(self.status, headerlist)
 
-        return stringified_body
+        return [stringified_body]
 
 
 
@@ -485,7 +485,7 @@ class ErrorResponse(webob.Response):
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
 
-        return stringified_body
+        return [stringified_body]
 
 
 

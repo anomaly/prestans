@@ -159,7 +159,7 @@ class DevServer(object):
             module_name, wsgi_app = default_module.rsplit(".", 1)
             imported_module = importlib.import_module(module_name)
             default_application = getattr(imported_module, wsgi_app)
-        except:
+        except (ImportError, AttributeError), exp:
             raise prestans.devel.exception.Base("[error] default_app module %s doesn't exists" % default_module)
 
         #: Sub modules
