@@ -20,8 +20,7 @@ Key features:
 
 And incase you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
-Getting Help
-------------
+### Getting Help
 
 We recommend the use of our mailing lists as the primary way of getting help:
 
@@ -29,8 +28,7 @@ We recommend the use of our mailing lists as the primary way of getting help:
 * [Announce](http://groups.google.com/group/prestans-announce "Announce") used for release and security announcements
 
 
-Reporting Issues
-----------------
+### Reporting Issues
 
 We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/prestans/issues "Issue Tracker"), to triage feature requests, bug reports.
 
@@ -48,8 +46,7 @@ When reporting issues:
 * Share a bit of your application code with us, it goes a long way to replicate issues
 
 
-About the Authors
------------------
+### About the Authors
 
 prestans was developed by [Devraj Mukherjee](http://twitter.com/mdevraj "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain "Brad Mclain on Twitter") while building large scale Web applications at Eternity Technologies. These applications run on  Google's [App Engine](https://developers.google.com/appengine/ "Google AppEngine web site") or servers running [Apache](http://httpd.apache.org "Apache official homepage") + [mod_wsgi](https://github.com/GrahamDumpleton/mod_wsgi "mod_wsgi on Github").
 

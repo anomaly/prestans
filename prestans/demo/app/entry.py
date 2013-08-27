@@ -35,12 +35,12 @@ import webapp2
 import prestans.rest
 
 import pdemo.page.handlers
-#import pdemo.rest.handlers
+import pdemo.rest.handlers
 
 frontend = webapp2.WSGIApplication([
 	(r'/', pdemo.page.handlers.Index)
 ], debug=True)
 
 api = prestans.rest.RequestRouter([
-	#(r'/api/player', pdemo.rest.handlers.player.Collection)
+	(r'/api/player', pdemo.rest.handlers.player.Collection)
 ], debug=True, application_name="prestans-demo")
