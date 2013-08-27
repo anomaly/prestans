@@ -63,5 +63,7 @@ class Base(webapp2.RequestHandler):
     
     ## @brief Jinja templates, consider using webapp2 jinja utilities for this
     def get_template_env(self):
-        template_path = os.path.join(config.get('pdemo', 'base_path'), config.get('pdemo', 'template_path'))
+    	script_path = os.path.abspath(os.path.dirname(__file__))
+        template_path = os.path.join(script_path, "..", "..", "..", config.get('pdemo', 'template_path'))
+
         return Environment(loader=FileSystemLoader(template_path))

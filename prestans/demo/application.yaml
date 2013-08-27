@@ -11,8 +11,8 @@ environ:
   value: config/pdemo.cfg
 
 static:
-- url: /img
-  path: static/img
+- url: /css
+  path: static/css
 
 default_app: entry.frontend
 
