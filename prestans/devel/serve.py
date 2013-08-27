@@ -143,6 +143,9 @@ class DevServer(object):
             url = entry['url']
             path = entry['path']
 
+            resource_path = os.path.join(self._config.base_path, path)
+            static_map[url] = resource_path
+
         return static_map
 
     def _add_handlers(self):
