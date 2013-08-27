@@ -18,16 +18,16 @@ Additional future types could include:
 * International All Star: Any player from test match histroy from all nations.
 
 Included nations:
-1. Australia
-2. Bandladesh
-3. England
-4. India
-5. New Zealand
-6. Pakistan
-7. South Africa
-8. Sri Lanka
-9. West Indies
-10. Zimbabwe
+* Australia
+* Bandladesh
+* England
+* India
+* New Zealand
+* Pakistan
+* South Africa
+* Sri Lanka
+* West Indies
+* Zimbabwe
 
 Running the Demo
 -----------------
