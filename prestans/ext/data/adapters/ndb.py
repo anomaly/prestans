@@ -41,6 +41,8 @@ __all__ = ['QueryResultIterator', 'ModelAdapter']
 import inspect
 
 import prestans.types
+import prestans.parser
+
 from prestans.ext.data import adapters
 
 #:
@@ -106,7 +108,7 @@ class ModelAdapter(adapters.ModelAdapter):
                 continue
 
             #: Attribute not visible don't bother processing
-            elif isinstance(attribute_filter, prestans.parsers.AttributeFilter) and\
+            elif isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
              not attribute_filter.is_attribute_visible(attribute_key):
                 continue
 
