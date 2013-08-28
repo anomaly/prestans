@@ -30,6 +30,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import inspect
+
 class ModelAdapter(object):
     
     def __init__(self, rest_model_class, persistent_model_class):

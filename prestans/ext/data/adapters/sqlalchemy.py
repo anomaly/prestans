@@ -104,8 +104,10 @@ class ModelAdapter(adapters.ModelAdapter):
                 continue
 
             #: Attribute not visible don't bother processing
-            elif isinstance(attribute_filter, prestans.parsers.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_key):
+            elif isinstance(attribute_filter, prestans.parsers.AttributeFilter) and\
+             not attribute_filter.is_attribute_visible(attribute_key):
                 continue
+
             elif issubclass(rest_attr.__class__, prestans.types.Array):        
                 #: Handles prestans array population from SQLAlchemy relationships 
 

@@ -87,7 +87,7 @@ class ModelAdapter(adapters.ModelAdapter):
     #:
     #: @todo test all data types provided by datastore
     #:
-    def adapt_persistent_to_rest(self, persistent_object):
+    def adapt_persistent_to_rest(self, persistent_object, attribute_filter=None):
 
         rest_model_instance = self.rest_model_class()
         
@@ -103,6 +103,11 @@ class ModelAdapter(adapters.ModelAdapter):
                     #: with default values, which is invalid when constructing responses
                     setattr(rest_model_instance, attribute_key, None)
                 
+                continue
+
+            #: Attribute not visible don't bother processing
+            elif isinstance(attribute_filter, prestans.parsers.AttributeFilter) and\
+             not attribute_filter.is_attribute_visible(attribute_key):
                 continue
 
             elif issubclass(rest_attr.__class__, prestans.types.Array):
