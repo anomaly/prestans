@@ -112,10 +112,10 @@ class ModelAdapter(adapters.ModelAdapter):
              not attribute_filter.is_attribute_visible(attribute_key):
                 continue
 
-            elif issubclass(rest_attr.__class__, prestans.types.Array):
+            elif isinstance(rest_attr, prestans.types.Array):
 
                 persistent_attr_value = getattr(persistent_object, attribute_key)
-                rest_model_array_handle = rest_model_instance.__dict__[attribute_key]
+                rest_model_array_handle = getattr(rest_model_instance, attribute_key)
                 
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
@@ -134,7 +134,7 @@ class ModelAdapter(adapters.ModelAdapter):
                         adapted_rest_model = element_adapter.adapt_persistent_to_rest(collection_element)                    
                         rest_model_array_handle.append(adapted_rest_model)
 
-            elif issubclass(rest_attr.__class__, prestans.types.Model):
+            elif isinstance(rest_attr, prestans.types.Model):
 
                 try:
                     
