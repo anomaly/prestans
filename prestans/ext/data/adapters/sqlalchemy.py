@@ -39,7 +39,7 @@ __all__ = ['QueryResultIterator', 'ModelAdapter']
 import inspect
 
 import prestans.types
-import prestans.parsers
+import prestans.parser
 
 from prestans.ext.data import adapters
 
@@ -104,13 +104,15 @@ class ModelAdapter(adapters.ModelAdapter):
                 continue
 
             #: Attribute not visible don't bother processing
-            elif isinstance(attribute_filter, prestans.parsers.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_key):
+            elif isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
+             not attribute_filter.is_attribute_visible(attribute_key):
                 continue
-            elif issubclass(rest_attr.__class__, prestans.types.Array):        
+
+            elif isinstance(rest_attr, prestans.types.Array):        
                 #: Handles prestans array population from SQLAlchemy relationships 
 
                 persistent_attr_value = getattr(persistent_object, attribute_key)
-                rest_model_array_handle = rest_model_instance.__dict__[attribute_key]
+                rest_model_array_handle = getattr(rest_model_instance, attribute_key)
                 
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
@@ -134,7 +136,7 @@ class ModelAdapter(adapters.ModelAdapter):
                         adapted_rest_model = element_adapter.adapt_persistent_to_rest(collection_element, sub_attribute_filter)                    
                         rest_model_array_handle.append(adapted_rest_model)
             
-            elif issubclass(rest_attr.__class__, prestans.types.Model):
+            elif isinstance(rest_attr, prestans.types.Model):
                 
                 try:
                     persistent_attr_value = getattr(persistent_object, attribute_key)

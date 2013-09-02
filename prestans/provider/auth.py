@@ -79,11 +79,11 @@ def login_required(http_method_handler):
     @wraps(http_method_handler)
     def secure_http_method_handler(self, *args):
             
-        if not self.__provider_config__.auth:
+        if not self.__provider_config__.authentication:
             _message = "Service available to authenticated users only, no auth context provider set in handler"
             raise prestans.exception.AuthenticationError(_message)
             
-        if not self.auth_context.is_authenticated_user():
+        if not self.__provider_config__.authentication.is_authenticated_user():
             raise prestans.exception.AuthenticationError()
 
         http_method_handler(self, *args)
@@ -108,12 +108,12 @@ def role_required(role_name=None):
                 raise prestans.exception.AuthorizationError("None")
         
             # Authentication context must be set
-            if not self.auth_context:
+            if not self.__provider_config__.authentication:
                 _message = "Service available to authenticated users only, no auth context provider set in handler"
                 raise prestans.exception.AuthenticationError(_message)
             
             # Check for the role by calling current_user_has_role
-            if not self.auth_context.current_user_has_role(role_name):
+            if not self.__provider_config__.authentication.current_user_has_role(role_name):
                 raise prestans.exception.AuthorizationError(role_name)
 
             http_method_handler(self, *args)

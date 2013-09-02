@@ -41,6 +41,8 @@ __all__ = ['QueryResultIterator', 'ModelAdapter']
 import inspect
 
 import prestans.types
+import prestans.parser
+
 from prestans.ext.data import adapters
 
 #:
@@ -87,7 +89,7 @@ class ModelAdapter(adapters.ModelAdapter):
     #:
     #: @todo test all data types provided by datastore
     #:
-    def adapt_persistent_to_rest(self, persistent_object):
+    def adapt_persistent_to_rest(self, persistent_object, attribute_filter=None):
 
         rest_model_instance = self.rest_model_class()
         
@@ -105,10 +107,15 @@ class ModelAdapter(adapters.ModelAdapter):
                 
                 continue
 
-            elif issubclass(rest_attr.__class__, prestans.types.Array):
+            #: Attribute not visible don't bother processing
+            elif isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
+             not attribute_filter.is_attribute_visible(attribute_key):
+                continue
+
+            elif isinstance(rest_attr, prestans.types.Array):
 
                 persistent_attr_value = getattr(persistent_object, attribute_key)
-                rest_model_array_handle = rest_model_instance.__dict__[attribute_key]
+                rest_model_array_handle = getattr(rest_model_instance, attribute_key)
                 
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
@@ -127,7 +134,7 @@ class ModelAdapter(adapters.ModelAdapter):
                         adapted_rest_model = element_adapter.adapt_persistent_to_rest(collection_element)                    
                         rest_model_array_handle.append(adapted_rest_model)
 
-            elif issubclass(rest_attr.__class__, prestans.types.Model):
+            elif isinstance(rest_attr, prestans.types.Model):
 
                 try:
                     
