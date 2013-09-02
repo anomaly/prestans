@@ -35,51 +35,40 @@ from prestans import types
 
 class Player(types.Model):
 	player_id = types.Integer(required=False)
+	team_id = types.Integer(required=True)
+
 	first_name = types.String(required=True)
 	last_name = types.String(required=True)
-	#height = 
-	weight = types.Integer(minimum=0, required=True)
 	dob = types.Date(required=True)
 
-class PlayerMatchStats(types.Model):
+	matches = types.Integer(required=True, default=0)
 
-	match_id = types.Integer(required=True)
-	player_id = types.Integer(required=True)
+	batting_hand = types.String(required=True, default="Right", choices=["Left", "Right"])
+	batting_average = types.Float(required=True, default=0.0)
+	batting_sr = types.Float(required=True, default=0.0)
 
-	minutes = types.Integer(minimum=0, default=0) #mintues played
-
-	fgm = types.Integer(minimum=0, default=0) #field goals made
-	fga = types.Integer(minimum=0, default=0) #field goals attempted
-
-	tpm = types.Integer(minimum=0, default=0) #three pointers made
-	tpa = types.Integer(minimum=0, default=0) #three pointers attempted
-
-	ftm = types.Integer(minimum=0, default=0) #free throws made
-	fta = types.Integer(minimum=0, default=0) #free throws attempted
-
-	reb = types.Integer(minimum=0, default=0) #rebounds
-	ast = types.Integer(minimum=0, default=0) #assists
-	blk = types.Integer(minimum=0, default=0) #blocks
-	stl = types.Integer(minimum=0, default=0) #steals
-	pf = types.Integer(minimum=0, default=0) #personal fouls
-	to = types.Integer(minimum=0, default=0) #turnovers
-	pts = types.Integer(minimum=0, default=0) #points
-
-class Match(types.Model):
-	match_id = types.Integer(required=True)
-	season_id = types.Integer(required=True)
-
-	venue = types.String(required=True)
-
-	player_stats = types.Array(element_template=PlayerMatchStats())
-
-class Season(types.Model):
-	season_id = types.Integer(required=True)
+	bowling_arm = types.String(required=True, default="Right", choices=["Left", "Right"])
+	#bowling_style = types.String(required=True)
+	bowling_average = types.Float(required=True, default=0.0)
+	bowling_sr = types.Float(required=True, default=0.0)
+	bowling_economy = types.Float(required=True, default=0.0)
 
 class Team(types.Model):
 	team_id = types.String(required=True)
-	city = types.String(required=True)
-	name = types.String(required=True)
+	nation = types.String(required=True)
+
+class SelectedTeam(types.Model):
+	selected_team_id = types.Integer(required=True)
+
+class SelectedPlayer(types.Model):
+	selected_player_id = types.Integer(required=True)
+	captain = types.Boolean(required=True, default=False)
+	vice_captain = types.Boolean(required=True, default=False)
+	batting_position = types.Integer(required=True, minimum=1, maximum=11)
+	role = types.String(required=True, default="Batsmen", choices=["Batsmen", "Keeper", "All-Rounder", "Bowler"])
+
+SelectedTeam.players = types.Array(element_template=SelectedPlayer())
+
 
 
 

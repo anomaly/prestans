@@ -22,36 +22,20 @@ pdemo.data.model.Team = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.city_ = new prestans.types.String({value: opt_json["city"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
         this.teamId_ = new prestans.types.String({value: opt_json["team_id"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
-        this.name_ = new prestans.types.String({value: opt_json["name"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
+        this.nation_ = new prestans.types.String({value: opt_json["nation"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
     }
     else {
-        this.city_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
         this.teamId_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
-        this.name_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
+        this.nation_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
     }
 };
 goog.inherits(pdemo.data.model.Team, prestans.types.Model);
 
 
 
-pdemo.data.model.Team.prototype.city_ = null;
 pdemo.data.model.Team.prototype.teamId_ = null;
-pdemo.data.model.Team.prototype.name_ = null;
-
-
-pdemo.data.model.Team.prototype.getCity = function() {
-    return this.city_.getValue();
-};
-
-pdemo.data.model.Team.prototype.setCity = function(value) {
-    var previousValue_ = this.city_.getValue();
-    var success_ = this.city_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "city", previousValue_, this.city_.getValue()));
-    return success_;
-};
-
+pdemo.data.model.Team.prototype.nation_ = null;
 
 
 pdemo.data.model.Team.prototype.getTeamId = function() {
@@ -67,14 +51,14 @@ pdemo.data.model.Team.prototype.setTeamId = function(value) {
 
 
 
-pdemo.data.model.Team.prototype.getName = function() {
-    return this.name_.getValue();
+pdemo.data.model.Team.prototype.getNation = function() {
+    return this.nation_.getValue();
 };
 
-pdemo.data.model.Team.prototype.setName = function(value) {
-    var previousValue_ = this.name_.getValue();
-    var success_ = this.name_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "name", previousValue_, this.name_.getValue()));
+pdemo.data.model.Team.prototype.setNation = function(value) {
+    var previousValue_ = this.nation_.getValue();
+    var success_ = this.nation_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "nation", previousValue_, this.nation_.getValue()));
     return success_;
 };
 
@@ -86,14 +70,11 @@ pdemo.data.model.Team.prototype.setValueForKey = function(key, value) {
 
     switch(key)
     {
-        case "city":
-            returnVal_ = this.setCity(value);
-            break;
         case "teamId":
             returnVal_ = this.setTeamId(value);
             break;
-        case "name":
-            returnVal_ = this.setName(value);
+        case "nation":
+            returnVal_ = this.setNation(value);
             break;
         default:
             throw "Key: "+key+" not found in model";
@@ -109,18 +90,14 @@ pdemo.data.model.Team.prototype.getJSONObject = function(opt_filter) {
 
     var jsonifiedObject_ = {};
     
-    if(goog.isDef(opt_filter) && opt_filter.getCity())
-        jsonifiedObject_["city"] = this.getCity()
-    else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["city"] = this.getCity()
     if(goog.isDef(opt_filter) && opt_filter.getTeamId())
         jsonifiedObject_["team_id"] = this.getTeamId()
     else if(!goog.isDef(opt_filter))
         jsonifiedObject_["team_id"] = this.getTeamId()
-    if(goog.isDef(opt_filter) && opt_filter.getName())
-        jsonifiedObject_["name"] = this.getName()
+    if(goog.isDef(opt_filter) && opt_filter.getNation())
+        jsonifiedObject_["nation"] = this.getNation()
     else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["name"] = this.getName()
+        jsonifiedObject_["nation"] = this.getNation()
 
     return jsonifiedObject_;
 };

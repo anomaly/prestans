@@ -35,7 +35,7 @@ import webapp2
 import prestans.rest
 
 import pdemo.page.handlers
-#import pdemo.rest.handlers
+import pdemo.rest.handlers
 
 frontend = webapp2.WSGIApplication([
 	(r'/', pdemo.page.handlers.Index)

@@ -10,9 +10,10 @@ goog.require('prestans.types.Model.AttributeChangedEvent');
 
 goog.require('prestans.types.Model');
 
+goog.require('prestans.types.Float');
+goog.require('prestans.types.String');
 goog.require('prestans.types.Date');
 goog.require('prestans.types.Integer');
-goog.require('prestans.types.String');
 
 /**
  * @constructor
@@ -24,65 +25,65 @@ pdemo.data.model.Player = function(opt_json) {
     prestans.types.Model.call(this);
 
     if(goog.isDefAndNotNull(opt_json)) {
-        this.dob_ = new prestans.types.Date({value: opt_json["dob"], required: true, default: null});
-        this.playerId_ = new prestans.types.Integer({value: opt_json["player_id"], required: false, default: null, maximum: null, minimum: null, choices: null});
-        this.firstName_ = new prestans.types.String({value: opt_json["first_name"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
+        this.bowlingSr_ = new prestans.types.Float({value: opt_json["bowling_sr"], required: true, default: 0.0, maximum: null, minimum: null, choices: null});
         this.lastName_ = new prestans.types.String({value: opt_json["last_name"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
-        this.weight_ = new prestans.types.Integer({value: opt_json["weight"], required: true, default: null, maximum: null, minimum: 0, choices: null});
+        this.battingAverage_ = new prestans.types.Float({value: opt_json["batting_average"], required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.dob_ = new prestans.types.Date({value: opt_json["dob"], required: true, default: null});
+        this.bowlingEconomy_ = new prestans.types.Float({value: opt_json["bowling_economy"], required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.firstName_ = new prestans.types.String({value: opt_json["first_name"], required: true, default: null, maxLength: null, minLength: null, format: null, choices: null});
+        this.battingType_ = new prestans.types.String({value: opt_json["batting_type"], required: true, default: "Right-hand", maxLength: null, minLength: null, format: null, choices: ['Left-hand', 'Right-hand']});
+        this.matches_ = new prestans.types.Integer({value: opt_json["matches"], required: true, default: 0, maximum: null, minimum: null, choices: null});
+        this.teamId_ = new prestans.types.Integer({value: opt_json["team_id"], required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.battingSr_ = new prestans.types.Float({value: opt_json["batting_sr"], required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.playerId_ = new prestans.types.Integer({value: opt_json["player_id"], required: false, default: null, maximum: null, minimum: null, choices: null});
+        this.bowlingType_ = new prestans.types.String({value: opt_json["bowling_type"], required: true, default: "Right-hand", maxLength: null, minLength: null, format: null, choices: ['Left-hand', 'Right-hand']});
+        this.bowlingAverage_ = new prestans.types.Float({value: opt_json["bowling_average"], required: true, default: 0.0, maximum: null, minimum: null, choices: null});
     }
     else {
-        this.dob_ = new prestans.types.Date({required: true, default: null});
-        this.playerId_ = new prestans.types.Integer({required: false, default: null, maximum: null, minimum: null, choices: null});
-        this.firstName_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
+        this.bowlingSr_ = new prestans.types.Float({required: true, default: 0.0, maximum: null, minimum: null, choices: null});
         this.lastName_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
-        this.weight_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: 0, choices: null});
+        this.battingAverage_ = new prestans.types.Float({required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.dob_ = new prestans.types.Date({required: true, default: null});
+        this.bowlingEconomy_ = new prestans.types.Float({required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.firstName_ = new prestans.types.String({required: true, default: null, max_length: null, min_length: null, format: null, choices: null});
+        this.battingType_ = new prestans.types.String({required: true, default: "Right-hand", max_length: null, min_length: null, format: null, choices: ['Left-hand', 'Right-hand']});
+        this.matches_ = new prestans.types.Integer({required: true, default: 0, maximum: null, minimum: null, choices: null});
+        this.teamId_ = new prestans.types.Integer({required: true, default: null, maximum: null, minimum: null, choices: null});
+        this.battingSr_ = new prestans.types.Float({required: true, default: 0.0, maximum: null, minimum: null, choices: null});
+        this.playerId_ = new prestans.types.Integer({required: false, default: null, maximum: null, minimum: null, choices: null});
+        this.bowlingType_ = new prestans.types.String({required: true, default: "Right-hand", max_length: null, min_length: null, format: null, choices: ['Left-hand', 'Right-hand']});
+        this.bowlingAverage_ = new prestans.types.Float({required: true, default: 0.0, maximum: null, minimum: null, choices: null});
     }
 };
 goog.inherits(pdemo.data.model.Player, prestans.types.Model);
 
 
 
-pdemo.data.model.Player.prototype.dob_ = null;
-pdemo.data.model.Player.prototype.playerId_ = null;
-pdemo.data.model.Player.prototype.firstName_ = null;
+pdemo.data.model.Player.prototype.bowlingSr_ = null;
 pdemo.data.model.Player.prototype.lastName_ = null;
-pdemo.data.model.Player.prototype.weight_ = null;
+pdemo.data.model.Player.prototype.battingAverage_ = null;
+pdemo.data.model.Player.prototype.dob_ = null;
+pdemo.data.model.Player.prototype.bowlingEconomy_ = null;
+pdemo.data.model.Player.prototype.firstName_ = null;
+pdemo.data.model.Player.prototype.battingType_ = null;
+pdemo.data.model.Player.BattingTypeChoices = ['Left-hand', 'Right-hand'];
+pdemo.data.model.Player.prototype.matches_ = null;
+pdemo.data.model.Player.prototype.teamId_ = null;
+pdemo.data.model.Player.prototype.battingSr_ = null;
+pdemo.data.model.Player.prototype.playerId_ = null;
+pdemo.data.model.Player.prototype.bowlingType_ = null;
+pdemo.data.model.Player.BowlingTypeChoices = ['Left-hand', 'Right-hand'];
+pdemo.data.model.Player.prototype.bowlingAverage_ = null;
 
 
-pdemo.data.model.Player.prototype.getDob = function() {
-    return this.dob_.getValue();
+pdemo.data.model.Player.prototype.getBowlingSr = function() {
+    return this.bowlingSr_.getValue();
 };
 
-pdemo.data.model.Player.prototype.setDob = function(value) {
-    var previousValue_ = this.dob_.getValue();
-    var success_ = this.dob_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "dob", previousValue_, this.dob_.getValue()));
-    return success_;
-};
-
-
-
-pdemo.data.model.Player.prototype.getPlayerId = function() {
-    return this.playerId_.getValue();
-};
-
-pdemo.data.model.Player.prototype.setPlayerId = function(value) {
-    var previousValue_ = this.playerId_.getValue();
-    var success_ = this.playerId_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "playerId", previousValue_, this.playerId_.getValue()));
-    return success_;
-};
-
-
-
-pdemo.data.model.Player.prototype.getFirstName = function() {
-    return this.firstName_.getValue();
-};
-
-pdemo.data.model.Player.prototype.setFirstName = function(value) {
-    var previousValue_ = this.firstName_.getValue();
-    var success_ = this.firstName_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "firstName", previousValue_, this.firstName_.getValue()));
+pdemo.data.model.Player.prototype.setBowlingSr = function(value) {
+    var previousValue_ = this.bowlingSr_.getValue();
+    var success_ = this.bowlingSr_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "bowlingSr", previousValue_, this.bowlingSr_.getValue()));
     return success_;
 };
 
@@ -101,14 +102,144 @@ pdemo.data.model.Player.prototype.setLastName = function(value) {
 
 
 
-pdemo.data.model.Player.prototype.getWeight = function() {
-    return this.weight_.getValue();
+pdemo.data.model.Player.prototype.getBattingAverage = function() {
+    return this.battingAverage_.getValue();
 };
 
-pdemo.data.model.Player.prototype.setWeight = function(value) {
-    var previousValue_ = this.weight_.getValue();
-    var success_ = this.weight_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "weight", previousValue_, this.weight_.getValue()));
+pdemo.data.model.Player.prototype.setBattingAverage = function(value) {
+    var previousValue_ = this.battingAverage_.getValue();
+    var success_ = this.battingAverage_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "battingAverage", previousValue_, this.battingAverage_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getDob = function() {
+    return this.dob_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setDob = function(value) {
+    var previousValue_ = this.dob_.getValue();
+    var success_ = this.dob_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "dob", previousValue_, this.dob_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getBowlingEconomy = function() {
+    return this.bowlingEconomy_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setBowlingEconomy = function(value) {
+    var previousValue_ = this.bowlingEconomy_.getValue();
+    var success_ = this.bowlingEconomy_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "bowlingEconomy", previousValue_, this.bowlingEconomy_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getFirstName = function() {
+    return this.firstName_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setFirstName = function(value) {
+    var previousValue_ = this.firstName_.getValue();
+    var success_ = this.firstName_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "firstName", previousValue_, this.firstName_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getBattingType = function() {
+    return this.battingType_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setBattingType = function(value) {
+    var previousValue_ = this.battingType_.getValue();
+    var success_ = this.battingType_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "battingType", previousValue_, this.battingType_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getMatches = function() {
+    return this.matches_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setMatches = function(value) {
+    var previousValue_ = this.matches_.getValue();
+    var success_ = this.matches_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "matches", previousValue_, this.matches_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getTeamId = function() {
+    return this.teamId_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setTeamId = function(value) {
+    var previousValue_ = this.teamId_.getValue();
+    var success_ = this.teamId_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "teamId", previousValue_, this.teamId_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getBattingSr = function() {
+    return this.battingSr_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setBattingSr = function(value) {
+    var previousValue_ = this.battingSr_.getValue();
+    var success_ = this.battingSr_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "battingSr", previousValue_, this.battingSr_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getPlayerId = function() {
+    return this.playerId_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setPlayerId = function(value) {
+    var previousValue_ = this.playerId_.getValue();
+    var success_ = this.playerId_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "playerId", previousValue_, this.playerId_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getBowlingType = function() {
+    return this.bowlingType_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setBowlingType = function(value) {
+    var previousValue_ = this.bowlingType_.getValue();
+    var success_ = this.bowlingType_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "bowlingType", previousValue_, this.bowlingType_.getValue()));
+    return success_;
+};
+
+
+
+pdemo.data.model.Player.prototype.getBowlingAverage = function() {
+    return this.bowlingAverage_.getValue();
+};
+
+pdemo.data.model.Player.prototype.setBowlingAverage = function(value) {
+    var previousValue_ = this.bowlingAverage_.getValue();
+    var success_ = this.bowlingAverage_.setValue(value);
+    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent(prestans.types.Model.EventType.ATTRIBUTE_CHANGED, "bowlingAverage", previousValue_, this.bowlingAverage_.getValue()));
     return success_;
 };
 
@@ -120,20 +251,44 @@ pdemo.data.model.Player.prototype.setValueForKey = function(key, value) {
 
     switch(key)
     {
-        case "dob":
-            returnVal_ = this.setDob(value);
-            break;
-        case "playerId":
-            returnVal_ = this.setPlayerId(value);
-            break;
-        case "firstName":
-            returnVal_ = this.setFirstName(value);
+        case "bowlingSr":
+            returnVal_ = this.setBowlingSr(value);
             break;
         case "lastName":
             returnVal_ = this.setLastName(value);
             break;
-        case "weight":
-            returnVal_ = this.setWeight(value);
+        case "battingAverage":
+            returnVal_ = this.setBattingAverage(value);
+            break;
+        case "dob":
+            returnVal_ = this.setDob(value);
+            break;
+        case "bowlingEconomy":
+            returnVal_ = this.setBowlingEconomy(value);
+            break;
+        case "firstName":
+            returnVal_ = this.setFirstName(value);
+            break;
+        case "battingType":
+            returnVal_ = this.setBattingType(value);
+            break;
+        case "matches":
+            returnVal_ = this.setMatches(value);
+            break;
+        case "teamId":
+            returnVal_ = this.setTeamId(value);
+            break;
+        case "battingSr":
+            returnVal_ = this.setBattingSr(value);
+            break;
+        case "playerId":
+            returnVal_ = this.setPlayerId(value);
+            break;
+        case "bowlingType":
+            returnVal_ = this.setBowlingType(value);
+            break;
+        case "bowlingAverage":
+            returnVal_ = this.setBowlingAverage(value);
             break;
         default:
             throw "Key: "+key+" not found in model";
@@ -149,26 +304,58 @@ pdemo.data.model.Player.prototype.getJSONObject = function(opt_filter) {
 
     var jsonifiedObject_ = {};
     
-    if(goog.isDef(opt_filter) && opt_filter.getDob())
-        jsonifiedObject_["dob"] = this.dob_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getBowlingSr())
+        jsonifiedObject_["bowling_sr"] = this.getBowlingSr()
     else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["dob"] = this.dob_.getJSONObject();
-    if(goog.isDef(opt_filter) && opt_filter.getPlayerId())
-        jsonifiedObject_["player_id"] = this.getPlayerId()
-    else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["player_id"] = this.getPlayerId()
-    if(goog.isDef(opt_filter) && opt_filter.getFirstName())
-        jsonifiedObject_["first_name"] = this.getFirstName()
-    else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["first_name"] = this.getFirstName()
+        jsonifiedObject_["bowling_sr"] = this.getBowlingSr()
     if(goog.isDef(opt_filter) && opt_filter.getLastName())
         jsonifiedObject_["last_name"] = this.getLastName()
     else if(!goog.isDef(opt_filter))
         jsonifiedObject_["last_name"] = this.getLastName()
-    if(goog.isDef(opt_filter) && opt_filter.getWeight())
-        jsonifiedObject_["weight"] = this.getWeight()
+    if(goog.isDef(opt_filter) && opt_filter.getBattingAverage())
+        jsonifiedObject_["batting_average"] = this.getBattingAverage()
     else if(!goog.isDef(opt_filter))
-        jsonifiedObject_["weight"] = this.getWeight()
+        jsonifiedObject_["batting_average"] = this.getBattingAverage()
+    if(goog.isDef(opt_filter) && opt_filter.getDob())
+        jsonifiedObject_["dob"] = this.dob_.getJSONObject();
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["dob"] = this.dob_.getJSONObject();
+    if(goog.isDef(opt_filter) && opt_filter.getBowlingEconomy())
+        jsonifiedObject_["bowling_economy"] = this.getBowlingEconomy()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["bowling_economy"] = this.getBowlingEconomy()
+    if(goog.isDef(opt_filter) && opt_filter.getFirstName())
+        jsonifiedObject_["first_name"] = this.getFirstName()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["first_name"] = this.getFirstName()
+    if(goog.isDef(opt_filter) && opt_filter.getBattingType())
+        jsonifiedObject_["batting_type"] = this.getBattingType()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["batting_type"] = this.getBattingType()
+    if(goog.isDef(opt_filter) && opt_filter.getMatches())
+        jsonifiedObject_["matches"] = this.getMatches()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["matches"] = this.getMatches()
+    if(goog.isDef(opt_filter) && opt_filter.getTeamId())
+        jsonifiedObject_["team_id"] = this.getTeamId()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["team_id"] = this.getTeamId()
+    if(goog.isDef(opt_filter) && opt_filter.getBattingSr())
+        jsonifiedObject_["batting_sr"] = this.getBattingSr()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["batting_sr"] = this.getBattingSr()
+    if(goog.isDef(opt_filter) && opt_filter.getPlayerId())
+        jsonifiedObject_["player_id"] = this.getPlayerId()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["player_id"] = this.getPlayerId()
+    if(goog.isDef(opt_filter) && opt_filter.getBowlingType())
+        jsonifiedObject_["bowling_type"] = this.getBowlingType()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["bowling_type"] = this.getBowlingType()
+    if(goog.isDef(opt_filter) && opt_filter.getBowlingAverage())
+        jsonifiedObject_["bowling_average"] = this.getBowlingAverage()
+    else if(!goog.isDef(opt_filter))
+        jsonifiedObject_["bowling_average"] = this.getBowlingAverage()
 
     return jsonifiedObject_;
 };
