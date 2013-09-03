@@ -34,9 +34,11 @@
 __all__ = ['gen', 'serve']
 
 import argparse
+import os
 
-import serve
-import gen
+import prestans.devel.serve
+import prestans.devel.gen
+import prestans.devel.exception
 
 class ArgParserFactory(object):
 
@@ -111,8 +113,8 @@ class ArgParserFactory(object):
         gen_parser.add_argument(
             "-t",
             "--template",
-            choices=['closure-model', 'closure-filter'],
-            default='closure-model',
+            choices=['closure.model', 'closure.filter'],
+            default='closure.model',
             required=True,
             dest="template",
             help="template to use for client side code generation"
@@ -182,21 +184,27 @@ class CommandDispatcher:
 
     def _dispatch_gen(self):
 
-        print self._args
+        if not os.path.isdir(self._args.output):
+            raise prestans.devel.exception.Base("%s is not a writeable directory" % 
+                self._args.output)
 
-        # preplate = gen.Preplate(
-        #     template_type="closure.model", 
-        #     model_file="../demo/app/pdemo/rest/models.py", 
-        #     namespace="pdemo.data.model", 
-        #     output_directory="../demo/client/pdemo/data/model")
+        if not os.path.isfile(self._args.model_path):
+            raise prestans.devel.exception.Base("failed to read model file %s" % 
+                self._args.model_path)
 
-        # preplate.run()
+        preplate = prestans.devel.gen.Preplate(
+            template_type=self._args.template, 
+            model_file=self._args.model_path, 
+            namespace=self._args.namespace, 
+            output_directory=self._args.output)
+
+        preplate.run()
 
     def _dispatch_build(self):
         print self._args
 
     def _dispatch_serve(self):
-        server_config = serve.Configuration(self._args.config_path)
+        server_config = prestans.devel.serve.Configuration(self._args.config_path)
         dev_server = serve.DevServer(server_config)
         dev_server.run()
         
