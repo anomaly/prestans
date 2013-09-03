@@ -6,7 +6,11 @@ def main():
 
     import prestans.devel.gen
 
-    preplate = prestans.devel.gen.Preplate(template_type="closure.model", model_file="../demo/app/pdemo/rest/models.py", namespace="pdemo.data.model", output_directory="../demo/client/pdemo/data/model")
+    preplate = prestans.devel.gen.Preplate(
+        template_type="closure.model", 
+        model_file="../demo/app/pdemo/rest/models.py", 
+        namespace="pdemo.data.model", 
+        output_directory="../demo/client/pdemo/data/model")
     #preplate = prestans.devel.gen.Preplate(template_type="closure.filter", model_file="../demo/app/pdemo/rest/models.py", namespace="pdemo.data.filter", output_directory="../demo/client/pdemo/data/filter")
 
     return preplate.run()

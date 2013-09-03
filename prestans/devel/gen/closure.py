@@ -34,8 +34,6 @@ import os
 import re
 
 import prestans.devel.gen
-import prestans.devel.gen.templates.closure.filter
-import prestans.devel.gen.templates.closure.model
 import prestans.types
 
 def udl_to_cc(text, ignoreFirst=False):

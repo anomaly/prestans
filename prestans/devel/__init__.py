@@ -36,6 +36,7 @@ __all__ = ['gen', 'serve']
 import argparse
 
 import serve
+import gen
 
 class ArgParserFactory(object):
 
@@ -180,7 +181,16 @@ class CommandDispatcher:
             self._dispatch_serve()
 
     def _dispatch_gen(self):
+
         print self._args
+
+        # preplate = gen.Preplate(
+        #     template_type="closure.model", 
+        #     model_file="../demo/app/pdemo/rest/models.py", 
+        #     namespace="pdemo.data.model", 
+        #     output_directory="../demo/client/pdemo/data/model")
+
+        # preplate.run()
 
     def _dispatch_build(self):
         print self._args
