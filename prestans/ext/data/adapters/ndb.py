@@ -116,7 +116,7 @@ class ModelAdapter(adapters.ModelAdapter):
 
                 persistent_attr_value = getattr(persistent_object, attribute_key)
                 rest_model_array_handle = getattr(rest_model_instance, attribute_key)
-                
+
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
                 for collection_element in persistent_attr_value:

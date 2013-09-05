@@ -98,8 +98,8 @@ class ModelAdapter(adapters.ModelAdapter):
                     try:
                         setattr(rest_model_instance, attribute_key, None)
                     #: Catch any exception thrown from setattr to give a useable error message
-                    except prestans.types.DataTypeValidationException, exp:
-                        raise prestans.types.DataTypeValidationException('Attribute %s, %s' % (attribute_key, str(exp)))
+                    except TypeError, exp:
+                        raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
                     
                 continue
 
@@ -155,8 +155,8 @@ class ModelAdapter(adapters.ModelAdapter):
 
                     setattr(rest_model_instance, attribute_key, adapted_rest_model)
                     
-                except prestans.types.DataTypeValidationException, exp:
-                    raise prestans.types.DataTypeValidationException('Attribute %s, %s' % (attribute_key, str(exp)))
+                except TypeError, exp:
+                    raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
                 
             else:
                 
@@ -164,8 +164,8 @@ class ModelAdapter(adapters.ModelAdapter):
                 try:
                     persistent_attr_value = getattr(persistent_object, attribute_key)
                     setattr(rest_model_instance, attribute_key, persistent_attr_value)
-                except prestans.types.DataTypeValidationException, exp:
-                    raise prestans.types.DataTypeValidationException('Attribute %s, %s' % (attribute_key, str(exp)))
+                except TypeError, exp:
+                    raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
 
         return rest_model_instance
         

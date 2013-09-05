@@ -713,7 +713,7 @@ class Array(DataCollection):
         self._array_elements.append(value)
             
     def as_serializable(self, attribute_filter=None, minified=False):
-        
+
         _result_array = list()
             
         for array_element in self._array_elements:
@@ -764,11 +764,7 @@ class Model(DataCollection):
         self._required = required
         self._default = default
 
-        for name, value in kwargs.iteritems():
-            if self.__class__.__dict__.has_key(name):
-                setattr(self, name, value)
-            else:
-                raise KeyError(name)
+        self._create_instance_attributes(kwargs)
                 
     def blueprint(self):
 
@@ -790,7 +786,7 @@ class Model(DataCollection):
                 continue
 
             if not isinstance(type_instance, DataType):
-                raise DataTypeValidationException(
+                raise TypeError(
                     "%s must be of a DataType subclass" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
@@ -857,7 +853,7 @@ class Model(DataCollection):
                         
                     self.__dict__[attribute_name] = type_instance.validate(value)
 
-                except DataTypeValidationException:
+                except TypeError:
                     self.__dict__[attribute_name] = None
 
     def get_attribute_keys(self):
