@@ -43,7 +43,7 @@ import prestans.parser
 
 from prestans.ext.data import adapters
 
-def QueryResultIterator(collection, target_rest_instance=None, attribute_filter=None):
+def QueryResultIterator(collection, target_rest_class=None, attribute_filter=None):
         
     #: Ensure that colleciton is iterable and has atleast one element 
     collection_length = 0
@@ -56,16 +56,16 @@ def QueryResultIterator(collection, target_rest_instance=None, attribute_filter=
         
     #: If the collection is empty then return a blank array 
     if collection_length == 0:
-        return prestans.types.Array()
+        return prestans.types.Array(element_template=target_rest_class())
         
     #: Try and get the adapter and the REST class for the persistent object 
-    if target_rest_instance is None:
+    if target_rest_class is None:
         adapter_instance = adapters.registry.get_adapter_for_persistent_model(collection[0])
     else:
-        if inspect.isclass(target_rest_instance):
-            target_rest_instance = target_rest_instance()
+        if inspect.isclass(target_rest_class):
+            target_rest_class = target_rest_class()
         
-        adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_instance)
+        adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_class)
         
     adapted_models = prestans.types.Array(element_template=adapter_instance.rest_model_class())
     

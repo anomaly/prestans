@@ -375,7 +375,7 @@ class Response(webob.Response):
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, prestans.types.Array) and \
-        not value.element_template == self.template.element_template:
+        not type(value.element_template) == type(self.template.element_template):
             raise TypeError("array elements must of be type %s, given %s" % 
                 (self.template.element_template.__class__.__name__, 
                     value.element_template.__class__.__name__))

@@ -664,7 +664,7 @@ class Array(DataCollection):
                                      max_length=self._max_length)
         
         if not isinstance(value, (list, tuple)):
-            raise prestans.exception.InvalidCollectionError(value)
+            raise TypeError(value)
             
         for array_element in value:
     
