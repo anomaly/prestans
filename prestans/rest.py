@@ -86,6 +86,10 @@ class Request(webob.Request):
     @property
     def selected_deserializer(self):
         return self._selected_deserializer
+
+    @property
+    def default_deserializer(self):
+        return self._default_deserializer
         
     #: Used by content_type_set to set get a referencey to the serializer object
     def set_deserializer_by_mime_type(self, mime_type):
@@ -237,6 +241,10 @@ class Response(webob.Response):
     @property
     def selected_serializer(self):
         return self._selected_serializer
+
+    @property
+    def default_serializer(self):
+        return self._default_serializer
 
     #: Used by content_type_set to set get a referencey to the serializer object
     def _set_serializer_by_mime_type(self, mime_type):
@@ -547,17 +555,16 @@ class RequestHandler(object):
 
             #: Intersection of requested types and supported types tells us if we
             #: can infact respond in one of the requess formats
-            _supportable_mime_types = set(self.request.accept.best_matches()).intersection(
-                set(self.response.supported_mime_types))
+            best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,
+                default_match=self.response.default_serializer.content_type())
 
-            if not _supportable_mime_types and len(_supportable_mime_types) < 1:
+            if best_accept_match is None:
                 self.logger.error("unsupported mime type in request; accept header reads %s" % 
                     self.request.accept)
                 raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
                     self.response.supported_mime_types_str)
 
             #: If content_type is not acceptable it will raise UnsupportedVocabulary
-            best_accept_match = self.request.accept.best_match(_supportable_mime_types)
             self.response.content_type = best_accept_match
 
             #: Authentication
