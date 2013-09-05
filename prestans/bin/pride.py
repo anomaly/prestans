@@ -65,7 +65,8 @@ def main():
 
 if __name__ == "__main__":
 
-    prestans_path = os.path.join("..", "..")
+    directory = os.path.dirname(__file__)
+    prestans_path = os.path.join(directory, "..", "..")
 
     #:
     #: While in development attempt to import prestans from top dir
