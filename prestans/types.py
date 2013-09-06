@@ -729,7 +729,11 @@ class Array(DataCollection):
                 _result_array.append(array_element.as_serializable(attribute_filter, minified))
         
         return _result_array
-        
+
+    #temporary fix for testing of minification
+    def attribute_rewrite_reverse_map(self):
+        self._element_template.attribute_rewrite_reverse_map()
+ 
     def get_attribute_filter(self, default_value=False):
 
         attribute_filter = None
