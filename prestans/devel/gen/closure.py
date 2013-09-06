@@ -279,6 +279,7 @@ class Model(Base):
             model_name = model_blueprint['constraints']['model_template']
             attributes = list()
             self._dependencies = list()
+            self._attribute_string = ""
 
             for field_name, field_blueprint in model_blueprint['fields'].iteritems():
 
@@ -314,6 +315,8 @@ class Filter(Base):
 
             model_name = model_blueprint['constraints']['model_template']
             attributes = list()
+            self._dependencies = list()
+            self._attribute_string = ""
 
             for field_name, field_blueprint in model_blueprint['fields'].iteritems():
 
