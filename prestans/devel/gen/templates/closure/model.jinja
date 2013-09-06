@@ -130,6 +130,17 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 {% endfor %}
 };
 
+//Reverse rewrite map
+{{namespace}}.{{name}}.REVERSE_REWRITE_MAP = {
+{% for attribute in attributes %}
+{% if loop.last %}
+    "{{attribute.map_name}}": "{{attribute.name}}"
+{% else %}
+    "{{attribute.map_name}}": "{{attribute.name}}",
+{% endif %}
+{% endfor %}
+};
+
 {% for attribute in attributes %}
 {{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
 {% if attribute.type == 'model' or attribute.type == 'array' %}
