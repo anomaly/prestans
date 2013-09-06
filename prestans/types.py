@@ -731,6 +731,10 @@ class Array(DataCollection):
         return _result_array
 
     #temporary fix for testing of minification
+    def attribute_rewrite_map(self):
+        self._element_template.attribute_rewrite_map()
+
+    #temporary fix for testing of minification
     def attribute_rewrite_reverse_map(self):
         self._element_template.attribute_rewrite_reverse_map()
  

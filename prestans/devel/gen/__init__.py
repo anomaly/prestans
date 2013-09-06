@@ -60,6 +60,8 @@ class Inspector(object):
                 continue
 
             blueprint = type_instance().blueprint()
+            for field_name, field_blueprint in blueprint['fields'].iteritems():
+                field_blueprint['map_name'] = type_instance().attribute_rewrite_map()[field_name]
             blueprints.append(blueprint)
 
 

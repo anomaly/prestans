@@ -58,6 +58,7 @@ class AttributeMetaData(object):
         self._format = None
 
         self._type = blueprint['type']
+        self._map_name = blueprint['map_name']
 
         #Basic types
         if self._type == 'string':
@@ -126,6 +127,10 @@ class AttributeMetaData(object):
     @property
     def type(self):
         return self._type
+
+    @property
+    def map_name(self):
+        return self._map_name
 
     @property
     def required(self):
@@ -283,7 +288,7 @@ class Model(Base):
 
             for field_name, field_blueprint in model_blueprint['fields'].iteritems():
 
-                attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)
+                attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)                
                 attributes.append(attribute)
 
                 self.add_model_dependency(attribute)
