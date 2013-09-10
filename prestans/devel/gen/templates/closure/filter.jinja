@@ -41,6 +41,19 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 
+//Rewrite map
+{{namespace}}.{{name}}.REWRITE_MAP = {
+{% for attribute in attributes %}
+{% if loop.last %}
+    "{{attribute.name}}": "{{attribute.map_name}}"
+{% else %}
+    "{{attribute.name}}": "{{attribute.map_name}}",
+{% endif %}
+{% endfor %}
+};
+
+
+
 {% for attribute in attributes %}
 {{namespace}}.{{name}}.prototype.enable{{attribute.cc}} = function() {
 {% if attribute.type == 'model' %}
@@ -103,42 +116,63 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 
-{{namespace}}.{{name}}.prototype.getJSONObject = function(opt_complete) {
+{{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_complete) {
 
     if(opt_complete != true)
         opt_complete = false;
 
     var jsonifiedObject_ = {};
     
-{% for attribute in attributes %}
-{% if attribute.type == 'model' %}
-    if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(opt_complete)))
-        jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
-    else if(opt_complete)
-        jsonifiedObject_["{{attribute.name}}"] = false;
-{% elif attribute.type == 'array' and attribute.element_template_is_model %}
-    if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
-        jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
-    else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
-        jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
-    else if(opt_complete)
-        jsonifiedObject_["{{attribute.name}}"] = false;
-{% else %}
-    if(this.{{attribute.ccif}}_ || opt_complete)
-       jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_;
-{% endif %}
-
-{% endfor %}
+    if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
+    {% for attribute in attributes %}
+    {% if attribute.type == 'model' %}
+        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(opt_complete)))
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        else if(opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
+    {% elif attribute.type == 'array' and attribute.element_template_is_model %}
+        if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject();
+        else if(opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
+    {% else %}
+        if(this.{{attribute.ccif}}_ || opt_complete)
+           jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_;
+    {% endif %}
+    {% endfor %}
+    }
+    else {
+    {% for attribute in attributes %}
+    {% if attribute.type == 'model' %}
+        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(opt_complete)))
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        else if(opt_complete)
+            jsonifiedObject_["{{attribute.name}}"] = false;
+    {% elif attribute.type == 'array' and attribute.element_template_is_model %}
+        if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
+        else if(opt_complete)
+            jsonifiedObject_["{{attribute.name}}"] = false;
+    {% else %}
+        if(this.{{attribute.ccif}}_ || opt_complete)
+           jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_;
+    {% endif %}
+    {% endfor %}
+    }
 
     return jsonifiedObject_;
 };
 
 
 
-{{namespace}}.{{name}}.prototype.getJSONString = function(opt_complete) {
+{{namespace}}.{{name}}.prototype.getJSONString = function(minified, opt_complete) {
 
     if(opt_complete != true)
         opt_complete = false;
 
-    return goog.json.serialize(this.getJSONObject(opt_complete));
+    return goog.json.serialize(this.getJSONObject(minified, opt_complete));
 };
