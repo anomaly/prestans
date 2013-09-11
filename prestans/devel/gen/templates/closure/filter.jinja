@@ -126,15 +126,15 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
     {% for attribute in attributes %}
     {% if attribute.type == 'model' %}
-        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(opt_complete)))
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(opt_complete)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
     {% elif attribute.type == 'array' and attribute.element_template_is_model %}
         if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject();
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified);
         else if(opt_complete)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
     {% else %}
@@ -146,15 +146,15 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     else {
     {% for attribute in attributes %}
     {% if attribute.type == 'model' %}
-        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(opt_complete)))
-            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(opt_complete)
             jsonifiedObject_["{{attribute.name}}"] = false;
     {% elif attribute.type == 'array' and attribute.element_template_is_model %}
         if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
-            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(opt_complete);
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
-            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
+            jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(minified);
         else if(opt_complete)
             jsonifiedObject_["{{attribute.name}}"] = false;
     {% else %}
