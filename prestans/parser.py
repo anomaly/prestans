@@ -154,7 +154,7 @@ class AttributeFilter(object):
     """
 
     @classmethod
-    def from_model(self, model_instance, default_value=False):
+    def from_model(self, model_instance, default_value=False, **kwargs):
         """
         wrapper for Model's get_attribute_filter
         """
@@ -166,29 +166,29 @@ class AttributeFilter(object):
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
         #: kwargs support
-        # for name, value in kwargs.iteritems():
-        #     if attribute_filter_instance.__dict__.has_key(name):
-        #         setattr(attribute_filter_instance, name, value)
-        #     else:
-        #         raise KeyError(name)
+        for name, value in kwargs.iteritems():
+            if attribute_filter_instance.__dict__.has_key(name):
+                setattr(attribute_filter_instance, name, value)
+            else:
+                raise KeyError(name)
 
         return attribute_filter_instance            
 
-    def __init__(self, from_dictionary=None, rewrite_map=None):
+    def __init__(self, from_dictionary=None, template_model=None, **kwargs):
         """
         Creates an attribute filter object, optionally populates from a 
         dictionary of booleans
         """
-        
+
         if from_dictionary:
-            self._init_from_dictionary(from_dictionary, rewrite_map)
+            self._init_from_dictionary(from_dictionary, template_model)
 
         #: kwargs support
-        # for name, value in kwargs.iteritems():
-        #     if self.__dict__.has_key(name):
-        #         setattr(self, name, value)
-        #     else:
-        #         raise KeyError(name)
+        for name, value in kwargs.iteritems():
+            if self.__dict__.has_key(name):
+                setattr(self, name, value)
+            else:
+                raise KeyError(name)
 
 
     def conforms_to_template_filter(self, template_filter):
@@ -365,7 +365,7 @@ class AttributeFilter(object):
         return output_dictionary
 
 
-    def _init_from_dictionary(self, from_dictionary, rewrite_map=None):
+    def _init_from_dictionary(self, from_dictionary, template_model=None):
         """ 
         Private helper to init values from a dictionary, wraps chidlren into 
         AttributeFilter objects
@@ -374,24 +374,57 @@ class AttributeFilter(object):
         if not isinstance(from_dictionary, dict):
             raise TypeError("from_dictionary must be of type dict, %s provided" % 
                             (from_dictionary.__class__.__name__))
+        rewrite_map = None
+        if template_model is not None:
+
+            rewrite_map = template_model.attribute_rewrite_reverse_map()
+
+            if not isinstance(template_model, prestans.types.DataCollection):
+                raise TypeError("template_model should be a prestans model in AttributeFilter init (from dictionary), %s provided" % 
+                                (template_model.__class__.__name__))
 
         for key, value in from_dictionary.iteritems():
 
-            #: Minification support
-            if rewrite_map is not None:
-                key = rewrite_map[key]
+            target_key = key
 
+            #:
+            #: Minification support
+            #:
+            if rewrite_map is not None:
+                target_key = rewrite_map[key]
+
+            #:
+            #: Check to see we can work with the value 
+            #:
             if not isinstance(value, (bool, dict)):
-                # Check to see we can work with the value 
                 raise TypeError("AttributeFilter input for key %s must be boolean or dict, %s provided" % 
                                 (key, value.__class__.__name__))
 
-            # Either keep the value of wrap it up with AttributeFilter 
-            if isinstance(value, bool):
-                setattr(self, key, value)
-            elif isinstance(value, dict):
-                setattr(self, key, AttributeFilter(from_dictionary=value))
+            #:
+            #: Ensure that the key exists in the template model
+            #:
+            if template_model is not None and not template_model.has_key(target_key):
+                raise prestans.exception.AttributeFilterDiffers(target_key)
 
+            #:
+            #: Either keep the value of wrap it up with AttributeFilter 
+            #:
+            if isinstance(value, bool):
+                setattr(self, target_key, value)
+            elif isinstance(value, dict):
+
+                sub_map = None
+                if template_model is not None:
+
+                    sub_map = getattr(template_model, target_key)
+
+                    #: prestans Array support
+                    if isinstance(sub_map, prestans.types.Array):
+                        sub_map = sub_map.element_template
+
+                setattr(self, target_key, AttributeFilter(from_dictionary=value, 
+                    template_model=sub_map))
+            
 
     def __setattr__(self, key, value):
         """

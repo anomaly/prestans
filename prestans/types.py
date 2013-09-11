@@ -730,13 +730,11 @@ class Array(DataCollection):
         
         return _result_array
 
-    #temporary fix for testing of minification
     def attribute_rewrite_map(self):
-        self._element_template.attribute_rewrite_map()
+        return self._element_template.attribute_rewrite_map()
 
-    #temporary fix for testing of minification
     def attribute_rewrite_reverse_map(self):
-        self._element_template.attribute_rewrite_reverse_map()
+        return self._element_template.attribute_rewrite_reverse_map()
  
     def get_attribute_filter(self, default_value=False):
 
@@ -1015,6 +1013,9 @@ class Model(DataCollection):
                 rewrite_map[rewritten_attribute_name] = attribute_name
 
         return rewrite_map
+
+    def has_key(self, attribute_name):
+        return self.__dict__.has_key(attribute_name)
 
     def _generate_attribute_token_rewrite_map(self, model_class_members):
 
