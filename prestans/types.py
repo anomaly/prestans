@@ -956,9 +956,9 @@ class Model(DataCollection):
                 
                 _model_instance.__dict__[attribute_name] = validated_object
                     
-            except prestans.exception.DataValidation, exp:
+            except prestans.exception.DataValidationException, exp:
                 #: @todo revise this
-                raise prestans.exception.DataValidationError('%s, %s' % (attribute_name, str(exp)))
+                raise prestans.exception.DataValidationException('%s, %s' % (attribute_name, str(exp)))
 
         return _model_instance
 

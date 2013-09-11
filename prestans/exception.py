@@ -152,15 +152,23 @@ class DataValidationException(Base):
 
     Each exception uses an HTTP status code and is sent to the client.
     """
-    def __init__(self, requested_mime_type, content_type):
+    def __init__(self, code, message, attribute_name, value, blueprint, parent_exception=None):
 
-        _code = prestans.http.STATUS.NOT_IMPLEMENTED
-        _message = "Unsupported Content-Type in Request"
-        super(UnsupportedContentTypeError, self).__init__(_code, _message)
+        super(DataValidationException, self).__init__(code, message)
+        self._attribute_name = attribute_name
+        self._value = value
 
-        self.push_trace({ 
-            'requested_type': requested_mime_type,
-            'supported_types': content_type
+        if parent_exception is not None:
+            self.trace = self.trace + parent_exception.trace
+
+        self.append_validation_trace(blueprint)
+
+    def append_validation_trace(self, blueprint):
+        self.push_trace({
+            'attribute_name': self._attribute_name,
+            'value': self._value,
+            'message': self._message,
+            'blueprint': blueprint
             })
 
 class ParserException(Base):
@@ -241,52 +249,75 @@ class EmptyBody(ParserException):
     pass
 
 
+class AttributeFilterDiffers(ParserException):
+    """
+    AttributeFilter initialised from request input does not conform to
+    the configured template.
+    """
+
+    def __init__(self, attribute_list):
+
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "attribute filter has attributes that are not part of template"
+        super(AttributeFilterDiffers, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'rejected_attribute_list': list(attribute_list),
+            })
+
+
 #:
 #: Data Validation
 #: 
 
 class RequiredAttributeError(DataValidationException):
 
-    def __init__(self, attribute_name):
+    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
 
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(RequiredAttributeError, self).__init__(_code, _message)
+        _message = "attribute %s is required" % attribute_name
+        super(RequiredAttributeError, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class ParseFailed(DataValidationException):
     
-    def __init__(self, value, data_type):
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(ParseFailed, self).__init__(_code, _message)
+    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
+        _message = "parse of attribute %s; failed" % attribute_name
+        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class InvalidValueError(DataValidationException):
     
-    def __init__(self, value):
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(InvalidValueError, self).__init__(_code, _message)
+    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
+        _message = "parse of attribute %s; failed" % attribute_name
+        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class LessThanMinimumError(DataValidationException):
     
-    def __init__(self, value, allowed_min):
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(LessThanMinimumError, self).__init__(_code, _message)
+    def __init__(self, attribute_name, value, allowed_min, blueprint, parent_exception=None):
+        _message = "provided value %i cannot be less than %i" % (value, allowed_min)
+        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class MoreThanMaximumError(DataValidationException):
 
-    def __init__(self, value, allowed_max):
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(MoreThanMaximumError, self).__init__(_code, _message)
+    def __init__(self, attribute_name, value, allowed_max, blueprint, parent_exception=None):
+        _message = "provided value %i cannot be more than %i" % (value, allowed_max)
+        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class InvalidChoiceError(DataValidationException):
 
-    def __init__(self, value, allowed_choices):
-        _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "message goes in here"
-        super(InvalidChoiceError, self).__init__(_code, _message)
+    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
+        _message = "%s is an invalid value choice" % value 
+        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
+            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
+            parent_exception=parent_exception)
 
 class UnacceptableLengthError(DataValidationException):
     
