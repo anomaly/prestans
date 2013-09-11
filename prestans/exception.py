@@ -249,6 +249,23 @@ class EmptyBody(ParserException):
     pass
 
 
+class AttributeFilterDiffers(ParserException):
+    """
+    AttributeFilter initialised from request input does not conform to
+    the configured template.
+    """
+
+    def __init__(self, attribute_list):
+
+        _code = prestans.http.STATUS.BAD_REQUEST
+        _message = "attribute filter has attributes that are not part of template"
+        super(AttributeFilterDiffers, self).__init__(_code, _message)
+
+        self.push_trace({ 
+            'rejected_attribute_list': list(attribute_list),
+            })
+
+
 #:
 #: Data Validation
 #: 

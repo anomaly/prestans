@@ -133,6 +133,7 @@ class ParameterSet(object):
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
             except prestans.types.DataTypeValidationException, exp:
+                # @todo implement exception handling
                 return None
             
         return validated_parameter_set
@@ -153,7 +154,7 @@ class AttributeFilter(object):
     """
 
     @classmethod
-    def from_model(self, model_instance, default_value=False, **kwargs):
+    def from_model(self, model_instance, default_value=False):
         """
         wrapper for Model's get_attribute_filter
         """
@@ -165,15 +166,15 @@ class AttributeFilter(object):
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
         #: kwargs support
-        for name, value in kwargs.iteritems():
-            if attribute_filter_instance.__dict__.has_key(name):
-                setattr(attribute_filter_instance, name, value)
-            else:
-                raise KeyError(name)
+        # for name, value in kwargs.iteritems():
+        #     if attribute_filter_instance.__dict__.has_key(name):
+        #         setattr(attribute_filter_instance, name, value)
+        #     else:
+        #         raise KeyError(name)
 
         return attribute_filter_instance            
 
-    def __init__(self, from_dictionary=None, rewrite_map=None, **kwargs):
+    def __init__(self, from_dictionary=None, rewrite_map=None):
         """
         Creates an attribute filter object, optionally populates from a 
         dictionary of booleans
@@ -183,11 +184,11 @@ class AttributeFilter(object):
             self._init_from_dictionary(from_dictionary, rewrite_map)
 
         #: kwargs support
-        for name, value in kwargs.iteritems():
-            if self.__dict__.has_key(name):
-                setattr(self, name, value)
-            else:
-                raise KeyError(name)
+        # for name, value in kwargs.iteritems():
+        #     if self.__dict__.has_key(name):
+        #         setattr(self, name, value)
+        #     else:
+        #         raise KeyError(name)
 
 
     def conforms_to_template_filter(self, template_filter):
@@ -217,9 +218,7 @@ class AttributeFilter(object):
         #:
         unwanted_keys = set(this_filter_keys) - set(template_filter_keys)
         if len(unwanted_keys) > 0:
-            keys_string = string.join(unwanted_keys, " ")
-            raise prestans.exception.InvalidType(
-                "AttributeFilter has attributes (%s) that are not part of the template model" % keys_string)
+            raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
 
         #:
         #: 2. Make a attribute_filter that we send back
