@@ -239,15 +239,22 @@ class AuthorizationError(ParserException):
         _message = "%s is not allowed to access this resource"
         super(AuthorizationError, self).__init__(_code, _message)
 
-class NoSetMatched(ParserException):
-    pass
 
-class BodyTemplateParseError(ParserException):
-    pass
+class SerializationFailedError(ParserException):
 
-class EmptyBody(ParserException):
-    pass
+    def __init__(self, format):
 
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "Serialization failed"
+        super(DeSerializationFailedError, self).__init__(_code, _message)
+
+class DeSerializationFailedError(ParserException):
+    
+    def __init__(self, format):
+
+        _code = prestans.http.STATUS.NOT_FOUND
+        _message = "DeSerialization failed"
+        super(DeSerializationFailedError, self).__init__(_code, _message)
 
 class AttributeFilterDiffers(ParserException):
     """
@@ -266,124 +273,104 @@ class AttributeFilterDiffers(ParserException):
             })
 
 
+class NoSetMatched(ParserException):
+    pass
+
+class BodyTemplateParseError(ParserException):
+    pass
+
+class EmptyBody(ParserException):
+    pass
+
 #:
 #: Data Validation
 #: 
 
+class DataValidationException(Exception):
+
+    def __init__(self, message):
+        self._message = message
+
+    def __str__ (self):
+        return self._message
+
 class RequiredAttributeError(DataValidationException):
 
-    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
-
-        _message = "attribute %s is required" % attribute_name
-        super(RequiredAttributeError, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self):
+        _message = "message goes in here"
+        super(RequiredAttributeError, self).__init__(_code, _message)
 
 class ParseFailed(DataValidationException):
     
-    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
-        _message = "parse of attribute %s; failed" % attribute_name
-        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self, value, data_type):
+        _message = "message goes in here"
+        super(ParseFailed, self).__init__(_code, _message)
 
 class InvalidValueError(DataValidationException):
     
-    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
-        _message = "parse of attribute %s; failed" % attribute_name
-        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self, value):
+        _message = "message goes in here"
+        super(InvalidValueError, self).__init__(_code, _message)
 
 class LessThanMinimumError(DataValidationException):
     
-    def __init__(self, attribute_name, value, allowed_min, blueprint, parent_exception=None):
-        _message = "provided value %i cannot be less than %i" % (value, allowed_min)
-        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self, value, allowed_min):
+        _message = "message goes in here"
+        super(LessThanMinimumError, self).__init__(_code, _message)
 
 class MoreThanMaximumError(DataValidationException):
 
-    def __init__(self, attribute_name, value, allowed_max, blueprint, parent_exception=None):
-        _message = "provided value %i cannot be more than %i" % (value, allowed_max)
-        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self, value, allowed_max):
+        _message = "message goes in here"
+        super(MoreThanMaximumError, self).__init__(_code, _message)
 
 class InvalidChoiceError(DataValidationException):
 
-    def __init__(self, attribute_name, value, blueprint, parent_exception=None):
-        _message = "%s is an invalid value choice" % value 
-        super(ParseFailed, self).__init__(code=prestans.http_status.STATUS.BAD_REQUEST,
-            message=_message, attribute_name=attribute_name, value=value, blueprint=blueprint, 
-            parent_exception=parent_exception)
+    def __init__(self, value, allowed_choices):
+        _message = "message goes in here"
+        super(InvalidChoiceError, self).__init__(_code, _message)
 
 class UnacceptableLengthError(DataValidationException):
     
     def __init__(self, value, minimum, maximum):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(UnacceptableLengthError, self).__init__(_code, _message)
 
 class InvalidType(DataValidationException):
     
     def __init__(self, value, type_name):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(InvalidType, self).__init__(_code, _message)
 
 class InvalidCollectionError(DataValidationException):
 
     def __init__(self, value):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(InvalidCollectionError, self).__init__(_code, _message)
 
 class MissingParameterError(DataValidationException):
 
     def __init__(self):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(MissingParameterError, self).__init__(_code, _message)
 
 class InvalidFormatError(DataValidationException):
     
     def __init__(self, value):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(InvalidFormatError, self).__init__(_code, _message)
 
 class InvalidMetaValueError(DataValidationException):
 
     def __init__(self):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(InvalidMetaValueError, self).__init__(_code, _message)
 
 class UnregisteredAdapterError(DataValidationException):
 
     def __init__(self):
-        _code = prestans.http.STATUS.BAD_REQUEST
         _message = "message goes in here"
         super(UnregisteredAdapterError, self).__init__(_code, _message)
-
-class SerializationFailedError(DataValidationException):
-
-    def __init__(self, format):
-
-        _code = prestans.http.STATUS.NOT_FOUND
-        _message = "Serialization failed"
-        super(DeSerializationFailedError, self).__init__(_code, _message)
-
-class DeSerializationFailedError(DataValidationException):
-    
-    def __init__(self, format):
-
-        _code = prestans.http.STATUS.NOT_FOUND
-        _message = "DeSerialization failed"
-        super(DeSerializationFailedError, self).__init__(_code, _message)
-
 
 #:
 #: The following excepetions are used by REST handlers to indicate 
