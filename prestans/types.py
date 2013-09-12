@@ -841,7 +841,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if issubclass(type_instance.__class__, DataCollection):
+            if isinstance(type_instance, DataCollection):
                 self.__dict__[attribute_name] = copy.deepcopy(type_instance)
                 continue
                 
@@ -849,17 +849,17 @@ class Model(DataCollection):
                 self.__dict__[attribute_name] = None
                 continue
                 
-            if issubclass(type_instance.__class__, DataType):
+            if isinstance(type_instance, DataType):
                 
                 try:
                     value = None
                     
                     if arguments.has_key(attribute_name):
                         value = arguments[attribute_name]
-                        
+
                     self.__dict__[attribute_name] = type_instance.validate(value)
 
-                except TypeError:
+                except prestans.exception.DataValidationException, exp:
                     self.__dict__[attribute_name] = None
 
     def get_attribute_keys(self):

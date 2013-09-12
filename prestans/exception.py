@@ -142,7 +142,7 @@ class UnsupportedContentTypeError(Base):
             'supported_types': content_type
             })
 
-class DataValidationException(Base):
+class DataValidationResponse(Base):
     """
     DataValidationException are Exceptions raised if prestans fails
     to validate data inbound or out using rules defined in Models.
@@ -297,80 +297,80 @@ class DataValidationException(Exception):
 class RequiredAttributeError(DataValidationException):
 
     def __init__(self):
-        _message = "message goes in here"
-        super(RequiredAttributeError, self).__init__(_code, _message)
+        _message = "attribute is required and does not provide a default value"
+        super(RequiredAttributeError, self).__init__(_message)
 
 class ParseFailed(DataValidationException):
     
     def __init__(self, value, data_type):
-        _message = "message goes in here"
-        super(ParseFailed, self).__init__(_code, _message)
+        _message = "attribute parse failed"
+        super(ParseFailed, self).__init__(_message)
 
 class InvalidValueError(DataValidationException):
     
     def __init__(self, value):
-        _message = "message goes in here"
-        super(InvalidValueError, self).__init__(_code, _message)
+        _message = "%s value is not acceptable for attribute" % str(value)
+        super(InvalidValueError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
     
     def __init__(self, value, allowed_min):
         _message = "message goes in here"
-        super(LessThanMinimumError, self).__init__(_code, _message)
+        super(LessThanMinimumError, self).__init__(_message)
 
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
         _message = "message goes in here"
-        super(MoreThanMaximumError, self).__init__(_code, _message)
+        super(MoreThanMaximumError, self).__init__(_message)
 
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
         _message = "message goes in here"
-        super(InvalidChoiceError, self).__init__(_code, _message)
+        super(InvalidChoiceError, self).__init__(_message)
 
 class UnacceptableLengthError(DataValidationException):
     
     def __init__(self, value, minimum, maximum):
         _message = "message goes in here"
-        super(UnacceptableLengthError, self).__init__(_code, _message)
+        super(UnacceptableLengthError, self).__init__(_message)
 
 class InvalidType(DataValidationException):
     
     def __init__(self, value, type_name):
         _message = "message goes in here"
-        super(InvalidType, self).__init__(_code, _message)
+        super(InvalidType, self).__init__(_message)
 
 class InvalidCollectionError(DataValidationException):
 
     def __init__(self, value):
         _message = "message goes in here"
-        super(InvalidCollectionError, self).__init__(_code, _message)
+        super(InvalidCollectionError, self).__init__(_message)
 
 class MissingParameterError(DataValidationException):
 
     def __init__(self):
         _message = "message goes in here"
-        super(MissingParameterError, self).__init__(_code, _message)
+        super(MissingParameterError, self).__init__(_message)
 
 class InvalidFormatError(DataValidationException):
     
     def __init__(self, value):
         _message = "message goes in here"
-        super(InvalidFormatError, self).__init__(_code, _message)
+        super(InvalidFormatError, self).__init__(_message)
 
 class InvalidMetaValueError(DataValidationException):
 
     def __init__(self):
         _message = "message goes in here"
-        super(InvalidMetaValueError, self).__init__(_code, _message)
+        super(InvalidMetaValueError, self).__init__(_message)
 
 class UnregisteredAdapterError(DataValidationException):
 
     def __init__(self):
         _message = "message goes in here"
-        super(UnregisteredAdapterError, self).__init__(_code, _message)
+        super(UnregisteredAdapterError, self).__init__(_message)
 
 #:
 #: The following excepetions are used by REST handlers to indicate 
