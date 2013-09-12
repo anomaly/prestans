@@ -955,8 +955,11 @@ class Model(DataCollection):
                 _model_instance.__dict__[attribute_name] = validated_object
                     
             except prestans.exception.DataValidationException, exp:
-                #: @todo revise this
-                raise prestans.exception.DataValidationException('%s, %s' % (attribute_name, str(exp)))
+                raise prestans.exception.ValidationError(
+                    message=str(exp), 
+                    attribute_name=attribute_name, 
+                    value=validation_input, 
+                    blueprint=type_instance.blueprint())
 
         return _model_instance
 

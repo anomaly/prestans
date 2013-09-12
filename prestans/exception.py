@@ -142,7 +142,7 @@ class UnsupportedContentTypeError(Base):
             'supported_types': content_type
             })
 
-class DataValidationResponse(Base):
+class ValidationError(Base):
     """
     DataValidationException are Exceptions raised if prestans fails
     to validate data inbound or out using rules defined in Models.
@@ -152,14 +152,11 @@ class DataValidationResponse(Base):
 
     Each exception uses an HTTP status code and is sent to the client.
     """
-    def __init__(self, code, message, attribute_name, value, blueprint, parent_exception=None):
+    def __init__(self, message, attribute_name, value, blueprint):
 
-        super(DataValidationException, self).__init__(code, message)
+        super(ValidationError, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
         self._attribute_name = attribute_name
         self._value = value
-
-        if parent_exception is not None:
-            self.trace = self.trace + parent_exception.trace
 
         self.append_validation_trace(blueprint)
 
@@ -302,26 +299,26 @@ class RequiredAttributeError(DataValidationException):
 
 class ParseFailed(DataValidationException):
     
-    def __init__(self, value, data_type):
-        _message = "attribute parse failed"
+    def __init__(self, data_type):
+        _message = "parse failed for a prestans %s" % data_type
         super(ParseFailed, self).__init__(_message)
 
-class InvalidValueError(DataValidationException):
+# class InvalidValueError(DataValidationException):
     
-    def __init__(self, value):
-        _message = "%s value is not acceptable for attribute" % str(value)
-        super(InvalidValueError, self).__init__(_message)
+#     def __init__(self, value):
+#         _message = "%s value is not acceptable for attribute" % str(value)
+#         super(InvalidValueError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
     
     def __init__(self, value, allowed_min):
-        _message = "message goes in here"
+        _message = "%i is less than the allowed minimum of %i" % (value, allowed_min)
         super(LessThanMinimumError, self).__init__(_message)
 
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
-        _message = "message goes in here"
+        _message = "%i is more than the allowed maximum" % (value, allowed_max)
         super(MoreThanMaximumError, self).__init__(_message)
 
 class InvalidChoiceError(DataValidationException):
@@ -333,7 +330,7 @@ class InvalidChoiceError(DataValidationException):
 class UnacceptableLengthError(DataValidationException):
     
     def __init__(self, value, minimum, maximum):
-        _message = "message goes in here"
+        _message = "value has to be %i and %i" % (minimum, maximum)
         super(UnacceptableLengthError, self).__init__(_message)
 
 class InvalidType(DataValidationException):
@@ -342,11 +339,11 @@ class InvalidType(DataValidationException):
         _message = "message goes in here"
         super(InvalidType, self).__init__(_message)
 
-class InvalidCollectionError(DataValidationException):
+# class InvalidCollectionError(DataValidationException):
 
-    def __init__(self, value):
-        _message = "message goes in here"
-        super(InvalidCollectionError, self).__init__(_message)
+#     def __init__(self, value):
+#         _message = "message goes in here"
+#         super(InvalidCollectionError, self).__init__(_message)
 
 class MissingParameterError(DataValidationException):
 
