@@ -111,7 +111,7 @@ class Request(webob.Request):
         Attribute filter that used to parse the request_body. This must be set
         before the body_template parameter is set
         """
-        self._response_attribute_filter = value
+        self._attribute_filter = value
 
     @property
     def body_template(self):
