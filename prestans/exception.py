@@ -303,12 +303,6 @@ class ParseFailed(DataValidationException):
         _message = "parse failed for a prestans %s" % data_type
         super(ParseFailed, self).__init__(_message)
 
-# class InvalidValueError(DataValidationException):
-    
-#     def __init__(self, value):
-#         _message = "%s value is not acceptable for attribute" % str(value)
-#         super(InvalidValueError, self).__init__(_message)
-
 class LessThanMinimumError(DataValidationException):
     
     def __init__(self, value, allowed_min):
@@ -324,7 +318,7 @@ class MoreThanMaximumError(DataValidationException):
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
-        _message = "message goes in here"
+        _message = "value is not one of these choics %s" % str(allowed_choices).strip('[]')
         super(InvalidChoiceError, self).__init__(_message)
 
 class UnacceptableLengthError(DataValidationException):
@@ -338,12 +332,6 @@ class InvalidType(DataValidationException):
     def __init__(self, value, type_name):
         _message = "message goes in here"
         super(InvalidType, self).__init__(_message)
-
-# class InvalidCollectionError(DataValidationException):
-
-#     def __init__(self, value):
-#         _message = "message goes in here"
-#         super(InvalidCollectionError, self).__init__(_message)
 
 class MissingParameterError(DataValidationException):
 
