@@ -406,10 +406,14 @@ class Response(webob.Response):
         """
 
         #: prestans' equivalent of webob.Response line 1022
-        if self.template is None:
+        if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
+
+            if self.template is not None:
+                self.logger.warn("handler returns No Content but has a response_template; set template to None")
+
             headerlist = self._abs_headerlist(environ)
             start_response(self.status, headerlist)
-            return webob.EmptyResponse(self._app_iter)
+            return []
 
         #: Body should be of type DataCollection try; attempt calling
         #: as_seriable with available attribute_filter
