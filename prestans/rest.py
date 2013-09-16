@@ -33,6 +33,7 @@
 import re
 import webob
 import logging
+import inspect
 
 import prestans
 import prestans.http
@@ -514,7 +515,7 @@ class RequestHandler(object):
     __provider_config__ = prestans.provider.Config()    
     __parser_config__ = prestans.parser.Config()
 
-    def __init__(self, args, request, response, logger, debug=False):
+    def __init__(self, args, request, response, logger, debug):
 
         self._args = args
         self._request = request
@@ -533,6 +534,54 @@ class RequestHandler(object):
     @property
     def logger(self):
         return self._logger
+
+    @property
+    def debug(self):
+        return self._debug
+
+    def blueprint(self):
+        
+        handler_blueprint = dict()
+
+        signature_map = [ prestans.http.VERB.GET, \
+        prestans.http.VERB.HEAD, \
+        prestans.http.VERB.POST, \
+        prestans.http.VERB.PUT, \
+        prestans.http.VERB.PATCH, \
+        prestans.http.VERB.DELETE ]
+
+        # Make a list of methods supported by this handler
+        for http_verb in signature_map:
+
+            http_verb_name = http_verb.lower()
+            local_function_handle = getattr(self, http_verb_name).__func__
+
+            # Ignore if the local signature is the same as the base method
+            if local_function_handle is getattr(RequestHandler, http_verb_name).__func__:
+                continue
+
+            verb_blueprint = dict()
+
+            # Docstring
+            verb_blueprint['description'] = inspect.getdoc(local_function_handle)
+            
+            # Arguments, get the first set of parameters for the function handle and ignore echoing self
+            verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
+
+            # See if the request parser has something to say
+            parser_rules = None
+
+            # if self.__class__.request_parser is not None and \
+            # getattr(self.__class__.request_parser, http_verb) is not None:
+
+            #     parser_rule_set = getattr(self.__class__.request_parser, http_verb)
+            #     parser_rules = parser_rule_set.blueprint()
+
+            verb_blueprint['parser_rules'] = parser_rules
+
+            handler_blueprint[http_verb] = verb_blueprint
+
+        return handler_blueprint
 
     def __call__(self, environ, start_response):
 
@@ -704,7 +753,51 @@ class RequestHandler(object):
 #:
 
 class BlueprintHandler(RequestHandler):
-    pass
+
+    def __init__(self, args, request, response, logger, debug, route_map):
+        super(BlueprintHandler, self).__init__(args, request, response, logger, debug)
+        self._route_map = route_map
+
+    def _create_blueprint(self):
+        
+        blueprint_groups = dict()
+
+        # Intterogate each handler
+        for regexp, handler_class in self.route_map:
+
+            # Ignore discovery handler
+            if issubclass(handler_class, BlueprintHandler):
+                continue
+
+            handler_blueprint = dict()
+            handler_blueprint['url'] = regexp
+            handler_blueprint['handler_class'] = handler_class.__name__
+            handler_blueprint['description'] = inspect.getdoc(handler_class)
+            handler_blueprint['supported_methods'] = handler_class(self._args, self.request, 
+                self.response, self.logger, self.debug).blueprint()
+
+            # Make a new group per module if one doesnt' exist
+            if not handler_class.__module__ in blueprint_groups:
+                blueprint_groups[handler_class.__module__] = []
+
+            blueprint_groups[handler_class.__module__].append(handler_blueprint)
+
+        return blueprint_groups
+
+    @property
+    def route_map(self):
+        return self._route_map
+
+    @route_map.setter
+    def route_map(self, value):
+        self._route_map = value
+
+    def __call__(self, environ, start_response):
+
+        import logging
+        logging.error(self._create_blueprint())
+
+        return []
 
 
 class RequestRouter(object):
@@ -814,8 +907,12 @@ class RequestRouter(object):
                 #: If we've found a match; ensure its a handler subclass and return it's callable
                 if match:
 
-                    request_handler = handler_class(args=match.groups(), request=request, response=response, 
-                        logger=self._logger, debug=self._debug)
+                    if issubclass(handler_class, BlueprintHandler):
+                        request_handler = handler_class(args=match.groups(), request=request, response=response, 
+                            logger=self._logger, debug=self._debug, route_map=self._routes)
+                    else:
+                        request_handler = handler_class(args=match.groups(), request=request, response=response, 
+                            logger=self._logger, debug=self._debug)
 
                     return request_handler(environ, start_response)
 
