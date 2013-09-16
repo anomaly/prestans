@@ -33,6 +33,7 @@
 __all__ = [
     'UnsupportedVocabularyError',
     'UnsupportedContentTypeError',
+    'ValidationError',
     'DataValidationException',
     'ParserException',
     'HandlerException',

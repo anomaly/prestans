@@ -598,7 +598,23 @@ class RequestHandler(object):
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
-                pass
+                
+                for parameter_set in verb_parser_config.parameter_sets:
+
+                    if not issubclass(parameter_set, prestans.parser.ParameterSet):
+                        raise TypeError("%s not a subclass of ParameterSet" % parameter_set.__class__.__name__)
+
+                    try:
+                        validated_parameter_set = parameter_set.validate(request)
+
+                        if validated_parameter_set is not None:
+                            self.parameter_set = validated_parameter_set
+                            return
+
+                    except prestans.exception.DataValidationException, exp:
+                        continue
+
+                return None
 
             #: Parse body
             if not request_method == prestans.http.VERB.GET and verb_parser_config is not None:
