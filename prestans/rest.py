@@ -550,6 +550,14 @@ class RequestHandler(object):
         prestans.http.VERB.PATCH, \
         prestans.http.VERB.DELETE ]
 
+        #: Provider configuration
+        provider_blueprint = None
+
+        if self.__class__.__provider_config__ is not None:
+            provider_blueprint = self.__class__.__provider_config__.blueprint()
+
+        handler_blueprint['provider_config'] = provider_blueprint
+
         # Make a list of methods supported by this handler
         for http_verb in signature_map:
 
@@ -568,8 +576,8 @@ class RequestHandler(object):
             # Arguments, get the first set of parameters for the function handle and ignore echoing self
             verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
 
-            # See if the request parser has something to say
-            parser_blueprint = dict()
+            #: Parser configuration
+            parser_blueprint = None
 
             if self.__class__.__parser_config__ is not None and \
             self.__class__.__parser_config__.get_config_for_verb(http_verb) is not None:

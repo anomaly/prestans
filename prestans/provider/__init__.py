@@ -39,6 +39,11 @@ class Config(object):
 		self._throttle = throttle
 		self._cache = cache
 
+	def blueprint(self):
+		provider_blueprint = dict()
+
+		return provider_blueprint
+
 	@property
 	def authentication(self):
 		return self._authentication
