@@ -117,7 +117,7 @@ class ModelAdapter(adapters.ModelAdapter):
                 #: Iterator uses the .append method exposed by prestans arrays to validate
                 #: and populate the collection in the instance.
                 for collection_element in persistent_attr_value:
-                    if isinstance(rest_attr.element_template, prestans.types.String:
+                    if isinstance(rest_attr.element_template, prestans.types.String):
                         rest_model_array_handle.append(collection_element)
                     elif isinstance(rest_attr.element_template, prestans.types.Integer):
                         rest_model_array_handle.append(collection_element)
