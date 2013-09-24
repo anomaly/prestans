@@ -418,7 +418,7 @@ class Response(object):
                 else:
                     serializable_body[key] = value
         
-        return self._serializer.dumps(serializable_body)
+        return [self._serializer.dumps(serializable_body)]
     
     ## @brief returns True if the body has one or more element(s)
     #   
