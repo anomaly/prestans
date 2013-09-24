@@ -763,6 +763,7 @@ class RequestHandler(object):
 class BlueprintHandler(RequestHandler):
 
     def __init__(self, args, request, response, logger, debug, route_map):
+
         super(BlueprintHandler, self).__init__(args, request, response, logger, debug)
         self._route_map = route_map
 
@@ -805,7 +806,9 @@ class BlueprintHandler(RequestHandler):
         import logging
         logging.error(self._create_blueprint())
 
-        return []
+        logging.error(self.response)
+
+        return self.response(environ, start_response)
 
 
 class RequestRouter(object):
@@ -823,12 +826,13 @@ class RequestRouter(object):
 
     def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None, 
         default_deserializer=None, charset="utf-8", application_name="prestans", 
-        logger=None, debug=False):
+        logger=None, debug=False, description=None):
 
         self._application_name = application_name
         self._debug = debug
         self._routes = routes
         self._charset = charset
+        self._description = description
 
         #: Are formats prestans handlers can send data back as
         self._serializers = serializers
