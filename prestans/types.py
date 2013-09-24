@@ -85,7 +85,7 @@ class DataCollection(DataType):
 class String(DataType):
     
     def __init__(self, default=None, min_length=None, max_length=None, 
-        required=True, format=None, choices=None, utf_encoding='utf-8'):
+        required=True, format=None, choices=None, utf_encoding='utf-8', description=None):
 
         if min_length and max_length and min_length > max_length:
             pass
@@ -100,6 +100,7 @@ class String(DataType):
         self._format = format
         self._choices = choices
         self._utf_encoding = utf_encoding
+        self._description = description
 
     def blueprint(self):
 
@@ -114,6 +115,7 @@ class String(DataType):
         constraints['format'] = self._format
         constraints['choices'] = self._choices
         constraints['utf_encoding'] = self._utf_encoding
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
 
@@ -159,7 +161,7 @@ class String(DataType):
 class Integer(DataType):
 
     def __init__(self, default=None, minimum=None, maximum=None, 
-        required=True, choices=None):
+        required=True, choices=None, description=None):
 
         if minimum and maximum and minimum > maximum:
             pass
@@ -169,6 +171,7 @@ class Integer(DataType):
         self._maximum = maximum
         self._required = required
         self._choices = choices
+        self._description = description
 
     def blueprint(self):
 
@@ -181,6 +184,7 @@ class Integer(DataType):
         constraints['maximum'] = self._maximum
         constraints['required'] = self._required
         constraints['choices'] = self._choices
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
 
@@ -216,12 +220,8 @@ class Integer(DataType):
 
 class Float(DataType):
 
-    def __init__(self, 
-                 default=None, 
-                 minimum=None, 
-                 maximum=None, 
-                 required=True, 
-                 choices=None):
+    def __init__(self, default=None, minimum=None, maximum=None, required=True, 
+        choices=None, description=None):
         
         if minimum and maximum and minimum > maximum:
             pass
@@ -231,6 +231,7 @@ class Float(DataType):
         self._maximum = maximum
         self._required = required
         self._choices = choices
+        self._description = description
 
     def blueprint(self):
 
@@ -243,6 +244,7 @@ class Float(DataType):
         constraints['maximum'] = self._maximum
         constraints['required'] = self._required
         constraints['choices'] = self._choices
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -278,11 +280,11 @@ class Float(DataType):
         
 class Boolean(DataType):
 
-    def __init__(self, default=None, required=True):
-
+    def __init__(self, default=None, required=True, description=None):
 
         self._default = default
         self._required = required
+        self._description = description
 
     def blueprint(self):
 
@@ -292,6 +294,7 @@ class Boolean(DataType):
         constraints = dict()
         constraints['default'] = self._default
         constraints['required'] = self._required
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -335,10 +338,11 @@ class DataURLFile(DataType):
         import uuid
         return uuid.uuid4().hex
 
-    def __init__(self, required=True, allowed_mime_types=[]):
+    def __init__(self, required=True, allowed_mime_types=[], description=None):
 
         self._required = required
         self._allowed_mime_types = allowed_mime_types
+        self._description = description
 
         if isinstance(allowed_mime_types, str):
             self._allowed_mime_types = [allowed_mime_types]
@@ -354,6 +358,7 @@ class DataURLFile(DataType):
         constraints = dict()
         constraints['required'] = self._required
         constraints['allowed_mime_types'] = self._allowed_mime_types
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -413,11 +418,12 @@ class DateTime(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
 
-    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S"):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S", description=None):
 
         self._default = default
         self._required = required
         self._format = format
+        self._description = description
 
     def blueprint(self):
 
@@ -428,6 +434,7 @@ class DateTime(DataStructure):
         constraints['default'] = self._default
         constraints['required'] = self._required
         constraints['format'] = self._format
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -475,11 +482,12 @@ class Date(DataStructure):
     class CONSTANT:
         TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
     
-    def __init__(self, default=None, required=True, format="%Y-%m-%d"):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d", description=None):
 
         self._default = default
         self._required = required
         self._format = format
+        self._description = description
 
     def blueprint(self):
 
@@ -490,6 +498,7 @@ class Date(DataStructure):
         constraints['default'] = self._default
         constraints['required'] = self._required
         constraints['format'] = self._format
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -537,11 +546,12 @@ class Time(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_TIME_NOW'
     
-    def __init__(self, default=None, required=True, format="%H:%M:%S"):
+    def __init__(self, default=None, required=True, format="%H:%M:%S", description=None):
 
         self._default = default
         self._required = required
         self._format = format
+        self._description = description
 
     def blueprint(self):
 
@@ -552,6 +562,7 @@ class Time(DataStructure):
         constraints['default'] = self._default
         constraints['required'] = self._required
         constraints['format'] = self._format
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -601,13 +612,14 @@ class Time(DataStructure):
 class Array(DataCollection):
     
     def __init__(self, default=None, required=True, element_template=None, 
-        min_length=None, max_length=None):
+        min_length=None, max_length=None, description=None):
         
         self._default = default
         self._required = required
         self._element_template = element_template
         self._min_length = min_length
         self._max_length = max_length
+        self._description = description
         
         self._array_elements = list()
 
@@ -622,6 +634,7 @@ class Array(DataCollection):
         constraints['min_length'] = self._min_length
         constraints['max_length'] = self._max_length
         constraints['element_template'] = self._element_template.blueprint()
+        constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
         return blueprint
@@ -754,7 +767,7 @@ class Array(DataCollection):
         
 class Model(DataCollection):
 
-    def __init__(self, required=True, default=None, **kwargs):
+    def __init__(self, required=True, default=None, description=None, **kwargs):
         """
         If you are using the Model constructor to provide Meta data, you can provide it
         a default dictionary to initialise instance to initalise it from
@@ -769,6 +782,7 @@ class Model(DataCollection):
 
         self._required = required
         self._default = default
+        self._description = description
 
         self._create_instance_attributes(kwargs)
                 
@@ -776,10 +790,13 @@ class Model(DataCollection):
 
         blueprint = dict()
         blueprint['type'] = 'model'
+        blueprint['description'] = inspect.getdoc(self.__class__)
 
         constraints = dict()
         constraints['required'] = self._required
         constraints['model_template'] = self.__class__.__name__
+        constraints['description'] = self._description
+
         blueprint['constraints'] = constraints
 
         # Fields

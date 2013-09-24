@@ -499,6 +499,11 @@ class VerbConfig(object):
 
         self._request_attribute_filter = request_attribute_filter
 
+    def blueprint(self):
+        
+        verb_config_blueprint = dict()
+
+        return verb_config_blueprint
 
     @property
     def response_template(self):

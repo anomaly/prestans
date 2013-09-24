@@ -553,11 +553,11 @@ class RequestHandler(object):
         # Make a list of methods supported by this handler
         for http_verb in signature_map:
 
-            http_verb_name = http_verb.lower()
-            local_function_handle = getattr(self, http_verb_name).__func__
+            http_verb_lower = http_verb.lower()
+            local_function_handle = getattr(self, http_verb_lower).__func__
 
             # Ignore if the local signature is the same as the base method
-            if local_function_handle is getattr(RequestHandler, http_verb_name).__func__:
+            if local_function_handle is getattr(RequestHandler, http_verb_lower).__func__:
                 continue
 
             verb_blueprint = dict()
@@ -569,15 +569,15 @@ class RequestHandler(object):
             verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
 
             # See if the request parser has something to say
-            parser_rules = None
+            parser_blueprint = dict()
 
-            # if self.__class__.request_parser is not None and \
-            # getattr(self.__class__.request_parser, http_verb) is not None:
+            if self.__class__.__parser_config__ is not None and \
+            self.__class__.__parser_config__.get_config_for_verb(http_verb) is not None:
 
-            #     parser_rule_set = getattr(self.__class__.request_parser, http_verb)
-            #     parser_rules = parser_rule_set.blueprint()
+                parser_config = self.__class__.__parser_config__.get_config_for_verb(http_verb)
+                parser_blueprint = parser_config.blueprint()
 
-            verb_blueprint['parser_rules'] = parser_rules
+            verb_blueprint['parser_config'] = parser_blueprint
 
             handler_blueprint[http_verb] = verb_blueprint
 
