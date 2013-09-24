@@ -32,7 +32,7 @@
 from distutils.core import setup
 
 setup(name='prestans',
-      version='1.1',
+      version='1.2',
       description='A WSGI compliant REST micro-framework',
       long_description='',
       download_url='',
