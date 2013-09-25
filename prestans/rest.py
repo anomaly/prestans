@@ -418,9 +418,9 @@ class Response(webob.Response):
             return []
 
         #: Ensure what we are able to serialize is serializable
-        if not issubclass(value._app_iter, prestans.types.DataCollection):
+        if not isinstance(self._app_iter, prestans.types.DataCollection):
             raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % 
-                value._app_iter.__name__)
+                self._app_iter.__name__)
 
         #: Body should be of type DataCollection try; attempt calling
         #: as_seriable with available attribute_filter
