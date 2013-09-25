@@ -276,7 +276,6 @@ class Response(webob.Response):
 
         self._template = value
 
-
     #:
     #: Attribute filter rsetup
     #:
@@ -406,14 +405,16 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
+        #: From webob.Response line 1021
+        headerlist = self._abs_headerlist(environ)
+        start_response(self.status, headerlist)
+
         #: prestans' equivalent of webob.Response line 1022
         if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
 
             if self.template is not None:
                 self.logger.warn("handler returns No Content but has a response_template; set template to None")
 
-            headerlist = self._abs_headerlist(environ)
-            start_response(self.status, headerlist)
             return []
 
         #: Body should be of type DataCollection try; attempt calling
@@ -431,13 +432,62 @@ class Response(webob.Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
+        return [stringified_body]
+
+#:
+#: DictionaryResponse serializes dictionaries using the selected_serializer
+#:
+
+class DictionaryResponse(Response):
+
+    #:
+    #: body; overrides webob.Response line 324
+    #:
+
+    def _body__get(self):
+        """
+        Overridden response does not support md5, text or json properties. _app_iter
+        is set using rules defined by prestans.
+
+        body getter will return the validated prestans model.
+
+        Webob does the heavy lifiting with headers. 
+        """
+        return self._app_iter
+
+
+    def _body__set(self, value):
+
+        #: value should be a subclass prestans.types.DataCollection
+        if not type(value) == dict:
+            raise TypeError("%s is not a dictionary" % 
+                value.__class__.__name__)
+
+        #: _app_iter assigned to value
+        #: we need to serialize the contents before we know the length
+        #: deffer the content_length property to be set by getter
+        self._app_iter = value
+
+    body = property(_body__get, _body__set, _body__set)
+
+    def __call__(self, environ, start_response):
+
         #: From webob.Response line 1021
         headerlist = self._abs_headerlist(environ)
         start_response(self.status, headerlist)
 
+        #: attempt serializing via registered serializer
+        stringified_body = self._selected_serializer.dumps(self.body)
+
+        if not type(stringified_body) == str:
+            raise TypeError("%s dumps must return a python str not %s" % 
+                (self._selected_serializer.__class__.__name__, 
+                    stringified_body.__class__.__name__))
+
+        #: set content_length
+        self.content_length = len(stringified_body)
+
         return [stringified_body]
-
-
 
 class ErrorResponse(webob.Response):
     """
@@ -762,7 +812,8 @@ class RequestHandler(object):
 
 
 #:
-#:
+#: Generates a blueprint of the handler and serializes it using the requested
+#: Accept header.
 #:
 
 class BlueprintHandler(RequestHandler):
@@ -811,13 +862,17 @@ class BlueprintHandler(RequestHandler):
         #: Setup serializers
         self._setup_serializers()
 
-        import logging
-        logging.error(self._create_blueprint())
+        self.response.status = prestans.http.STATUS.OK
 
-        logging.error(self.response)
+        self.response.body = self._create_blueprint()
 
         return self.response(environ, start_response)
 
+
+#:
+#: Maps URLs to handlers classes and routes requests based on patterns
+#: this is used to init a prestans application
+#:
 
 class RequestRouter(object):
     """
@@ -909,10 +964,6 @@ class RequestRouter(object):
         #: Attempt to parse the HTTP request
         request = Request(environ=environ, charset=self._charset, logger=self._logger, 
             deserializers=self._deserializers, default_deserializer=self._default_deserializer)
-        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
-            default_serializer=self._default_deserializer)
-
-        response.minify = request.is_minified
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
@@ -928,9 +979,20 @@ class RequestRouter(object):
                 if match:
 
                     if issubclass(handler_class, BlueprintHandler):
+
+                        response = DictionaryResponse(charset=self._charset, logger=self._logger, 
+                            serializers=self._serializers, default_serializer=self._default_deserializer)
+
                         request_handler = handler_class(args=match.groups(), request=request, response=response, 
                             logger=self._logger, debug=self._debug, route_map=self._routes)
+
                     else:
+
+                        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
+                            default_serializer=self._default_deserializer)
+
+                        response.minify = request.is_minified
+
                         request_handler = handler_class(args=match.groups(), request=request, response=response, 
                             logger=self._logger, debug=self._debug)
 
