@@ -591,6 +591,27 @@ class RequestHandler(object):
 
         return handler_blueprint
 
+    def _setup_serializers(self):
+
+        #:
+        #: Auto set the return serializer based on Accept headers
+        #: http://docs.webob.org/en/latest/reference.html#header-getters
+        #:
+
+        #: Intersection of requested types and supported types tells us if we
+        #: can infact respond in one of the requess formats
+        best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,
+            default_match=self.response.default_serializer.content_type())
+
+        if best_accept_match is None:
+            self.logger.error("unsupported mime type in request; accept header reads %s" % 
+                self.request.accept)
+            raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
+                self.response.supported_mime_types_str)
+
+        #: If content_type is not acceptable it will raise UnsupportedVocabulary
+        self.response.content_type = best_accept_match
+
     def __call__(self, environ, start_response):
 
         self.logger.info("handler %s.%s; callable excution start" 
@@ -610,24 +631,8 @@ class RequestHandler(object):
             if not prestans.http.VERB.is_supported_verb(self.request.method):
                 raise prestans.exception.UnimplementedVerbError(self.request.method)
 
-            #:
-            #: Auto set the return serializer based on Accept headers
-            #: http://docs.webob.org/en/latest/reference.html#header-getters
-            #:
-
-            #: Intersection of requested types and supported types tells us if we
-            #: can infact respond in one of the requess formats
-            best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,
-                default_match=self.response.default_serializer.content_type())
-
-            if best_accept_match is None:
-                self.logger.error("unsupported mime type in request; accept header reads %s" % 
-                    self.request.accept)
-                raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
-                    self.response.supported_mime_types_str)
-
-            #: If content_type is not acceptable it will raise UnsupportedVocabulary
-            self.response.content_type = best_accept_match
+            #: Setup serializers
+            self._setup_serializers()
 
             #: Authentication
             if self.__provider_config__.authentication is not None:
@@ -802,6 +807,9 @@ class BlueprintHandler(RequestHandler):
         self._route_map = value
 
     def __call__(self, environ, start_response):
+
+        #: Setup serializers
+        self._setup_serializers()
 
         import logging
         logging.error(self._create_blueprint())
