@@ -53,6 +53,9 @@ class Base(object):
     def is_authenticated_user(self, handler_reference):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
         
+    def is_authorized_user(self, handler_reference):
+        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+
     def get_current_user(self):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
@@ -121,3 +124,28 @@ def role_required(role_name=None):
         return wraps(http_method_handler)(secure_http_method_handler)
         
     return _role_required
+
+def access_required(config=None):
+    """
+    Authenticates a HTTP method handler based on a custom set of arguments
+    """
+    
+    def _access_required(http_method_handler):
+
+        def secure_http_method_handler(self, *args):
+
+            # Authentication context must be set
+            if not self.__provider_config__.authentication:
+                _message = "Service available to authenticated users only, no auth context provider set in handler"
+                raise prestans.exception.AuthenticationError(_message)
+
+            # Check for access by calling is_authorized_user
+            if not self.__provider_config__.authentication.is_authorized_user(config):
+                _message = "Service available to authorized users only"
+                raise prestans.exception.AuthorizationError(_message)
+
+            http_method_handler(self, *args)
+        
+        return wraps(http_method_handler)(secure_http_method_handler)
+        
+    return _access_required

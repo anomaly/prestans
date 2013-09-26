@@ -48,12 +48,24 @@ class Config(object):
 	def authentication(self):
 		return self._authentication
 
+	@authentication.setter
+	def authentication(self, value):
+		self._authentication = value
+
 	@property
 	def throttle(self):
 		return self._throttle
 
+	@throttle.setter
+	def throttle(self, value):
+		self._throttle = value
+
 	@property
 	def cache(self):
 		return self._cache
+
+	@cache.setter
+	def cache(self, value):
+		self._cache = value
 
 	
