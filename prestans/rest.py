@@ -699,22 +699,26 @@ class RequestHandler(object):
             #: Configuration as provided by the API or default of a VerbConfig object
             verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
 
-            #: Set the response template and attribute filter
-            self.response.template = verb_parser_config.response_template
+            #: Dress up the request and response with verb configuration
+            if verb_parser_config is not None:
 
-            response_attr_filter_template = verb_parser_config.response_attribute_filter_template
+                #: Set the response template and attribute filter
+                self.response.template = verb_parser_config.response_template
 
-            #: Minification support for response attribute filters
-            rewrite_template_model = None
-            if self.request.is_minified is True:
+                response_attr_filter_template = verb_parser_config.response_attribute_filter_template
 
-                if isinstance(self.response.template, prestans.types.Array):
-                    rewrite_template_model = self.response.template.element_template
-                else:
-                    rewrite_template_model = self.response.template
+                #: Minification support for response attribute filters
+                rewrite_template_model = None
+                if self.request.is_minified is True:
 
-            self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template, 
-                rewrite_template_model)
+                    if isinstance(self.response.template, prestans.types.Array):
+                        rewrite_template_model = self.response.template.element_template
+                    else:
+                        rewrite_template_model = self.response.template
+
+                #: Response attribute filter
+                self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template, 
+                    rewrite_template_model)
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
