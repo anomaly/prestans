@@ -47,7 +47,7 @@ __all__ = [
 
     #: Data Validation
     'RequiredAttributeError',
-    'ParseFailed',
+    'ParseFailedError',
     'InvalidValue',
     'LessThanMinimum',
     'MoreThanMaximum',
@@ -96,8 +96,11 @@ class Base(Exception):
     def push_trace(self, trace_object):
         self._stack_trace.append(trace_object)
 
+    def __unicode__(self):
+        return unicode(self._message)
+
     def __str__(self):
-        return self._message
+        return unicode(self._message).encode('utf-8')
 
 #:
 #: These are top level exceptions that layout tell prestans how
@@ -289,8 +292,8 @@ class DataValidationException(Exception):
     def __init__(self, message):
         self._message = message
 
-    def __str__ (self):
-        return self._message
+    #def __str__ (self):
+    #    return self._message
 
 class RequiredAttributeError(DataValidationException):
 
@@ -300,8 +303,8 @@ class RequiredAttributeError(DataValidationException):
 
 class ParseFailedError(DataValidationException):
     
-    def __init__(self, data_type):
-        _message = "parse failed for a prestans %s" % data_type
+    def __init__(self, attribute, data_type):
+        _message = "parse failed for attribute: %s of type %s" % (attribute, data_type)
         super(ParseFailedError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
