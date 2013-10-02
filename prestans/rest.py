@@ -210,8 +210,10 @@ class Response(webob.Response):
         self._default_serializer = default_serializer
         self._selected_serializer = None
         self._template = None
-        self._app_iter = None
+        self._app_iter = []
         self._minify = False
+        self._attribute_filter = None
+        self._template = None
 
         #: 
         #: IETF hash dropped the X- prefix for custom headers
