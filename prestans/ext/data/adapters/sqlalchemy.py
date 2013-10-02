@@ -79,12 +79,13 @@ class ModelAdapter(adapters.ModelAdapter):
     Provide a brige between REST models and SQLAlchemy objects
     """
     
-    ## @brief adapts a persistent model to a rest model by inspecting
-    #
     def adapt_persistent_to_rest(self, persistent_object, attribute_filter=None):
+        """
+        adapts a persistent model to a rest model by inspecting
+        """
 
         rest_model_instance = self.rest_model_class()
-        
+
         for attribute_key in rest_model_instance.get_attribute_keys():                           
 
             rest_attr = getattr(self.rest_model_class, attribute_key)
@@ -128,7 +129,7 @@ class ModelAdapter(adapters.ModelAdapter):
                     else:
                         element_adapter = adapters.registry.get_adapter_for_rest_model(rest_attr._element_template)
 
-                        #Check if there is a sub model filter
+                        #: Check if there is a sub model filter
                         sub_attribute_filter = None
                         if attribute_filter and attribute_filter.has_key(attribute_key):
                             sub_attribute_filter = getattr(attribute_filter, attribute_key)

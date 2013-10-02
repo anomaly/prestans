@@ -920,14 +920,20 @@ class Model(DataCollection):
         return attribute_filter
 
     def validate(self, value, attribute_filter=None, minified=False):
-        
+
         if self._required and (value is None or not isinstance(value, dict)):
+            """ 
+            Model level validation requires a parsed dictionary, this is done by the serializer 
+            """
             raise prestans.exception.RequiredAttributeError()
             
         if not value and self._default:
             return self._default
             
         if not self._required and not value:
+            """ 
+            Value was not provided by caller, but require a template 
+            """
             return None
             
         _model_instance = self.__class__()

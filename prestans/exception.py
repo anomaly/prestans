@@ -46,7 +46,7 @@ __all__ = [
     'EmptyBody',
 
     #: Data Validation
-    'RequiredAttribute',
+    'RequiredAttributeError',
     'ParseFailed',
     'InvalidValue',
     'LessThanMinimum',
@@ -298,11 +298,11 @@ class RequiredAttributeError(DataValidationException):
         _message = "attribute is required and does not provide a default value"
         super(RequiredAttributeError, self).__init__(_message)
 
-class ParseFailed(DataValidationException):
+class ParseFailedError(DataValidationException):
     
     def __init__(self, data_type):
         _message = "parse failed for a prestans %s" % data_type
-        super(ParseFailed, self).__init__(_message)
+        super(ParseFailedError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
     
