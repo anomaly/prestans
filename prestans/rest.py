@@ -558,9 +558,8 @@ class ErrorResponse(webob.Response):
 
         return [stringified_body]
 
-
 #:
-#:
+#: Base Request handler; all handlers must subclass this
 #:
 
 class RequestHandler(object):

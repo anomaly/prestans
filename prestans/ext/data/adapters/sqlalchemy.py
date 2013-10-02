@@ -127,7 +127,7 @@ class ModelAdapter(adapters.ModelAdapter):
                     elif isinstance(rest_attr.element_template, prestans.types.Boolean):
                         rest_model_array_handle.append(collection_element)
                     else:
-                        element_adapter = adapters.registry.get_adapter_for_rest_model(rest_attr._element_template)
+                        element_adapter = adapters.registry.get_adapter_for_rest_model(rest_attr.element_template)
 
                         #: Check if there is a sub model filter
                         sub_attribute_filter = None
