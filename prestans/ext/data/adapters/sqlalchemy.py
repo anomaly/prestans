@@ -158,9 +158,8 @@ class ModelAdapter(adapters.ModelAdapter):
                     
                 except TypeError, exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                except:
-                    import logging
-                    logging.error("here")
+                except prestans.exception.DataValidationException, exp:
+                    raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
                 
             else:
                 
@@ -170,6 +169,8 @@ class ModelAdapter(adapters.ModelAdapter):
                     setattr(rest_model_instance, attribute_key, persistent_attr_value)
                 except TypeError, exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
+                except prestans.exception.DataValidationException, exp:
+                    raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
 
         return rest_model_instance
         

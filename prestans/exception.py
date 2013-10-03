@@ -101,13 +101,11 @@ class Base(Exception):
     def message(self):
         return self._message
 
-    """
     def __unicode__(self):
         return unicode(self._message)
 
     def __str__(self):
-        #return unicode(self._message).encode('utf-8')
-    """
+        return unicode(self._message).encode('utf-8')
 
 #:
 #: These are top level exceptions that layout tell prestans how
@@ -280,6 +278,29 @@ class AttributeFilterDiffers(ParserException):
             'rejected_attribute_list': list(attribute_list),
             })
 
+class InconsistentPersistentDataError(Base):
+    """
+    Raised by Data Adapters if validation of stored data fails. Extra information is
+    written out to the server log and the client is returned a 500 response.
+
+    Practical expectation is that this should not occur; however if REST rules have 
+    changed since the instantiation of the system.
+    """
+
+    def __init__(self, attribute_name, exception_message):
+        _code = prestans.http.STATUS.INTERNAL_SERVER_ERROR
+        _message = "Data Adapter failed to validate stored data on the server"
+        super(InconsistentPersistentDataError, self).__init__(_code, _message)
+
+        self._attribute_name = attribute_name
+
+        self.push_trace({
+            'exception_message': exception_message,
+            'attribute_name': attribute_name
+            })
+
+    def __str__(self):
+        return "DataAdapter failed to adapt %s, %s" % (self._attribute_name, self.message)
 
 class NoSetMatched(ParserException):
     pass
@@ -297,7 +318,6 @@ class EmptyBody(ParserException):
 class DataValidationException(Base):
 
     def __init__(self, message):
-
         super(DataValidationException, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
 
 class RequiredAttributeError(DataValidationException):
@@ -339,13 +359,13 @@ class UnacceptableLengthError(DataValidationException):
 class InvalidType(DataValidationException):
     
     def __init__(self, value, type_name):
-        _message = "message goes in here"
+        _message = "invalid data type %s" % type_name
         super(InvalidType, self).__init__(_message)
 
 class MissingParameterError(DataValidationException):
 
     def __init__(self):
-        _message = "message goes in here"
+        _message = "missing parameter"
         super(MissingParameterError, self).__init__(_message)
 
 class InvalidFormatError(DataValidationException):

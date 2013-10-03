@@ -407,10 +407,10 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
-        start_response(self.status, self.headerlist)
-
         #: prestans' equivalent of webob.Response line 1022
         if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
+
+            start_response(self.status, self.headerlist)
 
             if self.template is not None:
                 self.logger.warn("handler returns No Content but has a response_template; set template to None")
@@ -437,6 +437,7 @@ class Response(webob.Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
+        start_response(self.status, self.headerlist)
         return [stringified_body]
 
     def __str__(self):
