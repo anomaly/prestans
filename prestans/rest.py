@@ -273,7 +273,7 @@ class Response(webob.Response):
     @template.setter
     def template(self, value):
 
-        if not isinstance(value, prestans.types.DataCollection):
+        if value is not None and not isinstance(value, prestans.types.DataCollection):
             raise TypeError("template in response must be of type prestans.types.DataCollection or subclass")
 
         self._template = value
@@ -407,6 +407,8 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
+        start_response(self.status, self.headerlist)
+
         #: prestans' equivalent of webob.Response line 1022
         if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
 
@@ -435,7 +437,6 @@ class Response(webob.Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
-        start_response(self.status, self.headerlist)
         return [stringified_body]
 
     def __str__(self):
@@ -480,6 +481,8 @@ class DictionaryResponse(Response):
 
     def __call__(self, environ, start_response):
 
+        start_response(self.status, self.headerlist)
+
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(self.body)
 
@@ -491,7 +494,6 @@ class DictionaryResponse(Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
-        start_response(self.status, self.headerlist)
         return [stringified_body]
 
 class ErrorResponse(webob.Response):
@@ -541,6 +543,8 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
+        start_response(self.status, self.headerlist)
+
         error_dict = dict()
 
         error_dict['code'] = self.status_int
@@ -550,7 +554,6 @@ class ErrorResponse(webob.Response):
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
 
-        start_response(self.status, self.headerlist)
         return [stringified_body]
 
     def __str__(self):

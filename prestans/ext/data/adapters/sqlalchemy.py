@@ -101,7 +101,7 @@ class ModelAdapter(adapters.ModelAdapter):
                     #: Catch any exception thrown from setattr to give a useable error message
                     except TypeError, exp:
                         raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                    
+
                 continue
 
             #: Attribute not visible don't bother processing
@@ -158,6 +158,9 @@ class ModelAdapter(adapters.ModelAdapter):
                     
                 except TypeError, exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
+                except:
+                    import logging
+                    logging.error("here")
                 
             else:
                 
