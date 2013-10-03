@@ -516,7 +516,7 @@ class ErrorResponse(webob.Response):
 
         self._exception = exception
         self._serializer = serializer
-        self._message = str(exception)
+        self._message = exception.message
         self._stack_trace = exception.stack_trace
 
         #: 
