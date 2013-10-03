@@ -408,8 +408,8 @@ class Response(webob.Response):
         """
 
         #: From webob.Response line 1021
-        headerlist = self._abs_headerlist(environ)
-        start_response(self.status, headerlist)
+        # headerlist = self._abs_headerlist(environ)
+        start_response(self.status, self.headerlist)
 
         #: prestans' equivalent of webob.Response line 1022
         if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
@@ -480,8 +480,8 @@ class DictionaryResponse(Response):
     def __call__(self, environ, start_response):
 
         #: From webob.Response line 1021
-        headerlist = self._abs_headerlist(environ)
-        start_response(self.status, headerlist)
+        # headerlist = self._abs_headerlist(environ)
+        start_response(self.status, self.headerlist)
 
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(self.body)
@@ -544,8 +544,8 @@ class ErrorResponse(webob.Response):
     def __call__(self, environ, start_response):
 
         #: From webob.Response line 1021
-        headerlist = self._abs_headerlist(environ)
-        start_response(self.status, headerlist)
+        # headerlist = self._abs_headerlist(environ)
+        start_response(self.status, self.headerlist)
 
         error_dict = dict()
 
