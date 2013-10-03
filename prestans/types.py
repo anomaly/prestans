@@ -140,7 +140,7 @@ class String(DataType):
             else:
                 _validated_value = str(value)
         except:
-            raise prestans.exception.ParseFailedError(value, 'String')
+            raise prestans.exception.ParseFailedError()
         
         if not self._required and len(_validated_value) == 0:
             return _validated_value
@@ -206,7 +206,7 @@ class Integer(DataType):
         try:
             _validated_value = int(value)
         except:
-            raise prestans.exception.ParseFailedError(value, 'Integer')
+            raise prestans.exception.ParseFailedError()
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
@@ -265,7 +265,7 @@ class Float(DataType):
         try:
             _validated_value = float(value)
         except:
-            raise prestans.exception.ParseFailedError(value, 'Float')
+            raise prestans.exception.ParseFailedError()
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
@@ -315,7 +315,7 @@ class Boolean(DataType):
         try:
             _validated_value = bool(value)
         except: 
-            raise prestans.exception.ParseFailedError(value, 'Boolean')
+            raise prestans.exception.ParseFailedError()
         
         return _validated_value
 
@@ -386,7 +386,7 @@ class DataURLFile(DataType):
             _validated_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
             _validated_value._file_contents = base64.b64decode(base64_content)
         except Exception, err:
-            raise prestans.exception.ParseFailedError(value, 'DataURLFile')
+            raise prestans.exception.ParseFailedError()
 
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
         and not _validated_value._mime_type in self._allowed_mime_types:
@@ -464,9 +464,9 @@ class DateTime(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError(value, 'DateTime')
+                raise prestans.exception.ParseFailedError()
         else:
-            raise prestans.exception.ParseFailedError(value, 'DateTime')
+            raise prestans.exception.ParseFailedError()
             
         return _validated_value
 
@@ -528,9 +528,9 @@ class Date(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).date()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError(value, 'Date')
+                raise prestans.exception.ParseFailedError()
         else:
-            raise prestans.exception.ParseFailedError(value, 'Date')
+            raise prestans.exception.ParseFailedError()
             
         return _validated_value
 
@@ -592,9 +592,9 @@ class Time(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError(value, 'Time')
+                raise prestans.exception.ParseFailedError()
         else:
-            raise prestans.exception.ParseFailedError(value, 'Time')
+            raise prestans.exception.ParseFailedError()
 
         return _validated_value
 
