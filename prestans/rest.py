@@ -928,6 +928,7 @@ class RequestRouter(object):
         #: http://www.blog.pythonlibrary.org/2012/08/02/python-101-an-intro-to-logging/
         #:
         if logger is None:
+            logging.basicConfig()
             self._logger = logging.getLogger("prestans.%s" % application_name)
         else:
             self._logger = logger
@@ -950,6 +951,25 @@ class RequestRouter(object):
         if default_deserializer is None:
             self._default_deserializer = prestans.deserializer.JSON()
 
+    @property
+    def logger(self):
+        return self._logger
+
+    @property
+    def description(self):
+        return self._description
+
+    @property
+    def charset(self):
+        return self._charset
+
+    @property
+    def debug(self):
+        return self._debug
+
+    @property
+    def application_name(self):
+        return self._application_name
 
     def __call__(self, environ, start_response):
 
@@ -1021,6 +1041,7 @@ class RequestRouter(object):
             raise prestans.exception.NoEndpointError()
 
         except prestans.exception.Base, exp:
+            self.logger.error(exp)
             error_response = ErrorResponse(exp, self._default_serializer)
             return error_response(environ, start_response)
 
