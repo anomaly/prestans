@@ -440,6 +440,10 @@ class Response(webob.Response):
 
         return [stringified_body]
 
+    def __str__(self):
+        #: Overridden so webob's __str__ skips serializing the body
+        super(Response, self).__str__(skip_body=True)
+
 #:
 #: DictionaryResponse serializes dictionaries using the selected_serializer
 #:
@@ -554,6 +558,10 @@ class ErrorResponse(webob.Response):
         self.content_length = len(stringified_body)
 
         return [stringified_body]
+
+    def __str__(self):
+        #: Overridden so webob's __str__ skips serializing the body
+        super(ErrorResponse, self).__str__(skip_body=True)
 
 #:
 #: Base Request handler; all handlers must subclass this
@@ -734,6 +742,7 @@ class RequestHandler(object):
                             return
 
                     except prestans.exception.DataValidationException, exp:
+                        #: @todo
                         continue
 
                 return None
