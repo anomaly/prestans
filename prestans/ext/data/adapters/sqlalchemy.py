@@ -149,7 +149,7 @@ class ModelAdapter(adapters.ModelAdapter):
 
                         #: Check if there is a sub model filter
                         sub_attribute_filter = None
-                        if isinstance(attribute_filter, prestans.parsers.AttributeFilter) and attribute_filter.has_key(attribute_key):
+                        if isinstance(attribute_filter, prestans.parser.AttributeFilter) and attribute_filter.has_key(attribute_key):
                             sub_attribute_filter = getattr(attribute_filter, attribute_key)
 
                         adapted_rest_model = model_adapter.adapt_persistent_to_rest(persistent_attr_value, sub_attribute_filter)
