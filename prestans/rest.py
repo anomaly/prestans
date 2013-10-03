@@ -407,9 +407,6 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
-        #: From webob.Response line 1021
-        start_response(self.status, self.headerlist)
-
         #: prestans' equivalent of webob.Response line 1022
         if self.template is None or self.status_code == prestans.http.STATUS.NO_CONTENT:
 
@@ -438,6 +435,7 @@ class Response(webob.Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
+        start_response(self.status, self.headerlist)
         return [stringified_body]
 
     def __str__(self):
@@ -482,9 +480,6 @@ class DictionaryResponse(Response):
 
     def __call__(self, environ, start_response):
 
-        #: From webob.Response line 1021
-        start_response(self.status, self.headerlist)
-
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(self.body)
 
@@ -496,6 +491,7 @@ class DictionaryResponse(Response):
         #: set content_length
         self.content_length = len(stringified_body)
 
+        start_response(self.status, self.headerlist)
         return [stringified_body]
 
 class ErrorResponse(webob.Response):
@@ -545,9 +541,6 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
-        #: From webob.Response line 1021
-        start_response(self.status, self.headerlist)
-
         error_dict = dict()
 
         error_dict['code'] = self.status_int
@@ -557,6 +550,7 @@ class ErrorResponse(webob.Response):
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
 
+        start_response(self.status, self.headerlist)
         return [stringified_body]
 
     def __str__(self):
