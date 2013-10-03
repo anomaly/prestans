@@ -408,7 +408,6 @@ class Response(webob.Response):
         """
 
         #: From webob.Response line 1021
-        # headerlist = self._abs_headerlist(environ)
         start_response(self.status, self.headerlist)
 
         #: prestans' equivalent of webob.Response line 1022
@@ -480,7 +479,6 @@ class DictionaryResponse(Response):
     def __call__(self, environ, start_response):
 
         #: From webob.Response line 1021
-        # headerlist = self._abs_headerlist(environ)
         start_response(self.status, self.headerlist)
 
         #: attempt serializing via registered serializer
@@ -544,7 +542,6 @@ class ErrorResponse(webob.Response):
     def __call__(self, environ, start_response):
 
         #: From webob.Response line 1021
-        # headerlist = self._abs_headerlist(environ)
         start_response(self.status, self.headerlist)
 
         error_dict = dict()
