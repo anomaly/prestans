@@ -9,14 +9,14 @@ prestans is a REST micro-framework built right on top of WSGI, designed perform 
 Key features:
 
 * Inbuilt URL handler so you use prestans directly on top of WSGI
-* Wel defined handler lifecycle, mapped to HTTP verbs with pre and post execution hooks
+* Well defined handler lifecycle, mapped to HTTP verbs with pre and post execution hooks
 * Strong reusable validation rules for incoming and outoging data payloads
 * Easy integration (e.g Authentication, Caching, Throttling) with existing WSGI framework and middleware by introducing a pattern of providers
 * Support for multiple serialization methods
 * Completely extendable by allowing you to write your own Providers
 * Designed for applications with pure Ajax (e.g Gmail) or native mobile clients
 * Extensive and useful documentation, published on [Github](http://github.com/prestans/prestans-docs/ "Docs source") and available on [Read The Docs](http://docs.prestans.org "prestans documentation")
-* Response minification
+* Response minification, drastically reduces responses
 
 And incase you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
