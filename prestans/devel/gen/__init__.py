@@ -56,7 +56,8 @@ class Inspector(object):
             sys.exit(1)
 
         for name, type_instance in models.__dict__.iteritems():
-            if name.startswith('__') or inspect.ismethod(type_instance) or not inspect.isclass(type_instance) or not issubclass(type_instance, prestans.types.Model):
+            if name.startswith('__') or inspect.ismethod(type_instance) or not inspect.isclass(type_instance) or\
+             not issubclass(type_instance, prestans.types.Model):
                 continue
 
             blueprint = type_instance().blueprint()
@@ -84,9 +85,11 @@ class Preplate(object):
 
         template = None
         if self._template_type == "closure.model":
-            template = prestans.devel.gen.closure.Model(template_engine=self._template_engine, model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
+            template = prestans.devel.gen.closure.Model(template_engine=self._template_engine, 
+                model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
         elif self._template_type == "closure.filter":
-            template = prestans.devel.gen.closure.Filter(template_engine=self._template_engine, model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
+            template = prestans.devel.gen.closure.Filter(template_engine=self._template_engine, 
+                model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
 
         if template is None:
             return 1
