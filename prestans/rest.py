@@ -704,7 +704,7 @@ class RequestHandler(object):
             verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
 
             #: Dress up the request and response with verb configuration
-            if verb_parser_config is not None:
+            if verb_parser_config is not None and verb_parser_config.response_template is not None:
 
                 #: Set the response template and attribute filter
                 self.response.template = verb_parser_config.response_template
