@@ -231,7 +231,7 @@ class Base(object):
     def add_filter_dependency(self, attribute):
 
         dependency = None
-        if attribute.type == 'array':
+        if attribute.type == 'array' and attribute.element_template_is_model:
             dependency = "%s.%s" % (self._namespace, attribute.element_template)
         elif attribute.type == 'model':
             dependency = "%s.%s" % (self._namespace, attribute.model_template)
