@@ -31,7 +31,7 @@ goog.require('{{dependency}}');
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% else %}
-        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], {{attribute.max_length}}, {{attribute.min_length}});
+        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% endif %}
 {% elif attribute.type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
@@ -58,7 +58,7 @@ goog.require('{{dependency}}');
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% else %}
-        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], {{attribute.max_length}}, {{attribute.min_length}});
+        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% endif %}
 {% elif attribute.type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
