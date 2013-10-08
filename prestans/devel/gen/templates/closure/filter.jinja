@@ -98,7 +98,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     else
         throw "{{attribute.ccif}} must be of type {{namespace}}.{{attribute.model_template}}";
 };
-{% elif attribute.type == 'array' %}
+{% elif attribute.type == 'array' and attribute.element_template_is_model %}
 {{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function({{attribute.ccif}}) {
     if({{attribute.ccif}} instanceof {{namespace}}.{{attribute.element_template}})
         this.{{attribute.ccif}}_ = {{attribute.ccif}};
