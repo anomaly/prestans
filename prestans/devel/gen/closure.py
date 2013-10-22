@@ -57,50 +57,59 @@ class AttributeMetaData(object):
         self._choices = None
         self._format = None
 
-        self._type = blueprint['type']
+        self._blueprint_type = blueprint['type']
         self._map_name = blueprint['map_name']
 
         #Basic types
-        if self._type == 'string':
+        if self._blueprint_type == 'string':
             self._required = blueprint['constraints']['required']
             self._min_length = blueprint['constraints']['min_length']
             self._max_length = blueprint['constraints']['max_length']
             self._default = blueprint['constraints']['default']
             self._choices = blueprint['constraints']['choices']
             self._format = blueprint['constraints']['format']
+            self._client_class_name = "String"
 
-        elif self._type == 'integer':
+        elif self._blueprint_type == 'integer':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
             self._minimum = blueprint['constraints']['minimum']
             self._maximum = blueprint['constraints']['maximum']
             self._choices = blueprint['constraints']['choices']
-        elif self._type == 'float':
+            self._client_class_name = "Integer"
+        elif self._blueprint_type == 'float':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
             self._minimum = blueprint['constraints']['minimum']
             self._maximum = blueprint['constraints']['maximum']
             self._choices = blueprint['constraints']['choices']
-        elif self._type == 'boolean':
+            self._client_class_name = "Float"
+        elif self._blueprint_type == 'boolean':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
-        elif self._type == 'datetime':
+            self._client_class_name = "Boolean"
+        elif self._blueprint_type == 'datetime':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
-        elif self._type == 'date':
+            self._client_class_name = "DateTime"
+        elif self._blueprint_type == 'date':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
-        elif self._type == 'time':
+            self._client_class_name = "Date"
+        elif self._blueprint_type == 'time':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
+            self._client_class_name = "Time"
         #Complex types
-        elif self._type == 'model':
+        elif self._blueprint_type == 'model':
             self._required = blueprint['constraints']['required']
             self._model_template = blueprint['constraints']['model_template']
-        elif self._type == 'array':
+            self._client_class_name = "Model"
+        elif self._blueprint_type == 'array':
             self._required = blueprint['constraints']['required']
             self._min_length = blueprint['constraints']['min_length']
             self._max_length = blueprint['constraints']['max_length']
+            self._client_class_name = "Array"
 
             element_template = blueprint['constraints']['element_template']
 
@@ -125,8 +134,12 @@ class AttributeMetaData(object):
         return udl_to_cc(self._name, True)
 
     @property
-    def type(self):
-        return self._type
+    def blueprint_type(self):
+        return self._blueprint_type
+
+    @property
+    def client_class_name(self):
+        return self._client_class_name
 
     @property
     def map_name(self):
@@ -231,9 +244,9 @@ class Base(object):
     def add_filter_dependency(self, attribute):
 
         dependency = None
-        if attribute.type == 'array' and attribute.element_template_is_model:
+        if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
             dependency = "%s.%s" % (self._namespace, attribute.element_template)
-        elif attribute.type == 'model':
+        elif attribute.blueprint_type == 'model':
             dependency = "%s.%s" % (self._namespace, attribute.model_template)
 
         if dependency is not None and dependency not in self._dependencies:
@@ -242,23 +255,23 @@ class Base(object):
     def add_model_dependency(self, attribute):
 
         dependency = None
-        if attribute.type == 'array' and attribute.element_template_is_model:
+        if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
             dependency = "%s.%s" % (self._namespace, attribute.element_template)
-        elif attribute.type == 'array':
+        elif attribute.blueprint_type == 'array':
             dependency = "%s.%s" % ("prestans.types", attribute.element_template)
-        elif attribute.type == 'model':
+        elif attribute.blueprint_type == 'model':
             dependency = "%s.%s" % (self._namespace, attribute.model_template)
         else:
-            dependency = "prestans.types.%s" % (attribute.type.capitalize())
+            dependency = "prestans.types.%s" % (attribute.client_class_name)
 
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)
 
     #used in filters
     def add_attribute_string(self, attribute):
-        if attribute.type == 'model':
+        if attribute.blueprint_type == 'model':
             self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
-        elif attribute.type == 'array':
+        elif attribute.blueprint_type == 'array':
             self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
         else:
             self._attribute_string += "this.%s_ || " % (attribute.ccif)

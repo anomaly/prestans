@@ -22,9 +22,9 @@ goog.require('{{dependency}}');
         opt_defaultValue = true;
 
 {% for attribute in attributes %}
-{% if attribute.type == 'model' %}
+{% if attribute.blueprint_type == 'model' %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(opt_defaultValue);
-{% elif attribute.type == 'array' and attribute.element_template_is_model %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(opt_defaultValue);
 {% else %}
     this.{{attribute.ccif}}_ = opt_defaultValue;
@@ -56,9 +56,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 {% for attribute in attributes %}
 {{namespace}}.{{name}}.prototype.enable{{attribute.cc}} = function() {
-{% if attribute.type == 'model' %}
+{% if attribute.blueprint_type == 'model' %}
     this.{{ccif}}_ = new {{namespace}}.{{attribute.model_template}}(true);
-{% elif attribute.type == 'array' and attribute.element_template_is_model %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
     this.{{ccif}}_ = new {{namespace}}.{{attribute.element_template}}(true);
 {% else %}
 	this.{{attribute.ccif}}_ = true;
@@ -70,9 +70,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 {% for attribute in attributes %}
 {{namespace}}.{{name}}.prototype.disable{{attribute.cc}} = function() {
-{% if attribute.type == 'model' %}
+{% if attribute.blueprint_type == 'model' %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(false);
-{% elif attribute.type == 'array' and attribute.element_template_is_model %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(false);
 {% else %}
 	this.{{attribute.ccif}}_ = false;
@@ -91,14 +91,14 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 {% for attribute in attributes %}
-{% if attribute.type == 'model' %}
+{% if attribute.blueprint_type == 'model' %}
 {{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function({{attribute.ccif}}) {
     if({{attribute.ccif}} instanceof {{namespace}}.{{attribute.model_template}})
         this.{{attribute.ccif}}_ = {{attribute.ccif}};
     else
         throw "{{attribute.ccif}} must be of type {{namespace}}.{{attribute.model_template}}";
 };
-{% elif attribute.type == 'array' and attribute.element_template_is_model %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
 {{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function({{attribute.ccif}}) {
     if({{attribute.ccif}} instanceof {{namespace}}.{{attribute.element_template}})
         this.{{attribute.ccif}}_ = {{attribute.ccif}};
@@ -125,12 +125,12 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     
     if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
     {% for attribute in attributes %}
-    {% if attribute.type == 'model' %}
+    {% if attribute.blueprint_type == 'model' %}
         if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(opt_complete)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
-    {% elif attribute.type == 'array' and attribute.element_template_is_model %}
+    {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
         if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
@@ -145,12 +145,12 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     }
     else {
     {% for attribute in attributes %}
-    {% if attribute.type == 'model' %}
+    {% if attribute.blueprint_type == 'model' %}
         if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
             jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(opt_complete)
             jsonifiedObject_["{{attribute.name}}"] = false;
-    {% elif attribute.type == 'array' and attribute.element_template_is_model %}
+    {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
         if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
             jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
         else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
