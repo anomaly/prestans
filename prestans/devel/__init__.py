@@ -36,8 +36,8 @@ __all__ = ['gen', 'serve']
 import argparse
 import os
 
-import prestans.devel.serve
-import prestans.devel.gen
+#import prestans.devel.serve
+#import prestans.devel.gen
 import prestans.devel.exception
 
 class ArgParserFactory(object):
@@ -192,6 +192,7 @@ class CommandDispatcher:
             raise prestans.devel.exception.Base("failed to read model file %s" % 
                 self._args.model_path)
 
+        import prestans.devel.gen
         preplate = prestans.devel.gen.Preplate(
             template_type=self._args.template, 
             model_file=self._args.model_path, 
@@ -204,6 +205,7 @@ class CommandDispatcher:
         print self._args
 
     def _dispatch_serve(self):
+        import prestans.devel.serve
         server_config = prestans.devel.serve.Configuration(self._args.config_path)
         dev_server = serve.DevServer(server_config)
         dev_server.run()
