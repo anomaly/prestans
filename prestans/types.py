@@ -613,6 +613,10 @@ class Array(DataCollection):
     
     def __init__(self, default=None, required=True, element_template=None, 
         min_length=None, max_length=None, description=None):
+
+        if not isinstance(element_template, DataType):
+            raise TypeError("Array element_template must a DataType subclass; %s given" % 
+                element_template.__class__.__name__)
         
         self._default = default
         self._required = required
@@ -799,7 +803,6 @@ class Model(DataCollection):
 
         blueprint['constraints'] = constraints
 
-        # Fields
         fields = dict()
         model_class_members = inspect.getmembers(self.__class__)
     
@@ -951,7 +954,7 @@ class Model(DataCollection):
                 continue
 
             if not issubclass(type_instance.__class__, DataType):
-                raise TypeError("%s must be a subclass of prestans.types.DataType" % attribute_name)
+                raise TypeError("%s must be a DataType subclass" % attribute_name)
 
             validation_input = None
 
