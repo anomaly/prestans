@@ -57,9 +57,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 {% for attribute in attributes %}
 {{namespace}}.{{name}}.prototype.enable{{attribute.cc}} = function() {
 {% if attribute.blueprint_type == 'model' %}
-    this.{{ccif}}_ = new {{namespace}}.{{attribute.model_template}}(true);
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(true);
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-    this.{{ccif}}_ = new {{namespace}}.{{attribute.element_template}}(true);
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(true);
 {% else %}
 	this.{{attribute.ccif}}_ = true;
 {% endif %}
