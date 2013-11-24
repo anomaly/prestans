@@ -34,19 +34,19 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
-        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'boolean' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'integer' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Integer({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'float' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'datetime' %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'date' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% endif %}
 {% endfor %}
     }
@@ -61,19 +61,19 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
-        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'boolean' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'integer' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Integer({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'float' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'datetime' %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'date' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
-        this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% endif %}
 {% endfor %}
     }
@@ -88,19 +88,19 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
 {% endif %}
 {% elif attribute.blueprint_type == "string" %}
-        this.{{attribute.ccif}}_ = new prestans.types.String({required: {{attribute.required}}, default: {{attribute.default}}, max_length: {{attribute.max_length}}, min_length: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.String({required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == "boolean" %}
-        this.{{attribute.ccif}}_ = new prestans.types.Boolean({required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == "integer" %}
-        this.{{attribute.ccif}}_ = new prestans.types.Integer({required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == "float" %}
-        this.{{attribute.ccif}}_ = new prestans.types.Float({required: {{attribute.required}}, default: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Float({required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == "datetime" %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == "date" %}
-        this.{{attribute.ccif}}_ = new prestans.types.Date({required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Date({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == "time" %}
-        this.{{attribute.ccif}}_ = new prestans.types.Time({required: {{attribute.required}}, default: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.Time({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% endif %}
 {% endfor %}
     }
