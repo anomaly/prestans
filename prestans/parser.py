@@ -159,7 +159,7 @@ class AttributeFilter(object):
         wrapper for Model's get_attribute_filter
         """
 
-        if not issubclass(model_instance.__class__, prestans.types.DataCollection):
+        if not isinstance(model_instance, prestans.types.DataCollection):
             raise TypeError("model_instance must be a sublcass of presatans.types.DataCollection, %s given" % 
                             (model_instance.__class__.__name__))
 
