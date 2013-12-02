@@ -130,6 +130,10 @@ class Request(webob.Request):
         if self.method == prestans.http.VERB.GET:
             raise AssertionError("body_template cannot be set for GET requests")
 
+        if value is None:
+            self.logger.warn("body_template is None, parsing will be ignored")
+            return
+
         if not isinstance(value, prestans.types.DataCollection):
             raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
 
