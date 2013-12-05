@@ -136,7 +136,7 @@ class String(DataType):
         
         try:
             if isinstance(value, unicode):
-                _validated_value = str(value.decode(self._utf_encoding))
+                _validated_value = u''.join(value).encode(self._utf_encoding).strip()
             else:
                 _validated_value = str(value)
         except:
