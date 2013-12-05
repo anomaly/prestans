@@ -328,8 +328,8 @@ class RequiredAttributeError(DataValidationException):
 
 class ParseFailedError(DataValidationException):
     
-    def __init__(self):
-        _message = "parse failed"
+    def __init__(self, message="Parser Failed"):
+        _message = message
         super(ParseFailedError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
