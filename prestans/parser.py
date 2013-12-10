@@ -122,9 +122,9 @@ class ParameterSet(object):
 
                 # Get input from parameters, None type returned if nothing provided
                 if issubclass(type_instance.__class__, prestans.types.Array):
-                    validation_input = request.get_all(attribute_name)
+                    validation_input = request.params.getall(attribute_name)
                 else:
-                    validation_input = request.get(attribute_name)
+                    validation_input = request.params.getone(attribute_name)
 
                 # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
                 validation_result = type_instance.validate(validation_input)
@@ -132,8 +132,10 @@ class ParameterSet(object):
                 # setattr
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
-            except prestans.types.DataTypeValidationException, exp:
+            except prestans.exception.DataValidationException, exp:
                 # @todo implement exception handling
+                import logging
+                logging.error(exp)
                 return None
             
         return validated_parameter_set
