@@ -741,9 +741,6 @@ class RequestHandler(object):
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
-                
-                import logging
-                logging.error(verb_parser_config.parameter_sets)
 
                 for parameter_set in verb_parser_config.parameter_sets:
 

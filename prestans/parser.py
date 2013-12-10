@@ -134,8 +134,6 @@ class ParameterSet(object):
 
             except prestans.exception.DataValidationException, exp:
                 # @todo implement exception handling
-                import logging
-                logging.error(exp)
                 return None
             
         return validated_parameter_set
