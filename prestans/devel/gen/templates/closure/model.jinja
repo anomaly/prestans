@@ -215,7 +215,10 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 
 };
 
-
+{{namespace}}.{{name}}.prototype.clone = function(opt_filter) {
+    var json_ = this.getJSONObject(false, opt_filter);
+    return new {{namespace}}.{{name}}(json_, false);
+};
 
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_filter) {
 
