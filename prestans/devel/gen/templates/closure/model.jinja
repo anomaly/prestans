@@ -47,6 +47,8 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
         this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+{% elif attribute.blueprint_type == 'data_url_file' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, allowed_mime_types: {{attribute.allowed_mime_types}}});
 {% endif %}
 {% endfor %}
     }
@@ -74,6 +76,8 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
         this.{{attribute.ccif}}_ = new prestans.types.Time({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+{% elif attribute.blueprint_type == 'data_url_file' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, allowed_mime_types: {{attribute.allowed_mime_types}}});
 {% endif %}
 {% endfor %}
     }
@@ -101,6 +105,8 @@ goog.require('{{dependency}}');
         this.{{attribute.ccif}}_ = new prestans.types.Date({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == "time" %}
         this.{{attribute.ccif}}_ = new prestans.types.Time({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+{% elif attribute.blueprint_type == "data_url_file" %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({required: {{attribute.required}}, allowed_mime_types: {{attribute.allowed_mime_types}}});
 {% endif %}
 {% endfor %}
     }

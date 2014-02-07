@@ -100,6 +100,10 @@ class AttributeMetaData(object):
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
             self._client_class_name = "Time"
+        elif self._blueprint_type == 'data_url_file':
+            self._required = blueprint['constraints']['required']
+            self._allowed_mime_types = blueprint['constraints']['allowed_mime_types']
+            self._client_class_name = "DataURLFile"
         #Complex types
         elif self._blueprint_type == 'model':
             self._required = blueprint['constraints']['required']
@@ -151,6 +155,10 @@ class AttributeMetaData(object):
             return "true"
         else:
             return "false"
+
+    @property
+    def allowed_mime_types(self):
+        return self._allowed_mime_types
 
     @property
     def default(self):
