@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['QueryResultIterator', 'ModelAdapter']
+__all__ = ['ModelAdapter']
 
 #:
 #: prestans.ext.data.adapters.sqlalchemy SQLAlchemy specific implementation of Data Adapter
@@ -43,7 +43,36 @@ import prestans.parser
 
 from prestans.ext.data import adapters
 
-def QueryResultIterator(collection, target_rest_class=None, attribute_filter=None):
+#:
+#: Adapt an instance
+#:
+def adapt_persistent_instance(persistent_object, target_rest_instance=None, attribute_filter=None):
+    """
+    Adapts a single persistent instance to a REST model; at present this is a
+    common method for all persistent backends.
+
+    This might be moved to backend specific packages if the need arrises
+
+    Refer to: https://groups.google.com/forum/#!topic/prestans-discuss/dO1yx8f60as
+    for discussion on this feature
+    """
+
+    #: Try and get the adapter and the REST class for the persistent object 
+    if target_rest_instance is None:
+        adapter_instance = adapters.registry.get_adapter_for_persistent_model(collection[0])
+    else:
+        if inspect.isclass(target_rest_instance):
+            target_rest_instance = target_rest_instance()
+        
+        adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_instance)
+
+    return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
+
+
+#:
+#: Adapt an instance
+#:
+def adapt_persistent_collection(collection, target_rest_class=None, attribute_filter=None):
         
     #: Ensure that colleciton is iterable and has atleast one element 
     collection_length = 0
