@@ -1162,3 +1162,6 @@ class Model(DataCollection):
 
         return model_dictionary
         
+class BinaryBodyTemplate(object):
+
+    pass

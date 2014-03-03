@@ -951,9 +951,6 @@ class RequestRouter(object):
         if default_serializer is None:
             self._default_serializer = prestans.serializer.JSON()
 
-        if isinstance(default_serializer, prestans.serializer.TextSerializer):
-            raise TypeError("default_serializer must be a TextualSerializer")
-
         #: Deserializers
         
         if deserializers is None:
