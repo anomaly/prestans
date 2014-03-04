@@ -288,7 +288,8 @@ class Response(webob.Response):
     @template.setter
     def template(self, value):
 
-        if value is not None and not isinstance(value, prestans.types.DataCollection):
+        if value is not None and (not isinstance(value, prestans.types.DataCollection) \
+            and not isinstance(value, prestans.types.BinaryResponse)):
             raise TypeError("template in response must be of type prestans.types.DataCollection or subclass")
 
         self._template = value
@@ -330,11 +331,12 @@ class Response(webob.Response):
     def _content_type__set(self, value):
 
         #: Check to see if response can support the requested mime type
-        if value not in self.supported_mime_types:
+        if not isinstance(self._app_iter, prestans.types.BinaryResponse) and value not in self.supported_mime_types:
             raise prestans.exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
 
         #: Keep a reference to the selected serializer
-        self._set_serializer_by_mime_type(value)
+        if not isinstance(self._app_iter, prestans.types.BinaryResponse):
+            self._set_serializer_by_mime_type(value)
 
         if not value:
             self._content_type__del()
@@ -379,11 +381,11 @@ class Response(webob.Response):
         #: If not response template; we have to assume its NO_CONTENT
         #: hence do not allow setting the body
         if self.template is None:
-            raise AssertionError("response template is None; handler can't return a response")
+            raise AssertionError("response_template is None; handler can't return a response")
 
         #: value should be a subclass prestans.types.DataCollection
-        if not issubclass(value.__class__, prestans.types.DataCollection):
-            raise TypeError("%s is not a prestans.types.DataCollection subclass" % 
+        if not isinstance(value, prestans.types.DataCollection) and not isinstance(value, prestans.types.BinaryResponse):
+            raise TypeError("%s is not a prestans.types.DataCollection or prestans.types.BinaryResponse subclass" % 
                 value.__class__.__name__)
 
         #: Ensure that it matches the return type template
@@ -433,27 +435,54 @@ class Response(webob.Response):
             return []
 
         #: Ensure what we are able to serialize is serializable
-        if not isinstance(self._app_iter, prestans.types.DataCollection):
+        if not isinstance(self._app_iter, prestans.types.DataCollection) and\
+         not isinstance(self._app_iter, prestans.types.BinaryResponse):
             raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % 
                 self._app_iter.__name__)
 
-        #: Body should be of type DataCollection try; attempt calling
-        #: as_seriable with available attribute_filter
-        serializable_body = self._app_iter.as_serializable(self.attribute_filter, self.minify)
+        if isinstance(self._app_iter, prestans.types.DataCollection):
 
-        #: attempt serializing via registered serializer
-        stringified_body = self._selected_serializer.dumps(serializable_body)
+            #: Body should be of type DataCollection try; attempt calling
+            #: as_seriable with available attribute_filter
+            serializable_body = self._app_iter.as_serializable(self.attribute_filter, self.minify)
 
-        if not type(stringified_body) == str:
-            raise TypeError("%s dumps must return a python str not %s" % 
-                (self._selected_serializer.__class__.__name__, 
-                    stringified_body.__class__.__name__))
+            #: attempt serializing via registered serializer
+            stringified_body = self._selected_serializer.dumps(serializable_body)
 
-        #: set content_length
-        self.content_length = len(stringified_body)
+            if not type(stringified_body) == str:
+                raise TypeError("%s dumps must return a python str not %s" % 
+                    (self._selected_serializer.__class__.__name__, 
+                        stringified_body.__class__.__name__))
 
-        start_response(self.status, self.headerlist)
-        return [stringified_body]
+            #: set content_length
+            self.content_length = len(stringified_body)
+
+            start_response(self.status, self.headerlist)
+            return [stringified_body]
+
+        elif isinstance(self._app_iter, prestans.types.BinaryResponse):
+
+            if self._app_iter.content_length == 0 or self._app_iter.mime_type == None or self._app_iter.file_name == None:
+                self.logger.warn("Faile to write binar response with content_length %i; mime_type %s; file_name %s" %
+                    (self._app_iter.content_length, self._app_iter.mime_type,self._app_iter.file_name))
+
+            #: Content type
+            self.content_type = self._app_iter.mime_type
+
+            #: Add content disposition header
+            if self._app_iter.as_attachment:
+                self.headers.add('Content-Disposition', "attachment; filename=%s" % self._app_iter.file_name)
+            else:                
+                self.headers.add('Content-Disposition', "inline; filename=%s" % self._app_iter.file_name)
+
+            #: Write out response
+            self.content_length = self._app_iter.content_length
+
+            start_response(self.status, self.headerlist)
+            return [self._app_iter.contents]
+
+        else:
+            raise AssertionError("prestans failed to write a binary or textual response")
 
     def __str__(self):
         #: Overridden so webob's __str__ skips serializing the body
@@ -1053,10 +1082,6 @@ class RequestRouter(object):
             error_response = ErrorResponse(exp, self._default_serializer)
             return error_response(environ, start_response)
 
-    #:    
-    #: @todo Update regular expressions to support webapp2 like routes
-    #: the followign code was originally taken from webapp
-    #:
     def _init_route_map(self, routes):
 
         parsed_handler_map = []

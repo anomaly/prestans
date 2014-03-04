@@ -1161,7 +1161,69 @@ class Model(DataCollection):
                 model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name]
 
         return model_dictionary
-        
-class BinaryBodyTemplate(object):
 
-    pass
+#:
+#: Body Response Template to transfer binary files
+#:
+
+class BinaryResponse(object):
+
+    def __init__(self, mime_type=None, file_name=None, as_attachment=True, contents=None):
+        
+        if mime_type is not None:
+            self._mime_type = mime_type.encode('ascii', 'ignore')
+        else:
+            self._mime_type = mime_type
+
+        if file_name is not None:
+            self._file_name = file_name.encode('ascii', 'ignore')
+        else:
+            self._file_name = file_name
+
+        self._as_attachment = as_attachment
+        self._contents = contents
+
+    @property
+    def mime_type(self):
+        return self._mime_type
+
+    @mime_type.setter
+    def mime_type(self, value):
+        self._mime_type = value.encode('ascii', 'ignore')
+
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, value):
+        self._file_name = value.encode('ascii', 'ignore')
+
+    @property
+    def as_attachment(self):
+        return self._as_attachment
+
+    @as_attachment.setter
+    def as_attachment(self, value):
+        self._as_attachment = value
+
+    @property
+    def contents(self):
+        return self._contents
+
+    @contents.setter
+    def contents(self, value):
+        self._contents = contents
+
+    @property
+    def content_length(self):
+        if self._contents == None:
+            return 0
+        return len(self._contents)
+
+    def validate(self):
+        return self._mime_type != None\
+         and self._file_name != None\
+          and self.content_length > 0
+
+

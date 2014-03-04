@@ -459,14 +459,17 @@ class VerbConfig(object):
         parameter_sets=[], body_template=None, request_attribute_filter=None):
 
         #: response_template; required parameter        
-        if response_template is not None and not isinstance(response_template, prestans.types.DataCollection):
+        if response_template is not None and (not isinstance(response_template, prestans.types.DataCollection) and\
+         not isinstance(response_template, prestans.types.BinaryResponse)):
             raise TypeError(
             "response_template of type %s must be an instance of a prestans.types.DataCollection subclass" % 
             response_template.__class__.__name__)
 
-        if response_template is not None:
+        if response_template is not None and isinstance(response_template, prestans.types.DataCollection):
             self._response_attribute_filter_template = AttributeFilter.from_model(model_instance=response_template, 
                 default_value=response_attribute_filter_default_value)
+        else:
+            self._response_attribute_filter_template = None
 
         self._response_template = response_template
 
