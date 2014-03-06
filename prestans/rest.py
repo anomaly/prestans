@@ -463,8 +463,11 @@ class Response(webob.Response):
         elif isinstance(self._app_iter, prestans.types.BinaryResponse):
 
             if self._app_iter.content_length == 0 or self._app_iter.mime_type == None or self._app_iter.file_name == None:
-                self.logger.warn("Faile to write binar response with content_length %i; mime_type %s; file_name %s" %
+                self.logger.warn("Failed to write binar response with content_length %i; mime_type %s; file_name %s" %
                     (self._app_iter.content_length, self._app_iter.mime_type,self._app_iter.file_name))
+                self.status = prestans.http.STATUS.INTERNAL_SERVER_ERROR
+                self.content_type = "text/plain"
+                return []
 
             #: Content type
             self.content_type = self._app_iter.mime_type
@@ -972,6 +975,12 @@ class RequestRouter(object):
             self._logger = logging.getLogger("prestans.%s" % application_name)
         else:
             self._logger = logger
+
+        #: Set logger level, API can override this
+        if self._debug == True:
+            self._logger.setLevel(logging.DEBUG)
+        else:
+            self._logger.setLevel(logging.ERROR)
 
         #: If serializers and deserialers aren't provided, prestans runs as a JSON app
         if serializers is None:
