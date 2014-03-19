@@ -320,7 +320,7 @@ class Boolean(DataType):
         return _validated_value
 
 
-class DataURLFile(DataType):
+class DataURLFile(DataStructure):
     """
     Accepts a Fileupload as part of the JSON body using FileReader's readAsDataURL
 
@@ -369,7 +369,11 @@ class DataURLFile(DataType):
 
     @property
     def file_contents(self):
-        return self._file_contents        
+        return self._file_contents
+
+    @property
+    def base64_contents(self):
+        return base64.b64encode(self._file_contents) 
 
     def validate(self, value):
 
@@ -407,6 +411,10 @@ class DataURLFile(DataType):
         file_handle = open(path, 'wb')
         file_handle.write(self._file_contents)
         file_handle.close()
+
+    def as_serializable(self, value):
+        #: This is passed in a DataURLFile and we construct a String back from it
+        return "data:%s;base64,%s" % (value.mime_type, value.base64_contents)
 
 #:
 #: DataStructures
@@ -742,7 +750,8 @@ class Array(DataCollection):
             isinstance(array_element, bool):
 
                 _result_array.append(array_element)
-            else:
+            elif isinstance(array_element, DataCollection):
+                # Assume that this is a model
                 _result_array.append(array_element.as_serializable(attribute_filter, minified))
         
         return _result_array
