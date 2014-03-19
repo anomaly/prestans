@@ -750,6 +750,11 @@ class Array(DataCollection):
             isinstance(array_element, bool):
 
                 _result_array.append(array_element)
+
+            elif isinstance(array_element, DataStructure):
+                serializable_value = self._element_template.as_serializable(array_element)
+                _result_array.append(serializable_value)
+
             elif isinstance(array_element, DataCollection):
                 # Assume that this is a model
                 _result_array.append(array_element.as_serializable(attribute_filter, minified))
