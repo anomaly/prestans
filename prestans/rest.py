@@ -805,22 +805,16 @@ class RequestHandler(object):
             #: prestans sets a sensible HTTP status code
             #:
             if request_method == prestans.http.VERB.GET:
-                self.response.status = prestans.http.STATUS.OK
                 self.get(*self._args)
             elif request_method == prestans.http.VERB.HEAD:
-                self.response.status = prestans.http.STATUS.NO_CONTENT
                 self.head(*self._args)
             elif request_method == prestans.http.VERB.POST:
-                self.response.status = prestans.http.STATUS.CREATED
                 self.post(*self._args)
             elif request_method == prestans.http.VERB.PUT:
-                self.response.status = prestans.http.STATUS.ACCEPTED
                 self.put(*self._args)
             elif request_method == prestans.http.VERB.PATCH:
-                self.response.status = prestans.http.STATUS.ACCEPTED
                 self.patch(*self._args)
             elif request_method == prestans.http.VERB.DELETE:
-                self.response.status = prestans.http.STATUS.NO_CONTENT
                 self.delete(*self._args)
 
             #: Tear down
