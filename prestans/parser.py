@@ -109,22 +109,27 @@ class ParameterSet(object):
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
+                raise TypeError("%s should be of type prestans.types.String/Integer/Float/Array" % attribute_name)
 
             if issubclass(type_instance.__class__, prestans.types.Array):
                 
-                if not issubclass(type_instance._element_template.__class__, prestans.types.String) and \
-                not issubclass(type_instance._element_template.__class__, prestans.types.Float) and \
-                issubclass(type_instance._element_template.__class__, prestans.types.Integer):
-                    raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
+                if not isinstance(type_instance._element_template, prestans.types.String) and \
+                not isinstance(type_instance._element_template, prestans.types.Float) and \
+                not isinstance(type_instance._element_template, prestans.types.Integer):
+                    raise TypeError("%s elements should be of type prestans.types.String/Integer/Float" % attribute_name)
 
             try:
 
-                # Get input from parameters, None type returned if nothing provided
+                #Get input from parameters
+                #Empty list returned if key is missing for getall
                 if issubclass(type_instance.__class__, prestans.types.Array):
                     validation_input = request.params.getall(attribute_name)
+                #Key error thrown if key is missing for getone
                 else:
-                    validation_input = request.params.getone(attribute_name)
+                    try:
+                        validation_input = request.params.getone(attribute_name)
+                    except KeyError:
+                        validation_input = None
 
                 # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
                 validation_result = type_instance.validate(validation_input)
