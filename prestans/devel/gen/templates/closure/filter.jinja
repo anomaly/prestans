@@ -19,7 +19,7 @@ goog.require('{{dependency}}');
 {{namespace}}.{{name}} = function(opt_defaultValue) {
 
     if(opt_defaultValue != false)
-        opt_defaultValue = true;
+        opt_defaultValue = false;
 
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}

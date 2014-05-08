@@ -165,11 +165,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
     if(value instanceof prestans.types.Array && value.getElementTemplate() == prestans.types.{{attribute.element_template}}) {
 {% endif %}
         this.{{attribute.ccif}}_ = value;
-        this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent({
-            identifier: "{{attribute.ccif}}",
-            previousValue: previousArray_,
-            currentValue: this.{{attribute.ccif}}_
-        }));
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousArray_, this.{{attribute.ccif}}_);
         return true;
     }
     else
@@ -178,11 +174,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
     var previousModel_ = this.{{attribute.ccif}}_;
     if(value instanceof {{namespace}}.{{attribute.model_template}}) {
         this.{{attribute.ccif}}_ = value;
-        this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent({
-            identifier: "{{attribute.ccif}}",
-            previousValue: previousModel_,
-            currentValue: this.{{attribute.ccif}}_
-            }));
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousModel_, this.{{attribute.ccif}}_);
         return true;
     }
     else
@@ -190,11 +182,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 {% else %}
     var previousValue_ = this.{{attribute.ccif}}_.getValue();
     var success_ = this.{{attribute.ccif}}_.setValue(value);
-    this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent({
-        identifier: "{{attribute.ccif}}",
-        previousValue: previousValue_,
-        currentValue: this.{{attribute.ccif}}_.getValue()
-    }));
+    this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousValue_, this.{{attribute.ccif}}_.getValue());
     return success_;
 {% endif %}
 };
