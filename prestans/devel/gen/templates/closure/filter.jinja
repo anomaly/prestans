@@ -18,7 +18,7 @@ goog.require('{{dependency}}');
 */
 {{namespace}}.{{name}} = function(opt_defaultValue) {
 
-    if(opt_defaultValue != false)
+    if(!goog.isBoolean(opt_defaultValue))
         opt_defaultValue = false;
 
 {% for attribute in attributes %}
