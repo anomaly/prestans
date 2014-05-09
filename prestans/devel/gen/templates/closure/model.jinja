@@ -110,6 +110,18 @@ goog.require('{{dependency}}');
 {% endif %}
 {% endfor %}
     }
+
+    //listen for array events
+    {% for attribute in attributes %}{% if attribute.blueprint_type == "array" %}
+this.{{attribute.ccif}}_.listen(prestans.types.Array.EventType.ARRAY_CHANGED, function(event) {
+        this.dispatchEvent(new prestans.types.Model.AttributeChangedEvent({
+            identifier: "{{attribute.ccif}}",
+            previousValue: null,
+            currentValue: null
+        }));
+    }, false, this);
+    {% endif %}{% endfor %}
+
 };
 goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 
