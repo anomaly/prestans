@@ -41,9 +41,6 @@ __all__ = [
     #: Parser Exceptions
     'NoEndpointError',
     'SerializationFailed',
-    'NoSetMatched',
-    'BodyTemplateParse',
-    'EmptyBody',
 
     #: Data Validation
     'RequiredAttributeError',
@@ -177,6 +174,18 @@ class ValidationError(Base):
             'blueprint': blueprint
             })
 
+    #:
+    #: The following are overridden to ensure sensible logging messages
+    #:
+
+    def __unicode__(self):
+        _loggable_message = ("%s %s" % self._attribute_name)
+        return unicode(self._loggable_message)
+
+    def __str__(self):
+        _loggable_message = ("%s %s" % self._attribute_name)
+        return unicode(self._loggable_message).encode('utf-8')
+
 class ParserException(Base):
     """
     ParserException are Exceptions raised if prestans fails to parse
@@ -301,15 +310,6 @@ class InconsistentPersistentDataError(Base):
 
     def __str__(self):
         return "DataAdapter failed to adapt %s, %s" % (self._attribute_name, self.message)
-
-class NoSetMatched(ParserException):
-    pass
-
-class BodyTemplateParseError(ParserException):
-    pass
-
-class EmptyBody(ParserException):
-    pass
 
 #:
 #: Data Validation
