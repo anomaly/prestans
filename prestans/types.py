@@ -779,10 +779,10 @@ class Array(DataCollection):
 
         attribute_filter = None
 
-        if issubclass(self._element_template.__class__, DataCollection):
+        if isinstance(self._element_template, DataCollection):
             attribute_filter = self._element_template.get_attribute_filter(default_value)
-        elif issubclass(self._element_template.__class__, DataType) or \
-            issubclass(self._element_template.__class__, DataStructure):
+        elif isinstance(self._element_template, DataType) or \
+            isinstance(self._element_template, DataStructure):
             attribute_filter = default_value
 
         return attribute_filter
@@ -921,7 +921,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
             
-            if issubclass(type_instance.__class__, DataType):
+            if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
             
         return _attribute_keys
@@ -937,7 +937,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if issubclass(type_instance.__class__, DataCollection):
+            if isinstance(type_instance, DataCollection):
                 setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
             else:
                 setattr(attribute_filter, attribute_name, default_value)
@@ -975,7 +975,7 @@ class Model(DataCollection):
                 _model_instance.__dict__[attribute_name] = None
                 continue
 
-            if not issubclass(type_instance.__class__, DataType):
+            if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
 
             validation_input = None
