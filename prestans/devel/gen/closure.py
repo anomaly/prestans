@@ -279,7 +279,7 @@ class Base(object):
     def add_attribute_string(self, attribute):
         if attribute.blueprint_type == 'model':
             self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
-        elif attribute.blueprint_type == 'array':
+        elif attribute.blueprint_type == 'array' and attribute.element_template_is_model:
             self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
         else:
             self._attribute_string += "this.%s_ || " % (attribute.ccif)
