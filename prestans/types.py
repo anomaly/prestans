@@ -625,7 +625,15 @@ class Array(DataCollection):
         if not isinstance(element_template, DataType):
             raise TypeError("Array element_template must a DataType subclass; %s given" % 
                 element_template.__class__.__name__)
-        
+
+        #:
+        #: Force required to be True if basic type in  use
+        #:
+        if isinstance(element_template, DataType)\
+         and not isinstance(element_template, DataCollection)\
+          and not isinstance(element_template, DataStructure):
+            element_template._required = True
+
         self._default = default
         self._required = required
         self._element_template = element_template
@@ -693,7 +701,7 @@ class Array(DataCollection):
             
         for array_element in value:
     
-            if issubclass(self._element_template.__class__, DataCollection):
+            if isinstance(self._element_template, DataCollection):
                 validated_array_element = self._element_template.validate(array_element, attribute_filter)
             else:
                 validated_array_element = self._element_template.validate(array_element)
