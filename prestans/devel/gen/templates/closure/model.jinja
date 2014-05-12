@@ -30,8 +30,34 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == 'array' %}
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
-{% else %}
-        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maxLength: {{attribute.element_template.max_length}}, minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}}),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
@@ -59,8 +85,34 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == 'array' %}
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
-{% else %}
-        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maxLength: {{attribute.element_template.max_length}}, minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json["{{attribute.name}}"],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json["{{attribute.name}}"],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            opt_json: opt_json["{{attribute.name}}"],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}}),
+            opt_json: opt_json["{{attribute.name}}"],
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
@@ -88,8 +140,30 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == 'array' %}
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
-{% else %}
-        this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: prestans.types.{{attribute.element_template}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}});
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maxLength: {{attribute.element_template.max_length}}, minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}}),
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, maximum: {{attribute.element_template.maximum}}, minimum: {{attribute.element_template.minimum}}, choices: {{attribute.element_template.choices}}}),
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}}),
+            maxLength: {{attribute.max_length}},
+            minLength: {{attribute.min_length}}
+        });
 {% endif %}
 {% elif attribute.blueprint_type == "string" %}
         this.{{attribute.ccif}}_ = new prestans.types.String({required: {{attribute.required}}, defaultValue: {{attribute.default}}, maxLength: {{attribute.max_length}}, minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
@@ -174,7 +248,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 {% if attribute.element_template_is_model %}
     if(value instanceof prestans.types.Array && value.getElementTemplate() == {{namespace}}.{{attribute.element_template}}) {
 {% else %}
-    if(value instanceof prestans.types.Array && value.getElementTemplate() == prestans.types.{{attribute.element_template}}) {
+    if(value instanceof prestans.types.Array && value.getElementTemplate() instanceof prestans.types.{{attribute.element_template.client_class_name}}) {
 {% endif %}
         this.{{attribute.ccif}}_ = value;
         this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousArray_, this.{{attribute.ccif}}_);

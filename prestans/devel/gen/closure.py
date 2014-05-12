@@ -43,6 +43,130 @@ def udl_to_cc(text, ignoreFirst=False):
         camel_case = camel_case[0:1].upper()+camel_case[1:]
     return camel_case
 
+class BasicTypeElementTemplate(object):
+
+    def __init__(self, blueprint_type, blueprint):
+        
+        self._blueprint_type = blueprint_type
+        self._required = None
+        self._default = None
+        self._minimum = None
+        self._maximum = None
+        self._min_length = None
+        self._max_length = None
+        self._choices = None
+        self._format = None
+
+        if self._blueprint_type == "string":
+            self._required = blueprint['required']
+            self._min_length = blueprint['min_length']
+            self._max_length = blueprint['max_length']
+            self._default = blueprint['default']
+            self._choices = blueprint['choices']
+            self._format = blueprint['format']
+            self._client_class_name = "String"
+        elif self._blueprint_type == 'integer':
+            self._required = blueprint['required']
+            self._default = blueprint['default']
+            self._minimum = blueprint['minimum']
+            self._maximum = blueprint['maximum']
+            self._choices = blueprint['choices']
+            self._client_class_name = "Integer"
+        elif self._blueprint_type == 'float':
+            self._required = blueprint['required']
+            self._default = blueprint['default']
+            self._minimum = blueprint['minimum']
+            self._maximum = blueprint['maximum']
+            self._choices = blueprint['choices']
+            self._client_class_name = "Float"
+        elif self._blueprint_type == 'boolean':
+            self._required = blueprint['required']
+            self._default = blueprint['default']
+            self._client_class_name = "Boolean"
+
+        if self._required is None:
+            self._required = True
+
+    @property
+    def blueprint_type(self):
+        return self._blueprint_type
+
+    @property
+    def client_class_name(self):
+        return self._client_class_name
+
+    @property
+    def required(self):
+        if self._required:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def default(self):
+        #dates are check first otherwise string will catch them
+        #if self._default == prestans.types.DateTime.CONSTANT.NOW:
+        #    return "prestans.types.DateTime.NOW"
+        #elif self._default == prestans.types.Date.CONSTANT.TODAY:
+        #    return "prestans.types.Date.TODAY"
+        #elif self._default == prestans.types.Time.CONSTANT.NOW:
+        #    return "prestans.types.Time.NOW"
+        if self._default is None:
+            return "null"
+        elif type(self._default) == str:
+            return "\"%s\"" % (self._default)
+        elif type(self._default) == bool:
+            if self._default:
+                return "true"
+            else:
+                return "false"
+        else:
+            return self._default
+
+    @property
+    def minimum(self):
+        if self._minimum is None:
+            return "null"
+        else:
+            return self._minimum
+
+    @property
+    def maximum(self):
+        if self._maximum is None:
+            return "null"
+        else:
+            return self._maximum
+
+    #string and array
+    @property
+    def min_length(self):
+        if self._min_length is None:
+            return "null"
+        else:
+            return self._min_length
+
+    @property
+    def max_length(self):
+        if self._max_length is None:
+            return "null"
+        else:
+            return self._max_length
+
+    @property
+    def format(self):
+        if self._format is None:
+            return "null"
+
+        format = self._format.replace("\\", "\\\\")
+        return "\"%s\"" % (format)
+
+    @property
+    def choices(self):
+        if self._choices is None:
+            return "null"
+        else:
+            return self._choices
+
 class AttributeMetaData(object):
 
     def __init__(self, name, blueprint):
@@ -122,7 +246,7 @@ class AttributeMetaData(object):
                 self._element_template = element_template['constraints']['model_template']
             else:
                 self._element_template_is_model = False
-                self._element_template = element_template['type'].capitalize()
+                self._element_template = BasicTypeElementTemplate(blueprint_type=element_template['type'], blueprint=element_template['constraints'])
 
 
     @property
@@ -266,7 +390,7 @@ class Base(object):
         if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
             dependency = "%s.%s" % (self._namespace, attribute.element_template)
         elif attribute.blueprint_type == 'array':
-            dependency = "%s.%s" % ("prestans.types", attribute.element_template)
+            dependency = "%s.%s" % ("prestans.types", attribute.element_template.client_class_name)
         elif attribute.blueprint_type == 'model':
             dependency = "%s.%s" % (self._namespace, attribute.model_template)
         else:
