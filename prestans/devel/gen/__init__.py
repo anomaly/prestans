@@ -70,11 +70,12 @@ class Inspector(object):
 
 class Preplate(object):
 
-    def __init__(self, template_type, model_file, namespace, output_directory):
+    def __init__(self, template_type, model_file, namespace, filter_namespace, output_directory):
         
         self._template_type = template_type
         self._model_file = model_file
         self._namespace = namespace
+        self._filter_namespace = filter_namespace
         self._output_directory = output_directory
         loader = jinja2.PackageLoader('prestans', 'devel/gen/templates')
         self._template_engine = jinja2.Environment(trim_blocks=True, loader=loader)
@@ -86,7 +87,7 @@ class Preplate(object):
         template = None
         if self._template_type == "closure.model":
             template = prestans.devel.gen.closure.Model(template_engine=self._template_engine, 
-                model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
+                model_file=self._model_file, namespace=self._namespace, filter_namespace=self._filter_namespace, output_directory=self._output_directory)
         elif self._template_type == "closure.filter":
             template = prestans.devel.gen.closure.Filter(template_engine=self._template_engine, 
                 model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
