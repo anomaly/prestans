@@ -45,7 +45,7 @@ class StringTypeUnitTest(unittest.TestCase):
             )
 
     def test_default(self):
-        pass
+        self.assertEqual(self._string._default, "orange", "Check default value")
 
     def test_length(self):
         pass
@@ -60,6 +60,6 @@ class StringTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        pass
+        self._string = None
 
         

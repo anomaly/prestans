@@ -787,8 +787,9 @@ class RequestHandler(object):
                             break
 
                     except prestans.exception.DataValidationException, exp:
-                        #: @todo
-                        continue
+                        self.logger.error(exp)
+                        error_response = ErrorResponse(exp, self.response.selected_serializer)
+                        return error_response(environ, start_response)
 
             #: Parse body
             if not request_method == prestans.http.VERB.GET and verb_parser_config is not None:
@@ -826,8 +827,8 @@ class RequestHandler(object):
             return self.response(environ, start_response)
 
         except prestans.exception.UnimplementedVerbError, exp:
-            error_response = ErrorResponse(exp, self.response.selected_serializer)
             self.logger.error(exp)
+            error_response = ErrorResponse(exp, self.response.selected_serializer)
             return error_response(environ, start_response)
 
 

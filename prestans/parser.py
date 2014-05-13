@@ -104,7 +104,7 @@ class ParameterSet(object):
                 # Ignore parameters with __ and if they are methods 
                 continue
 
-            #Must be one of the following types
+            #: Must be one of the following types
             if not isinstance(type_instance, prestans.types.String) and \
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
@@ -120,26 +120,28 @@ class ParameterSet(object):
 
             try:
 
-                #Get input from parameters
-                #Empty list returned if key is missing for getall
+                #: Get input from parameters
+                #: Empty list returned if key is missing for getall
                 if issubclass(type_instance.__class__, prestans.types.Array):
                     validation_input = request.params.getall(attribute_name)
-                #Key error thrown if key is missing for getone
+                #: Key error thrown if key is missing for getone
                 else:
                     try:
                         validation_input = request.params.getone(attribute_name)
                     except KeyError:
                         validation_input = None
 
-                # Validate input based on data type rules, raises DataTypeValidationException if validation fails 
+                #: Validate input based on data type rules, raises DataTypeValidationException if validation fails 
                 validation_result = type_instance.validate(validation_input)
 
-                # setattr
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
             except prestans.exception.DataValidationException, exp:
-                # @todo implement exception handling
-                return None
+                raise prestans.exception.ValidationError(
+                    message=str(exp), 
+                    attribute_name=attribute_name, 
+                    value=validation_input, 
+                    blueprint=type_instance.blueprint())
             
         return validated_parameter_set
 
