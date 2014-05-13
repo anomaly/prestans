@@ -302,9 +302,10 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_filter) {
 
-    //check that filter is of correct type (under development)
-    //if(goog.isDefAndNotNull(opt_filter) && !opt_filter instanceof )
-    //    throw "Incorrect filter for this model";
+    {% if filter_namespace != None %}//check that filter is of correct type
+    if(goog.isDefAndNotNull(opt_filter) && !(opt_filter instanceof {{filter_namespace}}.{{name}}))
+        throw "Incorrect filter for this model";
+    {% endif %}
 
     var jsonifiedObject_ = {};
     

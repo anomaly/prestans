@@ -414,9 +414,10 @@ class Base(object):
 
 class Model(Base):
 
-    def __init__(self, template_engine, model_file, namespace, output_directory):
+    def __init__(self, template_engine, model_file, namespace, filter_namespace, output_directory):
     
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
+        self._filter_namespace = filter_namespace
         self._template = self._template_engine.get_template("closure/model.jinja")
 
     def run(self):
@@ -442,7 +443,7 @@ class Model(Base):
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
+            output_file.write(self._template.render(namespace=self._namespace, filter_namespace=self._filter_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
             output_file.close()
 
             print "%-30s -> %s.%s.js" %(model_name, self._namespace, model_name)

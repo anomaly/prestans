@@ -142,7 +142,16 @@ class ArgParserFactory(object):
             "--namespace",
             required=True,
             dest="namespace",
-            help="namespace to use with template e.g prestans.demo.data"
+            help="namespace to use with template e.g prestans.data.model"
+            )
+
+        gen_parser.add_argument(
+            "-fn",
+            "--filter-namespace",
+            required=False,
+            default=None,
+            dest="filter_namespace",
+            help="filter namespace to use with template e.g prestans.data.filter"
             )
 
 
@@ -196,7 +205,8 @@ class CommandDispatcher:
         preplate = prestans.devel.gen.Preplate(
             template_type=self._args.template, 
             model_file=self._args.model_path, 
-            namespace=self._args.namespace, 
+            namespace=self._args.namespace,
+            filter_namespace=self._args.filter_namespace,
             output_directory=self._args.output)
 
         preplate.run()
