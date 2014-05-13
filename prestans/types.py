@@ -625,7 +625,15 @@ class Array(DataCollection):
         if not isinstance(element_template, DataType):
             raise TypeError("Array element_template must a DataType subclass; %s given" % 
                 element_template.__class__.__name__)
-        
+
+        #:
+        #: Force required to be True if basic type in  use
+        #:
+        if isinstance(element_template, DataType)\
+         and not isinstance(element_template, DataCollection)\
+          and not isinstance(element_template, DataStructure):
+            element_template._required = True
+
         self._default = default
         self._required = required
         self._element_template = element_template
@@ -693,7 +701,7 @@ class Array(DataCollection):
             
         for array_element in value:
     
-            if issubclass(self._element_template.__class__, DataCollection):
+            if isinstance(self._element_template, DataCollection):
                 validated_array_element = self._element_template.validate(array_element, attribute_filter)
             else:
                 validated_array_element = self._element_template.validate(array_element)
@@ -771,10 +779,10 @@ class Array(DataCollection):
 
         attribute_filter = None
 
-        if issubclass(self._element_template.__class__, DataCollection):
+        if isinstance(self._element_template, DataCollection):
             attribute_filter = self._element_template.get_attribute_filter(default_value)
-        elif issubclass(self._element_template.__class__, DataType) or \
-            issubclass(self._element_template.__class__, DataStructure):
+        elif isinstance(self._element_template, DataType) or \
+            isinstance(self._element_template, DataStructure):
             attribute_filter = default_value
 
         return attribute_filter
@@ -913,7 +921,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
             
-            if issubclass(type_instance.__class__, DataType):
+            if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
             
         return _attribute_keys
@@ -929,7 +937,7 @@ class Model(DataCollection):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if issubclass(type_instance.__class__, DataCollection):
+            if isinstance(type_instance, DataCollection):
                 setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
             else:
                 setattr(attribute_filter, attribute_name, default_value)
@@ -967,7 +975,7 @@ class Model(DataCollection):
                 _model_instance.__dict__[attribute_name] = None
                 continue
 
-            if not issubclass(type_instance.__class__, DataType):
+            if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
 
             validation_input = None

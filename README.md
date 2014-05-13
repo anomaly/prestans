@@ -18,7 +18,7 @@ Reasons you might like prestans:
 
 prestans ensures that we provide extensive and useful documentation, published at available on [Read The Docs](http://docs.prestans.org "prestans documentation"). Sphinx source available on [Github](http://github.com/prestans/prestans-docs/ "Docs source").
 
-If you author JavaScript applications using Google Closure tools, we offer a set of [client side tools](https://github.com/prestans/prestans-client/ "prestans client") to enhance the prestans experience.
+We also offer a set of [client side tools](https://github.com/prestans/prestans-client/ "prestans client") to compliment Google Closure.
 
 If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent." :)
 
@@ -36,8 +36,8 @@ We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/p
 
 Before you lodge a lodge a ticket:
 
-* Seek wisdom from our comprehensive written documentation
-* Check to ensure that you are not lodging a duplicate request.
+* Seek wisdom from our comprehensive documentation
+* Check to ensure that you are not lodging a duplicate request
 * Google to see that it’s not something to do with your server environment (versions of Web server, WSGI connectors, etc)
 * Ensure that you ask a question on our list, there might already be answer out there or we might have already acknowledged the issue
 
