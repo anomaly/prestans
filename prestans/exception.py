@@ -179,11 +179,11 @@ class ValidationError(Base):
     #:
 
     def __unicode__(self):
-        _loggable_message = ("%s %s" % self._attribute_name)
+        _loggable_message = "%s %s" % (self._attribute_name, self._message)
         return unicode(_loggable_message)
 
     def __str__(self):
-        _loggable_message = ("%s %s" % self._attribute_name)
+        _loggable_message = "%s %s" % (self._attribute_name, self._message)
         return unicode(_loggable_message).encode('utf-8')
 
 class ParserException(Base):
