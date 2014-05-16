@@ -295,6 +295,25 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 
 };
 
+{{namespace}}.{{name}}.prototype.getValueForKey = function(key) {
+
+    var returnVal_ = null;
+
+    switch(key)
+    {
+{% for attribute in attributes %}
+        case "{{attribute.ccif}}":
+            returnVal_ = this.get{{attribute.cc}}();
+            break;
+{% endfor %}
+        default:
+            throw "Key: "+key+" not found in model";
+    }
+
+    return returnVal_;
+
+};
+
 {{namespace}}.{{name}}.prototype.clone = function(opt_filter) {
     var json_ = this.getJSONObject(false, opt_filter);
     return new {{namespace}}.{{name}}(json_, false);
