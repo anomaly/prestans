@@ -50,9 +50,11 @@ class Inspector(object):
 
         try:
             sys.path.append(os.path.dirname(self._model_file))
-            models = __import__("models", globals(), locals(), [])
+            model_python_file = os.path.split(self._model_file)[1:][0]
+            namespace = model_python_file.split(".")[0]
+            models = __import__(namespace, globals(), locals(), [])
         except ImportError, import_error:
-            print "\npreplate requires "
+            print "\npreplate requires %s" % self._model_file
             sys.exit(1)
 
         for name, type_instance in models.__dict__.iteritems():
