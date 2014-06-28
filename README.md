@@ -47,7 +47,7 @@ When reporting issues:
 About the Authors
 -----------------
 
-prestans was developed by [Devraj Mukherjee](http://twitter.com/mdevraj "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain "Brad Mclain on Twitter") while building large scale Web applications at Eternity Technologies. These applications run on a Google's App Engine and servers running Apache + mod_wsgi.
+prestans was developed by [Devraj Mukherjee](http://twitter.com/mdevraj "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain "Brad Mclain on Twitter") while building large scale Web applications at Anomaly Software. These applications run on a Google's App Engine and servers running Apache + mod_wsgi.
 
 We sometimes have things to say on our Twitter streams and are actively involved on our mailing list.
 
