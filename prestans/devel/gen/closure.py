@@ -215,6 +215,8 @@ class AttributeMetaData(object):
         elif self._blueprint_type == 'datetime':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
+            self._timezone = blueprint['constraints']['timezone']
+            self._utc = blueprint['constraints']['utc']
             self._client_class_name = "DateTime"
         elif self._blueprint_type == 'date':
             self._required = blueprint['constraints']['required']
@@ -276,6 +278,20 @@ class AttributeMetaData(object):
     @property
     def required(self):
         if self._required:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def timezone(self):
+        if self._timezone:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def utc(self):
+        if self._utc:
             return "true"
         else:
             return "false"

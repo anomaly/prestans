@@ -74,7 +74,7 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == 'float' %}
         this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'datetime' %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, timezone: {{attribute.timezone}}, utc: {{attribute.utc}}});
 {% elif attribute.blueprint_type == 'date' %}
         this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
@@ -129,7 +129,7 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == 'float' %}
         this.{{attribute.ccif}}_ = new prestans.types.Float({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == 'datetime' %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, timezone: {{attribute.timezone}}, utc: {{attribute.utc}}});
 {% elif attribute.blueprint_type == 'date' %}
         this.{{attribute.ccif}}_ = new prestans.types.Date({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'time' %}
@@ -180,7 +180,7 @@ goog.require('{{dependency}}');
 {% elif attribute.blueprint_type == "float" %}
         this.{{attribute.ccif}}_ = new prestans.types.Float({required: {{attribute.required}}, defaultValue: {{attribute.default}}, maximum: {{attribute.maximum}}, minimum: {{attribute.minimum}}, choices: {{attribute.choices}}});
 {% elif attribute.blueprint_type == "datetime" %}
-        this.{{attribute.ccif}}_ = new prestans.types.DateTime({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({required: {{attribute.required}}, defaultValue: {{attribute.default}}, timezone: {{attribute.timezone}}, utc: {{attribute.utc}}});
 {% elif attribute.blueprint_type == "date" %}
         this.{{attribute.ccif}}_ = new prestans.types.Date({required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == "time" %}

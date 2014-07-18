@@ -426,10 +426,12 @@ class DateTime(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
 
-    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S", description=None):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S", timezone=False, utc=False, description=None):
 
         self._default = default
         self._required = required
+        self._timezone = timezone
+        self._utc = utc
         self._format = format
         self._description = description
 
@@ -442,6 +444,8 @@ class DateTime(DataStructure):
         constraints['default'] = self._default
         constraints['required'] = self._required
         constraints['format'] = self._format
+        constraints['timezone'] = self._timezone
+        constraints['utc'] = self._utc
         constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
@@ -472,7 +476,7 @@ class DateTime(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError()
+                raise prestans.exception.ParseFailedError(exp)
         else:
             raise prestans.exception.ParseFailedError("date time encoding failed %" % exp)
             
