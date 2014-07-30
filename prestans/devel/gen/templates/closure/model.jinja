@@ -26,7 +26,7 @@ goog.require('{{dependency}}');
     if(goog.isDef(opt_minified) && goog.isBoolean(opt_minified) && opt_minified && goog.isDefAndNotNull(opt_json)) {
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
-        this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]]);
+        this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], true);
 {% elif attribute.blueprint_type == 'array' %}
 {% if attribute.element_template_is_model %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({
