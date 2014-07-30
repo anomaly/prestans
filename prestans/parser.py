@@ -225,7 +225,7 @@ class AttributeFilter(object):
         #:
         unwanted_keys = set(this_filter_keys) - set(template_filter_keys)
         if len(unwanted_keys) > 0:
-            raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
+            raise prestans.exception.AttributeFilterDiffers(list(unwanted_keys))
 
         #:
         #: 2. Make a attribute_filter that we send back
@@ -411,7 +411,9 @@ class AttributeFilter(object):
             #: Ensure that the key exists in the template model
             #:
             if template_model is not None and not template_model.has_key(target_key):
-                raise prestans.exception.AttributeFilterDiffers(target_key)
+                unwanted_keys = list()
+                unwanted_keys.append(target_key)
+                raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
 
             #:
             #: Either keep the value of wrap it up with AttributeFilter 

@@ -284,7 +284,7 @@ class AttributeFilterDiffers(ParserException):
         super(AttributeFilterDiffers, self).__init__(_code, _message)
 
         self.push_trace({ 
-            'rejected_attribute_list': list(attribute_list),
+            'rejected_attribute_list': attribute_list,
             })
 
 class InconsistentPersistentDataError(Base):
