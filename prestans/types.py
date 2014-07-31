@@ -1070,7 +1070,30 @@ class Model(DataCollection):
         return rewrite_map
 
     def has_key(self, attribute_name):
-        return self.__dict__.has_key(attribute_name)
+
+        members = inspect.getmembers(self)
+        
+        has_key = self.__class__.__dict__.has_key(attribute_name)
+
+        if not has_key:
+
+            base_classes = list()
+            base_classes += list(self.__class__.__bases__)
+
+            while not has_key and base_classes:
+
+                #take a base class from the list
+                base_class = base_classes.pop()
+
+                #we found it clear the list
+                if base_class.__dict__.has_key(attribute_name):
+                    has_key = True
+                    base_classes = list()
+                #add any more base classes from this class
+                else:
+                    base_classes += list(base_class.__bases__)
+
+        return has_key
 
     def _generate_attribute_token_rewrite_map(self, model_class_members):
 

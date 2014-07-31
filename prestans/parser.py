@@ -411,6 +411,7 @@ class AttributeFilter(object):
             #: Ensure that the key exists in the template model
             #:
             if template_model is not None and not template_model.has_key(target_key):
+
                 unwanted_keys = list()
                 unwanted_keys.append(target_key)
                 raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
