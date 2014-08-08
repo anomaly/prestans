@@ -49,7 +49,7 @@ class ParameterSet(object):
 
     def blueprint(self):
         """
-        blueprint support, returnsn a partial dictionary
+        blueprint support, returns a partial dictionary
         """
 
         blueprint = dict()
@@ -70,8 +70,10 @@ class ParameterSet(object):
             if not isinstance(type_instance, prestans.types.String) and \
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
+            not isinstance(type_instance, prestans.types.Date) and \
+            not isinstance(type_instance, prestans.types.DateTime) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
+                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if isinstance(type_instance, prestans.types.Array):
                 if not isinstance(type_instance.element_template, prestans.types.String) and \
@@ -108,8 +110,10 @@ class ParameterSet(object):
             if not isinstance(type_instance, prestans.types.String) and \
             not isinstance(type_instance, prestans.types.Float) and \
             not isinstance(type_instance, prestans.types.Integer) and \
+            not isinstance(type_instance, prestans.types.Date) and \
+            not isinstance(type_instance, prestans.types.DateTime) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise TypeError("%s should be of type prestans.types.String/Integer/Float/Array" % attribute_name)
+                raise TypeError("%s should be of type prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if issubclass(type_instance.__class__, prestans.types.Array):
                 
