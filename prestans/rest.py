@@ -746,6 +746,7 @@ class RequestHandler(object):
             #: Authentication
             if self.__provider_config__.authentication is not None:
                 self.__provider_config__.authentication.debug = self.debug
+                self.provider_authentication = self.__provider_config__.authentication
 
             #: Configuration as provided by the API or default of a VerbConfig object
             verb_parser_config = self.__parser_config__.get_config_for_verb(request_method)
