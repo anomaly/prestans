@@ -354,6 +354,24 @@ class AttributeFilter(object):
 
         return True
 
+    def set_all_attribute_values(self, value):
+        """
+        sets all the attribute values to the value and propagate to any children
+        """         
+
+        for attribute_name, type_instance in inspect.getmembers(self):
+
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                # Ignore parameters with __ and if they are methods
+                continue
+
+            if isinstance(type_instance, bool):
+                self.__dict__[attribute_name] = value
+            elif isinstance(type_instance, self.__class__):
+                # Serialise attribute filter children to dictioanaries 
+                type_instance.set_all_attribute_values(value)
+
+
     def as_dict(self):
         """ 
         turns attribute filter object into python dictionary
@@ -451,7 +469,10 @@ class AttributeFilter(object):
             return
 
         # Values should either be boolean or type of self
-        if isinstance(value, (bool, self.__class__)):
+        if isinstance(value, bool) and key in self.__dict__ and isinstance(self.__dict__[key], self.__class__):
+            self.__dict__[key].set_all_attribute_values(value)
+            return
+        elif isinstance(value, (bool, self.__class__)):
             self.__dict__[key] = value
             return
 
