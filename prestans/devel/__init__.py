@@ -38,7 +38,7 @@ import os
 
 #import prestans.devel.serve
 #import prestans.devel.gen
-import prestans.devel.exception
+import exception
 
 class ArgParserFactory(object):
 
@@ -194,12 +194,10 @@ class CommandDispatcher:
     def _dispatch_gen(self):
 
         if not os.path.isdir(self._args.output):
-            raise prestans.devel.exception.Base("%s is not a writeable directory" % 
-                self._args.output)
+            raise exception.Base("%s is not a writeable directory" % self._args.output)
 
         if not os.path.isfile(self._args.model_path):
-            raise prestans.devel.exception.Base("failed to read model file %s" % 
-                self._args.model_path)
+            raise exception.Base("failed to read model file %s" % self._args.model_path)
 
         import prestans.devel.gen
         preplate = prestans.devel.gen.Preplate(
