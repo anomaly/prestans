@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#  prestans, a standards based WSGI compliant REST framework for Python
+#  prestans, A WSGI compliant REST micro-framework
 #  http://prestans.org
 #
 #  Copyright (c) 2014, Anomaly Software Pty Ltd.

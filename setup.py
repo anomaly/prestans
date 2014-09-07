@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#  prestans, a standards based WSGI compliant REST framework for Python
+#  prestans, A WSGI compliant REST micro-framework
 #  http://prestans.org
 #
 #  Copyright (c) 2014, Anomaly Software Pty Ltd.
@@ -39,8 +39,10 @@ setup(name='prestans',
       long_description=open("README.md").read(),
       download_url='https://github.com/prestans/prestans/archive/prestans-2.0.tar.gz',
       license='New BSD',
-      author='Devraj Mukherjee, Bradley Mclain',
-      author_email='framework@prestans.org',
+      author='Anomaly Software',
+      author_email='support@anomalymade.com',
+      maintainer='Anomaly Software',
+      maintainer_email='support@anomalymade.com',
       platforms=['any'],
       scripts=['prestans/bin/pride.py'],
       packages=find_packages(),
