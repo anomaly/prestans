@@ -30,17 +30,20 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='prestans',
       version='2.0',
       description='A WSGI compliant REST micro-framework',
-      long_description="""prestans is a REST micro-framework built right on top of WSGI, 
-      designed perform and co-exists with other middleware and frameworks that you employ. 
-      It's mainly aimed towards developers building serious REST backends for use with 
-      pure Ajax (using a framework like Google Closure) or mobile applications.""",
+      url='https://github.com/prestans/prestans',
+      long_description=open("README.md").read(),
       download_url='https://github.com/prestans/prestans/archive/prestans-2.0.tar.gz',
       license='New BSD',
+      author='Devraj Mukherjee, Bradley Mclain',
+      author_email='framework@prestans.org',
+      platform=['any'],
+      scripts=['prestans/bin/pride.py'],
+      packages=find_packages(),
       classifiers=[
       	'Environment :: Web Environment',
       	'Intended Audience :: Developers',
@@ -52,9 +55,5 @@ setup(name='prestans',
             'Topic :: Software Development :: Libraries :: Application Frameworks',
             'Topic :: Software Development :: Libraries :: Python Modules',
       ],
-      author='Devraj Mukherjee, Bradley Mclain',
-      author_email='framework@prestans.org',
-      url='https://github.com/prestans/prestans',
-      packages=['prestans', 'prestans.provider', 'prestans.ext', 'prestans.ext.data', 'prestans.ext.data.adapters'],
       install_requires=['webob==1.2.3',],
      )
