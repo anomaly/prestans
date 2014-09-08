@@ -68,28 +68,27 @@ def adapt_persistent_instance(persistent_object, target_rest_instance=None, attr
 
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 
-
 #:
 #: Adapt an instance
 #:
-def adapt_persistent_collection(collection, target_rest_class=None, attribute_filter=None):
+def adapt_persistent_persistent_collection(persistent_collection, target_rest_class=None, attribute_filter=None):
         
     #: Ensure that colleciton is iterable and has atleast one element 
-    collection_length = 0
+    persistent_collection_length = 0
     
-    #: Attempt to reliably detect the length of the collection 
-    if collection and isinstance(collection, (list, tuple)):
-        collection_length = len(collection)
-    elif collection and collection.__module__ == "sqlalchemy.orm.query":
-        collection_length = collection.count()
+    #: Attempt to reliably detect the length of the persistent_collection 
+    if persistent_collection and isinstance(persistent_collection, (list, tuple)):
+        persistent_collection_length = len(persistent_collection)
+    elif persistent_collection and persistent_collection.__module__ == "sqlalchemy.orm.query":
+        persistent_collection_length = persistent_collection.count()
         
-    #: If the collection is empty then return a blank array 
-    if collection_length == 0:
+    #: If the persistent_collection is empty then return a blank array 
+    if persistent_collection_length == 0:
         return prestans.types.Array(element_template=target_rest_class())
         
     #: Try and get the adapter and the REST class for the persistent object 
     if target_rest_class is None:
-        adapter_instance = adapters.registry.get_adapter_for_persistent_model(collection[0])
+        adapter_instance = adapters.registry.get_adapter_for_persistent_model(persistent_collection[0])
     else:
         if inspect.isclass(target_rest_class):
             target_rest_class = target_rest_class()
@@ -98,11 +97,11 @@ def adapt_persistent_collection(collection, target_rest_class=None, attribute_fi
         
     adapted_models = prestans.types.Array(element_template=adapter_instance.rest_model_class())
     
-    for persistent_object in collection:
+    for persistent_object in persistent_collection:
         adapted_models.append(adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter))
         
     return adapted_models
-
+    
 class ModelAdapter(adapters.ModelAdapter):
     """
     Provide a brige between REST models and SQLAlchemy objects
