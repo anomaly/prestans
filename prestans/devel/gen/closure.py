@@ -464,6 +464,8 @@ class Model(Base):
 
             print "%-30s -> %s.%s.js" %(model_name, self._namespace, model_name)
 
+        print "\nGenerated %i model(s)" % len(blueprints)
+
         return 0
 
 class Filter(Base):
@@ -502,6 +504,6 @@ class Filter(Base):
 
             print "%-30s -> %s.%s.js" % (model_name, self._namespace, model_name)
 
-
+        print "\nGenerated %i filter(s)" % len(blueprints)
 
         return 0

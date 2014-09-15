@@ -49,7 +49,7 @@ class ArgParserFactory(object):
 
         self._arg_parser = argparse.ArgumentParser(
             description="command line tools to compliment the prestans framework",
-            epilog="pride is distributed by the prestans project <http://github.com/prestans/> under the the New BSD license."
+            epilog="pride is distributed by the prestans project <http://github.com/anomaly/prestans/> under the the New BSD license."
         )
 
         subparsers_handle = self._arg_parser.add_subparsers(dest="sub_command")

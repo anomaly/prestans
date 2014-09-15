@@ -54,7 +54,7 @@ class Inspector(object):
             namespace = model_python_file.split(".")[0]
             models = __import__(namespace, globals(), locals(), [])
         except ImportError, import_error:
-            print "\npreplate requires %s" % self._model_file
+            print "\nFailed to process %s, %s" % (self._model_file, import_error)
             sys.exit(1)
 
         for name, type_instance in models.__dict__.iteritems():
