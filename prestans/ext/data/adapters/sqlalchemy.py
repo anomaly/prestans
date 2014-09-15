@@ -71,7 +71,7 @@ def adapt_persistent_instance(persistent_object, target_rest_instance=None, attr
 #:
 #: Adapt an instance
 #:
-def adapt_persistent_persistent_collection(persistent_collection, target_rest_class=None, attribute_filter=None):
+def adapt_persistent_collection(persistent_collection, target_rest_class=None, attribute_filter=None):
         
     #: Ensure that colleciton is iterable and has atleast one element 
     persistent_collection_length = 0
