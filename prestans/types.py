@@ -860,10 +860,19 @@ class Model(DataCollection):
                 validator = type_instance
             
         if validator is not None:
-            if validator.__class__ == value.__class__:
-                self.__dict__[key] = value
-            else:
-                self.__dict__[key] = validator.validate(value)
+
+            try:
+                if validator.__class__ == value.__class__:
+                    self.__dict__[key] = value
+                else:
+                    self.__dict__[key] = validator.validate(value)
+
+            except prestans.exception.DataValidationException, exp:
+                    raise prestans.exception.ValidationError(
+                    message=str(exp), 
+                    attribute_name=key, 
+                    value=value, 
+                    blueprint=validator.blueprint())
             
             return
             
@@ -1005,9 +1014,9 @@ class Model(DataCollection):
                     validated_object = type_instance.validate(validation_input)
                 
                 _model_instance.__dict__[attribute_name] = validated_object
-                    
+
             except prestans.exception.DataValidationException, exp:
-                raise prestans.exception.ValidationError(
+                    raise prestans.exception.ValidationError(
                     message=str(exp), 
                     attribute_name=attribute_name, 
                     value=validation_input, 

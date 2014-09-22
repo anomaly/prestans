@@ -322,7 +322,7 @@ class DataValidationException(Base):
 
 class RequiredAttributeError(DataValidationException):
 
-    def __init__(self):
+    def __init__(self, attribute_name=None):
         _message = "attribute is required and does not provide a default value"
         super(RequiredAttributeError, self).__init__(_message)
 
