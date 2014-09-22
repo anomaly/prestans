@@ -541,6 +541,26 @@ class VerbConfig(object):
         
         verb_config_blueprint = dict()
 
+        if self._response_template is not None:
+            verb_config_blueprint['response_template'] = self._response_template.blueprint()
+        else:
+            verb_config_blueprint['response_template'] = self._response_template
+
+        verb_config_blueprint['parameter_sets'] = []
+        for parameter_set in self._parameter_sets:
+            if parameter_set is not None:
+                verb_config_blueprint['parameter_sets'].append(parameter_set.blueprint())
+        
+        if self._body_template is not None:
+            verb_config_blueprint['body_template'] = self._body_template.blueprint()
+        else:
+            verb_config_blueprint['body_template'] = self._body_template
+
+        if self._request_attribute_filter is not None:
+            verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter.blueprint()
+        else:
+            verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter
+
         return verb_config_blueprint
 
     @property
