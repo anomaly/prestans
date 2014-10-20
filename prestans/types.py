@@ -102,6 +102,14 @@ class String(DataType):
         self._utf_encoding = utf_encoding
         self._description = description
 
+    @property
+    def max_length(self):
+        return self._max_length
+
+    @property
+    def min_length(self):
+        return self._min_length
+
     def blueprint(self):
 
         blueprint = dict()
