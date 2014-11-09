@@ -32,7 +32,7 @@
 from distutils.core import setup
 
 setup(name='prestans',
-      version='1.2',
+      version='1.2.1',
       description='A WSGI compliant REST micro-framework',
       long_description='',
       download_url='',
@@ -47,6 +47,7 @@ setup(name='prestans',
       author='Devraj Mukherjee, Bradley Mclain',
       author_email='devraj@gmail.com',
       url='https://github.com/prestans',
+      scripts=['prestans/bin/preplate', 'prestans/bin/preplate2', 'prestans/bin/presh'],
       packages=['prestans', 'prestans.ext', 'prestans.ext.data', 'prestans.ext.data.adapters'],
       install_requires=['webob==1.2.3',],
      )
