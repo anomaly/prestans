@@ -1,0 +1,219 @@
+#!/usr/bin/env python
+#
+#  preplate, automation tools of the prestans project
+#  http://prestans.googlecode.com
+#
+#  Copyright (c) 2013, Eternity Technologies Pty Ltd.
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#      * Neither the name of Eternity Technologies nor the
+#        names of its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL ETERNITY TECHNOLOGIES BE LIABLE FOR ANY
+#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
+#Debug settings for importing prestans package
+
+
+import re
+import sys
+import inspect
+from optparse import OptionParser
+
+try:
+    from mako.template import Template
+except ImportError, e:
+    print "preplate depends on mako templates which could not be found, please install mako and try again"
+    exit(1)
+
+#Note: types_ref is passed in due to dynamic python import being in local scope
+class ClassData(object):
+    def __init__(self, name, attribute_dict, types_ref):
+        
+        self.name = name
+        self.attributes = []
+        for attribute, type_instance in attribute_dict.iteritems():
+            if attribute.startswith('__') or inspect.ismethod(type_instance):
+                continue
+            else:
+                is_model = isinstance(type_instance, types_ref.Model)
+                is_array = isinstance(type_instance, types_ref.Array)
+                
+                #min length
+                min_length = None
+                if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Array)) and type_instance._min_length:
+                    min_length = type_instance._min_length
+                    
+                #max length
+                max_length = None
+                if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Array)) and type_instance._max_length:
+                    max_length = type_instance._max_length
+                
+                minimum = None
+                if(isinstance(type_instance, types_ref.Integer) or isinstance(type_instance, types_ref.Float)) and type_instance._minimum:
+                    minimum = type_instance._minimum
+                    
+                maximum = None
+                if(isinstance(type_instance, types_ref.Integer) or isinstance(type_instance, types_ref.Float)) and type_instance._maximum:
+                    maximum = type_instance._maximum
+                
+                #default value
+                default = None
+                if not is_model and not is_array:
+                    default = type_instance._default
+                
+                #model
+                if is_array:
+                    model = type_instance._element_template.__class__.__name__
+                else:
+                    model = type_instance.__class__.__name__
+                    
+                #choices
+                choices = None
+                if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Float) or isinstance(type_instance, types_ref.Integer)) and type_instance._choices:
+                    choices = type_instance._choices
+                    
+                #string format
+                string_format = None
+                if isinstance(type_instance, types_ref.String) and type_instance._format is not None:
+                    string_format = pyre_to_jre(type_instance._format)
+                    
+                #required
+                required = True
+                if not is_array:
+                    required = type_instance._required
+                
+                self.attributes.append([attribute,
+                                        udl_to_cc(attribute),
+                                        udl_to_cc(attribute, True),
+                                        is_model,
+                                        is_array,
+                                        model,
+                                        required,
+                                        min_length,
+                                        max_length,
+                                        minimum,
+                                        maximum,
+                                        choices,
+                                        string_format,
+                                        py_to_js(default)])
+        
+        
+
+#converts an underscore delimited variable name to camel case
+def udl_to_cc(text, ignoreFirst=False):
+    text = text.lower()
+    camel_case = re.sub(r"_(.)", lambda pat: pat.group(1).upper(), text)
+    if not ignoreFirst:
+        camel_case = camel_case[0:1].upper()+camel_case[1:]
+    return camel_case
+    
+#Converts a python value to a javascript equivalent value, which will always be a string so the template generator can write it correctly
+def py_to_js(value):
+    if isinstance(value, bool):
+        value = "true" if value is True else "false"
+    elif value is None:
+        value = "null"
+    elif isinstance(value, str) or isinstance(value, unicode):
+        value = unicode("\""+value+"\"")
+    return value
+
+#Converts a python regular expression to a javascript equivalent regular expression, which will always be a string so the template generator can write it correctly
+def pyre_to_jre(value):
+    return value.replace("\\", "\\\\")
+    
+
+def main():
+    #Setup the option parser
+    parser = OptionParser(version="%prog 1.0", usage="Usage: %prog [-ocnfv] path module")
+    
+    parser.add_option("-c", "--class", action="store", dest="class_name", default=None, help="Class to generate templates for, if omitted generates all classes found in path")
+    parser.add_option("-o", "--output", action="store", dest="output_file", default=None, help="output directory")
+    parser.add_option("-n", "--namespace", action="store", dest="namespace", default="namespace", help="namespace for generated classes")
+    parser.add_option("-f", "--framework", action="store", dest="framework", choices=["closure"], default="closure", help="framework to target [closure]")
+    #should this be quiet instead?
+    #parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False, help="show verbose output")
+    (options, args) = parser.parse_args()
+
+    #Load the module from the usr provided python path
+    if len(args) < 1 or args[0] is None:
+        print "Required argument path is missing"
+        exit(1)
+    elif len(args) < 2 or args[1] is None:
+        print "Required argument module is missing"
+        exit(1)
+    else:
+        try:
+            sys.path.append(args[0])
+            print args[1]
+            models =  __import__(args[1], globals(), locals(), ["*"], -1)
+        except ImportError, importError:
+            print "Failed to import module: %s" % (args[1])
+            print importError
+            exit(1)
+    
+    #load the prestans types, required for type checking later
+    try:
+        from prestans import types
+    except ImportError:
+        print "preplate depends on prestans"
+        exit(1)
+    
+    #Dynamically load the framework and type
+    try:
+        path = "prestans.tools.templates."+options.framework
+        framework = __import__(path, globals(), locals(), ["*"], -1)
+    except ImportError:
+        print "Unsupported framework"
+        exit(1)
+    
+    #extract data from the relevant classes/class
+    classes_to_generate = []
+    if options.class_name is not None:
+        name = options.class_name
+        class_blueprint = getattr(models, name)
+        
+        #if options.output_file is not None:
+        #   name = options.output_file
+            
+        if type(class_blueprint) == type(types.Model):
+            classes_to_generate.append(ClassData(name, class_blueprint.__dict__, types))
+    else:
+        for class_name in models.__dict__:
+            name = class_name
+            class_blueprint = getattr(models, name)
+            if type(class_blueprint) == type(types.Model):
+                classes_to_generate.append(ClassData(name, class_blueprint.__dict__, types))
+
+    #Generate the different files that need to be outputted
+    files_to_generate = []
+    for c in classes_to_generate:
+        if options.framework == "closure":
+            files_to_generate.append([c, framework.model, c.name+".js"])
+    #Write the output to file
+    for class_data, template, filename in files_to_generate:
+        output_file = open(filename, 'w+')
+        mako_template = Template(template)
+        output_file.write(mako_template.render(namespace=options.namespace, name=class_data.name, attributes=class_data.attributes))
+        output_file.close()
+
+if __name__ == "__main__":
+    main()

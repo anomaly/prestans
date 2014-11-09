@@ -1,0 +1,311 @@
+#!/usr/bin/env python
+#
+#  preplate, automation tools of the prestans project
+#  http://prestans.googlecode.com
+#
+#  Copyright (c) 2013, Eternity Technologies Pty Ltd.
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#      * Neither the name of Eternity Technologies nor the
+#        names of its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL ETERNITY TECHNOLOGIES BE LIABLE FOR ANY
+#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+import os
+import re
+import sys
+import inspect
+import argparse
+from datetime import datetime
+
+try:
+    from mako.template import Template
+except ImportError, e:
+    print "preplate requires mako templates, try `easy_install mako`"
+    exit(1)
+
+## @brief converts an underscore delimited variable name to camel case
+#
+def udl_to_cc(text, ignoreFirst=False):
+    text = text.lower()
+    camel_case = re.sub(r"_(.)", lambda pat: pat.group(1).upper(), text)
+    if not ignoreFirst:
+        camel_case = camel_case[0:1].upper()+camel_case[1:]
+    return camel_case
+    
+## @brief Converts a python value to a javascript equivalent value, which will always be a string so the template generator can write it correctly
+#
+def py_to_js(value):
+    if isinstance(value, bool):
+        value = "true" if value is True else "false"
+    elif value is None:
+        value = "null"
+    elif isinstance(value, str) or isinstance(value, unicode): #add quotes to the string
+        value = unicode("\"%s\"" % value)
+    return value
+    
+## @brief Converts a python value to a cocoa equivalent value, which will always be a string so the template generator can write it correctly
+#
+def py_to_cocoa(value):
+    if isinstance(value, bool):
+        value = "YES" if value is True else "NO"
+    elif value is None:
+        value = "NULL"
+    elif isinstance(value, str) or isinstance(value, unicode): #add quotes to the string
+        value = unicode("@\""+value+"\"")
+    return value
+
+## @brief Converts a python regular expression to a javascript equivalent regular expression, which will always be a string so the template generator can write it correctly
+#
+def pyre_to_jre(value):
+    return value.replace("\\", "\\\\")
+
+## @brief represents parsed meta data of a REST model
+#
+class ClassData(object):
+    
+    def __init__(self, name, model, types_ref, template):
+        
+        self.name = name
+        self.attributes = []
+
+        for attribute, type_instance in inspect.getmembers(model):
+
+            if attribute.startswith('__') or inspect.ismethod(type_instance):
+                continue
+
+            is_model = isinstance(type_instance, types_ref.Model)
+            is_array = isinstance(type_instance, types_ref.Array)
+            is_datetime = isinstance(type_instance, types_ref.DateTime)
+            is_date = isinstance(type_instance, types_ref.Date)
+            is_file = isinstance(type_instance, types_ref.DataURLFile)
+                
+            min_length = None
+            if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Array)) and type_instance._min_length:
+                min_length = type_instance._min_length
+                    
+            max_length = None
+            if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Array)) and type_instance._max_length:
+                max_length = type_instance._max_length
+                
+            minimum = None
+            if(isinstance(type_instance, types_ref.Integer) or isinstance(type_instance, types_ref.Float)) and type_instance._minimum:
+                minimum = type_instance._minimum
+                    
+            maximum = None
+            if(isinstance(type_instance, types_ref.Integer) or isinstance(type_instance, types_ref.Float)) and type_instance._maximum:
+                maximum = type_instance._maximum
+                
+            default = None
+            if is_datetime:
+                default = type_instance._default
+            elif is_date:
+                default = type_instance._default
+            elif not is_model and not is_array and not is_file:
+                default = type_instance._default
+                if template == "closure.model":
+                    default = py_to_js(default)
+                elif template == "cocoa.header" or template == "cocoa.implementation":
+                    default = py_to_cocoa(default)
+                
+            if is_array:
+                if type_instance._element_template == types_ref.CONSTANT.ARRAY_DYNAMIC_ELEMENT_TEMPLATE:
+                    model = type_instance._element_template
+                else:
+                    model = type_instance._element_template.__class__.__name__
+            elif is_file:
+                model = "String"
+            else:
+                model = type_instance.__class__.__name__
+                    
+            choices = None
+            if (isinstance(type_instance, types_ref.String) or isinstance(type_instance, types_ref.Float) or isinstance(type_instance, types_ref.Integer)) and type_instance._choices:
+                choices = type_instance._choices
+                    
+            format = None
+            if template == "closure.model" and isinstance(type_instance, types_ref.String) and type_instance._format is not None:
+                format = pyre_to_jre(type_instance._format)
+            if (template == "cocoa.header" or template == "cocoa.implementation") and isinstance(type_instance, types_ref.String) and type_instance._format is not None:
+                format = type_instance._format
+            elif isinstance(type_instance, types_ref.DateTime):
+                format = type_instance._format
+            
+            
+            required = True
+            if not is_array:
+                required = type_instance._required
+                
+            self.attributes.append([attribute,
+                                    udl_to_cc(attribute),
+                                    udl_to_cc(attribute, True),
+                                    is_model,
+                                    is_array,
+                                    model,
+                                    required,
+                                    min_length,
+                                    max_length,
+                                    minimum,
+                                    maximum,
+                                    choices,
+                                    format,
+                                    default])
+        
+
+
+## @brief Sets up an arg parser 
+#
+def setup_arg_parser():
+    
+    arg_parser = argparse.ArgumentParser(
+        description='auto generate client side code from prestans rest models.',
+        epilog='preplate is distributed by the prestans project <http://prestans.googlecode.com> under the the New BSD license.'
+    )
+
+    arg_parser.add_argument(
+        '-p', '--prestans-path',
+        dest='prestans_path',
+        help='path to the prestans python framework, required to introspect prestans models'
+    )
+    
+    arg_parser.add_argument(
+        '-r', '--rest-model-path',
+        dest='model_path',
+        help='path to the package containing the rest models',
+        required=True
+    )
+    
+    arg_parser.add_argument(
+        '-n', '--namespace',
+        dest='namespace',
+        help='namespace if required by client side template',
+        required=False
+    )
+    
+    arg_parser.add_argument(
+        '-t', '--template',
+        dest='template_name',
+        help='name of template to use to generate client side stubs',
+        choices=['closure.model', 'closure.filter', 'cocoa.header', 'cocoa.implementation'],
+        default='closure.model'
+    )
+    
+    arg_parser.add_argument(
+        '-c', '--rest-model-class',
+        dest='rest_model_class',
+        help='specific rest model class to generate stubs for, otherwise preplate will generate all models',
+        default='all'
+    )
+    
+    arg_parser.add_argument(
+        '-o', '--output-path',
+        dest='output_path',
+        help='output file or folder to write client stubs to',
+        required=True
+    )
+    
+    arg_parser.add_argument(
+        '-d', '--debug',
+        dest='debug',
+        help='run in debug mode, increases verbosity',
+        default=False
+    )
+    
+    arg_parser.add_argument(
+        '-v', '--version', 
+        action='version', 
+        version='%(prog)s 1.0'
+    )
+    
+    return arg_parser
+
+## @brief main execution block, responsible for introspecting the module and appropriate templates
+#
+def main():
+    
+    arg_parser = setup_arg_parser()
+    args = arg_parser.parse_args()
+    
+    if not os.path.isdir(args.prestans_path):
+        print "\n%s is not a directory, you must point prelate to the prestans package" % args.prestans_path
+        sys.exit(1)
+    
+    try:
+        sys.path.append(args.prestans_path)
+        from prestans import types
+    except ImportError, import_error:
+        print "\npreplate requires access prestans.types package to run, consider using the --prestans-path directive"
+        sys.exit(1)
+        
+    try:
+        path = "prestans.tools.templates.%s" % args.template_name
+        preplate_template_def = __import__(path, globals(), locals(), ["*"], -1)
+    except ImportError as ie:
+        print path
+        print ie
+        print "\n%s is not a valid template, use --help to see available options" % args.template_name
+        sys.exit(1)
+        
+    if not os.path.isfile(args.model_path):
+        print "\n%s is not a file, you must point prelate to a python file that contains model definitions" % args.model_path
+        sys.exit(1)
+        
+    try:
+        sys.path.append(os.path.dirname(args.model_path))
+        models = __import__("models", globals(), locals(), [])
+    except ImportError, import_error:
+        print "\npreplate requires "
+        sys.exit(1)
+
+    classes_to_generate = []
+
+    for attribute_name, type_instance in models.__dict__.iteritems():
+        
+        if attribute_name.startswith('__') or inspect.ismethod(type_instance) or not inspect.isclass(type_instance) or not issubclass(type_instance, types.Model):
+            continue
+            
+        classes_to_generate.append(ClassData(attribute_name, type_instance, types, args.template_name))
+        
+    files_to_generate = []
+    for class_name in classes_to_generate:
+        if args.template_name == "cocoa.header" or args.template_name == "cocoa.implementation":
+            filename = args.namespace+class_name.name+"."+preplate_template_def.extension
+        else:
+            filename = class_name.name+"."+preplate_template_def.extension
+        
+        files_to_generate.append([class_name, preplate_template_def.template, filename])
+
+    print ""
+    for class_data, template, filename in files_to_generate:
+
+        output_file = open(os.path.join(args.output_path, filename), 'w+')
+        mako_template = Template(template)
+        print "%-30s -> %-30s" %(class_data.name, filename)
+
+        now = datetime.now()
+        creation_date_string = now.strftime("%Y/%m/%d")
+        creation_time_string = now.strftime("%I:%M:%S %p")
+
+        output_file.write(mako_template.render(namespace=args.namespace, name=class_data.name, creation_date=creation_date_string, creation_time=creation_time_string, attributes=class_data.attributes))
+        output_file.close()
+    
+
+if __name__ == "__main__":
+    main()
