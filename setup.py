@@ -44,7 +44,7 @@ setup(name='prestans',
       maintainer='Anomaly Software',
       maintainer_email='support@anomalymade.com',
       platforms=['any'],
-      scripts=['prestans/bin/pride.py'],
+      scripts=['prestans/bin/pride'],
       packages=find_packages(),
       classifiers=[
       	'Environment :: Web Environment',
