@@ -35,7 +35,7 @@ from setuptools import setup, find_packages
 setup(name='prestans',
       version='2.0.1',
       description='A WSGI compliant REST micro-framework',
-      url='https://github.com/prestans/prestans',
+      url='https://github.com/anomaly/prestans.git',
       long_description=open("README.md").read(),
       download_url='https://github.com/anomaly/prestans/archive/2.0.1.tar.gz',
       license='New BSD',
