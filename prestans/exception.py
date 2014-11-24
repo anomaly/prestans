@@ -260,15 +260,15 @@ class SerializationFailedError(ParserException):
     def __init__(self, format):
 
         _code = prestans.http.STATUS.NOT_FOUND
-        _message = "Serialization failed"
-        super(DeSerializationFailedError, self).__init__(_code, _message)
+        _message = "Serialization failed: %s" % format
+        super(SerializationFailedError, self).__init__(_code, _message)
 
 class DeSerializationFailedError(ParserException):
     
     def __init__(self, format):
 
         _code = prestans.http.STATUS.NOT_FOUND
-        _message = "DeSerialization failed"
+        _message = "DeSerialization failed: %s" % format
         super(DeSerializationFailedError, self).__init__(_code, _message)
 
 class AttributeFilterDiffers(ParserException):
