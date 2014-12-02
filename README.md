@@ -1,4 +1,4 @@
-## prestans 2.0
+## Prestans 2.0
 
 A WSGI compliant REST micro-framework.
 
