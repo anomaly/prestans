@@ -2,14 +2,14 @@
 
 A WSGI compliant REST micro-framework.
 
-http://docs.prestans.org/en/2.0
+http://docs.prestans.org
 
 prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
 
 Reasons you might like prestans:
 
-* Built right on top of WSGI, and designed ground up to fit in with other frameworks and middleware
-* Strongly represent REST philosophies in the framework design, use of proper HTTP headers and verbs
+* Built right on top of WSGI, designed ground up to cooperate with other frameworks
+* Strong representative of REST philosophies leveraging HTTP headers and verbs
 * Support for multiple dialects, including formalised patterns for binary content 
 * Handlers maps HTTP verbs to implemented class methods, complimented  with custom request parser and response writer (built on top of WebOb)
 * Unforgivingly strict parsing of requests and responses to ensure data integrity
