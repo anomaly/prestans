@@ -868,6 +868,11 @@ class RequestHandler(object):
     def handler_did_run(self):
         return None
 
+    def redirect(self, url, status=prestans.http.STATUS.TEMPORARY_REDIRECT):
+
+        self._response.status = status
+        self._response.headers.add("Location", url)
+
 
 #:
 #: Generates a blueprint of the handler and serializes it using the requested
