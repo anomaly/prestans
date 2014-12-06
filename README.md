@@ -4,9 +4,13 @@ A WSGI compliant REST micro-framework.
 
 http://docs.prestans.org
 
-prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
+Prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
 
-Reasons you might like prestans:
+We recommend you install via [pip](https://pypi.python.org/pypi/prestans/):
+
+`pip install prestans`
+
+Reasons we think you will love Prestans:
 
 * Built right on top of WSGI, designed ground up to cooperate with other frameworks
 * Strong representative of REST philosophies leveraging HTTP headers and verbs
