@@ -347,7 +347,7 @@ class MoreThanMaximumError(DataValidationException):
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
-        _message = "value is not one of these choics %s" % str(allowed_choices).strip('[]')
+        _message = "value is not one of these choices %s" % str(allowed_choices).strip('[]')
         super(InvalidChoiceError, self).__init__(_message)
 
 class UnacceptableLengthError(DataValidationException):

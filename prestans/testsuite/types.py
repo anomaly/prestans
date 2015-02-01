@@ -53,7 +53,7 @@ class StringTypeUnitTest(unittest.TestCase):
     def test_regex_format(self):
         pass
 
-    def test_choics(self):
+    def test_choices(self):
         pass
 
     def test_encoding(self):
