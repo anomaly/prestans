@@ -75,6 +75,10 @@ class Request(webob.Request):
 
     @property
     def parsed_body(self):
+
+        if self.body_template is None:
+            raise AttributeError("access to request.parsed_body is not allowed when body_tempalte is set to None")
+
         return self._parsed_body
 
     @property
