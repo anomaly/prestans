@@ -110,6 +110,22 @@ class String(DataType):
     def min_length(self):
         return self._min_length
 
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def choices(self):
+        return self._choices
+
+    @property
+    def format(self):
+        return self._format
+
+    @property
+    def utf_encoding(self):
+        return self._utf_encoding
+
     def blueprint(self):
 
         blueprint = dict()
@@ -181,6 +197,22 @@ class Integer(DataType):
         self._choices = choices
         self._description = description
 
+    @property
+    def minimum(self):
+        return self._minimum
+
+    @property
+    def maximum(self):
+        return self._maximum
+
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def choices(self):
+        return self._choices
+
     def blueprint(self):
 
         blueprint = dict()
@@ -241,6 +273,22 @@ class Float(DataType):
         self._choices = choices
         self._description = description
 
+    @property
+    def minimum(self):
+        return self._minimum
+
+    @property
+    def maximum(self):
+        return self._maximum
+
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def choices(self):
+        return self._choices
+
     def blueprint(self):
 
         blueprint = dict()
@@ -293,6 +341,10 @@ class Boolean(DataType):
         self._default = default
         self._required = required
         self._description = description
+
+    @property
+    def default(self):
+        return self._default
 
     def blueprint(self):
 
@@ -357,6 +409,10 @@ class DataURLFile(DataStructure):
 
         self._mime_type = None
         self._file_contents = None
+
+    @property
+    def allowed_mime_types(self):
+        return self._allowed_mime_types
 
     def blueprint(self):
 
@@ -443,6 +499,22 @@ class DateTime(DataStructure):
         self._format = format
         self._description = description
 
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def format(self):
+        return self._format
+
+    @property
+    def timezone(self):
+        return self._timezone
+
+    @property
+    def utc(self):
+        return self._utc
+
     def blueprint(self):
 
         blueprint = dict()
@@ -509,6 +581,14 @@ class Date(DataStructure):
         self._format = format
         self._description = description
 
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def format(self):
+        return self._format
+
     def blueprint(self):
 
         blueprint = dict()
@@ -572,6 +652,14 @@ class Time(DataStructure):
         self._required = required
         self._format = format
         self._description = description
+
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def format(self):
+        return self._format
 
     def blueprint(self):
 
@@ -655,6 +743,26 @@ class Array(DataCollection):
         
         self._array_elements = list()
 
+    @property
+    def max_length(self):
+        return self._max_length
+
+    @property
+    def min_length(self):
+        return self._min_length
+
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def element_template(self):
+        return self._element_template
+
+    @element_template.setter
+    def element_template(self, value):
+        self._element_template = value
+
     def blueprint(self):
 
         blueprint = dict()
@@ -670,14 +778,6 @@ class Array(DataCollection):
 
         blueprint['constraints'] = constraints
         return blueprint
-
-    @property
-    def element_template(self):
-        return self._element_template
-
-    @element_template.setter
-    def element_template(self, value):
-        self._element_template = value
 
     def remove(self, value):
         self._array_elements.remove(value)
@@ -823,6 +923,10 @@ class Model(DataCollection):
         self._description = description
 
         self._create_instance_attributes(kwargs)
+
+    @property
+    def default(self):
+        return self._default
                 
     def blueprint(self):
 

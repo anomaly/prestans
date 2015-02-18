@@ -171,7 +171,7 @@ class AttributeFilter(object):
         """
 
         if not isinstance(model_instance, prestans.types.DataCollection):
-            raise TypeError("model_instance must be a sublcass of presatans.types.DataCollection, %s given" % 
+            raise TypeError("model_instance must be a sublcass of prestans.types.DataCollection, %s given" % 
                             (model_instance.__class__.__name__))
 
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
