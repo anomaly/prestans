@@ -743,6 +743,23 @@ class Array(DataCollection):
         
         self._array_elements = list()
 
+    def __len__(self):
+        return len(self._array_elements)
+        
+    def __iter__(self):
+        #:
+        #: With a little help from 
+        #: http://johnmc.co/llum/the-easiest-way-to-implement-__iter__-for-a-python-object/
+        #:
+        for element in self._array_elements:
+            yield element
+
+    def __getitem__(self, index):
+        return self._array_elements[index]
+
+    def __constains__(self, item):
+        return item in self._array_elements
+
     @property
     def max_length(self):
         return self._max_length
@@ -782,23 +799,6 @@ class Array(DataCollection):
     def remove(self, value):
         self._array_elements.remove(value)
     
-    def __len__(self):
-        return len(self._array_elements)
-        
-    def __iter__(self):
-        #:
-        #: With a little help from 
-        #: http://johnmc.co/llum/the-easiest-way-to-implement-__iter__-for-a-python-object/
-        #:
-        for element in self._array_elements:
-            yield element
-
-    def __getitem__(self, index):
-        return self._array_elements[index]
-
-    def __constains__(self, item):
-        return item in self._array_elements
-
     def validate(self, value, attribute_filter=None, minified=False):
         
         if not self._required and not value:
@@ -835,6 +835,10 @@ class Array(DataCollection):
             for element in value:
                 self.append(element)
             return
+
+        if not isinstance(value, DataType):
+            raise TypeError("value must DataType subclass; %s given" % 
+                value.__class__.__name__)
         
         if isinstance(self._element_template, String) and \
         isinstance(value, str):
