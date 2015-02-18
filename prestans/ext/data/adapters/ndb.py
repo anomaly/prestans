@@ -48,7 +48,7 @@ from prestans.ext.data import adapters
 #:
 #: Helper methods
 #:
-def adapt_persistent_instance(persistent_object, target_rest_instance=None, attribute_filter=None):
+def adapt_persistent_instance(persistent_object, target_rest_class=None, attribute_filter=None):
     """
     Adapts a single persistent instance to a REST model; at present this is a
     common method for all persistent backends.
@@ -60,13 +60,13 @@ def adapt_persistent_instance(persistent_object, target_rest_instance=None, attr
     """
 
     #: Try and get the adapter and the REST class for the persistent object 
-    if target_rest_instance is None:
+    if target_rest_class is None:
         adapter_instance = adapters.registry.get_adapter_for_persistent_model(collection[0])
     else:
-        if inspect.isclass(target_rest_instance):
-            target_rest_instance = target_rest_instance()
+        if inspect.isclass(target_rest_class):
+            target_rest_class = target_rest_class()
         
-        adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_instance)
+        adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_class)
 
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 

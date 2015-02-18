@@ -931,6 +931,22 @@ class Model(DataCollection):
     @property
     def default(self):
         return self._default
+
+    @property
+    def attribute_count(self):
+
+        count = 0
+        model_class_members = inspect.getmembers(self.__class__)
+        
+        for attribute_name, type_instance in model_class_members:
+            
+            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
+                continue
+            
+            if isinstance(type_instance, DataType):
+                _attribute_keys.append(attribute_name)
+
+        return count
                 
     def blueprint(self):
 
@@ -1297,6 +1313,9 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
+        #: Counts attributes that are not going to part of the response
+        invisible_attributes = 0
+
         for attribute_name, type_instance in model_class_members:
 
             serialized_attribute_name = attribute_name
@@ -1306,6 +1325,7 @@ class Model(DataCollection):
 
             if isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
              not attribute_filter.is_attribute_visible(attribute_name):
+                invisible_attributes = invisible_attributes + 1
                 continue
 
             #: Support minification
