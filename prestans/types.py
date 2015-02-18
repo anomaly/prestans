@@ -1313,9 +1313,6 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
-        #: Counts attributes that are not going to part of the response
-        invisible_attributes = 0
-
         for attribute_name, type_instance in model_class_members:
 
             serialized_attribute_name = attribute_name
@@ -1325,7 +1322,6 @@ class Model(DataCollection):
 
             if isinstance(attribute_filter, prestans.parser.AttributeFilter) and\
              not attribute_filter.is_attribute_visible(attribute_name):
-                invisible_attributes = invisible_attributes + 1
                 continue
 
             #: Support minification

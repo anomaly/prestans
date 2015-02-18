@@ -447,8 +447,13 @@ class Response(webob.Response):
         if isinstance(self._app_iter, prestans.types.DataCollection):
 
             #: See if attribute filter is completely invisible
-            if self.attribute_filter is not None and not self.attribute_filter.are_any_attributes_visible():
-                self.logger.warn("attribute_filter has all the attributes turned off, handler will return an empty response")
+            if self.attribute_filter is not None: 
+
+                #: Warning to say nothing is visible
+                if not self.attribute_filter.are_any_attributes_visible():
+                    self.logger.warn("attribute_filter has all the attributes turned off, handler will return an empty response")
+
+                #: Warning to say none of the fields match
 
             #: Body should be of type DataCollection try; attempt calling
             #: as_seriable with available attribute_filter
