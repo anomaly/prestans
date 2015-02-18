@@ -280,7 +280,7 @@ class AttributeFilterDiffers(ParserException):
     def __init__(self, attribute_list):
 
         _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "attribute filter has attributes that are not part of template"
+        _message = "attribute filter does not contain attributes (%s) that are not part of template" % (', '.join(attribute_list))
         super(AttributeFilterDiffers, self).__init__(_code, _message)
 
         self.push_trace({ 

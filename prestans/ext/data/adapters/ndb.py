@@ -68,6 +68,9 @@ def adapt_persistent_instance(persistent_object, target_rest_class=None, attribu
         
         adapter_instance = adapters.registry.get_adapter_for_rest_model(target_rest_class)
 
+    #: Would raise an exception if the attribute_filter differs from the target_rest_class
+    prestans.parser.AttributeFilter.from_model(target_rest_class).conforms_to_template_filter(attribute_filter)
+
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 
 #:
