@@ -928,11 +928,9 @@ class Model(DataCollection):
 
         self._create_instance_attributes(kwargs)
 
-    @property
     def default(self):
         return self._default
 
-    @property
     def attribute_count(self):
 
         count = 0
@@ -970,8 +968,7 @@ class Model(DataCollection):
                 continue
 
             if not isinstance(type_instance, DataType):
-                raise TypeError(
-                    "%s must be of a DataType subclass" % attribute_name)
+                raise TypeError("%s must be of a DataType subclass" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
 
