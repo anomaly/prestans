@@ -454,6 +454,17 @@ class Response(webob.Response):
                     self.logger.warn("attribute_filter has all the attributes turned off, handler will return an empty response")
 
                 #: Warning to say none of the fields match
+                model_attribute_filter = None
+                if isinstance(self._app_iter, prestans.types.Array):
+                    model_attribute_filter = prestans.parser.AttributeFilter.from_model(self._app_iter.element_template)
+                elif isinstance(self._app_iter, prestans.types.Model):
+                    model_attribute_filter = prestans.parser.AttributeFilter.from_model(self._app_iter)
+
+                if model_attribute_filter is not None:
+                    try:
+                        model_attribute_filter.conforms_to_template_filter(self.attribute_filter)
+                    except prestans.exception.AttributeFilterDiffers, exp:
+                        self.logger.warn("%s" %  exp)
 
             #: Body should be of type DataCollection try; attempt calling
             #: as_seriable with available attribute_filter
