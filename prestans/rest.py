@@ -179,7 +179,7 @@ class Request(webob.Request):
         """
         Prestans-Response-Attribute-List can contain a client's requested 
         definition for attributes required in the response. This should match
-        the response_attribute_fitler_tempalte? 
+        the response_attribute_filter_template? 
         """
 
         if template_filter is None or not 'Prestans-Response-Attribute-List' in self.headers:
@@ -795,6 +795,11 @@ class RequestHandler(object):
                 #: Response attribute filter
                 self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template, 
                     rewrite_template_model)
+
+                #: If the header is omitted then we ensure the response has a default template
+                #: at this point we can assume that we are going to sent down a response
+                if self.response.attribute_filter is None:
+                    self.response.attribute_filter = response_attr_filter_template
 
             #: Parameter sets
             if verb_parser_config is not None and len(verb_parser_config.parameter_sets) > 0:
