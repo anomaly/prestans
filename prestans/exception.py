@@ -162,7 +162,7 @@ class ValidationError(Base):
 
         super(ValidationError, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
         self._attribute_name = attribute_name
-        self._value = value
+        self._value = str(value)
 
         self.append_validation_trace(blueprint)
 
