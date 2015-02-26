@@ -556,9 +556,9 @@ class DateTime(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError(exp)
+                raise prestans.exception.ParseFailedError("date time parsing failed %" % exp)
         else:
-            raise prestans.exception.ParseFailedError("date time encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
             
         return _validated_value
 
@@ -628,9 +628,9 @@ class Date(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).date()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError()
+                raise prestans.exception.ParseFailedError("date parsing failed %" % exp)
         else:
-            raise prestans.exception.ParseFailedError("date encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
             
         return _validated_value
 
@@ -700,9 +700,9 @@ class Time(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError()
+                raise prestans.exception.ParseFailedError("time parsing failed %" % exp)
         else:
-            raise prestans.exception.ParseFailedError("time encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
 
         return _validated_value
 
