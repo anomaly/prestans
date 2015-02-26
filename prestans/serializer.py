@@ -53,8 +53,8 @@ class JSON(Base):
         import json
         try:
             return json.dumps(serializable_object)
-        except:
-            raise prestans.exception.SerializationFailedError('JSON')
+        except Exception as exp:
+            raise prestans.exception.SerializationFailedError('JSON: %s' % exp)
 
     def handler_body_type(self):
         return prestans.types.DataCollection
@@ -75,8 +75,8 @@ class XMLPlist(Base):
 
         try:
             plist_str = plistlib.writePlistToString(serializable_object)
-        except:
-            raise prestans.exception.SerializationFailedError('XML')
+        except Exception as exp:
+            raise prestans.exception.SerializationFailedError('XMLPlist: %s' % exp)
 
         return plist_str
 
