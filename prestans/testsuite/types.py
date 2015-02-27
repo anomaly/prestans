@@ -62,4 +62,166 @@ class StringTypeUnitTest(unittest.TestCase):
     def tearDown(self):
         self._string = None
 
+class IntegerTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
         
+        self._integer = prestans.types.Integer(
+            default=0,
+            minimum=0,
+            maximum=20,
+            choices=[1,2,3,4,5,6,7]
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._integer = None
+
+
+class FloatTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._float = prestans.types.Float(
+            default=1.0,
+            minimum=1.0,
+            maximum=20.0,
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._float = None
+
+class BooleanTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._boolean = prestans.types.Boolean(
+            default=True,
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._boolean = None
+
+class DataURLFileTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._data_url_file = prestans.types.DataURLFile(
+            allowed_mime_types=[],
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._data_url_file = None
+
+
+class DateTimeTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._datetime = prestans.types.DateTime(
+            default=True,
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._datetime = None
+
+class DateTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._date = prestans.types.Date(
+            default=True,
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._date = None
+
+class TimeTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        
+        self._time = prestans.types.Time(
+            default=True,
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._date = None
+
+class ArrayTypeUnitTest(unittest.TestCase):
+
+    def setUp(self):        
+        self._array = prestans.types.Array(
+            element_template=prestans.types.String(),
+            )
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._array = None
+
+class ModelTypeUnitTest(unittest.TestCase):
+
+    class TestModel(prestans.types.Model):
+
+        string = prestans.types.String(required=True, max_length=10)
+
+    def setUp(self):
+        
+        self._model = ModelTypeUnitTest.TestModel()
+
+    def test_default(self):
+        pass
+
+    def test_choices(self):
+        pass
+
+    def tearDown(self):
+        self._model = None
+
+if __name__ == '__main__':
+    unittest.main()
