@@ -51,11 +51,3 @@ When reporting issues:
 * Include as much detail as you can about your environment (e.g Server OS, Web Server Version, WSGI connector)
 * Steps that we can use to replicate the bug
 * Share a bit of your application code with us, it goes a long way to replicate issues
-
-
-### About the Authors
-
-prestans was developed and is maintained by [Devraj Mukherjee](http://twitter.com/mdevraj "Devraj Mukherjee on Twitter") and [Bradley Mclain](http://twitter.com/bradley_mclain "Brad Mclain on Twitter") while building large scale Web applications at Anomaly Software. These applications run on  Google's [App Engine](https://developers.google.com/appengine/ "Google AppEngine web site") or Linux servers running [Apache](http://httpd.apache.org "Apache official homepage") + [mod_wsgi](https://github.com/GrahamDumpleton/mod_wsgi "mod_wsgi on Github").
-
-We sometimes have things to say on our Twitter streams and are actively involved on our [mailing list](http://groups.google.com/group/prestans-discuss "Discuss").
-
