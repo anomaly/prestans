@@ -341,7 +341,7 @@ class LessThanMinimumError(DataValidationException):
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
-        _message = "%i is more than the allowed maximum" % (value, allowed_max)
+        _message = "%i is more than the allowed maximum %i" % (value, allowed_max)
         super(MoreThanMaximumError, self).__init__(_message)
 
 class InvalidChoiceError(DataValidationException):

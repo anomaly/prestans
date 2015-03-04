@@ -31,7 +31,9 @@
 #
 
 import unittest
+
 import prestans.types
+import prestans.exception
 
 class StringTypeUnitTest(unittest.TestCase):
 
@@ -67,17 +69,22 @@ class IntegerTypeUnitTest(unittest.TestCase):
     def setUp(self):
         
         self._integer = prestans.types.Integer(
-            default=0,
-            minimum=0,
+            default=1,
+            minimum=1,
             maximum=20,
-            choices=[1,2,3,4,5,6,7]
             )
 
     def test_default(self):
-        pass
+        self.assertEqual(self._integer.validate(1), 1)
+
+    def test_minimum(self):
+        self.assertRaises(prestans.exception.LessThanMinimumError, self._integer.validate(-1))
+
+    def text_maximum(self):
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self._integer.validate(21))
 
     def test_choices(self):
-        pass
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._integer.validate(2))
 
     def tearDown(self):
         self._integer = None
