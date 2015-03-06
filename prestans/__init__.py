@@ -34,5 +34,5 @@ import threading
 
 __all__ = ['http', 'types', 'rest', 'parsers', 'serializers', 'cache', 'throttle', 'exceptions']
 
-__version_info__ = (2, 0, 5)
+__version_info__ = (2, 0, 6)
 __version__ = '.'.join(str(v) for v in __version_info__)
