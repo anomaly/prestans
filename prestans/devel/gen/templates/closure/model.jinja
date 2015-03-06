@@ -299,6 +299,24 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
     },
 {% endif %}
 {% endif %}
+{% if attribute.blueprint_type == "model" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "array" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
 {% endfor %}
 };
 
