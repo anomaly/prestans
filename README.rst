@@ -1,4 +1,5 @@
-## Prestans 2.0
+Prestans 2.0
+============
 
 A WSGI compliant REST micro-framework.
 
@@ -7,9 +8,7 @@ A WSGI compliant REST micro-framework.
 
 Prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
 
-We recommend you install via [pip](https://pypi.python.org/pypi/prestans/):
-
-`pip install prestans`
+We recommend you install via `pip <https://pypi.python.org/pypi/prestans/>`_:
 
 Reasons we think you will love Prestans:
 
@@ -21,23 +20,24 @@ Reasons we think you will love Prestans:
 - Helper methods to ease transformation of persistent objects to REST responses
 - Pluggable integration to authentication
 
-prestans ensures that we provide extensive and useful documentation, published at available on [Read The Docs](http://docs.prestans.org "prestans documentation"). Sphinx source available on [Github](http://github.com/prestans/prestans-docs/ "Docs source").
+prestans ensures that we provide extensive and useful documentation, published at available on `Read The Docs <http://docs.prestans.org>`_). Sphinx source available on `Github <http://github.com/prestans/prestans-docs/>`_).
 
-We also offer a set of [client side tools](https://github.com/prestans/prestans-client/ "prestans client") to compliment Google Closure.
+We also offer a set of `client side tools <https://github.com/prestans/prestans-client/>`_) to compliment Google Closure.
 
 If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent." :)
 
-### Getting Help
+Getting Help
+^^^^^^^^^^^^
 
 We recommend the use of our mailing lists as the primary way of getting help:
 
-- [Discuss](http://groups.google.com/group/prestans-discuss "Discuss") used for general discussion.
-- [Announce](http://groups.google.com/group/prestans-announce "Announce") used for release and security announcements
+- `Discuss <http://groups.google.com/group/prestans-discuss>`_ used for general discussion.
+- `Announce <http://groups.google.com/group/prestans-announce>`_ used for release and security announcements
 
+Reporting Issues
+^^^^^^^^^^^^^^^^
 
-### Reporting Issues
-
-We prefer the use of our [Issue Tracker on Github](https://github.com/prestans/prestans/issues "Issue Tracker"), to triage feature requests, bug reports.
+We prefer the use of our `Issue Tracker on Github <https://github.com/prestans/prestans/issues>`_), to triage feature requests, bug reports.
 
 Before you lodge a lodge a ticket:
 
