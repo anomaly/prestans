@@ -205,17 +205,102 @@ this.{{attribute.ccif}}_.listen(prestans.types.Array.EventType.ARRAY_CHANGED, fu
 };
 goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 
-
-
+{{namespace}}.{{name}}.Meta = {
 {% for attribute in attributes %}
-{{namespace}}.{{name}}.prototype.{{attribute.ccif}}_ = null;
-{% if attribute.format != "null" %}
-{{namespace}}.{{name}}.{{attribute.cc}}StringFormat = new RegExp({{attribute.format}});
+{% if attribute.blueprint_type == "string" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAX_LENGTH: {{attribute.max_length}},
+        MIN_LENGTH: {{attribute.min_length}},
+        FORMAT: {{attribute.format}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
 {% endif %}
-{% if isinstance(attribute.choices, list) %}
-{{namespace}}.{{name}}.{{attribute.cc}}Choices = {{attribute.choices}};
+{% endif %}
+{% if attribute.blueprint_type == "boolean" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "integer" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAXIMUM: {{attribute.maximum}},
+        MININUM: {{attribute.minimum}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "float" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAXIMUM: {{attribute.maximum}},
+        MININUM: {{attribute.minimum}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "datetime" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        TIMEZONE: {{attribute.timezone}},
+        UTC: {{attribute.utc}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "date" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "time" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "data_url_file" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        ALLOWED_MIME_TYPES: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
 {% endif %}
 {% endfor %}
+};
 
 //Rewrite map
 {{namespace}}.{{name}}.REWRITE_MAP = {
