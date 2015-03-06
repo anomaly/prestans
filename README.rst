@@ -3,12 +3,20 @@ Prestans 2.0
 
 A WSGI compliant REST micro-framework.
 
+.. image:: https://pypip.in/version/prestans/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/prestans/
+    :alt: Latest Version
+
+.. image:: https://readthedocs.org/projects/prestans/badge/?version=latest
+        :target: https://prestans.readthedocs.org/
+        :alt: Documentation Status
+
 ![https://pypi.python.org/pypi/prestans/](https://pypip.in/version/prestans/badge.svg?style=flat)
 ![https://docs.prestans.org](https://readthedocs.org/projects/prestans/badge/?version=latest)
 
 Prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
 
-We recommend you install via `pip <https://pypi.python.org/pypi/prestans/>`_:
+We recommend you install via `pip <https://pypi.python.org/pypi/prestans/>`_.
 
 Reasons we think you will love Prestans:
 
@@ -37,7 +45,7 @@ We recommend the use of our mailing lists as the primary way of getting help:
 Reporting Issues
 ^^^^^^^^^^^^^^^^
 
-We prefer the use of our `Issue Tracker on Github <https://github.com/prestans/prestans/issues>`_), to triage feature requests, bug reports.
+We prefer the use of our `Issue Tracker on Github <https://github.com/prestans/prestans/issues>`_, to triage feature requests, bug reports.
 
 Before you lodge a lodge a ticket:
 
