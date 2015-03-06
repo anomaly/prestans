@@ -46,6 +46,9 @@ setup(name='prestans',
       platforms=['any'],
       scripts=['prestans/bin/pride'],
       packages=find_packages(),
+      package_data= { 
+            '': ['*.rst']
+      }
       classifiers=[
             'Environment :: Web Environment',
             'Intended Audience :: Developers',
