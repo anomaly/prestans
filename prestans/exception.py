@@ -371,19 +371,19 @@ class MissingParameterError(DataValidationException):
 class InvalidFormatError(DataValidationException):
     
     def __init__(self, value):
-        _message = "message goes in here"
+        _message = "invalid value %s provided" % value
         super(InvalidFormatError, self).__init__(_message)
 
 class InvalidMetaValueError(DataValidationException):
 
     def __init__(self):
-        _message = "message goes in here"
+        _message = "invalid meta value"
         super(InvalidMetaValueError, self).__init__(_message)
 
 class UnregisteredAdapterError(DataValidationException):
 
     def __init__(self):
-        _message = "message goes in here"
+        _message = "no registered adapters for data model"
         super(UnregisteredAdapterError, self).__init__(_message)
 
 #:
