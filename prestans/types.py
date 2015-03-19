@@ -849,6 +849,9 @@ class Array(DataCollection):
         elif isinstance(self._element_template, Integer) and \
         isinstance(value, int):
             value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template, Integer) and \
+        isinstance(value, long):
+            value = self._element_template.__class__().validate(value)
         elif isinstance(self._element_template, Float) and \
         isinstance(value, float):
             value = self._element_template.__class__().validate(value)
