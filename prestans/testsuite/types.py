@@ -198,14 +198,20 @@ class TimeTypeUnitTest(unittest.TestCase):
 class ArrayTypeUnitTest(unittest.TestCase):
 
     def setUp(self):        
-        self._array = prestans.types.Array(
-            element_template=prestans.types.String(),
-            )
+        self._string_array = prestans.types.Array(
+            element_template=prestans.types.String()
+        )
+        self._integer_array = prestans.types.Array(
+            element_template=prestans.types.Integer()
+        )
 
     def test_default(self):
         pass
 
     def test_choices(self):
+        pass
+
+    def test_append(self):
         pass
 
     def tearDown(self):

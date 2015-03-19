@@ -836,9 +836,9 @@ class Array(DataCollection):
                 self.append(element)
             return
 
-        if not isinstance(value, DataType):
-            raise TypeError("value must DataType subclass; %s given" % 
-                value.__class__.__name__)
+        #if not isinstance(value, DataType):
+        #    raise TypeError("value must DataType subclass; %s given" % 
+        #        value.__class__.__name__)
         
         if isinstance(self._element_template, String) and \
         isinstance(value, str):
@@ -856,8 +856,7 @@ class Array(DataCollection):
         isinstance(value, bool):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
-            raise TypeError("prestans array elements must be of type %s; given %s"
-                            (self._element_template.__class__.__name__, value.__class__.__name__))
+            raise TypeError("prestans array elements must be of type %s; given %s" % (self._element_template.__class__.__name__, value.__class__.__name__))
         
         self._array_elements.append(value)
             
