@@ -15,7 +15,7 @@ Prestans is a REST micro-framework built right on top of WSGI, designed perform 
 
 We recommend you install via `pip <https://pypi.python.org/pypi/prestans/>`_.
 
-Reasons we think you will love Prestans:
+Features:
 
 - Built right on top of WSGI, designed ground up to cooperate with other frameworks
 - Strong representative of REST philosophies leveraging HTTP headers and verbs
@@ -29,7 +29,7 @@ prestans ensures that we provide extensive and useful documentation, published a
 
 We also offer a set of `client side tools <https://github.com/prestans/prestans-client/>`_) to compliment Google Closure.
 
-If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent." :)
+If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
 Getting Help
 ^^^^^^^^^^^^
