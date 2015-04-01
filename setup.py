@@ -37,14 +37,13 @@ setup(name='prestans',
       description='A WSGI compliant REST micro-framework',
       url='https://github.com/anomaly/prestans.git',
       long_description="""
-      Prestans is a REST micro-framework built right on top of WSGI, designed 
-      perform and co-exists with other middleware and frameworks that you employ. 
-      Our target audience are developers building large REST backends for use 
-      with pure Ajax (using a framework like Google Closure) or mobile applications. 
-      Prestans is designed for you to "take as much or as little" you like, 
-      although we do think that it all works really well together.
+      Prestans is a REST micro-framework built right on top of WSGI, designed to perform and co-exists with other middleware and frameworks that you employ. 
 
-      Reasons we think you will love Prestans:
+      Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. 
+
+      Prestans is designed for you to "take as much or as little" as you like.
+
+      Features:
 
       - Built right on top of WSGI, designed ground up to cooperate with other frameworks
       - Strong representative of REST philosophies leveraging HTTP headers and verbs

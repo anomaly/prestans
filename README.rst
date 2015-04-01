@@ -11,7 +11,7 @@ A WSGI compliant REST micro-framework.
         :target: https://prestans.readthedocs.org/
         :alt: Documentation Status
 
-Prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" you like, although we do think that it all works really well together.
+Prestans is a REST micro-framework built right on top of WSGI, designed perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" as you like.
 
 We recommend you install via `pip <https://pypi.python.org/pypi/prestans/>`_.
 
@@ -25,9 +25,9 @@ Features:
 - Helper methods to ease transformation of persistent objects to REST responses
 - Pluggable integration to authentication
 
-prestans ensures that we provide extensive and useful documentation, published at available on `Read The Docs <http://docs.prestans.org>`_). Sphinx source available on `Github <http://github.com/prestans/prestans-docs/>`_).
+Prestans ensures that we provide extensive and useful documentation, published at available on `Read The Docs <http://docs.prestans.org>`_). Sphinx source available on `Github <http://github.com/prestans/prestans-docs/>`_).
 
-We also offer a set of `client side tools <https://github.com/prestans/prestans-client/>`_) to compliment Google Closure.
+Prestans also offers a set of `client side tools <https://github.com/prestans/prestans-client/>`_) to compliment Google Closure.
 
 If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
