@@ -459,7 +459,9 @@ class Model(Base):
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, filter_namespace=self._filter_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
+            project_namespace = self._namespace.split(".")[0]
+
+            output_file.write(self._template.render(namespace=self._namespace, project=project_namespace, filter_namespace=self._filter_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
             output_file.close()
 
             print "%-30s -> %s.%s.js" %(model_name, self._namespace, model_name)
@@ -499,7 +501,9 @@ class Filter(Base):
             filename = '%s.js' % (model_name)
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
-            output_file.write(self._template.render(namespace=self._namespace, name=model_name, attributes=attributes, dependencies=self._dependencies, attribute_string=self.attribute_string))
+            project_namespace = self._namespace.split(".")[0]
+
+            output_file.write(self._template.render(namespace=self._namespace, project=project_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies, attribute_string=self.attribute_string))
             output_file.close()
 
             print "%-30s -> %s.%s.js" % (model_name, self._namespace, model_name)
