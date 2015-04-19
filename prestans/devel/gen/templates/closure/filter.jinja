@@ -40,12 +40,18 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 {% for attribute in attributes %}
+/**
+ * @private
+ */
 {{namespace}}.{{name}}.prototype.{{attribute.ccif}}_ = null;
 {% endfor %}
 
 
 
-//Rewrite map
+/**
+ * @const
+ * Rewrite map
+ */
 {{namespace}}.{{name}}.REWRITE_MAP = {
 {% for attribute in attributes %}
 {% if loop.last %}
@@ -59,6 +65,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 {% for attribute in attributes %}
+/**
+ * @export
+ */
 {{namespace}}.{{name}}.prototype.enable{{attribute.cc}} = function() {
 {% if attribute.blueprint_type == 'model' %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(true);
@@ -73,6 +82,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 {% for attribute in attributes %}
+/**
+ * @export
+ */
 {{namespace}}.{{name}}.prototype.disable{{attribute.cc}} = function() {
 {% if attribute.blueprint_type == 'model' %}
     this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(false);
@@ -87,6 +99,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 {% for attribute in attributes %}
+/**
+ * @export
+ */
 {{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
     return this.{{attribute.ccif}}_;
 };
@@ -114,12 +129,20 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 
 
 
+/**
+ * @export
+ */
 {{namespace}}.{{name}}.prototype.anyFieldsEnabled = function() {
     return ({{attribute_string}});
 };
 
 
 
+/**
+ * @export
+ * @param {boolean} minified
+ * @param {boolean=} opt_complete
+ */
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_complete) {
 
     if(opt_complete != true)
@@ -172,7 +195,11 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 };
 
 
-
+/**
+ * @export
+ * @param {boolean} minified
+ * @param {boolean=} opt_complete
+ */
 {{namespace}}.{{name}}.prototype.getJSONString = function(minified, opt_complete) {
 
     if(opt_complete != true)
