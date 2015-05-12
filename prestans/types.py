@@ -244,7 +244,10 @@ class Integer(DataType):
             value = self._default
         
         try:
-            _validated_value = int(value)
+            if type(value) == long:
+                _validated_value = long(value)
+            else:
+                _validated_value = int(value)
         except Exception, exp:
             raise prestans.exception.ParseFailedError("int encoding failed %" % exp)
         
