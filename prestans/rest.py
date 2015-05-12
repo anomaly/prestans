@@ -831,25 +831,32 @@ class RequestHandler(object):
             #: Warm up
             self.handler_will_run()
 
-            #:
-            #: See if the handler supports the called method
-            #: prestans sets a sensible HTTP status code
-            #:
-            if request_method == prestans.http.VERB.GET:
-                self.get(*self._args)
-            elif request_method == prestans.http.VERB.HEAD:
-                self.head(*self._args)
-            elif request_method == prestans.http.VERB.POST:
-                self.post(*self._args)
-            elif request_method == prestans.http.VERB.PUT:
-                self.put(*self._args)
-            elif request_method == prestans.http.VERB.PATCH:
-                self.patch(*self._args)
-            elif request_method == prestans.http.VERB.DELETE:
-                self.delete(*self._args)
-
-            #: Tear down
-            self.handler_did_run()
+            try:
+                #:
+                #: See if the handler supports the called method
+                #: prestans sets a sensible HTTP status code
+                #:
+                if request_method == prestans.http.VERB.GET:
+                    self.get(*self._args)
+                elif request_method == prestans.http.VERB.HEAD:
+                    self.head(*self._args)
+                elif request_method == prestans.http.VERB.POST:
+                    self.post(*self._args)
+                elif request_method == prestans.http.VERB.PUT:
+                    self.put(*self._args)
+                elif request_method == prestans.http.VERB.PATCH:
+                    self.patch(*self._args)
+                elif request_method == prestans.http.VERB.DELETE:
+                    self.delete(*self._args)
+            #: Re-raise all prestans exceptions
+            except prestans.exception.Base as exception:
+                raise exception
+            #: Handle any non-prestans exceptions
+            except Exception as exp:
+                self.handler_raised_exception(exp)
+            #: Always run the tear down method
+            finally:
+                self.handler_did_run()
 
             self.logger.info("handler %s.%s; callable excution ends" 
                 % (self.__module__, self.__class__.__name__))
@@ -861,20 +868,32 @@ class RequestHandler(object):
             error_response = ErrorResponse(exp, self.response.selected_serializer)
             return error_response(environ, start_response)
 
-
-    #:
-    #: Placeholder functions for HTTP Verb; implementing handlers must override these
-    #: if not overridden prestans returns a Not Implemented error
-    #:
-
     def register_serializers(self):
         return []
 
     def register_deserializers(self):
         return []
 
+    #:
+    #: Placeholder functions for lifecycle methods
+    #:
+
     def handler_will_run(self):
         return None
+
+    #:
+    #: Default handler for a raised exception return service unavailable
+    #:
+    def handler_raised_exception(self, exception):
+        raise prestans.exception.ServiceUnavailable()
+
+    def handler_did_run(self):
+        return None
+
+    #:
+    #: Placeholder functions for HTTP Verb; implementing handlers must override these
+    #: if not overridden prestans returns a Not Implemented error
+    #:
 
     def get(self, *args):
         raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.GET)
@@ -893,9 +912,6 @@ class RequestHandler(object):
 
     def delete(self, *args):
         raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.DELETE)
-
-    def handler_did_run(self):
-        return None
 
     def redirect(self, url, status=prestans.http.STATUS.TEMPORARY_REDIRECT):
 

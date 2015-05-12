@@ -394,7 +394,7 @@ class UnregisteredAdapterError(DataValidationException):
 
 class ServiceUnavailable(HandlerException):
     
-    def __init__(self, message):
+    def __init__(self, message="This service is currently unavailable"):
         _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
         super(ServiceUnavailable, self).__init__(_code, message)
 
