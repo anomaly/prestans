@@ -25,9 +25,9 @@ Features:
 - Helper methods to ease transformation of persistent objects to REST responses
 - Pluggable integration to authentication
 
-Prestans ensures that we provide extensive and useful documentation, published at available on `Read The Docs <http://docs.prestans.org>`_). Sphinx source available on `Github <http://github.com/prestans/prestans-docs/>`_).
+Prestans ensures that we provide extensive and useful documentation, published at available on `Read The Docs <http://docs.prestans.org>`_. Sphinx source available on `Github <http://github.com/prestans/prestans-docs/>`_.
 
-Prestans also offers a set of `client side tools <https://github.com/prestans/prestans-client/>`_) to compliment Google Closure.
+Prestans also offers a set of `client side tools <https://github.com/prestans/prestans-client/>`_ to compliment Google Closure.
 
 If you are still wondering prestans is a latin word meaning "excellent, distinguished, imminent."
 
