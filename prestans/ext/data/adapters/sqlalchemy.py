@@ -59,7 +59,7 @@ def adapt_persistent_instance(persistent_object, target_rest_class=None, attribu
 
     #: Try and get the adapter and the REST class for the persistent object 
     if target_rest_class is None:
-        adapter_instance = adapters.registry.get_adapter_for_persistent_model(collection[0])
+        adapter_instance = adapters.registry.get_adapter_for_persistent_model(persistent_object)
     else:
         if inspect.isclass(target_rest_class):
             target_rest_class = target_rest_class()
