@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['DeSerializer', 'JSON', 'XMLPlist']
+__all__ = ['Base', 'JSON', 'XMLPlist']
 
 import prestans.exception
 

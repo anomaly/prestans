@@ -164,7 +164,7 @@ class String(DataType):
             else:
                 _validated_value = str(value)
         except Exception, exp:
-            raise prestans.exception.ParseFailedError("unicode or string encoding failed, %" % exp)
+            raise prestans.exception.ParseFailedError("unicode or string encoding failed, %s" % exp)
         
         if not self._required and len(_validated_value) == 0:
             return _validated_value
@@ -249,7 +249,7 @@ class Integer(DataType):
             else:
                 _validated_value = int(value)
         except Exception, exp:
-            raise prestans.exception.ParseFailedError("int encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("int encoding failed %s" % exp)
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
@@ -324,7 +324,7 @@ class Float(DataType):
         try:
             _validated_value = float(value)
         except Exception, exp:
-            raise prestans.exception.ParseFailedError("float encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("float encoding failed %s" % exp)
         
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
@@ -457,7 +457,7 @@ class DataURLFile(DataStructure):
             _validated_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
             _validated_value._file_contents = base64.b64decode(base64_content)
         except Exception, exp:
-            raise prestans.exception.ParseFailedError("data url file encoding failed %" % exp)
+            raise prestans.exception.ParseFailedError("data url file encoding failed %s" % exp)
 
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
         and not _validated_value._mime_type in self._allowed_mime_types:
@@ -559,7 +559,7 @@ class DateTime(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError("date time parsing failed %" % exp)
+                raise prestans.exception.ParseFailedError("date time parsing failed %s" % exp)
         else:
             raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
             
@@ -631,7 +631,7 @@ class Date(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).date()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError("date parsing failed %" % exp)
+                raise prestans.exception.ParseFailedError("date parsing failed %s" % exp)
         else:
             raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
             
@@ -703,7 +703,7 @@ class Time(DataStructure):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError, exp:
-                raise prestans.exception.ParseFailedError("time parsing failed %" % exp)
+                raise prestans.exception.ParseFailedError("time parsing failed %s" % exp)
         else:
             raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
 
@@ -824,10 +824,10 @@ class Array(DataCollection):
             _validated_value.append(validated_array_element)
     
         if self._min_length is not None and len(_validated_value) < self._min_length:
-            raise prestans.exception.LessThanMinimumError(value, self._minimum)
+            raise prestans.exception.LessThanMinimumError(value, self._min_length)
 
         if self._max_length is not None and len(_validated_value) > self._max_length:
-            raise prestans.exception.MoreThanMaximumError(value, self._maximum)
+            raise prestans.exception.MoreThanMaximumError(value, self._max_length)
 
         return _validated_value
     
