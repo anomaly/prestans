@@ -32,7 +32,17 @@
 
 import threading
 
-__all__ = ['http', 'types', 'rest', 'parsers', 'serializers', 'cache', 'throttle', 'exceptions']
+from . import http
+from . import rest
+from . import types
+from . import parser
+from . import serializer
+from . import deserializer
+from . import provider
+from . import ext
+from . import exception
+
+__all__ = ['http', 'types', 'rest', 'parser', 'serializer', 'deserializer', 'provider', 'ext', 'exception']
 
 __version_info__ = (2, 0, 9)
 __version__ = '.'.join(str(v) for v in __version_info__)
