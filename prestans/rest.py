@@ -747,7 +747,7 @@ class RequestHandler(object):
 
     def __call__(self, environ, start_response):
 
-        self.logger.info("handler %s.%s; callable excution start" 
+        self.logger.info("handler %s.%s; callable execution start" 
             % (self.__module__, self.__class__.__name__))
 
         self.logger.info("setting default response to %s" % self.request.accept)
@@ -858,7 +858,7 @@ class RequestHandler(object):
             finally:
                 self.handler_did_run()
 
-            self.logger.info("handler %s.%s; callable excution ends" 
+            self.logger.info("handler %s.%s; callable execution ends" 
                 % (self.__module__, self.__class__.__name__))
 
             return self.response(environ, start_response)
