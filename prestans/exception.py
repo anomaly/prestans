@@ -40,22 +40,20 @@ __all__ = [
 
     #: Parser Exceptions
     'NoEndpointError',
-    'SerializationFailed',
+    'SerializationFailedError',
 
     #: Data Validation
     'RequiredAttributeError',
     'ParseFailedError',
-    'InvalidValue',
-    'LessThanMinimum',
-    'MoreThanMaximum',
-    'InvalidChoice',
-    'UnacceptableLength',
+    'LessThanMinimumError',
+    'MoreThanMaximumError',
+    'InvalidChoiceError',
+    'UnacceptableLengthError',
     'InvalidType',
-    'InvalidCollection',
-    'MissingParameter',
-    'InvalidFormat',
-    'InvalidMetaValue',
-    'UnregisteredAdapter',
+    'MissingParameterError',
+    'InvalidFormatError',
+    'InvalidMetaValueError',
+    'UnregisteredAdapterError',
 
     #: Handler exceptions
     'ServiceUnavailable',
