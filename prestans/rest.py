@@ -1182,13 +1182,13 @@ class RequestRouter(object):
             except AttributeError:
                 pass
 
-            #: Patch regular expression if its incomplete 
+            #: Patch regular expression if its incomplete
             if not regexp.startswith('^'):
                 regexp = '^' + regexp
             if not regexp.endswith('$'):
                 regexp += '$'
-                
+
             compiled_regex = re.compile(regexp)
             parsed_handler_map.append((compiled_regex, handler))
-            
+
         return parsed_handler_map
