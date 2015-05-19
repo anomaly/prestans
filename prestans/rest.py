@@ -612,6 +612,7 @@ class ErrorResponse(webob.Response):
         self._serializer = serializer
         self._message = exception.message
         self._stack_trace = exception.stack_trace
+        self._trace = None
 
         #:
         #: IETF hash dropped the X- prefix for custom headers
@@ -665,6 +666,8 @@ class RequestHandler(object):
     override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
+    __provider_config__ = None
+    __parser_config__ = None
 
     def __init__(self, args, request, response, logger, debug):
 
