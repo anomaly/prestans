@@ -253,24 +253,28 @@ class AttributeFilter(object):
                 #: with value of true
                 #:
                 if isinstance(value, bool) and \
-                value is True and isinstance(getattr(template_filter, template_key), AttributeFilter):
-                    setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
+                value is True and \
+                isinstance(getattr(template_filter, template_key), AttributeFilter):
+                    setattr(evaluated_attribute_filter, template_key, \
+                        getattr(template_filter, template_key))
                 elif isinstance(value, bool):
                     setattr(evaluated_attribute_filter, template_key, value)
                 elif isinstance(value, self.__class__):
                     # Attribute lists sort themselves out, to produce sub Attribute Filters
                     template_sub_list = getattr(template_filter, template_key)
                     this_sub_list = getattr(self, template_key)
-                    setattr(evaluated_attribute_filter, template_key, this_sub_list.conforms_to_template_filter(template_sub_list))
+                    setattr(evaluated_attribute_filter, template_key, \
+                        this_sub_list.conforms_to_template_filter(template_sub_list))
             else:
-                setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
+                setattr(evaluated_attribute_filter, template_key, \
+                    getattr(template_filter, template_key))
 
         return evaluated_attribute_filter
-        
+
     def keys(self):
-        """ 
+        """
         returns a list of usable keys
-        """ 
+        """
 
         keys = list()
 
@@ -287,26 +291,27 @@ class AttributeFilter(object):
     def has_key(self, key):
         """
         contains a particular key, wrapper on self.__dict__.key
-        """ 
+        """
         return self.__dict__.has_key(key)
 
     def is_filter_at_key(self, key):
-        """ 
+        """
         return True if attribute is a subfilter
         """
 
-        if self.has_key(key) and isinstance(attribute_status, self.__class__):
-            return True
+        if self.has_key(key):
+            attribute_status = getattr(self, key)
+            if isinstance(attribute_status, self.__class__):
+                return True
 
         return False
 
     def is_attribute_visible(self, key):
         """
         returns True if an attribute is visible
-        
         If attribute is an instance of AttributeFilter, it returns True if all attributes
         of the sub filter are visible.
-        """         
+        """
         if self.has_key(key):
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, bool) and attribute_status == True:
@@ -320,19 +325,17 @@ class AttributeFilter(object):
     def are_any_attributes_visible(self):
         """
         checks to see if any attributes are set to true
-        """ 
+        """
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods 
                 continue
 
             if isinstance(type_instance, bool) and type_instance == True:
                 return True
             elif isinstance(type_instance, self.__class__) and \
             type_instance.are_all_attributes_visible() == True:
-                # Serialise attribute filter children to dictioanaries 
                 return True
 
         return False
@@ -340,7 +343,7 @@ class AttributeFilter(object):
     def are_all_attributes_visible(self):
         """
         checks to see if all attributes are set to true
-        """         
+        """
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -350,8 +353,8 @@ class AttributeFilter(object):
 
             if isinstance(type_instance, bool) and type_instance == False:
                 return False
-            elif isinstance(type_instance, self.__class__) and type_instance.are_all_attributes_visible() == False:
-                # Serialise attribute filter children to dictioanaries 
+            elif isinstance(type_instance, self.__class__) and \
+            type_instance.are_all_attributes_visible() == False:
                 return False
 
         return True
@@ -359,7 +362,7 @@ class AttributeFilter(object):
     def set_all_attribute_values(self, value):
         """
         sets all the attribute values to the value and propagate to any children
-        """         
+        """
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
@@ -370,12 +373,11 @@ class AttributeFilter(object):
             if isinstance(type_instance, bool):
                 self.__dict__[attribute_name] = value
             elif isinstance(type_instance, self.__class__):
-                # Serialise attribute filter children to dictioanaries 
                 type_instance.set_all_attribute_values(value)
 
 
     def as_dict(self):
-        """ 
+        """
         turns attribute filter object into python dictionary
         """
 
@@ -384,35 +386,33 @@ class AttributeFilter(object):
         for attribute_name, type_instance in inspect.getmembers(self):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods 
                 continue
 
             if isinstance(type_instance, bool):
                 output_dictionary[attribute_name] = type_instance
             elif isinstance(type_instance, self.__class__):
-                # Serialise attribute filter children to dictioanaries 
                 output_dictionary[attribute_name] = type_instance.as_dict()
 
         return output_dictionary
 
 
     def _init_from_dictionary(self, from_dictionary, template_model=None):
-        """ 
-        Private helper to init values from a dictionary, wraps chidlren into 
+        """
+        Private helper to init values from a dictionary, wraps chidlren into
         AttributeFilter objects
         """
 
         if not isinstance(from_dictionary, dict):
-            raise TypeError("from_dictionary must be of type dict, %s provided" % 
-                            (from_dictionary.__class__.__name__))
+            raise TypeError("from_dictionary must be of type dict, %s \
+                provided" % from_dictionary.__class__.__name__)
         rewrite_map = None
         if template_model is not None:
 
             rewrite_map = template_model.attribute_rewrite_reverse_map()
 
             if not isinstance(template_model, prestans.types.DataCollection):
-                raise TypeError("template_model should be a prestans model in AttributeFilter init (from dictionary), %s provided" % 
-                                (template_model.__class__.__name__))
+                raise TypeError("template_model should be a prestans model in AttributeFilter \
+                    init (from dictionary), %s provided" % template_model.__class__.__name__)
 
         for key, value in from_dictionary.iteritems():
 
@@ -456,8 +456,8 @@ class AttributeFilter(object):
                     if isinstance(sub_map, prestans.types.Array):
                         sub_map = sub_map.element_template
 
-                setattr(self, target_key, AttributeFilter(from_dictionary=value, 
-                    template_model=sub_map))
+                setattr(self, target_key, \
+                    AttributeFilter(from_dictionary=value, template_model=sub_map))
             
 
     def __setattr__(self, key, value):
@@ -478,7 +478,7 @@ class AttributeFilter(object):
             self.__dict__[key] = value
             return
 
-        raise TypeError("%s name in %s must be of type Boolean or AttributeFilter, given %s" % 
+        raise TypeError("%s name in %s must be of type Boolean or AttributeFilter, given %s" %
                         (key, self.__class__.__name__, value.__class__.__name__))
 
 
@@ -492,18 +492,19 @@ class VerbConfig(object):
     subclass of prestans.types.DataCollection.
     """
 
-    def __init__(self, response_template=None, response_attribute_filter_default_value=False,
+    def __init__(self, response_template=None, response_attribute_filter_default_value=False,\
         parameter_sets=[], body_template=None, request_attribute_filter=None):
 
-        #: response_template; required parameter        
+        #: response_template; required parameter
         if response_template is not None and (not isinstance(response_template, prestans.types.DataCollection) and\
          not isinstance(response_template, prestans.types.BinaryResponse)):
-            raise TypeError(
-            "response_template of type %s must be an instance of a prestans.types.DataCollection subclass" % 
-            response_template.__class__.__name__)
+            raise TypeError("response_template of type %s must be an instance of \
+                a prestans.types.DataCollection subclass" % response_template.__class__.__name__)
 
-        if response_template is not None and isinstance(response_template, prestans.types.DataCollection):
-            self._response_attribute_filter_template = AttributeFilter.from_model(model_instance=response_template, 
+        if response_template is not None and \
+        isinstance(response_template, prestans.types.DataCollection):
+            self._response_attribute_filter_template = AttributeFilter.\
+            from_model(model_instance=response_template,\
                 default_value=response_attribute_filter_default_value)
         else:
             self._response_attribute_filter_template = None
@@ -517,25 +518,25 @@ class VerbConfig(object):
 
         for parameter_set in parameter_sets:
             if not isinstance(parameter_set, ParameterSet):
-                raise TypeError(
-                "parameter_set of type %s must be an instance of prestans.parser.ParameterSet" %
-                parameter_set.__class__.__name__)
+                raise TypeError("parameter_set of type %s must be an instance of \
+                prestans.parser.ParameterSet" % parameter_set.__class__.__name__)
 
         self._parameter_sets = parameter_sets
 
         #: body_template
-        if body_template is not None and not isinstance(body_template, prestans.types.DataCollection):
+        if body_template is not None and not \
+        isinstance(body_template, prestans.types.DataCollection):
             raise TypeError(
-                "body_template of type %s must be an instance of a prestans.types.DataCollection subclass" %
-                body_template.__class__.__name__)
+                "body_template of type %s must be an instance of \
+                a prestans.types.DataCollection subclass" % body_template.__class__.__name__)
 
         self._body_template = body_template
 
         #: request_attribute_filter
-        if request_attribute_filter is not None and not isinstance(request_attribute_filter, AttributeFilter):
-            raise TypeError(
-            "request_attribute_filter of type %s must an instance of prestans.parser.AttributeFilter" % 
-            request_attribute_filter.__class__.__name__)
+        if request_attribute_filter is not None and \
+        not isinstance(request_attribute_filter, AttributeFilter):
+            raise TypeError("request_attribute_filter of type %s must an instance \
+            of prestans.parser.AttributeFilter" % request_attribute_filter.__class__.__name__)
 
         self._request_attribute_filter = request_attribute_filter
 
