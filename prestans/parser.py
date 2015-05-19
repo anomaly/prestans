@@ -33,7 +33,6 @@
 __all__ = ['Config', 'VerbConfig', 'AttributeFilter', 'ParameterSet']
 
 import inspect
-import string
 
 import prestans.types
 import prestans.http
