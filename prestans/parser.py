@@ -119,9 +119,9 @@ class ParameterSet(object):
 
             if issubclass(type_instance.__class__, prestans.types.Array):
 
-                if not isinstance(type_instance._element_template, prestans.types.String) and \
-                not isinstance(type_instance._element_template, prestans.types.Float) and \
-                not isinstance(type_instance._element_template, prestans.types.Integer):
+                if not isinstance(type_instance.element_template, prestans.types.String) and \
+                not isinstance(type_instance.element_template, prestans.types.Float) and \
+                not isinstance(type_instance.element_template, prestans.types.Integer):
                     raise TypeError("%s elements should be of \
                         type prestans.types.String/Integer/Float" % attribute_name)
 
@@ -425,11 +425,11 @@ class AttributeFilter(object):
                 target_key = rewrite_map[key]
 
             #:
-            #: Check to see we can work with the value 
+            #: Check to see we can work with the value
             #:
             if not isinstance(value, (bool, dict)):
-                raise TypeError("AttributeFilter input for key %s must be boolean or dict, %s provided" % 
-                                (key, value.__class__.__name__))
+                raise TypeError("AttributeFilter input for key %s must be \
+                    boolean or dict, %s provided" % (key, value.__class__.__name__))
 
             #:
             #: Ensure that the key exists in the template model
@@ -441,7 +441,7 @@ class AttributeFilter(object):
                 raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
 
             #:
-            #: Either keep the value of wrap it up with AttributeFilter 
+            #: Either keep the value of wrap it up with AttributeFilter
             #:
             if isinstance(value, bool):
                 setattr(self, target_key, value)
@@ -458,12 +458,11 @@ class AttributeFilter(object):
 
                 setattr(self, target_key, \
                     AttributeFilter(from_dictionary=value, template_model=sub_map))
-            
 
     def __setattr__(self, key, value):
         """
         Overrides setattr to allow only booleans or an AttributeFilter
-        """ 
+        """
 
         # Set internal fields
         if key[0:1] == "_":
@@ -471,7 +470,8 @@ class AttributeFilter(object):
             return
 
         # Values should either be boolean or type of self
-        if isinstance(value, bool) and key in self.__dict__ and isinstance(self.__dict__[key], self.__class__):
+        if isinstance(value, bool) and key in self.__dict__ and \
+        isinstance(self.__dict__[key], self.__class__):
             self.__dict__[key].set_all_attribute_values(value)
             return
         elif isinstance(value, (bool, self.__class__)):
@@ -496,7 +496,8 @@ class VerbConfig(object):
         parameter_sets=[], body_template=None, request_attribute_filter=None):
 
         #: response_template; required parameter
-        if response_template is not None and (not isinstance(response_template, prestans.types.DataCollection) and\
+        if response_template is not None and \
+        (not isinstance(response_template, prestans.types.DataCollection) and\
          not isinstance(response_template, prestans.types.BinaryResponse)):
             raise TypeError("response_template of type %s must be an instance of \
                 a prestans.types.DataCollection subclass" % response_template.__class__.__name__)
@@ -541,7 +542,7 @@ class VerbConfig(object):
         self._request_attribute_filter = request_attribute_filter
 
     def blueprint(self):
-        
+
         verb_config_blueprint = dict()
 
         if self._response_template is not None:
@@ -553,14 +554,15 @@ class VerbConfig(object):
         for parameter_set in self._parameter_sets:
             if parameter_set is not None:
                 verb_config_blueprint['parameter_sets'].append(parameter_set.blueprint())
-        
+
         if self._body_template is not None:
             verb_config_blueprint['body_template'] = self._body_template.blueprint()
         else:
             verb_config_blueprint['body_template'] = self._body_template
 
         if self._request_attribute_filter is not None:
-            verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter.blueprint()
+            verb_config_blueprint['request_attribute_filter'] = \
+            self._request_attribute_filter.blueprint()
         else:
             verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter
 
@@ -570,7 +572,7 @@ class VerbConfig(object):
     def response_template(self):
         return self._response_template
 
-    @property 
+    @property
     def response_attribute_filter_template(self):
         return self._response_attribute_filter_template
 
@@ -588,7 +590,7 @@ class VerbConfig(object):
 
 class Config(object):
     """
-    Configuration that's attached to each handler to define rules for each 
+    Configuration that's attached to each handler to define rules for each
     HTTP Verb. All HTTP verbs in use must have a configuration defined.
 
     __init__ takes in a VerbConfig instance for each parameter with names
