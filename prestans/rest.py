@@ -46,7 +46,7 @@ import prestans.deserializer
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
-    do the heavy lifiting of parsing HTTP requests. It adds on top parsing of 
+    do the heavy lifiting of parsing HTTP requests. It adds on top parsing of
     REST bodies and parameter sets based on rules set by the prestans app.
 
     It's responsible for making sense of the prestans headers and making them
@@ -77,7 +77,8 @@ class Request(webob.Request):
     def parsed_body(self):
 
         if self.body_template is None:
-            raise AttributeError("access to request.parsed_body is not allowed when body_tempalte is set to None")
+            raise AttributeError("access to request.parsed_body is not \
+                allowed when body_tempalte is set to None")
 
         return self._parsed_body
 
@@ -96,7 +97,7 @@ class Request(webob.Request):
     @property
     def default_deserializer(self):
         return self._default_deserializer
-        
+
     #: Used by content_type_set to set get a referencey to the serializer object
     def set_deserializer_by_mime_type(self, mime_type):
 
@@ -105,7 +106,8 @@ class Request(webob.Request):
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.supported_mime_types_str)
+        raise prestans.exception.UnsupportedContentTypeError(mime_type, \
+            self.supported_mime_types_str)
 
     @property
     def attribute_filter(self):
@@ -150,7 +152,8 @@ class Request(webob.Request):
             return
 
         if not isinstance(value, prestans.types.DataCollection):
-            raise AssertionError("body_template must be an instance of prestans.types.DataCollection")
+            raise AssertionError("body_template must be an instance of \
+                prestans.types.DataCollection")
 
         self._body_template = value
 
@@ -162,14 +165,16 @@ class Request(webob.Request):
         unserialized_body = self.selected_deserializer.loads(self.body)
 
         #: Parse the body using the remplate and attribute_filter
-        self._parsed_body = value.validate(unserialized_body, self.attribute_filter, self.is_minified)
+        self._parsed_body = value.validate(unserialized_body, \
+            self.attribute_filter, self.is_minified)
 
     def register_deserializers(self, deserializers):
 
         for deserializer in self._deserializers:
 
             if not isinstance(deserializer, prestans.deserializer.Base):
-                raise TypeError("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
+                raise TypeError("registered deserializer %s.%s does not \
+                    inherit from prestans.serializer.DeSerializer" % \
                     (deserializer.__module__, deserializer.__class__.__name__))
 
         self._deserializers = self._deserializers + deserializers
@@ -177,9 +182,9 @@ class Request(webob.Request):
 
     def get_response_attribute_filter(self, template_filter, template_model=None):
         """
-        Prestans-Response-Attribute-List can contain a client's requested 
+        Prestans-Response-Attribute-List can contain a client's requested
         definition for attributes required in the response. This should match
-        the response_attribute_filter_template? 
+        the response_attribute_filter_template?
         """
 
         if template_filter is None or not 'Prestans-Response-Attribute-List' in self.headers:
@@ -193,8 +198,8 @@ class Request(webob.Request):
         attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
-        attribute_filter = prestans.parser.AttributeFilter(from_dictionary=attribute_list_dictionary, 
-            template_model=template_model)
+        attribute_filter = prestans.parser.AttributeFilter(\
+            from_dictionary=attribute_list_dictionary, template_model=template_model)
 
         #: Check template? Do this even through we might have template_model
         #: incase users have made a custom filter
@@ -213,7 +218,7 @@ class Request(webob.Request):
 
 class Response(webob.Response):
     """
-    Response is the writable HTTP response. It inherits and leverages 
+    Response is the writable HTTP response. It inherits and leverages
     from webob.Response to do the heavy lifiting of HTTP Responses. It adds to
     weob.Response prestans customisations.
 
@@ -221,7 +226,7 @@ class Response(webob.Response):
     """
 
     def __init__(self, charset, logger, serializers, default_serializer):
-        
+
         super(Response, self).__init__()
 
         self._logger = logger
@@ -234,9 +239,9 @@ class Response(webob.Response):
         self._attribute_filter = None
         self._template = None
 
-        #: 
+        #:
         #: IETF hash dropped the X- prefix for custom headers
-        #: http://stackoverflow.com/q/3561381 
+        #: http://stackoverflow.com/q/3561381
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
@@ -277,11 +282,11 @@ class Response(webob.Response):
                 self._selected_serializer = serializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError(mime_type, 
+        raise prestans.exception.UnsupportedVocabularyError(mime_type,\
             self.supported_mime_types_str)
 
     #:
-    #: is an instance of prestans.types.DataType; mostly a subclass of 
+    #: is an instance of prestans.types.DataType; mostly a subclass of
     #: prestans.types.Model
     #:
 
@@ -294,7 +299,8 @@ class Response(webob.Response):
 
         if value is not None and (not isinstance(value, prestans.types.DataCollection) \
             and not isinstance(value, prestans.types.BinaryResponse)):
-            raise TypeError("template in response must be of type prestans.types.DataCollection or subclass")
+            raise TypeError("template in response must be of type \
+                prestans.types.DataCollection or subclass")
 
         self._template = value
 
@@ -310,7 +316,8 @@ class Response(webob.Response):
     def attribute_filter(self, value):
 
         if value is not None and not isinstance(value, prestans.parser.AttributeFilter):
-            raise TypeError("attribue_filter in response must be of type prestans.types.AttributeFilter")
+            raise TypeError("attribue_filter in response must be of \
+                type prestans.types.AttributeFilter")
 
         self._attribute_filter = value
 
@@ -335,8 +342,10 @@ class Response(webob.Response):
     def _content_type__set(self, value):
 
         #: Check to see if response can support the requested mime type
-        if not isinstance(self._app_iter, prestans.types.BinaryResponse) and value not in self.supported_mime_types:
-            raise prestans.exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
+        if not isinstance(self._app_iter, prestans.types.BinaryResponse) \
+        and value not in self.supported_mime_types:
+            raise prestans.exception.UnsupportedVocabularyError(value, \
+                self.supported_mime_types_str)
 
         #: Keep a reference to the selected serializer
         if not isinstance(self._app_iter, prestans.types.BinaryResponse):
@@ -370,7 +379,7 @@ class Response(webob.Response):
 
         body getter will return the validated prestans model.
 
-        Webob does the heavy lifiting with headers. 
+        Webob does the heavy lifiting with headers.
         """
 
         #: If template is null; return an empty iterable
@@ -388,20 +397,21 @@ class Response(webob.Response):
             raise AssertionError("response_template is None; handler can't return a response")
 
         #: value should be a subclass prestans.types.DataCollection
-        if not isinstance(value, prestans.types.DataCollection) and not isinstance(value, prestans.types.BinaryResponse):
-            raise TypeError("%s is not a prestans.types.DataCollection or prestans.types.BinaryResponse subclass" % 
-                value.__class__.__name__)
+        if not isinstance(value, prestans.types.DataCollection) and \
+        not isinstance(value, prestans.types.BinaryResponse):
+            raise TypeError("%s is not a prestans.types.DataCollection \
+                or prestans.types.BinaryResponse subclass" % value.__class__.__name__)
 
         #: Ensure that it matches the return type template
         if not value.__class__ == self.template.__class__:
-            raise TypeError("body must of be type %s, given %s" % 
+            raise TypeError("body must of be type %s, given %s" %\
                 (self.template.__class__.__name__, value.__class__.__name__))
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, prestans.types.Array) and \
         not type(value.element_template) == type(self.template.element_template):
-            raise TypeError("array elements must of be type %s, given %s" % 
-                (self.template.element_template.__class__.__name__, 
+            raise TypeError("array elements must of be \
+                type %s, given %s" % (self.template.element_template.__class__.__name__,\
                     value.element_template.__class__.__name__))
 
         #: _app_iter assigned to value
@@ -418,8 +428,9 @@ class Response(webob.Response):
         for serializer in serializers:
 
             if not isinstance(serializer, prestans.serializer.Base):
-                raise TypeError("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
-                    (serializer.__module__, serializer.__class__.__name__))
+                raise TypeError("registered serializer %s.%s does not inherit from \
+                    prestans.serializer.Serializer" % (serializer.__module__,\
+                        serializer.__class__.__name__))
 
         self._serializers = self._serializers + serializers
 
@@ -434,31 +445,35 @@ class Response(webob.Response):
             start_response(self.status, self.headerlist)
 
             if self.template is not None:
-                self.logger.warn("handler returns No Content but has a response_template; set template to None")
+                self.logger.warn("handler returns No Content but has a \
+                    response_template; set template to None")
 
             return []
 
         #: Ensure what we are able to serialize is serializable
         if not isinstance(self._app_iter, prestans.types.DataCollection) and\
          not isinstance(self._app_iter, prestans.types.BinaryResponse):
-            raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % 
-                self._app_iter.__name__)
+            raise TypeError("handler returns content of type %s; not a \
+                prestans.types.DataCollection subclass" % self._app_iter.__name__)
 
         if isinstance(self._app_iter, prestans.types.DataCollection):
 
             #: See if attribute filter is completely invisible
-            if self.attribute_filter is not None: 
+            if self.attribute_filter is not None:
 
                 #: Warning to say nothing is visible
                 if not self.attribute_filter.are_any_attributes_visible():
-                    self.logger.warn("attribute_filter has all the attributes turned off, handler will return an empty response")
+                    self.logger.warn("attribute_filter has all the attributes turned \
+                        off, handler will return an empty response")
 
                 #: Warning to say none of the fields match
                 model_attribute_filter = None
                 if isinstance(self._app_iter, prestans.types.Array):
-                    model_attribute_filter = prestans.parser.AttributeFilter.from_model(self._app_iter.element_template)
+                    model_attribute_filter = prestans.parser.AttributeFilter.\
+                    from_model(self._app_iter.element_template)
                 elif isinstance(self._app_iter, prestans.types.Model):
-                    model_attribute_filter = prestans.parser.AttributeFilter.from_model(self._app_iter)
+                    model_attribute_filter = prestans.parser.AttributeFilter.\
+                    from_model(self._app_iter)
 
                 if model_attribute_filter is not None:
                     try:
@@ -474,8 +489,8 @@ class Response(webob.Response):
             stringified_body = self._selected_serializer.dumps(serializable_body)
 
             if not type(stringified_body) == str:
-                raise TypeError("%s dumps must return a python str not %s" % 
-                    (self._selected_serializer.__class__.__name__, 
+                raise TypeError("%s dumps must return a python str \
+                    not %s" % (self._selected_serializer.__class__.__name__, \
                         stringified_body.__class__.__name__))
 
             #: set content_length
@@ -486,9 +501,12 @@ class Response(webob.Response):
 
         elif isinstance(self._app_iter, prestans.types.BinaryResponse):
 
-            if self._app_iter.content_length == 0 or self._app_iter.mime_type == None or self._app_iter.file_name == None:
-                self.logger.warn("Failed to write binar response with content_length %i; mime_type %s; file_name %s" %
-                    (self._app_iter.content_length, self._app_iter.mime_type,self._app_iter.file_name))
+            if self._app_iter.content_length == 0 or \
+            self._app_iter.mime_type == None or \
+            self._app_iter.file_name == None:
+                self.logger.warn("Failed to write binar response with content_length \
+                    %i; mime_type %s; file_name %s" % (self._app_iter.content_length, \
+                        self._app_iter.mime_type, self._app_iter.file_name))
                 self.status = prestans.http.STATUS.INTERNAL_SERVER_ERROR
                 self.content_type = "text/plain"
                 return []
@@ -498,9 +516,11 @@ class Response(webob.Response):
 
             #: Add content disposition header
             if self._app_iter.as_attachment:
-                self.headers.add('Content-Disposition', "attachment; filename=%s" % self._app_iter.file_name)
-            else:                
-                self.headers.add('Content-Disposition', "inline; filename=%s" % self._app_iter.file_name)
+                self.headers.add('Content-Disposition', \
+                    "attachment; filename=%s" % self._app_iter.file_name)
+            else:
+                self.headers.add('Content-Disposition', \
+                    "inline; filename=%s" % self._app_iter.file_name)
 
             #: Write out response
             self.content_length = self._app_iter.content_length
@@ -532,7 +552,7 @@ class DictionaryResponse(Response):
 
         body getter will return the validated prestans model.
 
-        Webob does the heavy lifiting with headers. 
+        Webob does the heavy lifiting with headers.
         """
         return self._app_iter
 
@@ -541,7 +561,7 @@ class DictionaryResponse(Response):
 
         #: value should be a subclass prestans.types.DataCollection
         if not type(value) == dict:
-            raise TypeError("%s is not a dictionary" % 
+            raise TypeError("%s is not a dictionary" %\
                 value.__class__.__name__)
 
         #: _app_iter assigned to value
@@ -559,8 +579,8 @@ class DictionaryResponse(Response):
         stringified_body = self._selected_serializer.dumps(self.body)
 
         if not type(stringified_body) == str:
-            raise TypeError("%s dumps must return a python str not %s" % 
-                (self._selected_serializer.__class__.__name__, 
+            raise TypeError("%s dumps must return a python str not %s" %\
+                (self._selected_serializer.__class__.__name__,\
                     stringified_body.__class__.__name__))
 
         #: set content_length
@@ -583,7 +603,7 @@ class ErrorResponse(webob.Response):
           ]
       }
     """
-    
+
     def __init__(self, exception, serializer):
 
         super(ErrorResponse, self).__init__()
@@ -593,9 +613,9 @@ class ErrorResponse(webob.Response):
         self._message = exception.message
         self._stack_trace = exception.stack_trace
 
-        #: 
+        #:
         #: IETF hash dropped the X- prefix for custom headers
-        #: http://stackoverflow.com/q/3561381 
+        #: http://stackoverflow.com/q/3561381
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
         self.headers.add('Prestans-Version', prestans.__version__)
@@ -638,17 +658,18 @@ class ErrorResponse(webob.Response):
 
 class RequestHandler(object):
     """
-    RequestHandler is a callable that all API end-points must inherit from. 
+    RequestHandler is a callable that all API end-points must inherit from.
     end-points are instantiated by RequestRouter as a match for a URL.
 
-    This class should not be initialised directly. Subclasses should 
+    This class should not be initialised directly. Subclasses should
     override corresponding methods for HTTP verbs; get, post, delete, put, patch.
     """
 
-    __provider_config__ = prestans.provider.Config()    
-    __parser_config__ = prestans.parser.Config()
 
     def __init__(self, args, request, response, logger, debug):
+
+        self.__provider_config__ = prestans.provider.Config()
+        self.__parser_config__ = prestans.parser.Config()
 
         self._args = args
         self._request = request
@@ -673,15 +694,15 @@ class RequestHandler(object):
         return self._debug
 
     def blueprint(self):
-        
+
         handler_blueprint = dict()
 
-        signature_map = [ prestans.http.VERB.GET, \
+        signature_map = [prestans.http.VERB.GET, \
         prestans.http.VERB.HEAD, \
         prestans.http.VERB.POST, \
         prestans.http.VERB.PUT, \
         prestans.http.VERB.PATCH, \
-        prestans.http.VERB.DELETE ]
+        prestans.http.VERB.DELETE]
 
         #: Provider configuration
         provider_blueprint = None
@@ -705,8 +726,9 @@ class RequestHandler(object):
 
             # Docstring
             verb_blueprint['description'] = inspect.getdoc(local_function_handle)
-            
-            # Arguments, get the first set of parameters for the function handle and ignore echoing self
+
+            # Arguments, get the first set of parameters for the
+            # function handle and ignore echoing self
             verb_blueprint['arguments'] = inspect.getargspec(local_function_handle)[0][1:]
 
             #: Parser configuration
@@ -733,13 +755,13 @@ class RequestHandler(object):
 
         #: Intersection of requested types and supported types tells us if we
         #: can infact respond in one of the requess formats
-        best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,
+        best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,\
             default_match=self.response.default_serializer.content_type())
 
         if best_accept_match is None:
-            self.logger.error("unsupported mime type in request; accept header reads %s" % 
+            self.logger.error("unsupported mime type in request; accept header reads %s" %\
                 self.request.accept)
-            raise prestans.exception.UnsupportedVocabularyError(self.request.accept, 
+            raise prestans.exception.UnsupportedVocabularyError(self.request.accept,\
                 self.response.supported_mime_types_str)
 
         #: If content_type is not acceptable it will raise UnsupportedVocabulary
@@ -747,7 +769,7 @@ class RequestHandler(object):
 
     def __call__(self, environ, start_response):
 
-        self.logger.info("handler %s.%s; callable execution start" 
+        self.logger.info("handler %s.%s; callable execution start"\
             % (self.__module__, self.__class__.__name__))
 
         self.logger.info("setting default response to %s" % self.request.accept)
@@ -781,7 +803,8 @@ class RequestHandler(object):
                 #: Set the response template and attribute filter
                 self.response.template = verb_parser_config.response_template
 
-                response_attr_filter_template = verb_parser_config.response_attribute_filter_template
+                response_attr_filter_template = verb_parser_config.\
+                response_attribute_filter_template
 
                 #: Minification support for response attribute filters
                 rewrite_template_model = None
@@ -793,7 +816,8 @@ class RequestHandler(object):
                         rewrite_template_model = self.response.template
 
                 #: Response attribute filter
-                self.response.attribute_filter = self.request.get_response_attribute_filter(response_attr_filter_template, 
+                self.response.attribute_filter = self.request.\
+                get_response_attribute_filter(response_attr_filter_template, \
                     rewrite_template_model)
 
                 #: If the header is omitted then we ensure the response has a default template
@@ -807,7 +831,8 @@ class RequestHandler(object):
                 for parameter_set in verb_parser_config.parameter_sets:
 
                     if not isinstance(parameter_set, prestans.parser.ParameterSet):
-                        raise TypeError("%s not a subclass of ParameterSet" % parameter_set.__class__.__name__)
+                        raise TypeError("%s not a subclass of ParameterSet" % \
+                            parameter_set.__class__.__name__)
 
                     try:
                         validated_parameter_set = parameter_set.validate(self.request)
@@ -858,8 +883,8 @@ class RequestHandler(object):
             finally:
                 self.handler_did_run()
 
-            self.logger.info("handler %s.%s; callable execution ends" 
-                % (self.__module__, self.__class__.__name__))
+            self.logger.info("handler %s.%s; callable execution ends" % \
+                (self.__module__, self.__class__.__name__))
 
             return self.response(environ, start_response)
 
@@ -932,7 +957,7 @@ class BlueprintHandler(RequestHandler):
         self._route_map = route_map
 
     def _create_blueprint(self):
-        
+
         blueprint_groups = dict()
 
         # Intterogate each handler
@@ -946,7 +971,7 @@ class BlueprintHandler(RequestHandler):
             handler_blueprint['url'] = regexp
             handler_blueprint['handler_class'] = handler_class.__name__
             handler_blueprint['description'] = inspect.getdoc(handler_class)
-            handler_blueprint['supported_methods'] = handler_class(self._args, self.request, 
+            handler_blueprint['supported_methods'] = handler_class(self._args, self.request,\
                 self.response, self.logger, self.debug).blueprint()
 
             # Make a new group per module if one doesnt' exist
@@ -984,7 +1009,7 @@ class BlueprintHandler(RequestHandler):
 
 class RequestRouter(object):
     """
-    RequestRouter is a specialised WSGI router that primarily maps URLs to Handlers. 
+    RequestRouter is a specialised WSGI router that primarily maps URLs to Handlers.
     All registered end-points must inherit from RequestHandler.
 
     RequestRouter sets the most likely response format based on Accept Headers. If
@@ -995,8 +1020,8 @@ class RequestRouter(object):
 
     """
 
-    def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None, 
-        default_deserializer=None, charset="utf-8", application_name="prestans", 
+    def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None,\
+        default_deserializer=None, charset="utf-8", application_name="prestans",\
         logger=None, debug=False, description=None):
 
         self._application_name = application_name
@@ -1036,7 +1061,7 @@ class RequestRouter(object):
             self._default_serializer = prestans.serializer.JSON()
 
         #: Deserializers
-        
+
         if deserializers is None:
             self._deserializers = [prestans.deserializer.JSON()]
 
@@ -1066,16 +1091,18 @@ class RequestRouter(object):
     def __call__(self, environ, start_response):
 
         #: Say hello
-        self._logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % (
-            self._application_name, len(self._routes), prestans.__version__, self._charset, self._debug))
+        self._logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % \
+            (self._application_name, len(self._routes), prestans.__version__, \
+                self._charset, self._debug))
 
         #: Validate serailziers and deserialzers; are subclasses of prestans.serializer.Serializer
         _default_outgoing_mime_types = list()
         for serializer in self._serializers:
 
             if not isinstance(serializer, prestans.serializer.Base):
-                raise TypeError("registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % 
-                    (serializer.__module__, serializer.__class__.__name__))
+                raise TypeError("registered serializer %s.%s does not \
+                    inherit from \prestans.serializer.Serializer" % (serializer.__module__, \
+                        serializer.__class__.__name__))
 
             _default_outgoing_mime_types.append(serializer.content_type())
 
@@ -1083,18 +1110,21 @@ class RequestRouter(object):
         for deserializer in self._deserializers:
 
             if not isinstance(deserializer, prestans.deserializer.Base):
-                raise TypeError("registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % 
+                raise TypeError("registered deserializer %s.%s \does not inherit from \
+                    prestans.serializer.DeSerializer" % \
                     (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
 
         #: Report on the acceptable mime types
-        self._logger.info("generally accepts %s; speaks %s" % 
-            (str(_default_outgoing_mime_types).strip("[]'"), str(_default_incoming_mime_types).strip("[]'")))
+        self._logger.info("generally accepts %s; speaks %s" %\
+            (str(_default_outgoing_mime_types).strip("[]'"),\
+                str(_default_incoming_mime_types).strip("[]'")))
 
         #: Attempt to parse the HTTP request
-        request = Request(environ=environ, charset=self._charset, logger=self._logger, 
-            deserializers=self._deserializers, default_deserializer=self._default_deserializer)
+        request = Request(environ=environ, charset=self._charset, \
+            logger=self._logger, deserializers=self._deserializers, \
+            default_deserializer=self._default_deserializer)
 
         #: Initialise the Route map
         route_map = self._init_route_map(self._routes)
@@ -1111,21 +1141,24 @@ class RequestRouter(object):
 
                     if issubclass(handler_class, BlueprintHandler):
 
-                        response = DictionaryResponse(charset=self._charset, logger=self._logger, 
-                            serializers=self._serializers, default_serializer=self._default_deserializer)
+                        response = DictionaryResponse(charset=self._charset, logger=self._logger,\
+                            serializers=self._serializers, \
+                            default_serializer=self._default_deserializer)
 
-                        request_handler = handler_class(args=match.groups(), request=request, response=response, 
+                        request_handler = handler_class(args=match.groups(), \
+                            request=request, response=response,\
                             logger=self._logger, debug=self._debug, route_map=self._routes)
 
                     else:
 
-                        response = Response(charset=self._charset, logger=self._logger, serializers=self._serializers, 
+                        response = Response(charset=self._charset, logger=self._logger, \
+                            serializers=self._serializers, \
                             default_serializer=self._default_deserializer)
 
                         response.minify = request.is_minified
 
-                        request_handler = handler_class(args=match.groups(), request=request, response=response, 
-                            logger=self._logger, debug=self._debug)
+                        request_handler = handler_class(args=match.groups(), request=request, \
+                            response=response, logger=self._logger, debug=self._debug)
 
                     return request_handler(environ, start_response)
 
@@ -1141,7 +1174,7 @@ class RequestRouter(object):
 
         parsed_handler_map = []
         handler_name = None
-        
+
         for regexp, handler in routes:
 
             try:
