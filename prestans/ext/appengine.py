@@ -30,7 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['AppEngineAuthContextProvider', 'AppEngineCacheProvider']
+__all__ = ['AppEngineAuthContextProvider']
 
 ## @package prestans.appengine Providers Google AppEngine specific implementation of providers
 #
