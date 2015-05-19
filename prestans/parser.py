@@ -57,7 +57,6 @@ class ParameterSet(object):
 
         # Fields
         fields = dict()
-        model_class_members = inspect.getmembers(self.__class__)
 
         # Inspects the attributes of a parameter set and tries to validate the input
         for attribute_name, type_instance in self.__class__.__dict__.iteritems():
@@ -169,7 +168,7 @@ class AttributeFilter(object):
     """
 
     @classmethod
-    def from_model(self, model_instance, default_value=False, **kwargs):
+    def from_model(cls, model_instance, default_value=False, **kwargs):
         """
         wrapper for Model's get_attribute_filter
         """
@@ -495,6 +494,8 @@ class VerbConfig(object):
     def __init__(self, response_template=None, response_attribute_filter_default_value=False,\
         parameter_sets=[], body_template=None, request_attribute_filter=None):
 
+        self._response_attribute_filter_template = None
+
         #: response_template; required parameter
         if response_template is not None and \
         (not isinstance(response_template, prestans.types.DataCollection) and\
@@ -504,11 +505,11 @@ class VerbConfig(object):
 
         if response_template is not None and \
         isinstance(response_template, prestans.types.DataCollection):
-            self._response_attribute_filter_template = AttributeFilter.\
+            self.response_attribute_filter_template = AttributeFilter.\
             from_model(model_instance=response_template,\
                 default_value=response_attribute_filter_default_value)
         else:
-            self._response_attribute_filter_template = None
+            self.response_attribute_filter_template = None
 
         self._response_template = response_template
 
@@ -576,6 +577,10 @@ class VerbConfig(object):
     def response_attribute_filter_template(self):
         return self._response_attribute_filter_template
 
+    @response_attribute_filter_template.setter
+    def response_attribute_filter_template(self, value):
+        self._response_attribute_filter_template = value
+
     @property
     def parameter_sets(self):
         return self._parameter_sets
@@ -616,26 +621,26 @@ class Config(object):
         return self._configs[verb]
 
     @property
-    def GET(self):
+    def get(self):
         return self._configs[prestans.http.VERB.GET]
 
     @property
-    def HEAD(self):
+    def head(self):
         return self._configs[prestans.http.VERB.HEAD]
 
     @property
-    def POST(self):
+    def post(self):
         return self._configs[prestans.http.VERB.POST]
 
     @property
-    def PUT(self):
+    def put(self):
         return self._configs[prestans.http.VERB.PUT]
 
     @property
-    def PATCH(self):
+    def patch(self):
         return self._configs[prestans.http.VERB.PATCH]
 
     @property
-    def DELETE(self):
+    def delete(self):
         return self._configs[prestans.http.VERB.DELETE]
      
