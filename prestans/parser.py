@@ -37,7 +37,7 @@ import string
 
 import prestans.types
 import prestans.http
-import prestans.exception               
+import prestans.exception
 
 class ParameterSet(object):
     """
@@ -58,12 +58,11 @@ class ParameterSet(object):
         # Fields
         fields = dict()
         model_class_members = inspect.getmembers(self.__class__)
-    
-        # Inspects the attributes of a parameter set and tries to validate the input 
+
+        # Inspects the attributes of a parameter set and tries to validate the input
         for attribute_name, type_instance in self.__class__.__dict__.iteritems():
-            
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods 
                 continue
 
             # Must be one of the following types
@@ -73,37 +72,39 @@ class ParameterSet(object):
             not isinstance(type_instance, prestans.types.Date) and \
             not isinstance(type_instance, prestans.types.DateTime) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
+                raise TypeError("%s should be subclass of\
+                 prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if isinstance(type_instance, prestans.types.Array):
                 if not isinstance(type_instance.element_template, prestans.types.String) and \
                 not isinstance(type_instance.element_template, prestans.types.Float) and \
                 not isinstance(type_instance.element_template, prestans.types.Integer):
-                    raise TypeError("%s should be subclass of prestans.types.String/Integer/Float/Array" % attribute_name)
+                    raise TypeError("%s should be subclass of \
+                        prestans.types.String/Integer/Float/Array" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
 
         blueprint['fields'] = fields
         return blueprint
-    
+
     def validate(self, request):
         """
         validate method for %ParameterSet
-        
-        Since the introduction of ResponseFieldListParser, the parameter _response_field_list 
+
+        Since the introduction of ResponseFieldListParser, the parameter _response_field_list
         will be ignore, this is a prestans reserved parameter, and cannot be used by apps.
-        
+
         @param self The object pointer
         @param request The request object to be validated
         """
-        
+
         validated_parameter_set = self.__class__()
 
-        # Inspects the attributes of a parameter set and tries to validate the input 
+        # Inspects the attributes of a parameter set and tries to validate the input
         for attribute_name, type_instance in self.__class__.__dict__.iteritems():
-            
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods 
+                # Ignore parameters with __ and if they are methods
                 continue
 
             #: Must be one of the following types
@@ -113,14 +114,16 @@ class ParameterSet(object):
             not isinstance(type_instance, prestans.types.Date) and \
             not isinstance(type_instance, prestans.types.DateTime) and \
             not isinstance(type_instance, prestans.types.Array):
-                raise TypeError("%s should be of type prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
+                raise TypeError("%s should be of type \
+                    prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if issubclass(type_instance.__class__, prestans.types.Array):
-                
+
                 if not isinstance(type_instance._element_template, prestans.types.String) and \
                 not isinstance(type_instance._element_template, prestans.types.Float) and \
                 not isinstance(type_instance._element_template, prestans.types.Integer):
-                    raise TypeError("%s elements should be of type prestans.types.String/Integer/Float" % attribute_name)
+                    raise TypeError("%s elements should be of \
+                        type prestans.types.String/Integer/Float" % attribute_name)
 
             try:
 
@@ -135,31 +138,32 @@ class ParameterSet(object):
                     except KeyError:
                         validation_input = None
 
-                #: Validate input based on data type rules, raises DataTypeValidationException if validation fails 
+                #: Validate input based on data type rules,
+                #: raises DataTypeValidationException if validation fails
                 validation_result = type_instance.validate(validation_input)
 
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
             except prestans.exception.DataValidationException, exp:
                 raise prestans.exception.ValidationError(
-                    message=str(exp), 
-                    attribute_name=attribute_name, 
-                    value=validation_input, 
+                    message=str(exp),
+                    attribute_name=attribute_name,
+                    value=validation_input,
                     blueprint=type_instance.blueprint())
-            
+
         return validated_parameter_set
 
 
 class AttributeFilter(object):
-    """     
-      { 
-        field_name0: true, 
-        field_name1: false, 
-        collection_name0: true, 
+    """
+      {
+        field_name0: true,
+        field_name1: false,
+        collection_name0: true,
         collection_name1: false,
         collection_name2: {
             sub_field_name0: true,
-            sub_field_name1: false 
+            sub_field_name1: false
         }
       }
     """
@@ -171,8 +175,8 @@ class AttributeFilter(object):
         """
 
         if not isinstance(model_instance, prestans.types.DataCollection):
-            raise TypeError("model_instance must be a sublcass of prestans.types.DataCollection, %s given" % 
-                            (model_instance.__class__.__name__))
+            raise TypeError("model_instance must be a sublcass of \
+                prestans.types.DataCollection, %s given" % (model_instance.__class__.__name__))
 
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
@@ -183,11 +187,11 @@ class AttributeFilter(object):
             else:
                 raise KeyError(name)
 
-        return attribute_filter_instance            
+        return attribute_filter_instance
 
     def __init__(self, from_dictionary=None, template_model=None, **kwargs):
         """
-        Creates an attribute filter object, optionally populates from a 
+        Creates an attribute filter object, optionally populates from a
         dictionary of booleans
         """
 
@@ -210,12 +214,11 @@ class AttributeFilter(object):
          - If sub list found, perform the first check
          - If self has a value for an attribute, assign to final AttributeFilter
          - If not found, assign value from template
-                  
-        """     
+        """
 
         if not isinstance(template_filter, self.__class__):
-            raise TypeError("AttributeFilter can only check conformance against another template filter, %s provided" % 
-                            (template_filter.__class__.__name__))
+            raise TypeError("AttributeFilter can only check conformance against \
+                another template filter, %s provided" % (template_filter.__class__.__name__))
 
         #:
         #: Keys from the template
@@ -246,17 +249,16 @@ class AttributeFilter(object):
                 value = getattr(self, template_key)
 
                 #:
-                #: If sub filter and boolean provided with of true, create default filter 
+                #: If sub filter and boolean provided with of true, create default filter
                 #: with value of true
                 #:
                 if isinstance(value, bool) and \
-                value is True and \
-                isinstance(getattr(template_filter, template_key), AttributeFilter):
+                value is True and isinstance(getattr(template_filter, template_key), AttributeFilter):
                     setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
                 elif isinstance(value, bool):
                     setattr(evaluated_attribute_filter, template_key, value)
                 elif isinstance(value, self.__class__):
-                    # Attribute lists sort themselves out, to produce sub Attribute Filters 
+                    # Attribute lists sort themselves out, to produce sub Attribute Filters
                     template_sub_list = getattr(template_filter, template_key)
                     this_sub_list = getattr(self, template_key)
                     setattr(evaluated_attribute_filter, template_key, this_sub_list.conforms_to_template_filter(template_sub_list))
