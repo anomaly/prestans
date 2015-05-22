@@ -63,7 +63,10 @@ class Request(webob.Request):
         self._selected_deserializer = None
         self._parameter_set = None
 
-        self.charset = charset
+        self._charset = charset
+
+        self._body_template = None
+        self._parsed_body = None
 
     @property
     def method(self):
@@ -238,6 +241,7 @@ class Response(webob.Response):
         self._minify = False
         self._attribute_filter = None
         self._template = None
+        self._charset = charset
 
         #:
         #: IETF hash dropped the X- prefix for custom headers
@@ -409,7 +413,7 @@ class Response(webob.Response):
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, prestans.types.Array) and \
-        not type(value.element_template) == type(self.template.element_template):
+        not isinstance(value.element_template, self.template.element_template):
             raise TypeError("array elements must of be \
                 type %s, given %s" % (self.template.element_template.__class__.__name__,\
                     value.element_template.__class__.__name__))
@@ -488,7 +492,7 @@ class Response(webob.Response):
             #: attempt serializing via registered serializer
             stringified_body = self._selected_serializer.dumps(serializable_body)
 
-            if not type(stringified_body) == str:
+            if not isinstance(stringified_body, str):
                 raise TypeError("%s dumps must return a python str \
                     not %s" % (self._selected_serializer.__class__.__name__, \
                         stringified_body.__class__.__name__))
@@ -560,7 +564,7 @@ class DictionaryResponse(Response):
     def _body__set(self, value):
 
         #: value should be a subclass prestans.types.DataCollection
-        if not type(value) == dict:
+        if not isinstance(value, dict):
             raise TypeError("%s is not a dictionary" %\
                 value.__class__.__name__)
 
@@ -578,7 +582,7 @@ class DictionaryResponse(Response):
         #: attempt serializing via registered serializer
         stringified_body = self._selected_serializer.dumps(self.body)
 
-        if not type(stringified_body) == str:
+        if not isinstance(stringified_body, str):
             raise TypeError("%s dumps must return a python str not %s" %\
                 (self._selected_serializer.__class__.__name__,\
                     stringified_body.__class__.__name__))
@@ -679,6 +683,9 @@ class RequestHandler(object):
         self._response = response
         self._logger = logger
         self._debug = debug
+
+        #: Initalization used elsewhere
+        self.provider_authentication = None
 
     @property
     def request(self):
@@ -913,6 +920,7 @@ class RequestHandler(object):
     #: Default handler for a raised exception return service unavailable
     #:
     def handler_raised_exception(self, exception):
+        self.logger.error(exception)
         raise prestans.exception.ServiceUnavailable()
 
     def handler_did_run(self):
@@ -1094,7 +1102,7 @@ class RequestRouter(object):
     def __call__(self, environ, start_response):
 
         #: Say hello
-        self._logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % \
+        self.logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % \
             (self._application_name, len(self._routes), prestans.__version__, \
                 self._charset, self._debug))
 
@@ -1104,7 +1112,7 @@ class RequestRouter(object):
 
             if not isinstance(serializer, prestans.serializer.Base):
                 raise TypeError("registered serializer %s.%s does not \
-                    inherit from \prestans.serializer.Serializer" % (serializer.__module__, \
+                    inherit from prestans.serializer.Serializer" % (serializer.__module__, \
                         serializer.__class__.__name__))
 
             _default_outgoing_mime_types.append(serializer.content_type())
@@ -1113,9 +1121,9 @@ class RequestRouter(object):
         for deserializer in self._deserializers:
 
             if not isinstance(deserializer, prestans.deserializer.Base):
-                raise TypeError("registered deserializer %s.%s \does not inherit from \
-                    prestans.serializer.DeSerializer" % \
-                    (deserializer.__module__, deserializer.__class__.__name__))
+                raise TypeError(
+                    "registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer"\
+                     % (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
 
@@ -1176,7 +1184,6 @@ class RequestRouter(object):
     def _init_route_map(self, routes):
 
         parsed_handler_map = []
-        handler_name = None
 
         for regexp, handler in routes:
 
