@@ -46,10 +46,10 @@ import prestans.exception
 
 #:
 #: Base type classes
-#: 
+#:
 
 class DataType(object):
-    
+
     def validate(self, value):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
@@ -58,12 +58,12 @@ class DataStructure(DataType):
     Wrappers on Python types generally represented as structures e.g DateTime
 
     as_serializable methods signature for %DataStructure is different to that of DataCollection
-    it requires a value to be passed in, this is because the python type of structures is 
+    it requires a value to be passed in, this is because the python type of structures is
     difference to what gets serialized.
 
     E.g DateTime serializes itself as a ISO string
     """
-    
+
     def as_serializable(self, value):
         raise TypeError("%s should not be used directly" % self.__class__.__name__)
 
@@ -83,8 +83,8 @@ class DataCollection(DataType):
 #:
 
 class String(DataType):
-    
-    def __init__(self, default=None, min_length=None, max_length=None, 
+
+    def __init__(self, default=None, min_length=None, max_length=None,\
         required=True, format=None, choices=None, utf_encoding='utf-8', description=None):
 
         if min_length and max_length and min_length > max_length:
@@ -148,7 +148,7 @@ class String(DataType):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -157,7 +157,7 @@ class String(DataType):
             return _validated_value
         elif not self._required and value is None:
             value = self._default
-        
+
         try:
             if isinstance(value, unicode):
                 _validated_value = u''.join(value).encode(self._utf_encoding).strip()
@@ -165,26 +165,30 @@ class String(DataType):
                 _validated_value = str(value)
         except Exception, exp:
             raise prestans.exception.ParseFailedError("unicode or string encoding failed, %s" % exp)
-        
+
         if not self._required and len(_validated_value) == 0:
             return _validated_value
-        
-        if _validated_value is not None and self._min_length and len(_validated_value) < self._min_length:
-            raise prestans.exception.UnacceptableLengthError(value, self._min_length, self._max_length)
-        if _validated_value is not None and self._max_length and len(_validated_value) > self._max_length:
-            raise prestans.exception.UnacceptableLengthError(value, self._min_length, self._max_length)
-            
+
+        if _validated_value is not None and self._min_length\
+        and len(_validated_value) < self._min_length:
+            raise prestans.exception.UnacceptableLengthError(value, self._min_length,\
+                self._max_length)
+        if _validated_value is not None and self._max_length\
+        and len(_validated_value) > self._max_length:
+            raise prestans.exception.UnacceptableLengthError(value, self._min_length,\
+                self._max_length)
+
         if self._choices is not None and not _validated_value in self._choices:
             raise prestans.exception.InvalidChoiceError(value, self._choices)
-            
+
         if self._format is not None and re.search(self._format, _validated_value) is None:
             raise prestans.exception.InvalidFormatError(_validated_value)
-        
+
         return _validated_value
 
 class Integer(DataType):
 
-    def __init__(self, default=None, minimum=None, maximum=None, 
+    def __init__(self, default=None, minimum=None, maximum=None,\
         required=True, choices=None, description=None):
 
         if minimum and maximum and minimum > maximum:
@@ -233,7 +237,7 @@ class Integer(DataType):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -242,33 +246,33 @@ class Integer(DataType):
             return _validated_value
         elif not self._required and value is None:
             value = self._default
-        
+
         try:
-            if type(value) == long:
+            if isinstance(value, long):
                 _validated_value = long(value)
             else:
                 _validated_value = int(value)
         except Exception, exp:
             raise prestans.exception.ParseFailedError("int encoding failed %s" % exp)
-        
+
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
         if _validated_value and self._maximum is not None and _validated_value > self._maximum:
             raise prestans.exception.MoreThanMaximumError(value, self._maximum)
-            
+
         if self._choices is not None and not _validated_value in self._choices:
             raise prestans.exception.InvalidChoiceError(value, self._choices)
-        
+
         return _validated_value
 
 class Float(DataType):
 
-    def __init__(self, default=None, minimum=None, maximum=None, required=True, 
+    def __init__(self, default=None, minimum=None, maximum=None, required=True,\
         choices=None, description=None):
-        
+
         if minimum and maximum and minimum > maximum:
             pass
-        
+
         self._default = default
         self._minimum = minimum
         self._maximum = maximum
@@ -296,7 +300,7 @@ class Float(DataType):
 
         blueprint = dict()
         blueprint['type'] = 'float'
-        
+
         constraints = dict()
         constraints['default'] = self._default
         constraints['minimum'] = self._minimum
@@ -311,7 +315,7 @@ class Float(DataType):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -320,23 +324,23 @@ class Float(DataType):
             return _validated_value
         elif not self._required and value is None:
             value = self._default
-        
+
         try:
             _validated_value = float(value)
         except Exception, exp:
             raise prestans.exception.ParseFailedError("float encoding failed %s" % exp)
-        
+
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
+
         if _validated_value and self._maximum is not None and _validated_value > self._maximum:
             raise prestans.exception.MoreThanMaximumError(value, self._maximum)
-            
+
         if self._choices is not None and not _validated_value in self._choices:
             raise prestans.exception.InvalidChoiceError(value, self._choices)
-        
+
         return _validated_value
 
-        
 class Boolean(DataType):
 
     def __init__(self, default=None, required=True, description=None):
@@ -365,7 +369,7 @@ class Boolean(DataType):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -374,12 +378,12 @@ class Boolean(DataType):
             return _validated_value
         elif not self._required and value is None:
             value = self._default
-        
+
         try:
             _validated_value = bool(value)
         except Exception, exp:
             raise prestans.exception.ParseFailedError()
-        
+
         return _validated_value
 
 
@@ -387,7 +391,7 @@ class DataURLFile(DataStructure):
     """
     Accepts a Fileupload as part of the JSON body using FileReader's readAsDataURL
 
-    readAsDataURL, encodes the contents of the file as a DataURLScheme, 
+    readAsDataURL, encodes the contents of the file as a DataURLScheme,
     http://en.wikipedia.org/wiki/Data_URI_scheme
 
     Example
@@ -440,7 +444,7 @@ class DataURLFile(DataStructure):
 
     @property
     def base64_contents(self):
-        return base64.b64encode(self._file_contents) 
+        return base64.b64encode(self._file_contents)
 
     def validate(self, value):
 
@@ -461,7 +465,8 @@ class DataURLFile(DataStructure):
 
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
         and not _validated_value._mime_type in self._allowed_mime_types:
-            raise prestans.exception.InvalidChoiceError(_validated_value._mime_type, self._allowed_mime_types)
+            raise prestans.exception.InvalidChoiceError(_validated_value._mime_type,\
+                self._allowed_mime_types)
 
         return _validated_value
 
@@ -474,7 +479,7 @@ class DataURLFile(DataStructure):
 
         prestans does not mask File IO exceptions so your handler can respond better.
         """
-        
+
         file_handle = open(path, 'wb')
         file_handle.write(self._file_contents)
         file_handle.close()
@@ -493,7 +498,8 @@ class DateTime(DataStructure):
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
 
-    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S", timezone=False, utc=False, description=None):
+    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S",\
+        timezone=False, utc=False, description=None):
 
         self._default = default
         self._required = required
@@ -537,7 +543,7 @@ class DateTime(DataStructure):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -552,7 +558,7 @@ class DateTime(DataStructure):
                 value = datetime.now()
             else:
                 value = self._default
-        
+
         if type(value) == datetime:
             _validated_value = value
         elif type(value) == str or type(value) == unicode:
@@ -561,22 +567,23 @@ class DateTime(DataStructure):
             except ValueError, exp:
                 raise prestans.exception.ParseFailedError("date time parsing failed %s" % exp)
         else:
-            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
-            
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s"\
+                % value.__class__.__name__)
+
         return _validated_value
 
     def as_serializable(self, value):
 
         if not type(value) == datetime:
             raise prestans.exception.InvalidTypeError(value, 'datetime.datetime')
-            
+
         return value.strftime(self._format)
 
 class Date(DataStructure):
 
     class CONSTANT:
         TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
-    
+
     def __init__(self, default=None, required=True, format="%Y-%m-%d", description=None):
 
         self._default = default
@@ -607,9 +614,9 @@ class Date(DataStructure):
         return blueprint
 
     def validate(self, value):
-        
+
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -624,7 +631,7 @@ class Date(DataStructure):
                 value = date.today()
             else:
                 value = self._default
-        
+
         if type(value) == date:
             _validated_value = value
         elif type(value) == str or type(value) == unicode:
@@ -633,22 +640,23 @@ class Date(DataStructure):
             except ValueError, exp:
                 raise prestans.exception.ParseFailedError("date parsing failed %s" % exp)
         else:
-            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
-            
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s" %\
+                value.__class__.__name__)
+
         return _validated_value
 
     def as_serializable(self, value):
 
         if not type(value) == date:
             raise prestans.exception.InvalidTypeError(value, 'datetime.date')
-            
+
         return value.strftime(self._format)
 
 class Time(DataStructure):
 
     class CONSTANT:
         NOW = '_PRESTANS_CONSTANT_MODEL_TIME_NOW'
-    
+
     def __init__(self, default=None, required=True, format="%H:%M:%S", description=None):
 
         self._default = default
@@ -681,7 +689,7 @@ class Time(DataStructure):
     def validate(self, value):
 
         _validated_value = None
-        
+
         if self._required and self._default is None and value is None:
             raise prestans.exception.RequiredAttributeError()
         elif self._required and value is None:
@@ -696,16 +704,17 @@ class Time(DataStructure):
                 value = time.today()
             else:
                 value = self._default
-        
-        if type(value) == time:
+
+        if isinstance(value, time):
             _validated_value = value
-        elif type(value) == str or type(value) == unicode:
+        elif isinstance(value, str) or isinstance(value, unicode):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError, exp:
                 raise prestans.exception.ParseFailedError("time parsing failed %s" % exp)
         else:
-            raise prestans.exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
+            raise prestans.exception.ParseFailedError("cannot parse value of type %s"\
+                % value.__class__.__name__)
 
         return _validated_value
 
@@ -713,7 +722,7 @@ class Time(DataStructure):
 
         if not type(value) == time:
             raise prestans.exception.InvalidTypeError(value, 'datetime.time')
-            
+
         return value.strftime(self._format)
 
 #:
@@ -721,12 +730,12 @@ class Time(DataStructure):
 #:
 
 class Array(DataCollection):
-    
-    def __init__(self, default=None, required=True, element_template=None, 
+
+    def __init__(self, default=None, required=True, element_template=None,\
         min_length=None, max_length=None, description=None):
 
         if not isinstance(element_template, DataType):
-            raise TypeError("Array element_template must a DataType subclass; %s given" % 
+            raise TypeError("Array element_template must a DataType subclass; %s given" %\
                 element_template.__class__.__name__)
 
         #:
@@ -743,15 +752,15 @@ class Array(DataCollection):
         self._min_length = min_length
         self._max_length = max_length
         self._description = description
-        
+
         self._array_elements = list()
 
     def __len__(self):
         return len(self._array_elements)
-        
+
     def __iter__(self):
         #:
-        #: With a little help from 
+        #: With a little help from
         #: http://johnmc.co/llum/the-easiest-way-to-implement-__iter__-for-a-python-object/
         #:
         for element in self._array_elements:
@@ -801,28 +810,30 @@ class Array(DataCollection):
 
     def remove(self, value):
         self._array_elements.remove(value)
-    
+
     def validate(self, value, attribute_filter=None, minified=False):
-        
+
         if not self._required and not value:
             return None
 
-        _validated_value = self.__class__(element_template=self._element_template, 
-                                     min_length=self._min_length, 
+        _validated_value = self.__class__(element_template=self._element_template,\
+                                     min_length=self._min_length,\
                                      max_length=self._max_length)
-        
+
         if not isinstance(value, (list, tuple)):
             raise TypeError(value)
-            
+
         for array_element in value:
-    
+
             if isinstance(self._element_template, DataCollection):
-                validated_array_element = self._element_template.validate(array_element, attribute_filter)
+                validated_array_element = self._element_template.\
+                validate(array_element, attribute_filter)
             else:
-                validated_array_element = self._element_template.validate(array_element)
-    
+                validated_array_element = self._element_template.\
+                validate(array_element)
+
             _validated_value.append(validated_array_element)
-    
+
         if self._min_length is not None and len(_validated_value) < self._min_length:
             raise prestans.exception.LessThanMinimumError(value, self._min_length)
 
@@ -830,19 +841,15 @@ class Array(DataCollection):
             raise prestans.exception.MoreThanMaximumError(value, self._max_length)
 
         return _validated_value
-    
+
     def append(self, value):
-        
+
         if isinstance(value, (list, tuple)):
 
             for element in value:
                 self.append(element)
             return
 
-        #if not isinstance(value, DataType):
-        #    raise TypeError("value must DataType subclass; %s given" % 
-        #        value.__class__.__name__)
-        
         if isinstance(self._element_template, String) and \
         isinstance(value, str):
             value = self._element_template.__class__().validate(value)
@@ -862,20 +869,21 @@ class Array(DataCollection):
         isinstance(value, bool):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
-            raise TypeError("prestans array elements must be of type %s; given %s" % (self._element_template.__class__.__name__, value.__class__.__name__))
-        
+            raise TypeError("prestans array elements must be of type %s; given %s"\
+                % (self._element_template.__class__.__name__, value.__class__.__name__))
+
         self._array_elements.append(value)
-            
+
     def as_serializable(self, attribute_filter=None, minified=False):
 
         _result_array = list()
-            
+
         for array_element in self._array_elements:
-        
-            if isinstance(array_element, str) or \
-            isinstance(array_element, unicode) or \
-            isinstance(array_element, float) or \
-            isinstance(array_element, int) or \
+
+            if isinstance(array_element, str) or\
+            isinstance(array_element, unicode) or\
+            isinstance(array_element, float) or\
+            isinstance(array_element, int) or\
             isinstance(array_element, bool):
 
                 _result_array.append(array_element)
@@ -887,7 +895,7 @@ class Array(DataCollection):
             elif isinstance(array_element, DataCollection):
                 # Assume that this is a model
                 _result_array.append(array_element.as_serializable(attribute_filter, minified))
-        
+
         return _result_array
 
     def attribute_rewrite_map(self):
@@ -895,7 +903,7 @@ class Array(DataCollection):
 
     def attribute_rewrite_reverse_map(self):
         return self._element_template.attribute_rewrite_reverse_map()
- 
+
     def get_attribute_filter(self, default_value=False):
 
         attribute_filter = None
@@ -911,7 +919,7 @@ class Array(DataCollection):
 #:
 #: Models
 #:
-        
+
 class Model(DataCollection):
 
     def __init__(self, required=True, default=None, description=None, **kwargs):
@@ -940,17 +948,17 @@ class Model(DataCollection):
 
         count = 0
         model_class_members = inspect.getmembers(self.__class__)
-        
+
         for attribute_name, type_instance in model_class_members:
-            
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
-            
+        
             if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
 
         return count
-                
+            
     def blueprint(self):
 
         blueprint = dict()
@@ -966,7 +974,7 @@ class Model(DataCollection):
 
         fields = dict()
         model_class_members = inspect.getmembers(self.__class__)
-    
+
         for attribute_name, type_instance in model_class_members:
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
@@ -981,18 +989,18 @@ class Model(DataCollection):
         return blueprint
 
     def __setattr__(self, key, value):
-        
+    
         if key[0:1] == "_":
             self.__dict__[key] = value
             return
-        
+    
         model_class_members = inspect.getmembers(self.__class__)
-        
+    
         validator = None
-        for attribute_name,  type_instance in model_class_members:
+        for attribute_name, type_instance in model_class_members:
             if attribute_name == key:
                 validator = type_instance
-            
+        
         if validator is not None:
 
             try:
@@ -1002,23 +1010,24 @@ class Model(DataCollection):
                     self.__dict__[key] = validator.validate(value)
 
             except prestans.exception.DataValidationException, exp:
-                    raise prestans.exception.ValidationError(
-                    message=str(exp), 
-                    attribute_name=key, 
-                    value=value, 
+                    raise prestans.exception.ValidationError(\
+                    message=str(exp),\
+                    attribute_name=key,\
+                    value=value,\
                     blueprint=validator.blueprint())
-            
+        
             return
-            
-        raise KeyError("No key named %s; in instance of type %s " % (key, self.__class__.__name__))
-    
+        
+        raise KeyError("No key named %s; in instance of type %s "\
+            % (key, self.__class__.__name__))
+
     def _create_instance_attributes(self, arguments):
         """
         Copies class level attribute templates and makes instance placeholders
 
-        This step is required for direct uses of Model classes. This creates a copy of attribute_names
-        ignores methods and private variables. DataCollection types are deep copied to ignore memory
-        reference conflicts.
+        This step is required for direct uses of Model classes. This creates a 
+        copy of attribute_names ignores methods and private variables.
+        DataCollection types are deep copied to ignore memory reference conflicts.
 
         DataType instances are initialized to None or default value.
         """
@@ -1033,16 +1042,16 @@ class Model(DataCollection):
             if isinstance(type_instance, DataCollection):
                 self.__dict__[attribute_name] = copy.deepcopy(type_instance)
                 continue
-                
+            
             if type_instance is None:
                 self.__dict__[attribute_name] = None
                 continue
-                
+            
             if isinstance(type_instance, DataType):
-                
+            
                 try:
                     value = None
-                    
+                
                     if arguments.has_key(attribute_name):
                         value = arguments[attribute_name]
 
@@ -1060,17 +1069,17 @@ class Model(DataCollection):
         """
 
         _attribute_keys = list()
-        
+    
         model_class_members = inspect.getmembers(self.__class__)
-        
+    
         for attribute_name, type_instance in model_class_members:
-            
+        
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
-            
+        
             if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
-            
+        
         return _attribute_keys
 
     def get_attribute_filter(self, default_value=False):
@@ -1094,20 +1103,20 @@ class Model(DataCollection):
     def validate(self, value, attribute_filter=None, minified=False):
 
         if self._required and (value is None or not isinstance(value, dict)):
-            """ 
+            """
             Model level validation requires a parsed dictionary, this is done by the serializer 
             """
             raise prestans.exception.RequiredAttributeError()
-            
+        
         if not value and self._default:
             return self._default
-            
+        
         if not self._required and not value:
             """ 
             Value was not provided by caller, but require a template 
             """
             return None
-            
+        
         _model_instance = self.__class__()
         _model_class_members = inspect.getmembers(self.__class__)
 
@@ -1132,28 +1141,28 @@ class Model(DataCollection):
             #: Minification support
             if minified is True:
                 input_value_key = rewrite_map[attribute_name]
-            
+        
             if value.has_key(input_value_key):
                 validation_input = value[input_value_key]
-                
+            
             try:
-                
+            
                 if isinstance(type_instance, DataCollection):
                     sub_attribute_filter = None
                     if attribute_filter and attribute_filter.has_key(attribute_name):
                         sub_attribute_filter = getattr(attribute_filter, attribute_name)
-                        
+                    
                     validated_object = type_instance.validate(validation_input, sub_attribute_filter, minified)
                 else:
                     validated_object = type_instance.validate(validation_input)
-                
+            
                 _model_instance.__dict__[attribute_name] = validated_object
 
             except prestans.exception.DataValidationException, exp:
-                    raise prestans.exception.ValidationError(
-                    message=str(exp), 
-                    attribute_name=attribute_name, 
-                    value=validation_input, 
+                    raise prestans.exception.ValidationError(\
+                    message=str(exp),\
+                    attribute_name=attribute_name,\
+                    value=validation_input,\
                     blueprint=type_instance.blueprint())
 
         return _model_instance
@@ -1170,7 +1179,7 @@ class Model(DataCollection):
         token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
 
         for attribute_name, type_instance in model_class_members:
-            
+        
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1195,7 +1204,7 @@ class Model(DataCollection):
         token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
 
         for attribute_name, type_instance in model_class_members:
-            
+        
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1215,7 +1224,7 @@ class Model(DataCollection):
     def has_key(self, attribute_name):
 
         members = inspect.getmembers(self)
-        
+    
         has_key = self.__class__.__dict__.has_key(attribute_name)
 
         if not has_key:
@@ -1251,7 +1260,7 @@ class Model(DataCollection):
 
         #: Create a list of tokens
         for attribute_name, type_instance in model_class_members:
-            
+        
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1309,7 +1318,7 @@ class Model(DataCollection):
 
         The response is used by serializers to return data to client
         """
-        
+    
         model_dictionary = dict()
         model_class_members = inspect.getmembers(self.__class__)
 
@@ -1361,7 +1370,7 @@ class Model(DataCollection):
 class BinaryResponse(object):
 
     def __init__(self, mime_type=None, file_name=None, as_attachment=True, contents=None):
-        
+    
         if mime_type is not None:
             self._mime_type = mime_type.encode('ascii', 'ignore')
         else:

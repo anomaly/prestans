@@ -126,11 +126,15 @@ class Request(webob.Request):
 
     @property
     def parameter_set(self):
+        """
+        Accessor for parameter_set
+        """
         return self._parameter_set
 
     @parameter_set.setter
     def parameter_set(self, value):
         """
+        Mutators for parameter_set
         """
         self._parameter_set = value
 
@@ -1122,7 +1126,8 @@ class RequestRouter(object):
 
             if not isinstance(deserializer, prestans.deserializer.Base):
                 raise TypeError(
-                    "registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer"\
+                    "registered deserializer %s.%s does not inherit from \
+                    prestans.serializer.DeSerializer"\
                      % (deserializer.__module__, deserializer.__class__.__name__))
 
             _default_incoming_mime_types.append(deserializer.content_type())
