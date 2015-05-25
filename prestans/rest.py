@@ -417,7 +417,7 @@ class Response(webob.Response):
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, prestans.types.Array) and \
-        not isinstance(value.element_template, self.template.element_template):
+        not isinstance(value.element_template, self.template.element_template.__class__):
             raise TypeError("array elements must of be \
                 type %s, given %s" % (self.template.element_template.__class__.__name__,\
                     value.element_template.__class__.__name__))
@@ -679,8 +679,11 @@ class RequestHandler(object):
 
     def __init__(self, args, request, response, logger, debug):
 
-        self.__provider_config__ = prestans.provider.Config()
-        self.__parser_config__ = prestans.parser.Config()
+        if self.__provider_config__ is None:
+            self.__provider_config__ = prestans.provider.Config()
+        if self.__parser_config__ is None:
+            self.__parser_config__ = prestans.parser.Config()
+
 
         self._args = args
         self._request = request
@@ -850,7 +853,7 @@ class RequestHandler(object):
 
                     try:
                         validated_parameter_set = parameter_set.validate(self.request)
-
+                        
                         if validated_parameter_set is not None:
                             self.request.parameter_set = validated_parameter_set
                             break

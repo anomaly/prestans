@@ -541,17 +541,19 @@ class VerbConfig(object):
 
         self._response_template = response_template
 
-
-        #: parameter_sets
-        if not isinstance(parameter_sets, list):
+        #: parameter_sets turn a single object into a list
+        if isinstance(parameter_sets, ParameterSet):
             parameter_sets = [parameter_sets]
 
-        for parameter_set in parameter_sets:
-            if not isinstance(parameter_set, ParameterSet):
-                raise TypeError("parameter_set of type %s must be an instance of \
-                prestans.parser.ParameterSet" % parameter_set.__class__.__name__)
+        if isinstance(parameter_sets, list):
+            for parameter_set in parameter_sets:
+                if not isinstance(parameter_set, ParameterSet):
+                    raise TypeError("parameter_set of type %s must be an instance of \
+                    prestans.parser.ParameterSet" % parameter_set.__class__.__name__)
 
-        self._parameter_sets = parameter_sets
+            self._parameter_sets = parameter_sets
+        else:
+            self._parameter_sets = list()
 
         #: body_template
         if body_template is not None and not \
