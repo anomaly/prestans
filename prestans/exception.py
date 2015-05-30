@@ -49,7 +49,7 @@ __all__ = [
     'MoreThanMaximumError',
     'InvalidChoiceError',
     'UnacceptableLengthError',
-    'InvalidType',
+    'InvalidTypeError',
     'MissingParameterError',
     'InvalidFormatError',
     'InvalidMetaValueError',
@@ -128,20 +128,20 @@ class UnsupportedVocabularyError(Base):
         _message = "Unsupported vocabulary in the Accept header"
         super(UnsupportedVocabularyError, self).__init__(_code, _message)
 
-        self.push_trace({ 
+        self.push_trace({
             'accept_header': str(accept_header),
             'supported_types': supported_types
             })
-    
+
 class UnsupportedContentTypeError(Base):
-    
+
     def __init__(self, requested_mime_type, content_type):
 
         _code = prestans.http.STATUS.NOT_IMPLEMENTED
         _message = "Unsupported Content-Type in Request"
         super(UnsupportedContentTypeError, self).__init__(_code, _message)
 
-        self.push_trace({ 
+        self.push_trace({
             'requested_type': requested_mime_type,
             'supported_types': content_type
             })
@@ -187,7 +187,7 @@ class ValidationError(Base):
 class ParserException(Base):
     """
     ParserException are Exceptions raised if prestans fails to parse
-    a request; these generally revolve around the Content-Types or 
+    a request; these generally revolve around the Content-Types or
     missing payload. Specific parsing messages are of type DataValidationException
     """
     def __init__(self, code, message):
@@ -220,7 +220,7 @@ class UnimplementedVerbError(ParserException):
         _message = "API does not implement the HTTP Verb"
         super(UnimplementedVerbError, self).__init__(_code, _message)
 
-        self.push_trace({ 
+        self.push_trace({
             'verb': verb_name,
             })
 
@@ -237,11 +237,11 @@ class AuthenticationError(ParserException):
     def __init__(self, message=None):
 
         _code = prestans.http.STATUS.UNAUTHORIZED
-    
+
         _message = message
         if _message is None:
             _message = "Authentication Error; service is only available to authenticated"
-    
+
         super(AuthenticationError, self).__init__(_code, _message)
 
 class AuthorizationError(ParserException):
@@ -249,7 +249,7 @@ class AuthorizationError(ParserException):
     def __init__(self, role_name):
 
         _code = prestans.http.STATUS.FORBIDDEN
-        _message = "%s is not allowed to access this resource"
+        _message = "%s is not allowed to access this resource" % role_name
         super(AuthorizationError, self).__init__(_code, _message)
 
 
@@ -262,7 +262,7 @@ class SerializationFailedError(ParserException):
         super(SerializationFailedError, self).__init__(_code, _message)
 
 class DeSerializationFailedError(ParserException):
-    
+
     def __init__(self, format):
 
         _code = prestans.http.STATUS.NOT_FOUND
@@ -278,10 +278,12 @@ class AttributeFilterDiffers(ParserException):
     def __init__(self, attribute_list):
 
         _code = prestans.http.STATUS.BAD_REQUEST
-        _message = "attribute filter does not contain attributes (%s) that are not part of template" % (', '.join(attribute_list))
+        _message = "attribute filter does not contain attributes (%s)\
+        that are not part of template" % (', '.join(attribute_list))
+
         super(AttributeFilterDiffers, self).__init__(_code, _message)
 
-        self.push_trace({ 
+        self.push_trace({
             'rejected_attribute_list': attribute_list,
             })
 
@@ -290,7 +292,7 @@ class InconsistentPersistentDataError(Base):
     Raised by Data Adapters if validation of stored data fails. Extra information is
     written out to the server log and the client is returned a 500 response.
 
-    Practical expectation is that this should not occur; however if REST rules have 
+    Practical expectation is that this should not occur; however if REST rules have
     changed since the instantiation of the system.
     """
 
@@ -311,7 +313,7 @@ class InconsistentPersistentDataError(Base):
 
 #:
 #: Data Validation
-#: 
+#:
 
 class DataValidationException(Base):
 
@@ -321,17 +323,18 @@ class DataValidationException(Base):
 class RequiredAttributeError(DataValidationException):
 
     def __init__(self, attribute_name=None):
-        _message = "attribute is required and does not provide a default value"
+        _message = "attribute %s is required and does not\
+        provide a default value" % attribute_name
         super(RequiredAttributeError, self).__init__(_message)
 
 class ParseFailedError(DataValidationException):
-    
+
     def __init__(self, message="Parser Failed"):
         _message = message
         super(ParseFailedError, self).__init__(_message)
 
 class LessThanMinimumError(DataValidationException):
-    
+
     def __init__(self, value, allowed_min):
         _message = "%i is less than the allowed minimum of %i" % (value, allowed_min)
         super(LessThanMinimumError, self).__init__(_message)
@@ -345,20 +348,21 @@ class MoreThanMaximumError(DataValidationException):
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
-        _message = "value is not one of these choices %s" % str(allowed_choices).strip('[]')
+        _message = "value %s is not one of these\
+        choices %s" % (value, str(allowed_choices).strip('[]'))
         super(InvalidChoiceError, self).__init__(_message)
 
 class UnacceptableLengthError(DataValidationException):
-    
+
     def __init__(self, value, minimum, maximum):
-        _message = "value has to be %i and %i" % (minimum, maximum)
+        _message = "value %i has to be %i and %i" % (value, minimum, maximum)
         super(UnacceptableLengthError, self).__init__(_message)
 
-class InvalidType(DataValidationException):
-    
+class InvalidTypeError(DataValidationException):
+
     def __init__(self, value, type_name):
-        _message = "invalid data type %s" % type_name
-        super(InvalidType, self).__init__(_message)
+        _message = "data type %s given, expected %s" % (value, type_name)
+        super(InvalidTypeError, self).__init__(_message)
 
 class MissingParameterError(DataValidationException):
 
@@ -367,7 +371,7 @@ class MissingParameterError(DataValidationException):
         super(MissingParameterError, self).__init__(_message)
 
 class InvalidFormatError(DataValidationException):
-    
+
     def __init__(self, value):
         _message = "invalid value %s provided" % value
         super(InvalidFormatError, self).__init__(_message)
@@ -385,13 +389,13 @@ class UnregisteredAdapterError(DataValidationException):
         super(UnregisteredAdapterError, self).__init__(_message)
 
 #:
-#: The following excepetions are used by REST handlers to indicate 
-#: commonly defined scenarios when dealing with data. BaseHandler traps 
+#: The following excepetions are used by REST handlers to indicate
+#: commonly defined scenarios when dealing with data. BaseHandler traps
 #: these and generates an appropriate error message for the end user.
 #:
 
 class ServiceUnavailable(HandlerException):
-    
+
     def __init__(self, message="This service is currently unavailable"):
         _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
         super(ServiceUnavailable, self).__init__(_code, message)
