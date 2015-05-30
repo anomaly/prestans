@@ -953,12 +953,12 @@ class Model(DataCollection):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
-        
+
             if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
 
         return count
-            
+
     def blueprint(self):
 
         blueprint = dict()
@@ -989,18 +989,18 @@ class Model(DataCollection):
         return blueprint
 
     def __setattr__(self, key, value):
-    
+
         if key[0:1] == "_":
             self.__dict__[key] = value
             return
-    
+
         model_class_members = inspect.getmembers(self.__class__)
-    
+
         validator = None
         for attribute_name, type_instance in model_class_members:
             if attribute_name == key:
                 validator = type_instance
-        
+
         if validator is not None:
 
             try:
@@ -1009,15 +1009,15 @@ class Model(DataCollection):
                 else:
                     self.__dict__[key] = validator.validate(value)
 
-            except prestans.exception.DataValidationException, exp:
-                    raise prestans.exception.ValidationError(\
-                    message=str(exp),\
-                    attribute_name=key,\
-                    value=value,\
-                    blueprint=validator.blueprint())
-        
+            except prestans.exception.DataValidationException as exp:
+                raise prestans.exception.ValidationError(\
+                message=str(exp),\
+                attribute_name=key,\
+                value=value,\
+                blueprint=validator.blueprint())
+
             return
-        
+
         raise KeyError("No key named %s; in instance of type %s "\
             % (key, self.__class__.__name__))
 
@@ -1025,7 +1025,7 @@ class Model(DataCollection):
         """
         Copies class level attribute templates and makes instance placeholders
 
-        This step is required for direct uses of Model classes. This creates a 
+        This step is required for direct uses of Model classes. This creates a
         copy of attribute_names ignores methods and private variables.
         DataCollection types are deep copied to ignore memory reference conflicts.
 
@@ -1042,16 +1042,16 @@ class Model(DataCollection):
             if isinstance(type_instance, DataCollection):
                 self.__dict__[attribute_name] = copy.deepcopy(type_instance)
                 continue
-            
+
             if type_instance is None:
                 self.__dict__[attribute_name] = None
                 continue
-            
+
             if isinstance(type_instance, DataType):
-            
+
                 try:
                     value = None
-                
+
                     if arguments.has_key(attribute_name):
                         value = arguments[attribute_name]
 
@@ -1064,22 +1064,22 @@ class Model(DataCollection):
         """
         Returns a list of managed attributes for the Model class
 
-        Implemented for use with data adapters, can be used to quickly make a list of the 
+        Implemented for use with data adapters, can be used to quickly make a list of the
         attribute names in a prestans model
         """
 
         _attribute_keys = list()
-    
+
         model_class_members = inspect.getmembers(self.__class__)
-    
+
         for attribute_name, type_instance in model_class_members:
-        
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
-        
+
             if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
-        
+
         return _attribute_keys
 
     def get_attribute_filter(self, default_value=False):
@@ -1094,7 +1094,8 @@ class Model(DataCollection):
                 continue
 
             if isinstance(type_instance, DataCollection):
-                setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
+                setattr(attribute_filter, attribute_name,\
+                    type_instance.get_attribute_filter(default_value))
             else:
                 setattr(attribute_filter, attribute_name, default_value)
 
@@ -1104,19 +1105,20 @@ class Model(DataCollection):
 
         if self._required and (value is None or not isinstance(value, dict)):
             """
-            Model level validation requires a parsed dictionary, this is done by the serializer 
+            Model level validation requires a parsed dictionary
+            this is done by the serializer
             """
             raise prestans.exception.RequiredAttributeError()
-        
+
         if not value and self._default:
             return self._default
-        
+
         if not self._required and not value:
-            """ 
-            Value was not provided by caller, but require a template 
+            """
+            Value was not provided by caller, but require a template
             """
             return None
-        
+
         _model_instance = self.__class__()
         _model_class_members = inspect.getmembers(self.__class__)
 
@@ -1141,33 +1143,34 @@ class Model(DataCollection):
             #: Minification support
             if minified is True:
                 input_value_key = rewrite_map[attribute_name]
-        
+
             if value.has_key(input_value_key):
                 validation_input = value[input_value_key]
-            
+
             try:
-            
+
                 if isinstance(type_instance, DataCollection):
                     sub_attribute_filter = None
                     if attribute_filter and attribute_filter.has_key(attribute_name):
                         sub_attribute_filter = getattr(attribute_filter, attribute_name)
-                    
-                    validated_object = type_instance.validate(validation_input, sub_attribute_filter, minified)
+
+                    validated_object = type_instance.validate(validation_input,\
+                        sub_attribute_filter, minified)
                 else:
                     validated_object = type_instance.validate(validation_input)
-            
+
                 _model_instance.__dict__[attribute_name] = validated_object
 
-            except prestans.exception.DataValidationException, exp:
-                    raise prestans.exception.ValidationError(\
-                    message=str(exp),\
-                    attribute_name=attribute_name,\
-                    value=validation_input,\
-                    blueprint=type_instance.blueprint())
+            except prestans.exception.DataValidationException as exp:
+                raise prestans.exception.ValidationError(\
+                message=str(exp),\
+                attribute_name=attribute_name,\
+                value=validation_input,\
+                blueprint=type_instance.blueprint())
 
         return _model_instance
 
-    #: 
+    #:
     #: Rewrite map generation
     #:
 
@@ -1179,7 +1182,7 @@ class Model(DataCollection):
         token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
 
         for attribute_name, type_instance in model_class_members:
-        
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1204,7 +1207,7 @@ class Model(DataCollection):
         token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
 
         for attribute_name, type_instance in model_class_members:
-        
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
@@ -1224,7 +1227,7 @@ class Model(DataCollection):
     def has_key(self, attribute_name):
 
         members = inspect.getmembers(self)
-    
+
         has_key = self.__class__.__dict__.has_key(attribute_name)
 
         if not has_key:
@@ -1260,14 +1263,14 @@ class Model(DataCollection):
 
         #: Create a list of tokens
         for attribute_name, type_instance in model_class_members:
-        
+
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
             if isinstance(type_instance, DataType):
                 rewrite_tokens = rewrite_tokens + attribute_name.split('_')
 
-        #: Remove duplicated; sort alphabetically for the algorithm to work 
+        #: Remove duplicated; sort alphabetically for the algorithm to work
         rewrite_tokens = list(set(rewrite_tokens))
         rewrite_tokens.sort()
 
@@ -1312,13 +1315,13 @@ class Model(DataCollection):
 
     def as_serializable(self, attribute_filter=None, minified=False):
         """
-        Returns a dictionary with attributes and pure python representation of 
+        Returns a dictionary with attributes and pure python representation of
         the data instances. If an attribute filter is provided as_serializable
         will respect the visibility.
 
         The response is used by serializers to return data to client
         """
-    
+
         model_dictionary = dict()
         model_class_members = inspect.getmembers(self.__class__)
 
@@ -1370,7 +1373,7 @@ class Model(DataCollection):
 class BinaryResponse(object):
 
     def __init__(self, mime_type=None, file_name=None, as_attachment=True, contents=None):
-    
+
         if mime_type is not None:
             self._mime_type = mime_type.encode('ascii', 'ignore')
         else:
