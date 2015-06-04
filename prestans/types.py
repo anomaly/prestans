@@ -252,8 +252,8 @@ class Integer(DataType):
                 _validated_value = long(value)
             else:
                 _validated_value = int(value)
-        except Exception, exp:
-            raise prestans.exception.ParseFailedError("int encoding failed %s" % exp)
+        except Exception as exp:
+            raise prestans.exception.ParseFailedError("encoding failed: value is not an integer or a long")
 
         if _validated_value and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
