@@ -48,7 +48,7 @@ Before you lodge a lodge a ticket:
 
 - Seek wisdom from our comprehensive `documentation <https://prestans.readthedocs.org>`_
 - Check to ensure that you are not lodging a duplicate request
-- Google to see that it’s not something to do with your server environment (versions of Web server, WSGI connectors, etc)
+- Search the Web to see that it’s not something to do with your server environment (versions of Web server, WSGI connectors, etc)
 - Ensure that you ask a question on our list, there might already be answer out there or we might have already acknowledged the issue
 
 When reporting issues:
