@@ -42,7 +42,7 @@ We recommend the use of our mailing lists as the primary way of getting help:
 Reporting Issues
 ^^^^^^^^^^^^^^^^
 
-We prefer the use of our `Issue Tracker on Github <https://github.com/prestans/prestans/issues>`_, to triage feature requests, bug reports.
+We prefer the use of our `Issue Tracker on Github <https://github.com/anomaly/prestans/issues>`_, to triage feature requests, bug reports.
 
 Before you lodge a lodge a ticket:
 
