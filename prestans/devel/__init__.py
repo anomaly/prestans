@@ -38,7 +38,8 @@ import os
 
 #import prestans.devel.serve
 #import prestans.devel.gen
-import exception
+from . import exception
+from . import __version__
 
 class ArgParserFactory(object):
 
@@ -57,6 +58,8 @@ class ArgParserFactory(object):
         self._add_generate_build_commands(subparsers_handle)
         self._add_generate_sub_commands(subparsers_handle)
         self._add_server_sub_commands(subparsers_handle)
+
+        self._arg_parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
 
     #:
     #: public message to fire argparser
