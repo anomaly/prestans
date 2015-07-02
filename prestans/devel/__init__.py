@@ -38,8 +38,8 @@ import os
 
 #import prestans.devel.serve
 #import prestans.devel.gen
-from . import exception
-from . import __version__
+from prestans import exception
+from prestans import __version__
 
 class ArgParserFactory(object):
 

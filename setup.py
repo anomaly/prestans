@@ -32,10 +32,10 @@
 
 from setuptools import setup, find_packages
 
-from prestans import __version_info__
+from prestans import __version__
 
 setup(name='prestans',
-      version=__version_info__,
+      version=__version__,
       description='A WSGI compliant REST micro-framework',
       url='https://github.com/anomaly/prestans.git',
       long_description="""
@@ -57,7 +57,7 @@ setup(name='prestans',
       - Pluggable integration to authentication
 
       """,
-      download_url='https://github.com/anomaly/prestans/archive/' + __version_info__ + '.tar.gz',
+      download_url='https://github.com/anomaly/prestans/archive/' + __version__ + '.tar.gz',
       license='New BSD',
       author='Anomaly Software',
       author_email='support@anomaly.net.au',
