@@ -895,7 +895,15 @@ class RequestHandler(object):
                 raise exception
             #: Handle any non-prestans exceptions
             except Exception as exp:
-                self.handler_raised_exception(exp)
+                if self.debug:
+                    raise
+                else:
+                    self.logger.error("handler %s.%s; exception raised: %s" % (\
+                        self.__module__,
+                        self.__class__,
+                        exp
+                    ))
+                    self.handler_raised_exception(exp)
             #: Always run the tear down method
             finally:
                 self.handler_did_run()
