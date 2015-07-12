@@ -903,7 +903,7 @@ class RequestHandler(object):
                         self.__class__,
                         exp
                     ))
-                    self.handler_raised_exception(exp)
+                    raise prestans.exception.ServiceUnavailable()
             #: Always run the tear down method
             finally:
                 self.handler_did_run()
@@ -930,13 +930,6 @@ class RequestHandler(object):
 
     def handler_will_run(self):
         return None
-
-    #:
-    #: Default handler for a raised exception return service unavailable
-    #:
-    def handler_raised_exception(self, exception):
-        self.logger.error(exception)
-        raise prestans.exception.ServiceUnavailable()
 
     def handler_did_run(self):
         return None
