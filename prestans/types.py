@@ -850,23 +850,11 @@ class Array(DataCollection):
                 self.append(element)
             return
 
-        if isinstance(self._element_template, String) and \
-        isinstance(value, str):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, String) and \
-        isinstance(value, unicode):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, Integer) and \
-        isinstance(value, int):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, Integer) and \
-        isinstance(value, long):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, Float) and \
-        isinstance(value, float):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, Boolean) and \
-        isinstance(value, bool):
+        #check for basic types supported by array
+        if isinstance(self._element_template, String) or \
+           isinstance(self._element_template, Integer) or \
+           isinstance(self._element_template, Float) or \
+           isinstance(self._element_template, Boolean):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
             raise TypeError("prestans array elements must be of type %s; given %s"\
@@ -880,21 +868,17 @@ class Array(DataCollection):
 
         for array_element in self._array_elements:
 
-            if isinstance(array_element, str) or\
-            isinstance(array_element, unicode) or\
-            isinstance(array_element, float) or\
-            isinstance(array_element, int) or\
-            isinstance(array_element, bool):
-
+            if isinstance(array_element, DataCollection):
+                serialized_value = array_element.as_serializable(attribute_filter, minified)
+                _result_array.append(serialized_value)
+            elif isinstance(array_element, DataStructure):
+                serialized_value = self._element_template.as_serializable(array_element)
+                _result_array.append(serialized_value)
+            elif isinstance(self._element_template, DataType):
                 _result_array.append(array_element)
 
-            elif isinstance(array_element, DataStructure):
-                serializable_value = self._element_template.as_serializable(array_element)
-                _result_array.append(serializable_value)
 
-            elif isinstance(array_element, DataCollection):
-                # Assume that this is a model
-                _result_array.append(array_element.as_serializable(attribute_filter, minified))
+
 
         return _result_array
 
