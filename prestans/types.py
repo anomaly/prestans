@@ -85,7 +85,8 @@ class DataCollection(DataType):
 class String(DataType):
 
     def __init__(self, default=None, min_length=None, max_length=None,\
-        required=True, format=None, choices=None, utf_encoding='utf-8', description=None):
+        required=True, format=None, choices=None, utf_encoding='utf-8',\
+        description=None, trim=True):
 
         if min_length and max_length and min_length > max_length:
             pass
@@ -101,6 +102,7 @@ class String(DataType):
         self._choices = choices
         self._utf_encoding = utf_encoding
         self._description = description
+        self._trim = trim
 
     @property
     def max_length(self):
@@ -123,6 +125,10 @@ class String(DataType):
         return self._format
 
     @property
+    def trim(self):
+        return self._trim
+
+    @property
     def utf_encoding(self):
         return self._utf_encoding
 
@@ -140,6 +146,7 @@ class String(DataType):
         constraints['choices'] = self._choices
         constraints['utf_encoding'] = self._utf_encoding
         constraints['description'] = self._description
+        constraints['trim'] = self._trim
 
         blueprint['constraints'] = constraints
 
@@ -166,17 +173,18 @@ class String(DataType):
         except Exception, exp:
             raise prestans.exception.ParseFailedError("unicode or string encoding failed, %s" % exp)
 
+        if self._trim:
+            _validated_value = _validated_value.strip()
+
         if not self._required and len(_validated_value) == 0:
             return _validated_value
 
         if _validated_value is not None and self._min_length\
         and len(_validated_value) < self._min_length:
-            raise prestans.exception.UnacceptableLengthError(value, self._min_length,\
-                self._max_length)
+            raise prestans.exception.MinimumLengthError(value, self._min_length)
         if _validated_value is not None and self._max_length\
         and len(_validated_value) > self._max_length:
-            raise prestans.exception.UnacceptableLengthError(value, self._min_length,\
-                self._max_length)
+            raise prestans.exception.MaximumLengthError(value, self._max_length)
 
         if self._choices is not None and not _validated_value in self._choices:
             raise prestans.exception.InvalidChoiceError(value, self._choices)

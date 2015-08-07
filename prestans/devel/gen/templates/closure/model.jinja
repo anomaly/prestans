@@ -43,7 +43,7 @@ goog.require('{{filter_namespace}}.{{name}}');
         });
 {% elif attribute.element_template.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({
-            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}}),
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}, choices: {{attribute.element_template.trim}}}),
             opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
             opt_maxLength: {{attribute.max_length}},
             opt_minLength: {{attribute.min_length}}
@@ -71,7 +71,7 @@ goog.require('{{filter_namespace}}.{{name}}');
         });
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
-        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, opt_maxLength: {{attribute.max_length}}, opt_minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}, opt_maxLength: {{attribute.max_length}}, opt_minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}, trim: {{attribute.trim}}});
 {% elif attribute.blueprint_type == 'boolean' %}
         this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'integer' %}
@@ -98,7 +98,7 @@ goog.require('{{filter_namespace}}.{{name}}');
         this.{{attribute.ccif}}_ = new prestans.types.Array({elementTemplate: {{namespace}}.{{attribute.element_template}}, opt_json: opt_json["{{attribute.name}}"], opt_maxLength: {{attribute.max_length}}, opt_minLength: {{attribute.min_length}}});
 {% elif attribute.element_template.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({
-            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}}),
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}, trim: {{attribute.element_template.trim}}}),
             opt_json: opt_json["{{attribute.name}}"],
             opt_maxLength: {{attribute.max_length}},
             opt_minLength: {{attribute.min_length}}
@@ -126,7 +126,7 @@ goog.require('{{filter_namespace}}.{{name}}');
         });
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
-        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, opt_maxLength: {{attribute.max_length}}, opt_minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}});
+        this.{{attribute.ccif}}_ = new prestans.types.String({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}, opt_maxLength: {{attribute.max_length}}, opt_minLength: {{attribute.min_length}}, format: {{attribute.format}}, choices: {{attribute.choices}}, trim: {{attribute.trim}}});
 {% elif attribute.blueprint_type == 'boolean' %}
         this.{{attribute.ccif}}_ = new prestans.types.Boolean({value: opt_json["{{attribute.name}}"], required: {{attribute.required}}, defaultValue: {{attribute.default}}});
 {% elif attribute.blueprint_type == 'integer' %}

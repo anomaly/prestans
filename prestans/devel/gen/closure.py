@@ -56,6 +56,7 @@ class BasicTypeElementTemplate(object):
         self._max_length = None
         self._choices = None
         self._format = None
+        self._trim = None
 
         if self._blueprint_type == "string":
             self._required = blueprint['required']
@@ -64,6 +65,7 @@ class BasicTypeElementTemplate(object):
             self._default = blueprint['default']
             self._choices = blueprint['choices']
             self._format = blueprint['format']
+            self._trim = blueprint['trim']
             self._client_class_name = "String"
         elif self._blueprint_type == 'integer':
             self._required = blueprint['required']
@@ -98,6 +100,13 @@ class BasicTypeElementTemplate(object):
     @property
     def required(self):
         if self._required:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def trim(self):
+        if self._trim:
             return "true"
         else:
             return "false"
@@ -180,6 +189,7 @@ class AttributeMetaData(object):
         self._max_length = None
         self._choices = None
         self._format = None
+        self._trim = None
 
         self._blueprint_type = blueprint['type']
         self._map_name = blueprint['map_name']
@@ -192,6 +202,7 @@ class AttributeMetaData(object):
             self._default = blueprint['constraints']['default']
             self._choices = blueprint['constraints']['choices']
             self._format = blueprint['constraints']['format']
+            self._trim = blueprint['constraints']['trim']
             self._client_class_name = "String"
 
         elif self._blueprint_type == 'integer':
@@ -278,6 +289,13 @@ class AttributeMetaData(object):
     @property
     def required(self):
         if self._required:
+            return "true"
+        else:
+            return "false"
+
+    @property
+    def trim(self):
+        if self._trim:
             return "true"
         else:
             return "false"

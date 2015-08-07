@@ -352,10 +352,16 @@ class InvalidChoiceError(DataValidationException):
         choices %s" % (value, str(allowed_choices).strip('[]'))
         super(InvalidChoiceError, self).__init__(_message)
 
-class UnacceptableLengthError(DataValidationException):
+class MinimumLengthError(DataValidationException):
 
-    def __init__(self, value, minimum, maximum):
-        _message = "value %i has to be %i and %i" % (value, minimum, maximum)
+    def __init__(self, value, minimum):
+        _message = "length of value: %s has to be greater than %i" % (value, minimum)
+        super(UnacceptableLengthError, self).__init__(_message)
+
+class MaximumLengthError(DataValidationException):
+
+    def __init__(self, value, maximum):
+        _message = "length of value: %s has to be less than %i" % (value, maximum)
         super(UnacceptableLengthError, self).__init__(_message)
 
 class InvalidTypeError(DataValidationException):
