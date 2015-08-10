@@ -44,5 +44,5 @@ from . import exception
 
 __all__ = ['http', 'types', 'rest', 'parser', 'serializer', 'deserializer', 'provider', 'ext', 'exception']
 
-__version_info__ = (2, 0, 9)
+__version_info__ = (2, 0, 10)
 __version__ = '.'.join(str(v) for v in __version_info__)
