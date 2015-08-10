@@ -176,6 +176,10 @@ class String(DataType):
         if self._trim:
             _validated_value = _validated_value.strip()
 
+        #check for required and empty string
+        if self._required and len(_validated_value) == 0:
+            raise prestans.exception.RequiredAttributeError()
+
         if not self._required and len(_validated_value) == 0:
             return _validated_value
 
