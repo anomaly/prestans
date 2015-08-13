@@ -43,7 +43,7 @@ goog.require('{{filter_namespace}}.{{name}}');
         });
 {% elif attribute.element_template.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.Array({
-            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}, choices: {{attribute.element_template.trim}}}),
+            elementTemplate: new prestans.types.String({required: {{attribute.element_template.required}}, defaultValue: {{attribute.element_template.default}}, opt_opt_maxLength: {{attribute.element_template.max_length}}, opt_minLength: {{attribute.element_template.min_length}}, format: {{attribute.element_template.format}}, choices: {{attribute.element_template.choices}}, trim: {{attribute.element_template.trim}}}),
             opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
             opt_maxLength: {{attribute.max_length}},
             opt_minLength: {{attribute.min_length}}
