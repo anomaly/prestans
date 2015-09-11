@@ -77,5 +77,5 @@ setup(name='prestans',
             'Topic :: Software Development :: Libraries :: Application Frameworks',
             'Topic :: Software Development :: Libraries :: Python Modules',
       ],
-      install_requires=['webob==1.4',],
+      install_requires=['WebOb==1.4',],
      )
