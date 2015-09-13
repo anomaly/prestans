@@ -30,18 +30,6 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import threading
-
-from . import http
-from . import rest
-from . import types
-from . import parser
-from . import serializer
-from . import deserializer
-from . import provider
-from . import ext
-from . import exception
-
 __all__ = ['http', 'types', 'rest', 'parser', 'serializer', 'deserializer', 'provider', 'ext', 'exception']
 
 __version_info__ = (2, 0, 11)
