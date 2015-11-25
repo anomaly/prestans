@@ -29,23 +29,22 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-
-__all__ = ['gen', 'serve']
+"""
+Contains development tools for prestans.
+"""
+__all__ = []
 
 import argparse
 import os
 
-#import prestans.devel.serve
-#import prestans.devel.gen
 from prestans import exception
 from prestans import __version__
 
 class ArgParserFactory(object):
+    """
+    Argument parser factory.
+    """
 
-    #:
-    #:
-    #:
     def __init__(self):
 
         self._arg_parser = argparse.ArgumentParser(
@@ -53,66 +52,33 @@ class ArgParserFactory(object):
             epilog="pride is distributed by the prestans project <http://github.com/anomaly/prestans/> under the the New BSD license."
         )
 
-        subparsers_handle = self._arg_parser.add_subparsers(dest="sub_command")
+        self._subparsers_handle = self._arg_parser.add_subparsers(dest="sub_command")
 
-        self._add_generate_build_commands(subparsers_handle)
-        self._add_generate_sub_commands(subparsers_handle)
-        self._add_server_sub_commands(subparsers_handle)
+        self._add_generate_sub_commands()
 
-        self._arg_parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
+        self._arg_parser.add_argument(
+            '--version',
+            action='version',
+            version='%(prog)s ' + __version__
+        )
 
-    #:
-    #: public message to fire argparser
-    #:
     def parse(self):
+        """
+        Method to start the argument parsing.
+        """
         return self._arg_parser.parse_args()
 
-    #:
-    #: build subcommand
-    #:
-    def _add_generate_build_commands(self, subparsers_handle):
+    def _add_generate_sub_commands(self):
+        """
+        Subcommands for generating models for usage by clients.
+        Currently supports Google Closure.
+        """
 
-        gen_parser = subparsers_handle.add_parser(
-            name="build",
-            help="builds deployable javascript, css and server"
-            )
-
-        build_sub_parser = gen_parser.add_subparsers(dest="build-sub-commands")
-
-        #:
-        #: build a distribution
-        #:
-        build_sub_parser.add_parser(
-            name="dist",
-            help="builds distributable application"
-            )
-
-        #:
-        #: Javascript
-        #:
-        build_sub_parser.add_parser(
-            name="js",
-            help="builds distributable javascript"
-            )
-
-        #:
-        #: CSS
-        #:
-        build_sub_parser.add_parser(
-            name="css",
-            help="builds distributable css"
-            )
-
-    #:
-    #: gen subcommand
-    #:
-    def _add_generate_sub_commands(self, subparsers_handle):
-
-        gen_parser = subparsers_handle.add_parser(
+        gen_parser = self._subparsers_handle.add_parser(
             name="gen",
             help="generate client side model stubs, filters"
             )
-        
+
         gen_parser.add_argument(
             "-t",
             "--template",
@@ -157,44 +123,26 @@ class ArgParserFactory(object):
             help="filter namespace to use with template e.g prestans.data.filter"
             )
 
-
-
-    #:
-    #: server subcommand
-    #:
-    #: --config path to configuration file
-    #:
-    def _add_server_sub_commands(self, subparsers_handle):
-
-        server_parser = subparsers_handle.add_parser(
-            name="serve",
-            help="runs a local HTTP WSGI server for your prestans project"
-            )
-
-        server_parser.add_argument(
-            "-c",
-            "--config",
-            default="./devserver.yaml",
-            dest="config_path",
-            help="path to prestans devserver configuration"
-            )
-
-
-class CommandDispatcher:
+class CommandDispatcher(object):
+    """
+    Processes the user's commands.
+    """
 
     def __init__(self, args):
         self._args = args
 
     def dispatch(self):
-        
+        """
+        Start processing the user's commands.
+        """
+
         if self._args.sub_command == "gen":
             self._dispatch_gen()
-        elif self._args.sub_command == "build":
-            self._dispatch_build()
-        elif self._args.sub_command == "serve":
-            self._dispatch_serve()
 
     def _dispatch_gen(self):
+        """
+        Process the generate subset of commands.
+        """
 
         if not os.path.isdir(self._args.output):
             raise exception.Base("%s is not a writeable directory" % self._args.output)
@@ -204,20 +152,11 @@ class CommandDispatcher:
 
         import prestans.devel.gen
         preplate = prestans.devel.gen.Preplate(
-            template_type=self._args.template, 
-            model_file=self._args.model_path, 
+            template_type=self._args.template,
+            model_file=self._args.model_path,
             namespace=self._args.namespace,
             filter_namespace=self._args.filter_namespace,
             output_directory=self._args.output)
 
         preplate.run()
-
-    def _dispatch_build(self):
-        print self._args
-
-    def _dispatch_serve(self):
-        import prestans.devel.serve
-        server_config = prestans.devel.serve.Configuration(self._args.config_path)
-        dev_server = serve.DevServer(server_config)
-        dev_server.run()
         
