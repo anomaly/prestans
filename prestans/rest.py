@@ -898,7 +898,7 @@ class RequestHandler(object):
                 if self.debug:
                     raise
                 else:
-                    self.logger.error("handler %s.%s; exception raised: %s" % (\
+                    self.logger.exception("handler %s.%s; exception raised: %s" % (\
                         self.__module__,
                         self.__class__,
                         exp
