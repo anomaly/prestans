@@ -48,7 +48,8 @@ __all__ = [
     'LessThanMinimumError',
     'MoreThanMaximumError',
     'InvalidChoiceError',
-    'UnacceptableLengthError',
+    'MinimumLengthError',
+    'MaximumLengthError',
     'InvalidTypeError',
     'MissingParameterError',
     'InvalidFormatError',
@@ -355,13 +356,13 @@ class MinimumLengthError(DataValidationException):
 
     def __init__(self, value, minimum):
         _message = "length of value: %s has to be greater than %i" % (value, minimum)
-        super(UnacceptableLengthError, self).__init__(_message)
+        super(MinimumLengthError, self).__init__(_message)
 
 class MaximumLengthError(DataValidationException):
 
     def __init__(self, value, maximum):
         _message = "length of value: %s has to be less than %i" % (value, maximum)
-        super(UnacceptableLengthError, self).__init__(_message)
+        super(MaximumLengthError, self).__init__(_message)
 
 class InvalidTypeError(DataValidationException):
 
