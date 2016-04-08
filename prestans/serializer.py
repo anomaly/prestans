@@ -52,7 +52,7 @@ class JSON(Base):
         
         import json
         try:
-            return json.dumps(serializable_object)
+            return json.dumps(serializable_object, ensure_ascii=False)
         except Exception as exp:
             raise prestans.exception.SerializationFailedError('JSON: %s' % exp)
 
