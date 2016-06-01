@@ -39,15 +39,15 @@ class StringTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
         
-        self._string = prestans.types.String(
-            default="orange",
-            min_length=1,
-            max_length=20,
-            choices=['orange','mango','banana'],
-            )
+        self._default = prestans.types.String(default="orange")
+        #self._length = prestans.types.String()
+        self._choices = prestans.types.String(choices=["apple", "banana"])
+
+    def rest_required(self):
+        pass
 
     def test_default(self):
-        self.assertEqual(self._string._default, "orange", "Check default value")
+        self.assertEqual(self._default.validate(None), "orange")
 
     def test_length(self):
         pass
@@ -56,13 +56,14 @@ class StringTypeUnitTest(unittest.TestCase):
         pass
 
     def test_choices(self):
-        pass
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, "orange")
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, "grape")
 
     def test_encoding(self):
         pass
 
     def tearDown(self):
-        self._string = None
+        pass
 
 class IntegerTypeUnitTest(unittest.TestCase):
 
@@ -71,23 +72,27 @@ class IntegerTypeUnitTest(unittest.TestCase):
         self._integer = prestans.types.Integer(
             default=1,
             minimum=1,
-            maximum=20,
-            )
+            maximum=5
+        )
+
+        self._choices = prestans.types.Integer(
+            choices=[1,5]
+        )
 
     def test_default(self):
-        self.assertEqual(self._integer.validate(1), 1)
+        self.assertEqual(self._integer.validate(None), 1)
 
     def test_minimum(self):
-        self.assertRaises(prestans.exception.LessThanMinimumError, self._integer.validate(-1))
+        self.assertRaises(prestans.exception.LessThanMinimumError, self._integer.validate, -1)
 
     def text_maximum(self):
-        self.assertRaises(prestans.exception.MoreThanMaximumError, self._integer.validate(21))
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self._integer.validate, 6)
 
     def test_choices(self):
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._integer.validate(2))
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 3)
 
     def tearDown(self):
-        self._integer = None
+        pass
 
 
 class FloatTypeUnitTest(unittest.TestCase):
@@ -98,16 +103,28 @@ class FloatTypeUnitTest(unittest.TestCase):
             default=1.0,
             minimum=1.0,
             maximum=20.0,
-            )
+        )
+
+        self._choices = prestans.types.Float(
+            choices=[1.0, 3.0]
+        )
 
     def test_default(self):
-        pass
+        self.assertEqual(self._float.validate(1.0), 1.0)
+
+    def test_minimum(self):
+        self.assertRaises(prestans.exception.LessThanMinimumError, self._float.validate, 0.5)
+
+    def text_maximum(self):
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self._float.validate, 21.5)
 
     def test_choices(self):
-        pass
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 0.0)
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 2.0)
+        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 4.0)
 
     def tearDown(self):
-        self._float = None
+        pass
 
 class BooleanTypeUnitTest(unittest.TestCase):
 
@@ -124,7 +141,7 @@ class BooleanTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._boolean = None
+        pass
 
 class DataURLFileTypeUnitTest(unittest.TestCase):
 
@@ -141,7 +158,7 @@ class DataURLFileTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._data_url_file = None
+        pass
 
 
 class DateTimeTypeUnitTest(unittest.TestCase):
@@ -159,7 +176,7 @@ class DateTimeTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._datetime = None
+        pass
 
 class DateTypeUnitTest(unittest.TestCase):
 
@@ -176,7 +193,7 @@ class DateTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._date = None
+        pass
 
 class TimeTypeUnitTest(unittest.TestCase):
 
@@ -193,7 +210,7 @@ class TimeTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._date = None
+        pass
 
 class ArrayTypeUnitTest(unittest.TestCase):
 
@@ -215,7 +232,7 @@ class ArrayTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._array = None
+        pass
 
 class ModelTypeUnitTest(unittest.TestCase):
 
@@ -234,7 +251,7 @@ class ModelTypeUnitTest(unittest.TestCase):
         pass
 
     def tearDown(self):
-        self._model = None
+        pass
 
 if __name__ == '__main__':
     unittest.main()
