@@ -39,25 +39,53 @@ class StringTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
         
-        self._default = prestans.types.String(default="orange")
-        #self._length = prestans.types.String()
-        self._choices = prestans.types.String(choices=["apple", "banana"])
+        self.required = prestans.types.String(required=True)
+        self.not_required = prestans.types.String(required=False)
+        self.type = prestans.types.String()
+        self.default = prestans.types.String(default="orange")
+        self.length = prestans.types.String(min_length=5, max_length=7)
+        self.format = prestans.types.String(format="[0-9]{2}[a-z]{5}[0-9]{3}")
+        self.choices = prestans.types.String(choices=["apple", "banana"])
 
-    def rest_required(self):
-        pass
+    def test_required(self):
+        self.assertRaises(prestans.exception.RequiredAttributeError, self.required.validate, None)
+        self.assertRaises(prestans.exception.RequiredAttributeError, self.required.validate, "")
+        self.assertEqual(self.required.validate("apple"), "apple")
+
+        self.assertEqual(self.not_required.validate("apple"), "apple")
+        self.assertEqual(self.not_required.validate(""), "")
+        self.assertEqual(self.not_required.validate(None), None)
+
+    def test_type(self):
+        self.assertEqual(self.type.validate("orange"), "orange")
+        self.assertEqual(self.type.validate(1), "1")
+        self.assertEqual(self.type.validate(1.0), "1.0")
+        self.assertEqual(self.type.validate(True), "True")
 
     def test_default(self):
-        self.assertEqual(self._default.validate(None), "orange")
+        self.assertEqual(self.default.validate(None), "orange")
+        self.assertEqual(self.default.validate("apple"), "apple")
 
-    def test_length(self):
-        pass
+    def test_min_length(self):
+        self.assertRaises(prestans.exception.MinimumLengthError, self.length.validate, "1234")
+        self.assertEqual(self.length.validate("12345"), "12345")
 
-    def test_regex_format(self):
-        pass
+    def test_max_length(self):
+        self.assertRaises(prestans.exception.MaximumLengthError, self.length.validate, "123456789")
+        self.assertEqual(self.length.validate("1234567"), "1234567")
+
+    def test_format(self):
+        self.assertRaises(prestans.exception.InvalidFormatError, self.format.validate, "cat")
+        self.assertRaises(prestans.exception.InvalidFormatError, self.format.validate, "ab45678as")
+        self.assertEqual(self.format.validate("12abcde123"), "12abcde123")
+        self.assertEqual(self.format.validate("89uwxyz789"), "89uwxyz789")
 
     def test_choices(self):
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, "orange")
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, "grape")
+        self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, "orange")
+        self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, "grape")
+
+        self.assertEqual(self.choices.validate("apple"), "apple")
+        self.assertEqual(self.choices.validate("banana"), "banana")
 
     def test_encoding(self):
         pass
