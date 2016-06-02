@@ -170,29 +170,56 @@ class FloatTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
         
-        self._float = prestans.types.Float(
-            default=1.0,
-            minimum=1.0,
-            maximum=20.0,
-        )
+        self.types = prestans.types.Float()
+        self.required = prestans.types.Float(required=True)
+        self.not_required = prestans.types.Float(required=False)
+        self.default = prestans.types.Float(default=6.0)
+        self.positive_range = prestans.types.Float(minimum=1.0, maximum=5.0)
+        self.negative_range = prestans.types.Float(minimum=-5.0, maximum=-1.0)
+        self.choices = prestans.types.Float(choices=[1.0, 3.0])
 
-        self._choices = prestans.types.Float(
-            choices=[1.0, 3.0]
-        )
+    def test_types(self):
+        self.assertRaises(prestans.exception.ParseFailedError, self.types.validate, "string")
+
+    def test_required(self):
+        self.assertRaises(prestans.exception.RequiredAttributeError, self.required.validate, None)
+        self.assertEqual(self.required.validate(1.0), 1.0)
+
+        self.assertEqual(self.not_required.validate(1.0), 1.0)
+        self.assertEqual(self.not_required.validate(None), None)
 
     def test_default(self):
-        self.assertEqual(self._float.validate(1.0), 1.0)
+        self.assertEqual(self.default.validate(5.0), 5.0)
+        self.assertEqual(self.default.validate(None), 6.0)
 
     def test_minimum(self):
-        self.assertRaises(prestans.exception.LessThanMinimumError, self._float.validate, 0.5)
+        self.assertRaises(prestans.exception.LessThanMinimumError, self.positive_range.validate, 0.0)
+        self.assertRaises(prestans.exception.LessThanMinimumError, self.positive_range.validate, 0.5)
+        self.assertEqual(self.positive_range.validate(1.0), 1.0)
+        self.assertEqual(self.positive_range.validate(1.5), 1.5)
+
+        self.assertRaises(prestans.exception.LessThanMinimumError, self.negative_range.validate, -7.0)
+        self.assertRaises(prestans.exception.LessThanMinimumError, self.negative_range.validate, -6.0)
+        self.assertEqual(self.negative_range.validate(-5.0), -5.0)
+        self.assertEqual(self.negative_range.validate(-4.0), -4.0)
 
     def text_maximum(self):
-        self.assertRaises(prestans.exception.MoreThanMaximumError, self._float.validate, 21.5)
+        self.assertEqual(self.positive_range.validate(4.0), 4.0)
+        self.assertEqual(self.positive_range.validate(4.5), 4.5)
+        self.assertEqual(self.positive_range.validate(5.0), 5.0)
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self.positive_range.validate, 6.5)
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self.positive_range.validate, 7.0)
+
+        self.assertEqual(self.negative_range.validate(-3.0), -3.0)
+        self.assertEqual(self.negative_range.validate(-2.0), -2.0)
+        self.assertEqual(self.negative_range.validate(-1.0), -1.0)
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self.negative_range.validate, -0.5)
+        self.assertRaises(prestans.exception.MoreThanMaximumError, self.negative_range.validate, 0.0)
 
     def test_choices(self):
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 0.0)
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 2.0)
-        self.assertRaises(prestans.exception.InvalidChoiceError, self._choices.validate, 4.0)
+        self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 0.0)
+        self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 2.0)
+        self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 4.0)
 
     def tearDown(self):
         pass

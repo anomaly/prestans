@@ -342,10 +342,10 @@ class Float(DataType):
         except Exception, exp:
             raise prestans.exception.ParseFailedError("float encoding failed %s" % exp)
 
-        if _validated_value and self._minimum is not None and _validated_value < self._minimum:
+        if _validated_value is not None and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
 
-        if _validated_value and self._maximum is not None and _validated_value > self._maximum:
+        if _validated_value is not None and self._maximum is not None and _validated_value > self._maximum:
             raise prestans.exception.MoreThanMaximumError(value, self._maximum)
 
         if self._choices is not None and not _validated_value in self._choices:
