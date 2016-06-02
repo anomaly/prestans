@@ -31,3 +31,21 @@
 #
 
 import unittest
+
+import prestans.rest
+
+class RequestUnitTest(unittest.TestCase):
+
+    def setUp(self):
+    	self.rest_application = prestans.rest.RequestRouter([
+
+    	], application_name="test-request-api", debug=True)
+
+    def test_unimplemented_verb(self):
+    	pass
+
+    def test_no_endpoint(self):
+    	pass
+
+    def tearDown(self):
+        pass
