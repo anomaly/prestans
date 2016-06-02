@@ -31,21 +31,71 @@
 #
 
 import unittest
+import logging
 
+import prestans.http
 import prestans.rest
+
+"""
+class Handler(prestans.rest.RequestHandler):
+    pass
+
+get_request = {
+    "REQUEST_METHOD": "GET",
+    "SERVER_NAME": "localhost",
+    "PATH_INFO": "/test",
+    "wsgi.version": (1, 0),
+    "wsgi.url_scheme" : "http"
+}
+
+def start_response(self, status, headers):
+    pass
+
+rest_application = prestans.rest.RequestRouter([
+    ('/test', Handler)
+], application_name="test-request-api", debug=True)
+"""
 
 class RequestUnitTest(unittest.TestCase):
 
     def setUp(self):
-    	self.rest_application = prestans.rest.RequestRouter([
+        
+        logging.basicConfig()
+        self.logger = logging.getLogger("prestans")
 
-    	], application_name="test-request-api", debug=True)
+        deserializers=[prestans.deserializer.JSON()]
+        self.default_deserializer=prestans.deserializer.JSON()
 
-    def test_unimplemented_verb(self):
-    	pass
+        self.get_request = prestans.rest.Request(
+            environ={
+                "REQUEST_METHOD": prestans.http.VERB.GET
+            },
+            charset="utf-8",
+            logger=self.logger,
+            deserializers=deserializers,
+            default_deserializer=self.default_deserializer
+        )
 
-    def test_no_endpoint(self):
-    	pass
+        self.post_request = prestans.rest.Request(
+            environ={
+                "REQUEST_METHOD": prestans.http.VERB.POST
+            },
+            charset="utf-8",
+            logger=self.logger,
+            deserializers=deserializers,
+            default_deserializer=self.default_deserializer
+        )
+
+    def test_method(self):
+        self.assertEqual(self.get_request.method, prestans.http.VERB.GET)
+        self.assertEqual(self.post_request.method, prestans.http.VERB.POST)
+
+    def test_logger(self):
+        self.assertEqual(self.get_request.logger, self.logger)
+
+    def test_default_deserializer(self):
+        self.assertEqual(self.get_request.default_deserializer, self.default_deserializer)
+        self.assertEqual(self.get_request.default_deserializer, self.default_deserializer)
 
     def tearDown(self):
         pass
