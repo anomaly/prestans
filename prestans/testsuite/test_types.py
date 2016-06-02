@@ -220,6 +220,8 @@ class FloatTypeUnitTest(unittest.TestCase):
         self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 0.0)
         self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 2.0)
         self.assertRaises(prestans.exception.InvalidChoiceError, self.choices.validate, 4.0)
+        self.assertEqual(self.choices.validate(1.0), 1.0)
+        self.assertEqual(self.choices.validate(3.0), 3.0)
 
     def tearDown(self):
         pass
