@@ -120,7 +120,10 @@ def role_required(role_name=None):
 
             # Role name must be provided
             if role_name is None:
-                raise prestans.exception.AuthorizationError("None")
+                _message = "Role name must be provided"
+                authorization_error = prestans.exception.AuthorizationError(_message)
+                authorization_error.request = self.request
+                raise authorization_error
 
             # Authentication context must be set
             if not self.__provider_config__.authentication:
@@ -155,12 +158,16 @@ def access_required(config=None):
             if not self.__provider_config__.authentication:
                 _message = """Service available to authenticated users only,
                               no auth context provider set in handler"""
-                raise prestans.exception.AuthenticationError(_message)
+                authentication_error = prestans.exception.AuthenticationError(_message)
+                authentication_error.request = self.request
+                raise authentication_error
 
             # Check for access by calling is_authorized_user
             if not self.__provider_config__.authentication.is_authorized_user(config):
                 _message = "Service available to authorized users only"
-                raise prestans.exception.AuthorizationError(_message)
+                authorization_error = prestans.exception.AuthorizationError(_message)
+                authorization_error.request = self.request
+                raise authorization_error
 
             http_method_handler(self, *args)
 
