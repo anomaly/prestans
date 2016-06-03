@@ -95,7 +95,7 @@ def login_required(http_method_handler):
             authentication_error.request = self.request
             raise authentication_error
 
-        if not self.__provider_config__.authentication.is_authenticated_user(http_method_handler):
+        if not self.__provider_config__.authentication.is_authenticated_user():
             authentication_error = prestans.exception.AuthenticationError()
             authentication_error.request = self.request
             raise authentication_error
