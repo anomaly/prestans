@@ -31,5 +31,3 @@
 #
 
 import unittest
-
-import prestans.testsuite.types

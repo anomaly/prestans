@@ -183,11 +183,11 @@ class String(DataType):
         if not self._required and len(_validated_value) == 0:
             return _validated_value
 
-        if _validated_value is not None and self._min_length\
-        and len(_validated_value) < self._min_length:
+        if _validated_value is not None and self._min_length is not None and \
+           len(_validated_value) < self._min_length:
             raise prestans.exception.MinimumLengthError(value, self._min_length)
-        if _validated_value is not None and self._max_length\
-        and len(_validated_value) > self._max_length:
+        if _validated_value is not None and self._max_length is not None and \
+           len(_validated_value) > self._max_length:
             raise prestans.exception.MaximumLengthError(value, self._max_length)
 
         if self._choices is not None and not _validated_value in self._choices:
@@ -267,9 +267,9 @@ class Integer(DataType):
         except Exception as exp:
             raise prestans.exception.ParseFailedError("encoding failed: value is not an integer or a long")
 
-        if _validated_value and self._minimum is not None and _validated_value < self._minimum:
+        if _validated_value is not None and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
-        if _validated_value and self._maximum is not None and _validated_value > self._maximum:
+        if _validated_value is not None and self._maximum is not None and _validated_value > self._maximum:
             raise prestans.exception.MoreThanMaximumError(value, self._maximum)
 
         if self._choices is not None and not _validated_value in self._choices:
@@ -342,10 +342,10 @@ class Float(DataType):
         except Exception, exp:
             raise prestans.exception.ParseFailedError("float encoding failed %s" % exp)
 
-        if _validated_value and self._minimum is not None and _validated_value < self._minimum:
+        if _validated_value is not None and self._minimum is not None and _validated_value < self._minimum:
             raise prestans.exception.LessThanMinimumError(value, self._minimum)
 
-        if _validated_value and self._maximum is not None and _validated_value > self._maximum:
+        if _validated_value is not None and self._maximum is not None and _validated_value > self._maximum:
             raise prestans.exception.MoreThanMaximumError(value, self._maximum)
 
         if self._choices is not None and not _validated_value in self._choices:
