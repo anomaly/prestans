@@ -48,16 +48,16 @@ class Base(object):
         self._debug = value
 
     def current_user_has_role(self, role_name):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise TypeError("%s class should not be used directly, please override current_user_has_role" % self.__class__.__name__)
     
     def is_authenticated_user(self, handler_reference):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise TypeError("%s class should not be used directly, please override is_authenticated_user" % self.__class__.__name__)
         
     def is_authorized_user(self, handler_reference):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise TypeError("%s class should not be used directly, please override is_authorized_user" % self.__class__.__name__)
 
     def get_current_user(self):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise TypeError("%s class should not be used directly, please override get_current_user" % self.__class__.__name__)
 
 
 def login_required(http_method_handler):
@@ -86,7 +86,7 @@ def login_required(http_method_handler):
             _message = "Service available to authenticated users only, no auth context provider set in handler"
             raise prestans.exception.AuthenticationError(_message)
             
-        if not self.__provider_config__.authentication.is_authenticated_user():
+        if not self.__provider_config__.authentication.is_authenticated_user(http_method_handler):
             raise prestans.exception.AuthenticationError()
 
         http_method_handler(self, *args)
