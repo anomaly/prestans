@@ -35,28 +35,36 @@ from functools import wraps
 import prestans.exception
 
 class Base(object):
+    """Base class for an auth provider, this should be overridden to suit
+    each application."""
 
     def __init__(self):
         self._debug = False
 
     @property
     def debug(self):
+        """Getter for debug property"""
         return self._debug
 
     @debug.setter
     def debug(self, value):
+        """Setter for debug property"""
         self._debug = value
 
     def current_user_has_role(self, role_name):
+        """Override this method to check if the given role is allowed access"""
         raise NotImplementedError
 
     def is_authenticated_user(self, handler_reference):
+        """Override this method to check if a user is logged in"""
         raise NotImplementedError
 
     def is_authorized_user(self, handler_reference):
+        """Override this method to check if a user has access"""
         raise NotImplementedError
 
     def get_current_user(self):
+        """Override this method to provide reference to logged in user"""
         raise NotImplementedError
 
 def login_required(http_method_handler):
@@ -107,6 +115,7 @@ def role_required(role_name=None):
 
     def _role_required(http_method_handler):
 
+        @wraps(http_method_handler)
         def secure_http_method_handler(self, *args):
 
             # Role name must be provided
