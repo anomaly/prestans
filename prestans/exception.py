@@ -208,7 +208,7 @@ class HandlerException(Base):
         if self.request is None:
             return self._message
         else:
-            #method:url:user agent message
+            #method:url:user agent:message
             return "%s %s %s \"%s\"" % (
                 self.request.method,
                 self.request.url,

@@ -37,13 +37,13 @@ import prestans.exception
 class Base(object):
 
     def dumps(self, serializable_object):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
     def handler_body_type(self):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
     def content_type(self):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
 
 class JSON(Base):

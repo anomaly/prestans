@@ -48,17 +48,16 @@ class Base(object):
         self._debug = value
 
     def current_user_has_role(self, role_name):
-        raise TypeError("%s class should not be used directly, please override current_user_has_role" % self.__class__.__name__)
-    
+        raise NotImplementedError
+
     def is_authenticated_user(self, handler_reference):
-        raise TypeError("%s class should not be used directly, please override is_authenticated_user" % self.__class__.__name__)
-        
+        raise NotImplementedError
+
     def is_authorized_user(self, handler_reference):
-        raise TypeError("%s class should not be used directly, please override is_authorized_user" % self.__class__.__name__)
+        raise NotImplementedError
 
     def get_current_user(self):
-        raise TypeError("%s class should not be used directly, please override get_current_user" % self.__class__.__name__)
-
+        raise NotImplementedError
 
 def login_required(http_method_handler):
     """
@@ -67,32 +66,36 @@ def login_required(http_method_handler):
     RESTRequestHandler subclass must have a auth_context instance, refer to prestans.auth
     for the parent class definition.
 
-    If decorator is used and no auth_context is provided the client will be denied access
+    If decorator is used and no auth_context is provided the client will be denied access.
 
-    Handler will return a 401 Unauthorized if the user is not logged in, the service does not redirect
-    to login handler page, this is the client's responsibility
+    Handler will return a 401 Unauthorized if the user is not logged in, the service does
+    not redirect to login handler page, this is the client's responsibility.
 
-    auth_context_handler instance provides a message called get_current_user, use this to obtain a
-    reference to an authenticated user profile.
+    auth_context_handler instance provides a message called get_current_user, use this
+    to obtain a reference to an authenticated user profile.
 
     If all goes well, the original handler definition is executed.
-
     """
-    
+
     @wraps(http_method_handler)
     def secure_http_method_handler(self, *args):
-            
+
         if not self.__provider_config__.authentication:
-            _message = "Service available to authenticated users only, no auth context provider set in handler"
-            raise prestans.exception.AuthenticationError(_message)
-            
+            _message = """Service available to authenticated users only,
+                          no auth context provider set in handler"""
+            authentication_error = prestans.exception.AuthenticationError(_message)
+            authentication_error.request = self.request
+            raise authentication_error
+
         if not self.__provider_config__.authentication.is_authenticated_user(http_method_handler):
-            raise prestans.exception.AuthenticationError()
+            authentication_error = prestans.exception.AuthenticationError()
+            authentication_error.request = self.request
+            raise authentication_error
 
         http_method_handler(self, *args)
-        
+
     return secure_http_method_handler
-    
+
 def role_required(role_name=None):
     """
     Authenticates a HTTP method handler based on a provided role
@@ -101,42 +104,48 @@ def role_required(role_name=None):
     http://mrcoles.com/blog/3-decorator-examples-and-awesome-python/
 
     """
-    
+
     def _role_required(http_method_handler):
 
         def secure_http_method_handler(self, *args):
-    
+
             # Role name must be provided
             if role_name is None:
                 raise prestans.exception.AuthorizationError("None")
-        
+
             # Authentication context must be set
             if not self.__provider_config__.authentication:
-                _message = "Service available to authenticated users only, no auth context provider set in handler"
-                raise prestans.exception.AuthenticationError(_message)
-            
+                _message = """Service available to authenticated users only,
+                              no auth context provider set in handler"""
+                authentication_error = prestans.exception.AuthenticationError(_message)
+                authentication_error.request = self.request
+                raise authentication_error
+
             # Check for the role by calling current_user_has_role
             if not self.__provider_config__.authentication.current_user_has_role(role_name):
-                raise prestans.exception.AuthorizationError(role_name)
+                authorization_error = prestans.exception.AuthorizationError(role_name)
+                authorization_error.request = self.request
+                raise authorization_error
 
             http_method_handler(self, *args)
-        
+
         return wraps(http_method_handler)(secure_http_method_handler)
-        
+
     return _role_required
 
 def access_required(config=None):
     """
     Authenticates a HTTP method handler based on a custom set of arguments
     """
-    
+
     def _access_required(http_method_handler):
 
         def secure_http_method_handler(self, *args):
 
             # Authentication context must be set
             if not self.__provider_config__.authentication:
-                _message = "Service available to authenticated users only, no auth context provider set in handler"
+                _message = """Service available to authenticated users only,
+                              no auth context provider set in handler"""
                 raise prestans.exception.AuthenticationError(_message)
 
             # Check for access by calling is_authorized_user
@@ -145,7 +154,7 @@ def access_required(config=None):
                 raise prestans.exception.AuthorizationError(_message)
 
             http_method_handler(self, *args)
-        
+
         return wraps(http_method_handler)(secure_http_method_handler)
-        
+
     return _access_required

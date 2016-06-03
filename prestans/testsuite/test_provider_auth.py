@@ -48,16 +48,16 @@ class BaseUnitTest(unittest.TestCase):
         self.assertEqual(self.auth.debug, True)
 
     def test_current_user_has_role(self):
-        self.assertRaises(TypeError, self.auth.current_user_has_role, "Admin")
+        self.assertRaises(NotImplementedError, self.auth.current_user_has_role, "Admin")
 
     def test_is_authenticated_user(self):
-        self.assertRaises(TypeError, self.auth.is_authenticated_user, None)
+        self.assertRaises(NotImplementedError, self.auth.is_authenticated_user, None)
 
     def test_is_authorized_user(self):
-        self.assertRaises(TypeError, self.auth.is_authorized_user, None)
+        self.assertRaises(NotImplementedError, self.auth.is_authorized_user, None)
 
     def test_get_current_user(self):
-        self.assertRaises(TypeError, self.auth.get_current_user)
+        self.assertRaises(NotImplementedError, self.auth.get_current_user)
 
     def tearDown(self):
         pass
