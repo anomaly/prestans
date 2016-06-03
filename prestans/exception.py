@@ -336,20 +336,20 @@ class ParseFailedError(DataValidationException):
 class LessThanMinimumError(DataValidationException):
 
     def __init__(self, value, allowed_min):
-        _message = "%i is less than the allowed minimum of %i" % (value, allowed_min)
+        _message = "%s is less than the allowed minimum of %i" % (str(value), allowed_min)
         super(LessThanMinimumError, self).__init__(_message)
 
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
-        _message = "%i is more than the allowed maximum %i" % (value, allowed_max)
+        _message = "%s is more than the allowed maximum %i" % (str(value), allowed_max)
         super(MoreThanMaximumError, self).__init__(_message)
 
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
         _message = "value %s is not one of these\
-        choices %s" % (value, str(allowed_choices).strip('[]'))
+        choices %s" % (str(value), str(allowed_choices).strip('[]'))
         super(InvalidChoiceError, self).__init__(_message)
 
 class MinimumLengthError(DataValidationException):
