@@ -125,6 +125,11 @@ class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
     def current_user_has_role(self, role_name):
         return role_name == "Admin"
 
+class UnauthenticatedHandlerProvider(prestans.provider.auth.Base):
+    
+    def is_authenticated_user(self, handler_reference):
+        return False
+
 class HandlerWithoutProvider(prestans.rest.RequestHandler):
 
     @prestans.provider.auth.login_required
@@ -147,6 +152,16 @@ class AuthenticatedHandler(prestans.rest.RequestHandler):
 
     @prestans.provider.auth.role_required("Manager")
     def put(self):
+        self.response.status = prestans.http.STATUS.NO_CONTENT
+
+class UnauthenticatedHandler(prestans.rest.RequestHandler):
+    
+    __provider_config__ = prestans.provider.Config(
+        authentication=UnauthenticatedHandlerProvider()
+    )
+
+    @prestans.provider.auth.login_required
+    def get(self):
         self.response.status = prestans.http.STATUS.NO_CONTENT
 
 def start_response(status, headers):
@@ -206,6 +221,14 @@ class HandlerUnitTest(unittest.TestCase):
             debug=True
         )
 
+        self.unauthenticated_handler = UnauthenticatedHandler(
+            args=[],
+            request=get_request,
+            response=response,
+            logger=logger,
+            debug=True
+        )
+
         self.correct_role_handler = AuthenticatedHandler(
             args=[],
             request=post_request,
@@ -232,6 +255,7 @@ class HandlerUnitTest(unittest.TestCase):
 
     def test_login_required(self):
         self.assertRaises(prestans.exception.AuthenticationError, self.handler_without_provider, self.get_environ, start_response)
+        self.assertRaises(prestans.exception.AuthenticationError, self.unauthenticated_handler, self.get_environ, start_response)
         self.assertIsInstance(self.authenticated_handler(self.get_environ, start_response), list)
 
     def test_current_user_has_role(self):
