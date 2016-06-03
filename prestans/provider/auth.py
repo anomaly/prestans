@@ -89,8 +89,8 @@ def login_required(http_method_handler):
     def secure_http_method_handler(self, *args):
 
         if not self.__provider_config__.authentication:
-            _message = """Service available to authenticated users only,
-                          no auth context provider set in handler"""
+            _message = ("Service available to authenticated users only, "
+                        "no auth context provider set in handler")
             authentication_error = prestans.exception.AuthenticationError(_message)
             authentication_error.request = self.request
             raise authentication_error
@@ -127,8 +127,8 @@ def role_required(role_name=None):
 
             # Authentication context must be set
             if not self.__provider_config__.authentication:
-                _message = """Service available to authenticated users only,
-                              no auth context provider set in handler"""
+                _message = ("Service available to authenticated users only, "
+                            "no auth context provider set in handler")
                 authentication_error = prestans.exception.AuthenticationError(_message)
                 authentication_error.request = self.request
                 raise authentication_error
@@ -156,8 +156,8 @@ def access_required(config=None):
 
             # Authentication context must be set
             if not self.__provider_config__.authentication:
-                _message = """Service available to authenticated users only,
-                              no auth context provider set in handler"""
+                _message = ("Service available to authenticated users only, "
+                            "no auth context provider set in handler")
                 authentication_error = prestans.exception.AuthenticationError(_message)
                 authentication_error.request = self.request
                 raise authentication_error
