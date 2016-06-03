@@ -55,11 +55,11 @@ class Base(object):
         """Override this method to check if the given role is allowed access"""
         raise NotImplementedError
 
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self):
         """Override this method to check if a user is logged in"""
         raise NotImplementedError
 
-    def is_authorized_user(self, handler_reference):
+    def is_authorized_user(self, config):
         """Override this method to check if a user has access"""
         raise NotImplementedError
 
