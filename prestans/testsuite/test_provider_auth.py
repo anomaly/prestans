@@ -122,6 +122,9 @@ class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
     def is_authenticated_user(self, handler_reference):
         return True
 
+    def current_user_has_role(self, role_name):
+        return role_name == "Admin"
+
 class HandlerWithoutProvider(prestans.rest.RequestHandler):
 
     @prestans.provider.auth.login_required
@@ -136,7 +139,15 @@ class AuthenticatedHandler(prestans.rest.RequestHandler):
 
     @prestans.provider.auth.login_required
     def get(self):
-        pass
+        self.response.status = prestans.http.STATUS.NO_CONTENT
+
+    @prestans.provider.auth.role_required("Admin")
+    def post(self):
+        self.response.status = prestans.http.STATUS.NO_CONTENT
+
+    @prestans.provider.auth.role_required("Manager")
+    def put(self):
+        self.response.status = prestans.http.STATUS.NO_CONTENT
 
 def start_response(status, headers):
     pass
@@ -152,12 +163,28 @@ class HandlerUnitTest(unittest.TestCase):
         serializers=[prestans.deserializer.JSON()]
         default_serializer=prestans.deserializer.JSON()
 
-        self.get_environ = {
-            "REQUEST_METHOD": prestans.http.VERB.GET
-        }
+        self.get_environ = {"REQUEST_METHOD": prestans.http.VERB.GET}
+        self.post_environ = {"REQUEST_METHOD": prestans.http.VERB.POST}
+        self.put_environ = {"REQUEST_METHOD": prestans.http.VERB.PUT}
 
         get_request = prestans.rest.Request(
             environ=self.get_environ,
+            charset=charset,
+            logger=logger,
+            deserializers=serializers,
+            default_deserializer=default_serializer
+        )
+
+        post_request = prestans.rest.Request(
+            environ=self.post_environ,
+            charset=charset,
+            logger=logger,
+            deserializers=serializers,
+            default_deserializer=default_serializer
+        )
+
+        put_request = prestans.rest.Request(
+            environ=self.put_environ,
             charset=charset,
             logger=logger,
             deserializers=serializers,
@@ -171,9 +198,25 @@ class HandlerUnitTest(unittest.TestCase):
             default_serializer=default_serializer
         )
 
-        self.authenitcated_handler = AuthenticatedHandler(
+        self.authenticated_handler = AuthenticatedHandler(
             args=[],
             request=get_request,
+            response=response,
+            logger=logger,
+            debug=True
+        )
+
+        self.correct_role_handler = AuthenticatedHandler(
+            args=[],
+            request=post_request,
+            response=response,
+            logger=logger,
+            debug=True
+        )
+
+        self.incorrect_role_handler = AuthenticatedHandler(
+            args=[],
+            request=put_request,
             response=response,
             logger=logger,
             debug=True
@@ -189,8 +232,11 @@ class HandlerUnitTest(unittest.TestCase):
 
     def test_login_required(self):
         self.assertRaises(prestans.exception.AuthenticationError, self.handler_without_provider, self.get_environ, start_response)
-        
-        logging.error(self.authenitcated_handler(self.get_environ, start_response))
+        self.assertIsInstance(self.authenticated_handler(self.get_environ, start_response), list)
+
+    def test_current_user_has_role(self):
+        self.assertRaises(prestans.exception.AuthorizationError, self.incorrect_role_handler, self.post_environ, start_response)
+        self.assertIsInstance(self.correct_role_handler(self.put_environ, start_response), list)
 
     def tearDown(self):
         pass
