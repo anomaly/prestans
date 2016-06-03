@@ -486,7 +486,8 @@ class Response(webob.Response):
                 if model_attribute_filter is not None:
                     try:
                         model_attribute_filter.conforms_to_template_filter(self.attribute_filter)
-                    except prestans.exception.AttributeFilterDiffers, exp:
+                    except prestans.exception.AttributeFilterDiffers as exception:
+                        exception.request = self.request
                         self.logger.warn("%s" %  exp)
 
             #: Body should be of type DataCollection try; attempt calling
@@ -792,7 +793,6 @@ class RequestHandler(object):
         self.logger.info("setting default response to %s" % self.request.accept)
 
         try:
-
             #: Register additional serializers and de-serializers
             self.request.register_deserializers(self.register_deserializers())
             self.response.register_serializers(self.register_serializers())
@@ -801,7 +801,9 @@ class RequestHandler(object):
 
             #: Ensure we support the HTTP verb
             if not prestans.http.VERB.is_supported_verb(self.request.method):
-                raise prestans.exception.UnimplementedVerbError(self.request.method)
+                unimplemented_verb_error = prestans.exception.UnimplementedVerbError(self.request.method)
+                unimplemented_verb_error.request = self.request
+                raise unimplemented_verb_error
 
             #: Setup serializers
             self._setup_serializers()
@@ -892,6 +894,9 @@ class RequestHandler(object):
                     self.delete(*self._args)
             #: Re-raise all prestans exceptions
             except prestans.exception.Base as exception:
+                if issubclass(exception.__class__, prestans.exception.HandlerException):
+                    exception.request = self.request
+
                 raise exception
             #: Handle any non-prestans exceptions
             except Exception as exp:
@@ -940,22 +945,34 @@ class RequestHandler(object):
     #:
 
     def get(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.GET)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.GET)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def head(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.HEAD)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.HEAD)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def post(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.POST)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.POST)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def put(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.PUT)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.PUT)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def patch(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.PATCH)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.PATCH)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def delete(self, *args):
-        raise prestans.exception.UnimplementedVerbError(prestans.http.VERB.DELETE)
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.DELETE)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
 
     def redirect(self, url, status=prestans.http.STATUS.TEMPORARY_REDIRECT):
 
@@ -1183,7 +1200,9 @@ class RequestRouter(object):
                     return request_handler(environ, start_response)
 
             #: Request does not have a matched handler
-            raise prestans.exception.NoEndpointError()
+            no_endpoint = prestans.exception.NoEndpointError()
+            no_endpoint.request = request
+            raise no_endpoint
 
         except prestans.exception.Base, exp:
             self.logger.error(exp)

@@ -51,7 +51,7 @@ import prestans.exception
 class DataType(object):
 
     def validate(self, value):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
 class DataStructure(DataType):
     """
@@ -65,18 +65,18 @@ class DataStructure(DataType):
     """
 
     def as_serializable(self, value):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
 class DataCollection(DataType):
 
     def validate(self, value, attribute_filter=None):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
     def as_serializable(self, attribute_filter=None):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
     def get_attribute_filter(self):
-        raise TypeError("%s should not be used directly" % self.__class__.__name__)
+        raise NotImplementedError
 
 #:
 #: Basic Types
