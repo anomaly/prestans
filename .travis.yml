@@ -1,10 +1,6 @@
 language: python                
 python:         
   - "2.7"
-  - "3.5"
-branches:               
-  only:         
-    - 3.0
 install:
-  - python setup.py -q install
+  - pip install .
 script: make tests
