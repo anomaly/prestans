@@ -645,8 +645,6 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
-        start_response(self.status, self.headerlist)
-
         error_dict = dict()
 
         error_dict['code'] = self.status_int
@@ -655,6 +653,8 @@ class ErrorResponse(webob.Response):
 
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
+
+        start_response(self.status, self.headerlist)
 
         return [stringified_body]
 
