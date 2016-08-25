@@ -43,6 +43,9 @@ import prestans.exception
 import prestans.serializer
 import prestans.deserializer
 
+import sys
+sys.path.append("devel/pycharm-debug.egg")
+
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
@@ -645,8 +648,6 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
-        start_response(self.status, self.headerlist)
-
         error_dict = dict()
 
         error_dict['code'] = self.status_int
@@ -655,6 +656,8 @@ class ErrorResponse(webob.Response):
 
         stringified_body = self._serializer.dumps(error_dict)
         self.content_length = len(stringified_body)
+
+        start_response(self.status, self.headerlist)
 
         return [stringified_body]
 
@@ -1010,9 +1013,9 @@ class BlueprintHandler(RequestHandler):
             handler_blueprint['supported_methods'] = handler_class(self._args, self.request,\
                 self.response, self.logger, self.debug).blueprint()
 
-            # Make a new group per module if one doesnt' exist
             if not handler_class.__module__ in blueprint_groups:
                 blueprint_groups[handler_class.__module__] = []
+            # Make a new group per module if one doesnt' exist
 
             blueprint_groups[handler_class.__module__].append(handler_blueprint)
 
@@ -1059,6 +1062,7 @@ class RequestRouter(object):
     def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None,\
         default_deserializer=None, charset="utf-8", application_name="prestans",\
         logger=None, debug=False, description=None):
+
 
         self._application_name = application_name
         self._debug = debug
@@ -1171,7 +1175,9 @@ class RequestRouter(object):
             #: Check if the requested URL has a valid registered handler
             for regexp, handler_class in route_map:
 
-                match = regexp.match(request.path)
+                # if not 'PATH_INFO' in environ.keys():
+
+                match = regexp.match(environ['PATH_INFO'])
 
                 #: If we've found a match; ensure its a handler subclass and return it's callable
                 if match:

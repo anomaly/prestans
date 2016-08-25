@@ -80,7 +80,7 @@ class AdapterRegistryManager:
         
         class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
         
-        if not self._persistent_map.has_key(class_signature):
+        if not self._persistent_map.has_key(class_signature) :
             raise TypeError("No registered Data Adapter for class %s" % class_signature)
 
         return self._persistent_map[class_signature]
