@@ -38,6 +38,7 @@ import prestans.rest
 LOGGER_MCLOGFACE = logging.Logger("temp", level='ERROR')
 LOGGER_MCLOGFACE.disabled = 50  # silence the logger
 
+
 class MyModel(prestans.types.Model):
     id = prestans.types.Integer()
 
@@ -60,6 +61,7 @@ class MockStartResponse:
     @classmethod
     def __call__(cls, status, response_headers, exc_info=None):
         pass
+
 
 class RequestRouterTest(unittest.TestCase):
     def test_script_alias_match_with_global_match_group_should_not_pass_call(self):
@@ -113,6 +115,23 @@ class RequestRouterTest(unittest.TestCase):
             "SERVER_NAME": "localhost",
             "SERVER_PORT": "1234"
         }, match=r"/mountpoint/some/path/([0-9]+)", should_pass=False)
+
+    def test_router_should_not_crash_with_no_script_name_field(self):
+        """
+        Test the ability to accept a blank SCRIPT_NAME as per spec PEP 3333
+
+        `<https://www.python.org/dev/peps/pep-3333/#environ-variables>`
+        :return:
+        """
+
+        expected_value = 123
+
+        self._test_routing_behavour(environ={
+            "REQUEST_METHOD": prestans.http.VERB.GET,
+            "PATH_INFO": "/some/path/{}".format(123),
+            "wsgi.url_scheme": "http",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "1234"})
 
     def _test_routing_behavour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
 
