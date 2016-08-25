@@ -1177,7 +1177,7 @@ class RequestRouter(object):
 
                 # if not 'PATH_INFO' in environ.keys():
 
-                match = regexp.match(environ['PATH_INFO'])
+                match = regexp.match(environ.get("PATH_INFO", "")) # if absent, can assume to be empty string # https://www.python.org/dev/peps/pep-3333/#environ-variables
 
                 #: If we've found a match; ensure its a handler subclass and return it's callable
                 if match:

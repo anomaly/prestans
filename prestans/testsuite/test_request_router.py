@@ -30,13 +30,13 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import unittest
 import logging
-import prestans
+import unittest
+
+import prestans.rest
 
 LOGGER_MCLOGFACE = logging.Logger("temp", level='ERROR')
 LOGGER_MCLOGFACE.disabled = 50  # silence the logger
-
 
 class MyModel(prestans.types.Model):
     id = prestans.types.Integer()
@@ -85,6 +85,8 @@ class RequestRouterTest(unittest.TestCase):
     def test_script_alias_match_with_match_group_should_pass_call(self):
         """
         WSGIScriptAliasMatch /mountpoint(.*) script.wsgi$1
+
+        with router ``TestRequestRouter``
         :return:
         """
         self._test_routing_behavour(environ={
@@ -96,6 +98,22 @@ class RequestRouterTest(unittest.TestCase):
             "SERVER_PORT": "1234"
         })
 
+    def test_router_should_not_crash_with_no_path_info_field(self):
+        """
+        Test the ability to accept blank PATH_INFO as per specification PEP 3333
+
+        :return:
+        """
+        expected_value = 123
+
+        self._test_routing_behavour(environ={
+            "REQUEST_METHOD": prestans.http.VERB.GET,
+            "SCRIPT_NAME": "/mountpoint/some/path/{}".format(123),
+            "wsgi.url_scheme": "http",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "1234"
+        }, match=r"/mountpoint/some/path/([0-9]+)", should_pass=False)
+
     def _test_routing_behavour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
 
         test_router = prestans.rest.RequestRouter([
@@ -105,22 +123,29 @@ class RequestRouterTest(unittest.TestCase):
         response = test_router(environ=environ, start_response=MockStartResponse.__call__)
         response_parsed = prestans.deserializer.JSON().loads(response[0])
         if should_pass:
-            if 'code' in response_parsed.keys() and response_parsed['code'] == 404:
-                self.fail("SCRIPT_NAME[{script}] and PATH_INFO[{path}] SHOULD match route[{route}]".format(
-                    script=environ.get("SCRIPT_NAME", ""),
-                    path=environ.get("PATH_INFO", ""),
-                    route=match
-                ))
-            else:
-                self.assertEqual(response_parsed['id'], expected_value,
-                                 "expected id field with value of {}".format(expected_value))
+            self.assert_should_find_route(environ, expected_value, match, response_parsed)
         else:
-            if 'id' in response_parsed.keys():
-                self.fail("SCRIPT_NAME[{script}] and PATH_INFO[{path}] SHOULD NOT match route[{route}]".format(
-                    script=environ.get("SCRIPT_NAME", ""),
-                    path=environ.get("PATH_INFO", ""),
-                    route=match
-                ))
+            self.assert_should_not_find_route(environ, match, response_parsed)
+
+    def assert_should_not_find_route(self, environ, match, response_parsed):
+        if 'id' in response_parsed.keys():
+            self.fail(self.gen_route_match_failure_message(environ, match, assertion="SHOULD NOT MATCH"))
+
+    def assert_should_find_route(self, environ, expected_value, match, response_parsed):
+        if 'code' in response_parsed.keys() and response_parsed['code'] == 404:
+            self.fail(self.gen_route_match_failure_message(environ, match, assertion="SHOULD MATCH"))
+        else:
+            self.assertEqual(response_parsed['id'], expected_value,
+                             "expected id field with value of {}".format(expected_value))
+
+    def gen_route_match_failure_message(self, environ, match, assertion="SHOULD"):
+        return "SCRIPT_NAME[{script}] and PATH_INFO[{path}] {assertion} route[{route}]".format(
+            script=environ.get("SCRIPT_NAME", ""),
+            path=environ.get("PATH_INFO", ""),
+            route=match,
+            assertion=assertion
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
