@@ -100,6 +100,20 @@ class RequestRouterTest(unittest.TestCase):
             "SERVER_PORT": "1234"
         })
 
+    def test_script_alias_match_with_solidus_should_pass_call(self):
+        """
+        WSGIScriptAliasMatch /mountpoint/(.*) script.wsgi/$1
+        :return:
+        """
+        self._test_routing_behavour(environ={
+            "REQUEST_METHOD": prestans.http.VERB.GET,
+            "SCRIPT_NAME": "/mountpoint/",
+            "PATH_INFO": "/some/path/{}".format(123),
+            "wsgi.url_scheme": "http",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "1234"
+        })
+
     def test_router_should_not_crash_with_no_path_info_field(self):
         """
         Test the ability to accept blank PATH_INFO as per specification PEP 3333
