@@ -51,7 +51,7 @@ class BaseUnitTest(unittest.TestCase):
         self.assertRaises(NotImplementedError, self.auth.current_user_has_role, "Admin")
 
     def test_is_authenticated_user(self):
-        self.assertRaises(NotImplementedError, self.auth.is_authenticated_user, None)
+        self.assertRaises(NotImplementedError, callableObj=self.auth.is_authenticated_user)
 
     def test_is_authorized_user(self):
         self.assertRaises(NotImplementedError, self.auth.is_authorized_user, None)
@@ -119,7 +119,7 @@ class CustomUnitTest(unittest.TestCase):
 
 class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
     
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self, handler_reference=None):
         return True
 
     def current_user_has_role(self, role_name):
@@ -127,7 +127,7 @@ class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
 
 class UnauthenticatedHandlerProvider(prestans.provider.auth.Base):
     
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self, handler_reference=None):
         return False
 
 class HandlerWithoutProvider(prestans.rest.RequestHandler):
