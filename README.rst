@@ -3,6 +3,10 @@ Prestans 2.0
 
 A WSGI compliant REST micro-framework.
 
+.. image:: http://img.shields.io/pypi/dm/prestans.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/prestans/
+    :alt: Download
+    
 .. image:: https://pypip.in/version/prestans/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/prestans/
     :alt: Latest Version
