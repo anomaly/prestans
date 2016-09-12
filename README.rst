@@ -7,7 +7,7 @@ A WSGI compliant REST micro-framework.
     :target: https://pypi.python.org/pypi/prestans/
     :alt: Download
     
-.. image:: https://pypip.in/version/prestans/badge.svg?style=flat
+.. image:: http://pypip.in/version/prestans/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/prestans/
     :alt: Latest Version
 
