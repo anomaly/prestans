@@ -493,7 +493,7 @@ class Filter(Base):
     def __init__(self, template_engine, model_file, namespace, output_directory):
 
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
-        self._template = self._template_engine.get_template("closure/filter.jinja")
+        self._template = self._template_engine.get_template("closure/filter/filter.jinja")
 
     def run(self):
 
