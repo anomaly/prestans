@@ -4,13 +4,12 @@
  */
 goog.provide('{{namespace}}.{{name}}');
 
-goog.require('{{project}}');
-
 goog.require('goog.json');
 goog.require('goog.object');
 
 goog.require('prestans.types.Filter');
 
+goog.require('{{project}}');
 {% for dependency in dependencies %}
 goog.require('{{dependency}}');
 {% endfor %}
@@ -27,13 +26,7 @@ goog.require('{{dependency}}');
         opt_defaultValue = false;
 
 {% for attribute in attributes %}
-{% if attribute.blueprint_type == 'model' %}
-    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(opt_defaultValue);
-{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(opt_defaultValue);
-{% else %}
-    this.{{attribute.ccif}}_ = opt_defaultValue;
-{% endif %}
+{{filter.attributeDefinition(namespace, name, attribute)}}
 {% endfor %}
 };
 goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
@@ -68,52 +61,37 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
 {% endfor %}
 
 {% for attribute in attributes %}
-{% if attribute.blueprint_type == 'model' %}
+{% if attribute.blueprint_type == 'model' or (attribute.blueprint_type == 'array' and attribute.element_template_is_model) %}
 {{filter.setMethod(namespace, name, attribute)}}
 {% endif %}
 {% endfor %}
 
-
-
 /**
- * @export
+ * @final
+ *
+ * @return {!boolean}
  */
 {{namespace}}.{{name}}.prototype.anyFieldsEnabled = function() {
     return ({{attribute_string}});
 };
 
-
-
 /**
- * @export
- * @param {boolean} minified
- * @param {boolean=} opt_complete
+ * @final
+ * @param {!boolean} minified
+ * @param {!boolean=} opt_complete
+ *
+ * @return {!Object}
  */
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_complete) {
 
-    if(opt_complete != true)
+    if(!goog.isBoolean(opt_complete))
         opt_complete = false;
 
     var jsonifiedObject_ = {};
     
     if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
     {% for attribute in attributes %}
-    {% if attribute.blueprint_type == 'model' %}
-        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
-        else if(opt_complete)
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
-    {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-        if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
-        else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified);
-        else if(opt_complete)
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
-    {% else %}
-        if(this.{{attribute.ccif}}_ || opt_complete)
-           jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_;
-    {% endif %}
+    {{filter.minifiedAttribute(namespace, name, attribute)}}
     {% endfor %}
     }
     else {
@@ -140,16 +118,14 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
     return jsonifiedObject_;
 };
 
-
 /**
- * @export
- * @param {boolean} minified
- * @param {boolean=} opt_complete
+ * @final
+ * @param {!boolean} minified
+ * @param {!boolean=} opt_complete
+ *
+ * @return {!string}
  */
 {{namespace}}.{{name}}.prototype.getJSONString = function(minified, opt_complete) {
-
-    if(opt_complete != true)
-        opt_complete = false;
 
     return goog.json.serialize(this.getJSONObject(minified, opt_complete));
 };

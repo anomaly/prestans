@@ -29,8 +29,6 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-__all__ = ['closure', 'templates']
-
 import inspect
 import jinja2
 import os
@@ -38,6 +36,7 @@ import sys
 
 import prestans.devel.gen.closure
 import prestans.types
+
 
 class Inspector(object):
 
@@ -53,8 +52,8 @@ class Inspector(object):
             model_python_file = os.path.split(self._model_file)[1:][0]
             namespace = model_python_file.split(".")[0]
             models = __import__(namespace, globals(), locals(), [])
-        except ImportError, import_error:
-            print "\nFailed to process %s, %s" % (self._model_file, import_error)
+        except ImportError as import_error:
+            print ("\nFailed to process %s, %s" % (self._model_file, import_error))
             sys.exit(1)
 
         for name, type_instance in models.__dict__.iteritems():
@@ -69,6 +68,7 @@ class Inspector(object):
 
 
         return blueprints
+
 
 class Preplate(object):
 
