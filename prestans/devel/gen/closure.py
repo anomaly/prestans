@@ -458,7 +458,7 @@ class Model(Base):
     
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
         self._filter_namespace = filter_namespace
-        self._template = self._template_engine.get_template("closure/model.jinja")
+        self._template = self._template_engine.get_template("closure/model/model.jinja")
 
     def run(self):
 

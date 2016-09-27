@@ -1,0 +1,75 @@
+{% macro getMethod(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model'  %}
+/**
+ * @final
+ *
+ * @return {!{{namespace}}.{{attribute.model_template}}}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_;
+};
+{% elif attribute.blueprint_type == 'array' %}
+/**
+ * @final
+ *
+ * @return {!prestans.types.Array}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_;
+};
+{% else %}
+/**
+ * @final
+ *
+{% if attribute.blueprint_type == 'boolean' %}
+ * @return {boolean}
+{% elif attribute.blueprint_type == 'float' or attribute.blueprint_type == 'integer' %}
+ * @return {number}
+{% elif attribute.blueprint_type == 'string' %}
+ * @return {string}
+{% elif attribute.blueprint_type == 'date' %}
+ * @return {goog.date.Date}
+{% elif attribute.blueprint_type == 'time' %}
+ * @return {goog.date.Time}
+{% elif attribute.blueprint_type == 'datetime' %}
+ * @return {goog.date.DateTime}
+{% endif %}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_.getValue();
+ };
+{% endif %}
+{%- endmacro %}
+
+{% macro setMethod(namespace, name, attribute) -%}
+{{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function(value) {
+{% if attribute.blueprint_type == 'array' %}
+    var previousArray_ = this.{{attribute.ccif}}_;
+{% if attribute.element_template_is_model %}
+    if(value instanceof prestans.types.Array && value.getElementTemplate() == {{namespace}}.{{attribute.element_template}}) {
+{% else %}
+    if(value instanceof prestans.types.Array && value.getElementTemplate() instanceof prestans.types.{{attribute.element_template.client_class_name}}) {
+{% endif %}
+        this.{{attribute.ccif}}_ = value;
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousArray_, this.{{attribute.ccif}}_);
+        return true;
+    }
+    else
+        return false;
+{% elif attribute.blueprint_type == 'model' %}
+    var previousModel_ = this.{{attribute.ccif}}_;
+    if(value instanceof {{namespace}}.{{attribute.model_template}}) {
+        this.{{attribute.ccif}}_ = value;
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousModel_, this.{{attribute.ccif}}_);
+        return true;
+    }
+    else
+        return false;
+{% else %}
+    var previousValue_ = this.{{attribute.ccif}}_.getValue();
+    var success_ = this.{{attribute.ccif}}_.setValue(value);
+    this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousValue_, this.{{attribute.ccif}}_.getValue());
+    return success_;
+{% endif %}
+};
+{%- endmacro %}
