@@ -402,7 +402,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 };
 
 /**
- * @param {{'{'}}{{filter_namespace}}.{{name}}=} opt_filter
+ * @param {!{{filter_namespace}}.{{name}}=} opt_filter
  *
  * @return {!{{namespace}}.{{name}}}
  */
@@ -412,8 +412,8 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 };
 
 /**
- * @param {boolean} minified
- * @param {{'{'}}{{filter_namespace}}.{{name}}=} opt_filter
+ * @param {!boolean} minified
+ * @param {!{{filter_namespace}}.{{name}}=} opt_filter
  *
  * @return {!Object}
  */
@@ -449,7 +449,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
     {% else %}
         if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true, opt_filter.get{{attribute.cc}}());
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
         else if(!goog.isDef(opt_filter))
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
     {% endif %}
@@ -489,7 +489,7 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
     {% else %}
         if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
-            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false, opt_filter.get{{attribute.cc}}());
+            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
         else if(!goog.isDef(opt_filter))
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
     {% endif %}
@@ -511,9 +511,11 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 };
 
 /**
- * @export
- * @param {boolean} minified
- * @param {{'{'}}{{filter_namespace}}.{{name}}{{'=}'}} opt_filter
+ * @final
+ * @param {!boolean} minified
+ * @param {!{{filter_namespace}}.{{name}}=} opt_filter
+ *
+ * @return {!string}
  */
 {{namespace}}.{{name}}.prototype.getJSONString = function(minified, opt_filter) {
     return goog.json.serialize(this.getJSONObject(minified, opt_filter));
