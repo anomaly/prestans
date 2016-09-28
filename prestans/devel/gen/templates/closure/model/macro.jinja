@@ -22,17 +22,17 @@
  * @final
  *
 {% if attribute.blueprint_type == 'boolean' %}
- * @return {boolean}
+ * @return {?boolean}
 {% elif attribute.blueprint_type == 'float' or attribute.blueprint_type == 'integer' %}
  * @return {?number}
 {% elif attribute.blueprint_type == 'string' %}
- * @return {string}
+ * @return {?string}
 {% elif attribute.blueprint_type == 'date' %}
- * @return {goog.date.Date}
+ * @return {?goog.date.Date}
 {% elif attribute.blueprint_type == 'time' %}
- * @return {goog.date.Time}
+ * @return {?goog.date.DateTime}
 {% elif attribute.blueprint_type == 'datetime' %}
- * @return {goog.date.DateTime}
+ * @return {?goog.date.DateTime}
 {% endif %}
  */
 {{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
