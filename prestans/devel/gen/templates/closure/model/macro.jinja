@@ -33,6 +33,8 @@
  * @return {?goog.date.DateTime}
 {% elif attribute.blueprint_type == 'datetime' %}
  * @return {?goog.date.DateTime}
+ {% elif attribute.blueprint_type == 'data_url_file' %}
+ * @return {?string}
 {% endif %}
  */
 {{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
@@ -42,6 +44,12 @@
 {%- endmacro %}
 
 {% macro setMethod(namespace, name, attribute) -%}
+/**
+ * @final
+ * @param {*} value
+ *
+ * @return {!boolean}
+ */
 {{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function(value) {
 {% if attribute.blueprint_type == 'array' %}
     var previousArray_ = this.{{attribute.ccif}}_;
