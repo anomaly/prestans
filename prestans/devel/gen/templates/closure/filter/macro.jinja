@@ -1,0 +1,106 @@
+{% macro attributeDefinition(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model' %}
+    /**
+     * @private
+     * @type {!{{namespace}}.{{attribute.model_template}}}
+     */
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(opt_defaultValue);
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+    /**
+     * @private
+     * @type {!{{namespace}}.{{attribute.element_template}}}
+     */
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(opt_defaultValue);
+{% else %}
+    /**
+     * @private
+     * @type {!boolean}
+     */
+    this.{{attribute.ccif}}_ = opt_defaultValue;
+{% endif %}
+{%- endmacro %}
+
+{% macro enableMethod(namespace, name, attribute) -%}
+/**
+ * @final
+ */
+{{namespace}}.{{name}}.prototype.enable{{attribute.cc}} = function() {
+{% if attribute.blueprint_type == 'model' %}
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(true);
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(true);
+{% else %}
+	this.{{attribute.ccif}}_ = true;
+{% endif %}
+};
+{%- endmacro %}
+
+{% macro disableMethod(namespace, name, attribute) -%}
+/**
+ * @final
+ */
+{{namespace}}.{{name}}.prototype.disable{{attribute.cc}} = function() {
+{% if attribute.blueprint_type == 'model' %}
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(false);
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+    this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.element_template}}(false);
+{% else %}
+	this.{{attribute.ccif}}_ = false;
+{% endif %}
+};
+{%- endmacro %}
+
+{% macro getMethod(namespace, name, attribute) -%}
+/**
+ * @final
+{% if attribute.blueprint_type == 'model' %}
+ * @return {!{{namespace}}.{{attribute.model_template}}}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+ * @return {!{{namespace}}.{{attribute.element_template}}}
+{% else %}
+ * @return {!boolean}
+{% endif %}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_;
+};
+{%- endmacro %}
+
+{% macro setMethod(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model' %}
+/**
+ * @final
+ * @param {!{{namespace}}.{{attribute.model_template}}} {{attribute.ccif}}
+ */
+{{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function({{attribute.ccif}}) {
+    this.{{attribute.ccif}}_ = {{attribute.ccif}};
+};
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+/**
+ * @final
+ * @param {!{{namespace}}.{{attribute.element_template}}} {{attribute.ccif}}
+ */
+{{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function({{attribute.ccif}}) {
+    this.{{attribute.ccif}}_ = {{attribute.ccif}};
+};
+{% endif %}
+{%- endmacro %}
+
+{% macro minifiedAttribute(namespace, name, attribute) -%}
+    {% if attribute.blueprint_type == 'model' %}
+        if(this.{{attribute.ccif}}_ != null && !goog.object.isEmpty(this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete)))
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
+        else if(opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
+    {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+        if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified, opt_complete);
+        else if(this.{{attribute.ccif}}_ instanceof prestans.types.Filter && !opt_complete && this.{{attribute.ccif}}_.anyFieldsEnabled())
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject(minified);
+        else if(opt_complete)
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = false;
+    {% else %}
+        if(this.{{attribute.ccif}}_ || opt_complete)
+           jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_;
+    {% endif %}
+{%- endmacro %}
