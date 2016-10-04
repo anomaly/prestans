@@ -36,12 +36,14 @@ import re
 import prestans.devel.gen
 import prestans.types
 
-def udl_to_cc(text, ignoreFirst=False):
+
+def udl_to_cc(text, ignore_first=False):
     text = text.lower()
     camel_case = re.sub(r"_(.)", lambda pat: pat.group(1).upper(), text)
-    if not ignoreFirst:
+    if not ignore_first:
         camel_case = camel_case[0:1].upper()+camel_case[1:]
     return camel_case
+
 
 class BasicTypeElementTemplate(object):
 
@@ -146,7 +148,7 @@ class BasicTypeElementTemplate(object):
         else:
             return self._maximum
 
-    #string and array
+    # string and array
     @property
     def min_length(self):
         if self._min_length is None:
@@ -166,8 +168,8 @@ class BasicTypeElementTemplate(object):
         if self._format is None:
             return "null"
 
-        format = self._format.replace("\\", "\\\\")
-        return "\"%s\"" % (format)
+        formatted = self._format.replace("\\", "\\\\")
+        return "\"%s\"" % formatted
 
     @property
     def choices(self):
@@ -175,6 +177,7 @@ class BasicTypeElementTemplate(object):
             return "null"
         else:
             return self._choices
+
 
 class AttributeMetaData(object):
 
@@ -194,7 +197,7 @@ class AttributeMetaData(object):
         self._blueprint_type = blueprint['type']
         self._map_name = blueprint['map_name']
 
-        #Basic types
+        # basic types
         if self._blueprint_type == 'string':
             self._required = blueprint['constraints']['required']
             self._min_length = blueprint['constraints']['min_length']
@@ -204,7 +207,6 @@ class AttributeMetaData(object):
             self._format = blueprint['constraints']['format']
             self._trim = blueprint['constraints']['trim']
             self._client_class_name = "String"
-
         elif self._blueprint_type == 'integer':
             self._required = blueprint['constraints']['required']
             self._default = blueprint['constraints']['default']
@@ -241,7 +243,7 @@ class AttributeMetaData(object):
             self._required = blueprint['constraints']['required']
             self._allowed_mime_types = blueprint['constraints']['allowed_mime_types']
             self._client_class_name = "DataURLFile"
-        #Complex types
+        # complex types
         elif self._blueprint_type == 'model':
             self._required = blueprint['constraints']['required']
             self._model_template = blueprint['constraints']['model_template']
@@ -259,8 +261,10 @@ class AttributeMetaData(object):
                 self._element_template = element_template['constraints']['model_template']
             else:
                 self._element_template_is_model = False
-                self._element_template = BasicTypeElementTemplate(blueprint_type=element_template['type'], blueprint=element_template['constraints'])
-
+                self._element_template = BasicTypeElementTemplate(
+                    blueprint_type=element_template['type'],
+                    blueprint=element_template['constraints']
+                )
 
     @property
     def name(self):
@@ -320,7 +324,7 @@ class AttributeMetaData(object):
 
     @property
     def default(self):
-        #dates are check first otherwise string will catch them
+        # dates are checked first otherwise string will catch them
         if self._default == prestans.types.DateTime.CONSTANT.NOW:
             return "prestans.types.DateTime.NOW"
         elif self._default == prestans.types.Date.CONSTANT.TODAY:
@@ -330,7 +334,7 @@ class AttributeMetaData(object):
         elif self._default is None:
             return "null"
         elif type(self._default) == str:
-            return "\"%s\"" % (self._default)
+            return "\"%s\"" % self._default
         elif type(self._default) == bool:
             if self._default:
                 return "true"
@@ -344,8 +348,8 @@ class AttributeMetaData(object):
         if self._format is None:
             return "null"
 
-        format = self._format.replace("\\", "\\\\")
-        return "\"%s\"" % (format)
+        formatted = self._format.replace("\\", "\\\\")
+        return "\"%s\"" % formatted
 
     @property
     def minimum(self):
@@ -368,7 +372,7 @@ class AttributeMetaData(object):
         else:
             return self._choices
 
-    #string and array
+    # string and array
     @property
     def min_length(self):
         if self._min_length is None:
@@ -383,12 +387,12 @@ class AttributeMetaData(object):
         else:
             return self._max_length
 
-    #model
+    # model
     @property
     def model_template(self):
         return self._model_template
 
-    #array
+    # array
     @property
     def element_template(self):
         return self._element_template
@@ -396,6 +400,7 @@ class AttributeMetaData(object):
     @property
     def element_template_is_model(self):
         return self._element_template_is_model
+
 
 class Base(object):
 
@@ -428,23 +433,24 @@ class Base(object):
         elif attribute.blueprint_type == 'model':
             dependency = "%s.%s" % (self._namespace, attribute.model_template)
         else:
-            dependency = "prestans.types.%s" % (attribute.client_class_name)
+            dependency = "prestans.types.%s" % attribute.client_class_name
 
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)
 
-    #used in filters
+    # used in filters
     def add_attribute_string(self, attribute):
         if attribute.blueprint_type == 'model':
-            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
+            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % attribute.ccif
         elif attribute.blueprint_type == 'array' and attribute.element_template_is_model:
-            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % (attribute.ccif)
+            self._attribute_string += "this.%s_.anyFieldsEnabled() || " % attribute.ccif
         else:
-            self._attribute_string += "this.%s_ || " % (attribute.ccif)
+            self._attribute_string += "this.%s_ || " % attribute.ccif
 
     @property
     def attribute_string(self):
         return self._attribute_string[:-4]
+
 
 class Model(Base):
 
@@ -452,7 +458,7 @@ class Model(Base):
     
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
         self._filter_namespace = filter_namespace
-        self._template = self._template_engine.get_template("closure/model.jinja")
+        self._template = self._template_engine.get_template("closure/model/model.jinja")
 
     def run(self):
 
@@ -473,27 +479,37 @@ class Model(Base):
 
                 self.add_model_dependency(attribute)
 
-            #write out template
-            filename = '%s.js' % (model_name)
+            self._dependencies.sort()
+
+            # write out template
+            filename = '%s.js' % model_name
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
             project_namespace = self._namespace.split(".")[0]
 
-            output_file.write(self._template.render(namespace=self._namespace, project=project_namespace, filter_namespace=self._filter_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies))
+            output_file.write(self._template.render(
+                namespace=self._namespace,
+                project=project_namespace,
+                filter_namespace=self._filter_namespace,
+                name=model_name,
+                attributes=attributes,
+                dependencies=self._dependencies
+            ))
             output_file.close()
 
-            print "%-30s -> %s.%s.js" %(model_name, self._namespace, model_name)
+            print ("%-30s -> %s.%s.js" %(model_name, self._namespace, model_name))
 
-        print "\nGenerated %i model(s)" % len(blueprints)
+        print ("\nGenerated %i model(s)" % len(blueprints))
 
         return 0
+
 
 class Filter(Base):
 
     def __init__(self, template_engine, model_file, namespace, output_directory):
 
         Base.__init__(self, template_engine, model_file, namespace, output_directory)
-        self._template = self._template_engine.get_template("closure/filter.jinja")
+        self._template = self._template_engine.get_template("closure/filter/filter.jinja")
 
     def run(self):
 
@@ -515,17 +531,26 @@ class Filter(Base):
                 self.add_filter_dependency(attribute)
                 self.add_attribute_string(attribute)
 
-            #write out template
-            filename = '%s.js' % (model_name)
+            self._dependencies.sort()
+
+            # write out template
+            filename = '%s.js' % model_name
             output_file = open(os.path.join(self._output_directory, filename), 'w+')
 
             project_namespace = self._namespace.split(".")[0]
 
-            output_file.write(self._template.render(namespace=self._namespace, project=project_namespace, name=model_name, attributes=attributes, dependencies=self._dependencies, attribute_string=self.attribute_string))
+            output_file.write(self._template.render(
+                namespace=self._namespace,
+                project=project_namespace,
+                name=model_name,
+                attributes=attributes,
+                dependencies=self._dependencies,
+                attribute_string=self.attribute_string
+            ))
             output_file.close()
 
-            print "%-30s -> %s.%s.js" % (model_name, self._namespace, model_name)
+            print ("%-30s -> %s.%s.js" % (model_name, self._namespace, model_name))
 
-        print "\nGenerated %i filter(s)" % len(blueprints)
+        print ("\nGenerated %i filter(s)" % len(blueprints))
 
         return 0

@@ -1,0 +1,482 @@
+{% macro minifiedAttributeWithJson(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model' %}
+        this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(
+            opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            true,
+            opt_raiseValidateException
+        );
+{% elif attribute.blueprint_type == 'array' %}
+{% if attribute.element_template_is_model %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: {{namespace}}.{{attribute.element_template}},
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            opt_minified: opt_minified,
+            opt_opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                opt_opt_maxLength: {{attribute.element_template.max_length}},
+                opt_minLength: {{attribute.element_template.min_length}},
+                format: {{attribute.element_template.format}},
+                choices: {{attribute.element_template.choices}},
+                trim: {{attribute.element_template.trim}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% endif %}
+{% elif attribute.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.String({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}},
+            format: {{attribute.format}},
+            choices: {{attribute.choices}},
+            trim: {{attribute.trim}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Float({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'datetime' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            timezone: {{attribute.timezone}},
+            utc: {{attribute.utc}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'date' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Date({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'time' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Time({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'data_url_file' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({
+            value: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]],
+            required: {{attribute.required}},
+            allowed_mime_types: {{attribute.allowed_mime_types}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% endif %}
+{%- endmacro %}
+
+{% macro attributeWithJson(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model' %}
+        this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(
+            opt_json["{{attribute.name}}"],
+            false,
+            opt_raiseValidateException
+        );
+{% elif attribute.blueprint_type == 'array' %}
+{% if attribute.element_template_is_model %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: {{namespace}}.{{attribute.element_template}},
+            opt_json: opt_json["{{attribute.name}}"],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                opt_maxLength: {{attribute.element_template.max_length}},
+                opt_minLength: {{attribute.element_template.min_length}},
+                format: {{attribute.element_template.format}},
+                choices: {{attribute.element_template.choices}},
+                trim: {{attribute.element_template.trim}}
+            }),
+            opt_json: opt_json["{{attribute.name}}"],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_json: opt_json["{{attribute.name}}"],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_json: opt_json["{{attribute.name}}"],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}}
+            }),
+            opt_json: opt_json["{{attribute.name}}"],
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% endif %}
+{% elif attribute.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.String({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}},
+            format: {{attribute.format}},
+            choices: {{attribute.choices}},
+            trim: {{attribute.trim}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Float({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'datetime' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            timezone: {{attribute.timezone}},
+            utc: {{attribute.utc}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'date' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Date({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'time' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Time({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'data_url_file' %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({
+            value: opt_json["{{attribute.name}}"],
+            required: {{attribute.required}},
+            allowed_mime_types: {{attribute.allowed_mime_types}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% endif %}
+{%- endmacro %}
+
+{% macro attribute(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model' %}
+        this.{{attribute.ccif}}_ = new {{namespace}}.{{attribute.model_template}}(null, false, opt_raiseValidateException);
+{% elif attribute.blueprint_type == 'array' %}
+{% if attribute.element_template_is_model %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: {{namespace}}.{{attribute.element_template}},
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'string' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.String({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                opt_maxLength: {{attribute.element_template.max_length}},
+                opt_minLength: {{attribute.element_template.min_length}},
+                format: {{attribute.element_template.format}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'integer' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Integer({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'float' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Float({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                maximum: {{attribute.element_template.maximum}},
+                minimum: {{attribute.element_template.minimum}},
+                choices: {{attribute.element_template.choices}}
+            }),
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'boolean' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Boolean({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}}
+            }),
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}}
+        }, opt_raiseValidateException);
+{% endif %}
+{% elif attribute.blueprint_type == "string" %}
+        this.{{attribute.ccif}}_ = new prestans.types.String({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_maxLength: {{attribute.max_length}},
+            opt_minLength: {{attribute.min_length}},
+            format: {{attribute.format}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "boolean" %}
+        this.{{attribute.ccif}}_ = new prestans.types.Boolean({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "integer" %}
+        this.{{attribute.ccif}}_ = new prestans.types.Integer({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "float" %}
+        this.{{attribute.ccif}}_ = new prestans.types.Float({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            maximum: {{attribute.maximum}},
+            minimum: {{attribute.minimum}},
+            choices: {{attribute.choices}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "datetime" %}
+        this.{{attribute.ccif}}_ = new prestans.types.DateTime({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            timezone: {{attribute.timezone}},
+            utc: {{attribute.utc}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "date" %}
+        this.{{attribute.ccif}}_ = new prestans.types.Date({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "time" %}
+        this.{{attribute.ccif}}_ = new prestans.types.Time({
+            required: {{attribute.required}},
+            defaultValue: {{attribute.default}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% elif attribute.blueprint_type == "data_url_file" %}
+        this.{{attribute.ccif}}_ = new prestans.types.DataURLFile({
+            required: {{attribute.required}},
+            allowed_mime_types: {{attribute.allowed_mime_types}},
+            opt_name: "{{name}}.{{attribute.ccif}}"
+        }, opt_raiseValidateException);
+{% endif %}
+{%- endmacro %}
+
+{% macro getMethod(namespace, name, attribute) -%}
+{% if attribute.blueprint_type == 'model'  %}
+/**
+ * @final
+ *
+ * @return {!{{namespace}}.{{attribute.model_template}}}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_;
+};
+{% elif attribute.blueprint_type == 'array' %}
+/**
+ * @final
+ *
+ * @return {!prestans.types.Array}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_;
+};
+{% else %}
+/**
+ * @final
+ *
+{% if attribute.blueprint_type == 'boolean' %}
+ * @return {?boolean}
+{% elif attribute.blueprint_type == 'float' or attribute.blueprint_type == 'integer' %}
+ * @return {?number}
+{% elif attribute.blueprint_type == 'string' %}
+ * @return {?string}
+{% elif attribute.blueprint_type == 'date' %}
+ * @return {?goog.date.Date}
+{% elif attribute.blueprint_type == 'time' %}
+ * @return {?goog.date.DateTime}
+{% elif attribute.blueprint_type == 'datetime' %}
+ * @return {?goog.date.DateTime}
+ {% elif attribute.blueprint_type == 'data_url_file' %}
+ * @return {?string}
+{% endif %}
+ */
+{{namespace}}.{{name}}.prototype.get{{attribute.cc}} = function() {
+    return this.{{attribute.ccif}}_.getValue();
+ };
+{% endif %}
+{%- endmacro %}
+
+{% macro setMethod(namespace, name, attribute) -%}
+/**
+ * @final
+ * @param {*} value
+ *
+ * @return {!boolean}
+ */
+{{namespace}}.{{name}}.prototype.set{{attribute.cc}} = function(value) {
+{% if attribute.blueprint_type == 'array' %}
+    var previousArray_ = this.{{attribute.ccif}}_;
+{% if attribute.element_template_is_model %}
+    if(value instanceof prestans.types.Array && value.getElementTemplate() == {{namespace}}.{{attribute.element_template}}) {
+{% else %}
+    if(value instanceof prestans.types.Array && value.getElementTemplate() instanceof prestans.types.{{attribute.element_template.client_class_name}}) {
+{% endif %}
+        this.{{attribute.ccif}}_ = value;
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousArray_, this.{{attribute.ccif}}_);
+        return true;
+    }
+    else
+        return false;
+{% elif attribute.blueprint_type == 'model' %}
+    var previousModel_ = this.{{attribute.ccif}}_;
+    if(value instanceof {{namespace}}.{{attribute.model_template}}) {
+        this.{{attribute.ccif}}_ = value;
+        this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousModel_, this.{{attribute.ccif}}_);
+        return true;
+    }
+    else
+        return false;
+{% else %}
+    var previousValue_ = this.{{attribute.ccif}}_.getValue();
+    var success_ = this.{{attribute.ccif}}_.setValue(value);
+    this.dispatchAttributeChangedEvent_("{{attribute.ccif}}", previousValue_, this.{{attribute.ccif}}_.getValue());
+    return success_;
+{% endif %}
+};
+{%- endmacro %}
