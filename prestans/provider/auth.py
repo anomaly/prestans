@@ -40,6 +40,7 @@ class Base(object):
 
     def __init__(self):
         self._debug = False
+        self._request = None
 
     @property
     def debug(self):
@@ -50,6 +51,16 @@ class Base(object):
     def debug(self, value):
         """Setter for debug property"""
         self._debug = value
+
+    @property
+    def request(self):
+        """Getter for request property"""
+        return self._request
+
+    @request.setter
+    def request(self, value):
+        """Setter for request property"""
+        self._request = value
 
     def current_user_has_role(self, role_name):
         """Override this method to check if the given role is allowed access"""
