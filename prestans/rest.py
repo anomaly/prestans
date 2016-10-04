@@ -43,6 +43,9 @@ import prestans.exception
 import prestans.serializer
 import prestans.deserializer
 
+import sys
+sys.path.append("devel/pycharm-debug.egg")
+
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
@@ -1011,9 +1014,9 @@ class BlueprintHandler(RequestHandler):
             handler_blueprint['supported_methods'] = handler_class(self._args, self.request,\
                 self.response, self.logger, self.debug).blueprint()
 
-            # Make a new group per module if one doesnt' exist
             if not handler_class.__module__ in blueprint_groups:
                 blueprint_groups[handler_class.__module__] = []
+            # Make a new group per module if one doesnt' exist
 
             blueprint_groups[handler_class.__module__].append(handler_blueprint)
 
@@ -1060,6 +1063,7 @@ class RequestRouter(object):
     def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None,\
         default_deserializer=None, charset="utf-8", application_name="prestans",\
         logger=None, debug=False, description=None):
+
 
         self._application_name = application_name
         self._debug = debug
@@ -1172,7 +1176,9 @@ class RequestRouter(object):
             #: Check if the requested URL has a valid registered handler
             for regexp, handler_class in route_map:
 
-                match = regexp.match(request.path)
+                # if not 'PATH_INFO' in environ.keys():
+
+                match = regexp.match(environ.get("PATH_INFO", "")) # if absent, can assume to be empty string # https://www.python.org/dev/peps/pep-3333/#environ-variables
 
                 #: If we've found a match; ensure its a handler subclass and return it's callable
                 if match:

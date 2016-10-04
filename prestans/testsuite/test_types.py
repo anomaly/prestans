@@ -321,6 +321,18 @@ class ArrayTypeUnitTest(unittest.TestCase):
         self._integer_array = prestans.types.Array(
             element_template=prestans.types.Integer()
         )
+        self._boolean_array = prestans.types.Array(
+            element_template=prestans.types.Boolean()
+        )
+        self._float_array = prestans.types.Array(
+            element_template=prestans.types.Float()
+        )
+
+    def test_array_is_scalar_is_true_for_scalar_element_templates(self):
+        self.assertTrue(self._integer_array.is_scalar)
+        self.assertTrue(self._string_array.is_scalar)
+        self.assertTrue(self._boolean_array.is_scalar)
+        self.assertTrue(self._float_array.is_scalar)
 
     def test_default(self):
         pass

@@ -179,7 +179,8 @@ class AttributeFilter(object):
         if not isinstance(model_instance, prestans.types.DataCollection):
             raise TypeError("model_instance must be a sublcass of \
                 prestans.types.DataCollection, %s given" % (model_instance.__class__.__name__))
-
+        elif isinstance(model_instance, prestans.types.Array) and model_instance.is_scalar:
+            return AttributeFilter(is_array_scalar=True)
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
         #: kwargs support
@@ -191,7 +192,7 @@ class AttributeFilter(object):
 
         return attribute_filter_instance
 
-    def __init__(self, from_dictionary=None, template_model=None, **kwargs):
+    def __init__(self, from_dictionary=None, template_model=None, is_array_scalar=False, **kwargs):
         """
         Creates an attribute filter object, optionally populates from a
         dictionary of booleans
@@ -673,4 +674,3 @@ class Config(object):
     @property
     def delete(self):
         return self._configs[prestans.http.VERB.DELETE]
-     
