@@ -32,40 +32,39 @@
 
 __all__ = ['Config', 'auth', 'cache', 'throttle']
 
+
 class Config(object):
-	
-	def __init__(self, authentication=None, throttle=None, cache=None):
-		self._authentication = authentication
-		self._throttle = throttle
-		self._cache = cache
 
-	def blueprint(self):
-		provider_blueprint = dict()
+    def __init__(self, authentication=None, throttle=None, cache=None):
+        self._authentication = authentication
+        self._throttle = throttle
+        self._cache = cache
 
-		return provider_blueprint
+    def blueprint(self):
+        provider_blueprint = dict()
 
-	@property
-	def authentication(self):
-		return self._authentication
+        return provider_blueprint
 
-	@authentication.setter
-	def authentication(self, value):
-		self._authentication = value
+    @property
+    def authentication(self):
+        return self._authentication
 
-	@property
-	def throttle(self):
-		return self._throttle
+    @authentication.setter
+    def authentication(self, value):
+        self._authentication = value
 
-	@throttle.setter
-	def throttle(self, value):
-		self._throttle = value
+    @property
+    def throttle(self):
+        return self._throttle
 
-	@property
-	def cache(self):
-		return self._cache
+    @throttle.setter
+    def throttle(self, value):
+        self._throttle = value
 
-	@cache.setter
-	def cache(self, value):
-		self._cache = value
+    @property
+    def cache(self):
+        return self._cache
 
-	
+    @cache.setter
+    def cache(self, value):
+        self._cache = value

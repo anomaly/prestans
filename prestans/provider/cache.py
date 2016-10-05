@@ -30,6 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+
 class Base(object):
 
     def __init__(self):

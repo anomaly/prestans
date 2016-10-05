@@ -36,6 +36,7 @@ import unittest
 import prestans.provider.auth
 import prestans.rest
 
+
 class BaseUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -51,7 +52,7 @@ class BaseUnitTest(unittest.TestCase):
         self.assertRaises(NotImplementedError, self.auth.current_user_has_role, "Admin")
 
     def test_is_authenticated_user(self):
-        self.assertRaises(NotImplementedError, self.auth.is_authenticated_user, None)
+        self.assertRaises(NotImplementedError, self.auth.is_authenticated_user)
 
     def test_is_authorized_user(self):
         self.assertRaises(NotImplementedError, self.auth.is_authorized_user, None)
@@ -62,30 +63,36 @@ class BaseUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class AdminRoleProvider(prestans.provider.auth.Base):
     
     def current_user_has_role(self, role_name):
         return role_name == "Admin"
 
+
 class AuthenticatedProvider(prestans.provider.auth.Base):
 
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self):
         return True
+
 
 class UnauthenticatedProvider(prestans.provider.auth.Base):
 
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self):
         return False
+
 
 class AuthorizedProvider(prestans.provider.auth.Base):
 
-    def is_authorized_user(self, handler_reference):
+    def is_authorized_user(self, config):
         return True
+
 
 class UnauthorizedProvider(prestans.provider.auth.Base):
 
-    def is_authorized_user(self, handler_reference):
+    def is_authorized_user(self, config):
         return False
+
 
 class CustomUnitTest(unittest.TestCase):
 
@@ -107,8 +114,8 @@ class CustomUnitTest(unittest.TestCase):
         self.assertEqual(self.admin_role.current_user_has_role("Manager"), False)
 
     def test_is_authenticated_user(self):
-        self.assertEqual(self.authenticated.is_authenticated_user(None), True)
-        self.assertEqual(self.unauthenticated.is_authenticated_user(None), False)
+        self.assertEqual(self.authenticated.is_authenticated_user(), True)
+        self.assertEqual(self.unauthenticated.is_authenticated_user(), False)
 
     def test_is_authorized_user(self):
         self.assertEqual(self.authorized.is_authorized_user(None), True)
@@ -117,24 +124,28 @@ class CustomUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
     
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self):
         return True
 
     def current_user_has_role(self, role_name):
         return role_name == "Admin"
 
+
 class UnauthenticatedHandlerProvider(prestans.provider.auth.Base):
     
-    def is_authenticated_user(self, handler_reference):
+    def is_authenticated_user(self):
         return False
+
 
 class HandlerWithoutProvider(prestans.rest.RequestHandler):
 
     @prestans.provider.auth.login_required
     def get(self):
         pass
+
 
 class AuthenticatedHandler(prestans.rest.RequestHandler):
     
@@ -154,6 +165,7 @@ class AuthenticatedHandler(prestans.rest.RequestHandler):
     def put(self):
         self.response.status = prestans.http.STATUS.NO_CONTENT
 
+
 class UnauthenticatedHandler(prestans.rest.RequestHandler):
     
     __provider_config__ = prestans.provider.Config(
@@ -164,8 +176,10 @@ class UnauthenticatedHandler(prestans.rest.RequestHandler):
     def get(self):
         self.response.status = prestans.http.STATUS.NO_CONTENT
 
+
 def start_response(status, headers):
     pass
+
 
 class HandlerUnitTest(unittest.TestCase):
 

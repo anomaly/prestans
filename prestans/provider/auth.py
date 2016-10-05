@@ -34,6 +34,7 @@ from functools import wraps
 
 import prestans.exception
 
+
 class Base(object):
     """Base class for an auth provider, this should be overridden to suit
     each application."""
@@ -78,6 +79,7 @@ class Base(object):
         """Override this method to provide reference to logged in user"""
         raise NotImplementedError
 
+
 def login_required(http_method_handler):
     """
     provides a decorator for RESTRequestHandler methods to check for authenticated users
@@ -114,6 +116,7 @@ def login_required(http_method_handler):
         http_method_handler(self, *args)
 
     return secure_http_method_handler
+
 
 def role_required(role_name=None):
     """
@@ -155,6 +158,7 @@ def role_required(role_name=None):
         return wraps(http_method_handler)(secure_http_method_handler)
 
     return _role_required
+
 
 def access_required(config=None):
     """
