@@ -50,6 +50,7 @@ class BasicTypeElementTemplate(object):
     def __init__(self, blueprint_type, blueprint):
         
         self._blueprint_type = blueprint_type
+
         self._required = None
         self._default = None
         self._minimum = None
@@ -59,34 +60,54 @@ class BasicTypeElementTemplate(object):
         self._choices = None
         self._format = None
         self._trim = None
+        self._allowed_mime_types = None
 
-        if self._blueprint_type == "string":
-            self._required = blueprint['required']
-            self._min_length = blueprint['min_length']
-            self._max_length = blueprint['max_length']
-            self._default = blueprint['default']
-            self._choices = blueprint['choices']
-            self._format = blueprint['format']
-            self._trim = blueprint['trim']
-            self._client_class_name = "String"
-        elif self._blueprint_type == 'integer':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
-            self._minimum = blueprint['minimum']
-            self._maximum = blueprint['maximum']
-            self._choices = blueprint['choices']
-            self._client_class_name = "Integer"
-        elif self._blueprint_type == 'float':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
-            self._minimum = blueprint['minimum']
-            self._maximum = blueprint['maximum']
-            self._choices = blueprint['choices']
-            self._client_class_name = "Float"
-        elif self._blueprint_type == 'boolean':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
+        if self._blueprint_type == "boolean":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
             self._client_class_name = "Boolean"
+        elif self._blueprint_type == "data_url_file":
+            self._required = blueprint["required"]
+            self._allowed_mime_types = blueprint["allowed_mime_types"]
+            self._client_class_name = "DataURLFile"
+        elif self._blueprint_type == "date":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
+            self._format = blueprint["format"]
+            self._client_class_name = "Date"
+        elif self._blueprint_type == "datetime":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
+            self._format = blueprint["format"]
+            self._client_class_name = "DateTime"
+        elif self._blueprint_type == "float":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
+            self._minimum = blueprint["minimum"]
+            self._maximum = blueprint["maximum"]
+            self._choices = blueprint["choices"]
+            self._client_class_name = "Float"
+        elif self._blueprint_type == "integer":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
+            self._minimum = blueprint["minimum"]
+            self._maximum = blueprint["maximum"]
+            self._choices = blueprint["choices"]
+            self._client_class_name = "Integer"
+        elif self._blueprint_type == "string":
+            self._required = blueprint["required"]
+            self._min_length = blueprint["min_length"]
+            self._max_length = blueprint["max_length"]
+            self._default = blueprint["default"]
+            self._choices = blueprint["choices"]
+            self._format = blueprint["format"]
+            self._trim = blueprint["trim"]
+            self._client_class_name = "String"
+        elif self._blueprint_type == "time":
+            self._required = blueprint["required"]
+            self._default = blueprint["default"]
+            self._format = blueprint["format"]
+            self._client_class_name = "Time"
 
         if self._required is None:
             self._required = True
@@ -177,6 +198,13 @@ class BasicTypeElementTemplate(object):
             return "null"
         else:
             return self._choices
+
+    @property
+    def allowed_mime_types(self):
+        if self._allowed_mime_types is None:
+            return "null"
+        else:
+            return self._allowed_mime_types
 
 
 class AttributeMetaData(object):

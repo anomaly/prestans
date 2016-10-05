@@ -65,6 +65,39 @@
             opt_maxLength: {{attribute.max_length}},
             opt_minLength: {{attribute.min_length}}
         }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'data_url_file' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.DataURLFile({
+                required: {{attribute.element_template.required}},
+                allowedMimeTypes: {{attribute.element_template.allowed_mime_types}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]]
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'date' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Date({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]]
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'datetime' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.DateTime({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]]
+        }, opt_raiseValidateException);
+{% elif attribute.element_template.blueprint_type == 'time' %}
+        this.{{attribute.ccif}}_ = new prestans.types.Array({
+            elementTemplate: new prestans.types.Time({
+                required: {{attribute.element_template.required}},
+                defaultValue: {{attribute.element_template.default}},
+                format: {{attribute.element_template.format}}
+            }),
+            opt_json: opt_json[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]]
+        }, opt_raiseValidateException);
 {% endif %}
 {% elif attribute.blueprint_type == 'string' %}
         this.{{attribute.ccif}}_ = new prestans.types.String({
