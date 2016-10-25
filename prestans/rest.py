@@ -464,8 +464,13 @@ class Response(webob.Response):
         #: Ensure what we are able to serialize is serializable
         if not isinstance(self._app_iter, prestans.types.DataCollection) and\
          not isinstance(self._app_iter, prestans.types.BinaryResponse):
-            raise TypeError("handler returns content of type %s; not a \
-                prestans.types.DataCollection subclass" % self._app_iter.__name__)
+
+            if isinstance(self._app_iter, list):
+                type = "list"
+            else:
+                type = self._app_iter.__name__
+
+            raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % type)
 
         if isinstance(self._app_iter, prestans.types.DataCollection):
 
