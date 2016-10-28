@@ -43,9 +43,6 @@ import prestans.exception
 import prestans.serializer
 import prestans.deserializer
 
-import sys
-sys.path.append("devel/pycharm-debug.egg")
-
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
@@ -496,7 +493,7 @@ class Response(webob.Response):
                         model_attribute_filter.conforms_to_template_filter(self.attribute_filter)
                     except prestans.exception.AttributeFilterDiffers as exception:
                         exception.request = self.request
-                        self.logger.warn("%s" %  exp)
+                        self.logger.warn("%s" %  exception)
 
             #: Body should be of type DataCollection try; attempt calling
             #: as_seriable with available attribute_filter
