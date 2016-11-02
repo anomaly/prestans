@@ -531,10 +531,10 @@ class Response(webob.Response):
             #: Add content disposition header
             if self._app_iter.as_attachment:
                 self.headers.add('Content-Disposition', \
-                    "attachment; filename=%s" % self._app_iter.file_name)
+                    "attachment; filename=\"%s\"" % self._app_iter.file_name)
             else:
                 self.headers.add('Content-Disposition', \
-                    "inline; filename=%s" % self._app_iter.file_name)
+                    "inline; filename=\"%s\"" % self._app_iter.file_name)
 
             #: Write out response
             self.content_length = self._app_iter.content_length
