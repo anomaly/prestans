@@ -1,1 +1,2 @@
-include prestans/devel/gen/templates/closure/*
+include prestans/devel/gen/templates/closure/filter/*
+include prestans/devel/gen/templates/closure/model/*

@@ -32,5 +32,5 @@
 
 __all__ = ['http', 'types', 'rest', 'parser', 'serializer', 'deserializer', 'provider', 'ext', 'exception']
 
-__version_info__ = (2, 1, 1)
+__version_info__ = (2, 1, 2)
 __version__ = '.'.join(str(v) for v in __version_info__)
