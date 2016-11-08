@@ -37,9 +37,7 @@ goog.require('{{dependency}}');
 {% for attribute in attributes %}{{model.minifiedAttributeWithJson(namespace, name, attribute)}}{% endfor %}
     }
     else if(goog.isDefAndNotNull(opt_json)) {
-{% for attribute in attributes %}
 {% for attribute in attributes %}{{model.attributeWithJson(namespace, name, attribute)}}{% endfor %}
-{% endfor %}
     }
     else {
 {% for attribute in attributes %}{{model.attribute(namespace, name, attribute)}}{% endfor %}
