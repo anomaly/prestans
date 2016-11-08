@@ -78,5 +78,8 @@ setup(name='prestans',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=['WebOb==1.4',],
+    extras_require={
+        "devel": ["Jinja2"]
+    },
     include_package_data = True
 )
