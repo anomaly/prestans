@@ -30,7 +30,6 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import inspect
 
 class ModelAdapter(object):
     
@@ -49,6 +48,7 @@ class ModelAdapter(object):
     def adapt_persistent_to_rest(self, persistent_object):
         raise AssertionError("adapt_persistent_to_rest direct use not allowed")
 
+
 class AdapterRegistryManager:
     """
     AdapterRegistryManager keeps track of rest to persistent model maps
@@ -64,11 +64,19 @@ class AdapterRegistryManager:
     def register_adapter(self, model_adapter):
         
         if not isinstance(model_adapter, ModelAdapter):
-            raise TypeError("Registry recd instance of type %s is not a ModelAdapter" 
-                % model_adapter.__class__.__name__)
+            raise TypeError("Registry recd instance of type %s is not a ModelAdapter" % (
+                                model_adapter.__class__.__name__
+                           ))
         
-        rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
-        persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
+        rest_class_signature = "%s.%s" % (
+            model_adapter.rest_model_class.__module__,
+            model_adapter.rest_model_class.__name__
+        )
+
+        persistent_class_signature = "%s.%s" % (
+            model_adapter.persistent_model_class.__module__,
+            model_adapter.persistent_model_class.__name__
+        )
         
         #:
         #: Store references to how a rest model maps to a persistent model and vice versa 
@@ -80,7 +88,7 @@ class AdapterRegistryManager:
         
         class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
         
-        if not self._persistent_map.has_key(class_signature) :
+        if class_signature not in self._persistent_map:
             raise TypeError("No registered Data Adapter for class %s" % class_signature)
 
         return self._persistent_map[class_signature]
@@ -89,13 +97,13 @@ class AdapterRegistryManager:
         
         class_signature = rest_model.__class__.__module__ + "." + rest_model.__class__.__name__
         
-        if not self._rest_map.has_key(class_signature):
+        if class_signature not in self._rest_map:
             raise TypeError("No registered Data Adapter for class %s" % class_signature)
 
         return self._rest_map[class_signature]
 
 
 #:
-#: Singleton instantiated if adapeter package is imported
+#: Singleton instantiated if adapter package is imported
 #:
 registry = AdapterRegistryManager()
