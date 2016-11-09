@@ -122,7 +122,14 @@ class ModelAdapter(adapters.ModelAdapter):
 
             rest_attr = getattr(self.rest_model_class, attribute_key)
 
-            if not hasattr(persistent_object, attribute_key):
+            # done to avoid hasattr masking exceptions in properties
+            has_attr = True
+            try:
+                getattr(persistent_object, attribute_key)
+            except AttributeError as exp:
+                has_attr = False
+
+            if not has_attr:
                 # Don't bother processing if the persistent model doesn't have this attribute
 
                 if isinstance(rest_attr, prestans.types.Model):
