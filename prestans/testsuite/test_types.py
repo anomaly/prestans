@@ -35,6 +35,7 @@ import unittest
 import prestans.types
 import prestans.exception
 
+
 class StringTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -91,6 +92,7 @@ class StringTypeUnitTest(unittest.TestCase):
 
     def tearDown(self):
         pass
+
 
 class IntegerTypeUnitTest(unittest.TestCase):
 
@@ -226,22 +228,33 @@ class FloatTypeUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class BooleanTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
-        
-        self._boolean = prestans.types.Boolean(
-            default=True,
-            )
+        self.types = prestans.types.Boolean()
+
+        self.required = prestans.types.Boolean(required=True)
+        self.not_required = prestans.types.Boolean(required=False)
+
+        self.default_true = prestans.types.Boolean(default=True)
+        self.default_false = prestans.types.Boolean(default=False)
+
+    def test_types(self):
+        self.types.validate("string")
+
+    def test_required(self):
+        self.assertRaises(prestans.exception.RequiredAttributeError, self.required.validate, None)
 
     def test_default(self):
-        pass
-
-    def test_choices(self):
-        pass
+        self.assertEqual(self.default_true.validate(None), True)
+        self.assertEqual(self.default_true.validate(False), False)
+        self.assertEqual(self.default_false.validate(None), False)
+        self.assertEqual(self.default_false.validate(True), True)
 
     def tearDown(self):
         pass
+
 
 class DataURLFileTypeUnitTest(unittest.TestCase):
 
@@ -278,6 +291,7 @@ class DateTimeTypeUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class DateTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -295,6 +309,7 @@ class DateTypeUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class TimeTypeUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -311,6 +326,7 @@ class TimeTypeUnitTest(unittest.TestCase):
 
     def tearDown(self):
         pass
+
 
 class ArrayTypeUnitTest(unittest.TestCase):
 
