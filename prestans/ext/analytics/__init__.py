@@ -3,7 +3,7 @@
 #  prestans, A WSGI compliant REST micro-framework
 #  http://prestans.org
 #
-#  Copyright (c) 2015, Anomaly Software Pty Ltd.
+#  Copyright (c) 2017, Anomaly Software Pty Ltd.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
