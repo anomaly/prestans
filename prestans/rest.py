@@ -109,8 +109,7 @@ class Request(webob.Request):
                 self._selected_deserializer = deserializer
                 return
 
-        raise prestans.exception.UnsupportedContentTypeError(mime_type, \
-            self.supported_mime_types_str)
+        raise prestans.exception.UnsupportedContentTypeError(mime_type, self.supported_mime_types_str)
 
     @property
     def attribute_filter(self):
@@ -171,9 +170,8 @@ class Request(webob.Request):
         #: Parse the body using the deserializer
         unserialized_body = self.selected_deserializer.loads(self.body)
 
-        #: Parse the body using the remplate and attribute_filter
-        self._parsed_body = value.validate(unserialized_body, \
-            self.attribute_filter, self.is_minified)
+        #: Parse the body using the template and attribute_filter
+        self._parsed_body = value.validate(unserialized_body, self.attribute_filter, self.is_minified)
 
     def register_deserializers(self, deserializers):
 
@@ -205,11 +203,13 @@ class Request(webob.Request):
         attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
         #: Construct an AttributeFilter
-        attribute_filter = prestans.parser.AttributeFilter(\
-            from_dictionary=attribute_list_dictionary, template_model=template_model)
+        attribute_filter = prestans.parser.AttributeFilter(
+            from_dictionary=attribute_list_dictionary,
+            template_model=template_model
+        )
 
         #: Check template? Do this even through we might have template_model
-        #: incase users have made a custom filter
+        #: in case users have made a custom filter
         evaluated_filter = attribute_filter.conforms_to_template_filter(template_filter)
 
         return evaluated_filter
@@ -226,8 +226,8 @@ class Request(webob.Request):
 class Response(webob.Response):
     """
     Response is the writable HTTP response. It inherits and leverages
-    from webob.Response to do the heavy lifiting of HTTP Responses. It adds to
-    weob.Response prestans customisations.
+    from webob.Response to do the heavy lifting of HTTP Responses. It adds to
+    webob.Response prestans customisations.
 
     Overrides content_type property to use prestans' serializers with the set body
     """
@@ -305,15 +305,14 @@ class Response(webob.Response):
     @template.setter
     def template(self, value):
 
-        if value is not None and (not isinstance(value, prestans.types.DataCollection) \
-            and not isinstance(value, prestans.types.BinaryResponse)):
-            raise TypeError("template in response must be of type \
-                prestans.types.DataCollection or subclass")
+        if value is not None and (not isinstance(value, prestans.types.DataCollection) and
+           not isinstance(value, prestans.types.BinaryResponse)):
+            raise TypeError("template in response must be of type prestans.types.DataCollection or subclass")
 
         self._template = value
 
     #:
-    #: Attribute filter rsetup
+    #: Attribute filter setup
     #:
 
     @property
@@ -330,7 +329,7 @@ class Response(webob.Response):
         self._attribute_filter = value
 
     #:
-    #: content_type; overrides webob.Resposne line 606
+    #: content_type; overrides webob.Response line 606
     #:
 
     def _content_type__get(self):
@@ -350,10 +349,8 @@ class Response(webob.Response):
     def _content_type__set(self, value):
 
         #: Check to see if response can support the requested mime type
-        if not isinstance(self._app_iter, prestans.types.BinaryResponse) \
-        and value not in self.supported_mime_types:
-            raise prestans.exception.UnsupportedVocabularyError(value, \
-                self.supported_mime_types_str)
+        if not isinstance(self._app_iter, prestans.types.BinaryResponse) and value not in self.supported_mime_types:
+            raise prestans.exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
 
         #: Keep a reference to the selected serializer
         if not isinstance(self._app_iter, prestans.types.BinaryResponse):
@@ -372,8 +369,12 @@ class Response(webob.Response):
     def _content_type__del(self):
         self.headers.pop('Content-Type', None)
 
-    content_type = property(_content_type__get, _content_type__set,
-                            _content_type__del, doc=_content_type__get.__doc__)
+    content_type = property(
+        _content_type__get,
+        _content_type__set,
+        _content_type__del,
+        doc=_content_type__get.__doc__
+    )
 
 
     #:
@@ -395,7 +396,6 @@ class Response(webob.Response):
             return []
 
         return self._app_iter
-
 
     def _body__set(self, value):
 
@@ -650,17 +650,22 @@ class ErrorResponse(webob.Response):
 
     def __call__(self, environ, start_response):
 
-        error_dict = dict()
+        # we have received a custom error response model, use it instead
+        if isinstance(self._exception, prestans.exception.ResponseException) and self._exception.response_model:
+            stringified_body = self._serializer.dumps(self._exception.response_model.as_serializable())
+        # pack into default format for error response
+        else:
+            error_dict = dict()
 
-        error_dict['code'] = self.status_int
-        error_dict['message'] = self._message
-        error_dict['trace'] = self._stack_trace
+            error_dict['code'] = self.status_int
+            error_dict['message'] = self._message
+            error_dict['trace'] = self._stack_trace
 
-        stringified_body = self._serializer.dumps(error_dict)
+            stringified_body = self._serializer.dumps(error_dict)
+
         self.content_length = len(stringified_body)
 
         start_response(self.status, self.headerlist)
-
         return [stringified_body]
 
     def __str__(self):
@@ -670,6 +675,7 @@ class ErrorResponse(webob.Response):
 #:
 #: Base Request handler; all handlers must subclass this
 #:
+
 
 class RequestHandler(object):
     """
@@ -720,12 +726,14 @@ class RequestHandler(object):
 
         handler_blueprint = dict()
 
-        signature_map = [prestans.http.VERB.GET, \
-        prestans.http.VERB.HEAD, \
-        prestans.http.VERB.POST, \
-        prestans.http.VERB.PUT, \
-        prestans.http.VERB.PATCH, \
-        prestans.http.VERB.DELETE]
+        signature_map = [
+            prestans.http.VERB.GET,
+            prestans.http.VERB.HEAD,
+            prestans.http.VERB.POST,
+            prestans.http.VERB.PUT,
+            prestans.http.VERB.PATCH,
+            prestans.http.VERB.DELETE
+        ]
 
         #: Provider configuration
         provider_blueprint = None
@@ -777,24 +785,26 @@ class RequestHandler(object):
         #:
 
         #: Intersection of requested types and supported types tells us if we
-        #: can infact respond in one of the requess formats
-        best_accept_match = self.request.accept.best_match(self.response.supported_mime_types,\
-            default_match=self.response.default_serializer.content_type())
+        #: can in fact respond in one of the request formats
+        best_accept_match = self.request.accept.best_match(
+            self.response.supported_mime_types,
+            default_match=self.response.default_serializer.content_type()
+        )
 
         if best_accept_match is None:
             self.logger.error("unsupported mime type in request; accept header reads %s" %\
                 self.request.accept)
-            raise prestans.exception.UnsupportedVocabularyError(self.request.accept,\
-                self.response.supported_mime_types_str)
+            raise prestans.exception.UnsupportedVocabularyError(
+                self.request.accept,
+                self.response.supported_mime_types_str
+            )
 
         #: If content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = best_accept_match
 
     def __call__(self, environ, start_response):
 
-        self.logger.info("handler %s.%s; callable execution start"\
-            % (self.__module__, self.__class__.__name__))
-
+        self.logger.info("handler %s.%s; callable execution start" % (self.__module__, self.__class__.__name__))
         self.logger.info("setting default response to %s" % self.request.accept)
 
         try:
@@ -841,9 +851,10 @@ class RequestHandler(object):
                         rewrite_template_model = self.response.template
 
                 #: Response attribute filter
-                self.response.attribute_filter = self.request.\
-                get_response_attribute_filter(response_attr_filter_template, \
-                    rewrite_template_model)
+                self.response.attribute_filter = self.request.get_response_attribute_filter(
+                    response_attr_filter_template,
+                    rewrite_template_model
+                )
 
                 #: If the header is omitted then we ensure the response has a default template
                 #: at this point we can assume that we are going to sent down a response
@@ -856,8 +867,7 @@ class RequestHandler(object):
                 for parameter_set in verb_parser_config.parameter_sets:
 
                     if not isinstance(parameter_set, prestans.parser.ParameterSet):
-                        raise TypeError("%s not a subclass of ParameterSet" % \
-                            parameter_set.__class__.__name__)
+                        raise TypeError("%s not a subclass of ParameterSet" % parameter_set.__class__.__name__)
 
                     try:
                         validated_parameter_set = parameter_set.validate(self.request)
@@ -866,7 +876,7 @@ class RequestHandler(object):
                             self.request.parameter_set = validated_parameter_set
                             break
 
-                    except prestans.exception.DataValidationException, exp:
+                    except prestans.exception.DataValidationException as exp:
                         self.logger.error(exp)
                         error_response = ErrorResponse(exp, self.response.selected_serializer)
                         return error_response(environ, start_response)
@@ -924,7 +934,7 @@ class RequestHandler(object):
 
             return self.response(environ, start_response)
 
-        except prestans.exception.UnimplementedVerbError, exp:
+        except prestans.exception.UnimplementedVerbError as exp:
             self.logger.error(exp)
             error_response = ErrorResponse(exp, self.response.selected_serializer)
             return error_response(environ, start_response)
@@ -1062,10 +1072,9 @@ class RequestRouter(object):
 
     """
 
-    def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None,\
-        default_deserializer=None, charset="utf-8", application_name="prestans",\
-        logger=None, debug=False, description=None):
-
+    def __init__(self, routes, serializers=None, default_serializer=None, deserializers=None,
+                 default_deserializer=None, charset="utf-8", application_name="prestans",
+                 logger=None, debug=False, description=None):
 
         self._application_name = application_name
         self._debug = debug
@@ -1138,7 +1147,7 @@ class RequestRouter(object):
             (self._application_name, len(self._routes), prestans.__version__, \
                 self._charset, self._debug))
 
-        #: Validate serailziers and deserialzers; are subclasses of prestans.serializer.Serializer
+        #: Validate serializers and deserializers; are subclasses of prestans.serializer.Serializer
         _default_outgoing_mime_types = list()
         for serializer in self._serializers:
 
@@ -1213,7 +1222,7 @@ class RequestRouter(object):
             no_endpoint.request = request
             raise no_endpoint
 
-        except prestans.exception.Base, exp:
+        except prestans.exception.Base as exp:
             self.logger.error(exp)
             error_response = ErrorResponse(exp, self._default_serializer)
             return error_response(environ, start_response)
