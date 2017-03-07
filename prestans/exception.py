@@ -70,6 +70,7 @@ __all__ = [
 import prestans
 import prestans.http
 
+
 class Base(Exception):
 
     def __init__(self, http_status, message):
@@ -116,6 +117,7 @@ class Base(Exception):
 #: http://www.python.org/dev/peps/pep-0008/#exception-names
 #:
 
+
 class UnsupportedVocabularyError(Base):
     """
     Called if none of the requested vocabularies are supported by the API
@@ -134,6 +136,7 @@ class UnsupportedVocabularyError(Base):
             'supported_types': supported_types
             })
 
+
 class UnsupportedContentTypeError(Base):
 
     def __init__(self, requested_mime_type, content_type):
@@ -146,6 +149,7 @@ class UnsupportedContentTypeError(Base):
             'requested_type': requested_mime_type,
             'supported_types': content_type
             })
+
 
 class ValidationError(Base):
     """
@@ -185,6 +189,7 @@ class ValidationError(Base):
         _loggable_message = "%s %s" % (self._attribute_name, self._message)
         return unicode(_loggable_message).encode('utf-8')
 
+
 class HandlerException(Base):
     """
     The base class for request and response exceptions.
@@ -208,7 +213,7 @@ class HandlerException(Base):
         if self.request is None:
             return self._message
         else:
-            #method:url:user agent:message
+            # method:url:user agent:message
             return "%s %s %s \"%s\"" % (
                 self.request.method,
                 self.request.url,
@@ -232,24 +237,35 @@ class RequestException(HandlerException):
     def __init__(self, code, message):
         super(RequestException, self).__init__(code, message)
 
+
 class ResponseException(HandlerException):
     """
     ResponseExceptions are Exceptions that are raised by response handlers of the
     REST application. REST encourages the use different error codes to
     denote what the error is.
 
-    E.g Use 404 to denote that a reqeusted doesn't exists on the server.
+    E.g Use 404 to denote that a requested entity doesn't exist on the server.
 
     If one of these exceptions do not match your user case; you are free
     construct your own error message and use an error code from outlined
     in prestans.http
     """
-    def __init__(self, code, message):
+    def __init__(self, code, message, response_model=None):
+
+        if not isinstance(response_model, prestans.types.Model):
+            raise TypeError("%s not a subclass of prestans.types.Model" % response_model.__class__.__name__)
+
+        self._response_model = response_model
         super(ResponseException, self).__init__(code, message)
+
+    @property
+    def response_model(self):
+        return self._response_model
 
 #:
 #: Parser Exception
 #:
+
 
 class UnimplementedVerbError(RequestException):
 
@@ -261,7 +277,8 @@ class UnimplementedVerbError(RequestException):
 
         self.push_trace({
             'verb': verb_name,
-            })
+        })
+
 
 class NoEndpointError(RequestException):
 
@@ -270,6 +287,7 @@ class NoEndpointError(RequestException):
         _code = prestans.http.STATUS.NOT_FOUND
         _message = "API does not provide this end-point"
         super(NoEndpointError, self).__init__(_code, _message)
+
 
 class AuthenticationError(RequestException):
 
@@ -282,6 +300,7 @@ class AuthenticationError(RequestException):
             _message = "Authentication Error; service is only available to authenticated"
 
         super(AuthenticationError, self).__init__(_code, _message)
+
 
 class AuthorizationError(RequestException):
 
@@ -300,6 +319,7 @@ class SerializationFailedError(RequestException):
         _message = "Serialization failed: %s" % format
         super(SerializationFailedError, self).__init__(_code, _message)
 
+
 class DeSerializationFailedError(RequestException):
 
     def __init__(self, format):
@@ -307,6 +327,7 @@ class DeSerializationFailedError(RequestException):
         _code = prestans.http.STATUS.NOT_FOUND
         _message = "DeSerialization failed: %s" % format
         super(DeSerializationFailedError, self).__init__(_code, _message)
+
 
 class AttributeFilterDiffers(RequestException):
     """
@@ -325,6 +346,7 @@ class AttributeFilterDiffers(RequestException):
         self.push_trace({
             'rejected_attribute_list': attribute_list,
             })
+
 
 class InconsistentPersistentDataError(Base):
     """
@@ -354,10 +376,12 @@ class InconsistentPersistentDataError(Base):
 #: Data Validation
 #:
 
+
 class DataValidationException(Base):
 
     def __init__(self, message):
         super(DataValidationException, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
+
 
 class RequiredAttributeError(DataValidationException):
 
@@ -365,11 +389,13 @@ class RequiredAttributeError(DataValidationException):
         _message = "attribute is required and does not provide a default value"
         super(RequiredAttributeError, self).__init__(_message)
 
+
 class ParseFailedError(DataValidationException):
 
     def __init__(self, message="Parser Failed"):
         _message = message
         super(ParseFailedError, self).__init__(_message)
+
 
 class LessThanMinimumError(DataValidationException):
 
@@ -377,11 +403,13 @@ class LessThanMinimumError(DataValidationException):
         _message = "%s is less than the allowed minimum of %i" % (str(value), allowed_min)
         super(LessThanMinimumError, self).__init__(_message)
 
+
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
         _message = "%s is more than the allowed maximum %i" % (str(value), allowed_max)
         super(MoreThanMaximumError, self).__init__(_message)
+
 
 class InvalidChoiceError(DataValidationException):
 
@@ -390,11 +418,13 @@ class InvalidChoiceError(DataValidationException):
         choices %s" % (str(value), str(allowed_choices).strip('[]'))
         super(InvalidChoiceError, self).__init__(_message)
 
+
 class MinimumLengthError(DataValidationException):
 
     def __init__(self, value, minimum):
         _message = "length of value: %s has to be greater than %i" % (value, minimum)
         super(MinimumLengthError, self).__init__(_message)
+
 
 class MaximumLengthError(DataValidationException):
 
@@ -402,11 +432,13 @@ class MaximumLengthError(DataValidationException):
         _message = "length of value: %s has to be less than %i" % (value, maximum)
         super(MaximumLengthError, self).__init__(_message)
 
+
 class InvalidTypeError(DataValidationException):
 
     def __init__(self, value, type_name):
         _message = "data type %s given, expected %s" % (value, type_name)
         super(InvalidTypeError, self).__init__(_message)
+
 
 class MissingParameterError(DataValidationException):
 
@@ -414,17 +446,20 @@ class MissingParameterError(DataValidationException):
         _message = "missing parameter"
         super(MissingParameterError, self).__init__(_message)
 
+
 class InvalidFormatError(DataValidationException):
 
     def __init__(self, value):
         _message = "invalid value %s provided" % value
         super(InvalidFormatError, self).__init__(_message)
 
+
 class InvalidMetaValueError(DataValidationException):
 
     def __init__(self):
         _message = "invalid meta value"
         super(InvalidMetaValueError, self).__init__(_message)
+
 
 class UnregisteredAdapterError(DataValidationException):
 
@@ -433,55 +468,63 @@ class UnregisteredAdapterError(DataValidationException):
         super(UnregisteredAdapterError, self).__init__(_message)
 
 #:
-#: The following excepetions are used by REST handlers to indicate
+#: The following exceptions are used by REST handlers to indicate
 #: commonly defined scenarios when dealing with data. BaseHandler traps
 #: these and generates an appropriate error message for the end user.
 #:
 
+
 class ServiceUnavailable(ResponseException):
 
-    def __init__(self, message="This service is currently unavailable"):
+    def __init__(self, message="Service Unavailable", response_model=None):
         _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
-        super(ServiceUnavailable, self).__init__(_code, message)
+        super(ServiceUnavailable, self).__init__(_code, message, response_model)
+
 
 class BadRequest(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Bad Request", response_model=None):
         _code = prestans.http.STATUS.BAD_REQUEST
-        super(BadRequest, self).__init__(_code, message)
+        super(BadRequest, self).__init__(_code, message, response_model)
+
 
 class Conflict(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Conflict", response_model=None):
         _code = prestans.http.STATUS.CONFLICT
-        super(Conflict, self).__init__(_code, message)
+        super(Conflict, self).__init__(_code, message, response_model)
+
 
 class NotFound(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Not Found", response_model=None):
         _code = prestans.http.STATUS.NOT_FOUND
-        super(NotFound, self).__init__(_code, message)
+        super(NotFound, self).__init__(_code, message, response_model)
+
 
 class Unauthorized(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Unauthorized", response_model=None):
         _code = prestans.http.STATUS.UNAUTHORIZED
-        super(Unauthorized, self).__init__(_code, message)
+        super(Unauthorized, self).__init__(_code, message, response_model)
+
 
 class MovedPermanently(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Moved Permanently", response_model=None):
         _code = prestans.http.STATUS.MOVED_PERMANENTLY
-        super(MovedPermanently, self).__init__(_code, message)
+        super(MovedPermanently, self).__init__(_code, message, response_model)
+
 
 class PaymentRequired(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Payment Required", response_model=None):
         _code = prestans.http.STATUS.PAYMENT_REQUIRED
-        super(PaymentRequired, self).__init__(_code, message)
+        super(PaymentRequired, self).__init__(_code, message, response_model)
+
 
 class Forbidden(ResponseException):
 
-    def __init__(self, message):
+    def __init__(self, message="Forbidden", response_model=None):
         _code = prestans.http.STATUS.FORBIDDEN
-        super(Forbidden, self).__init__(_code, message)
+        super(Forbidden, self).__init__(_code, message, response_model)
