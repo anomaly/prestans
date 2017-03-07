@@ -252,7 +252,7 @@ class ResponseException(HandlerException):
     """
     def __init__(self, code, message, response_model=None):
 
-        if not isinstance(response_model, prestans.types.Model):
+        if response_model and not isinstance(response_model, prestans.types.Model):
             raise TypeError("%s not a subclass of prestans.types.Model" % response_model.__class__.__name__)
 
         self._response_model = response_model
