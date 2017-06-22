@@ -45,16 +45,17 @@ class VERB:
     HEAD is similar to a GET but it does not return a response.
     """
 
-    GET    = "GET"
-    HEAD   = "HEAD"
-    POST   = "POST"
-    PUT    = "PUT"
-    PATCH  = "PATCH"
-    DELETE = "DELETE"
+    GET     = "GET"
+    HEAD    = "HEAD"
+    POST    = "POST"
+    PUT     = "PUT"
+    PATCH   = "PATCH"
+    DELETE  = "DELETE"
+    OPTIONS = "OPTIONS"
 
     @classmethod
     def is_supported_verb(cls, method):
-        return method in [VERB.GET, VERB.HEAD, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE]
+        return method in [VERB.GET, VERB.HEAD, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE, VERB.OPTIONS]
 
 class STATUS:
     """

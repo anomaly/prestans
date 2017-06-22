@@ -647,6 +647,7 @@ class Config(object):
         self._configs[prestans.http.VERB.PUT] = PUT
         self._configs[prestans.http.VERB.PATCH] = PATCH
         self._configs[prestans.http.VERB.DELETE] = DELETE
+        self._configs[prestans.http.VERB.OPTIONS] = OPTIONS
 
     def get_config_for_verb(self, verb):
         return self._configs[verb]
@@ -674,3 +675,7 @@ class Config(object):
     @property
     def delete(self):
         return self._configs[prestans.http.VERB.DELETE]
+
+    @property
+    def options(self):
+        return self._configs[prestans.http.VERB.OPTIONS]

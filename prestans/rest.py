@@ -732,7 +732,8 @@ class RequestHandler(object):
             prestans.http.VERB.POST,
             prestans.http.VERB.PUT,
             prestans.http.VERB.PATCH,
-            prestans.http.VERB.DELETE
+            prestans.http.VERB.DELETE,
+            prestans.http.VERB.OPTIONS
         ]
 
         #: Provider configuration
@@ -908,6 +909,8 @@ class RequestHandler(object):
                     self.patch(*self._args)
                 elif request_method == prestans.http.VERB.DELETE:
                     self.delete(*self._args)
+                elif request_method == prestans.http.VERB.OPTIONS:
+                    self.delete(*self._args)
             #: Re-raise all prestans exceptions
             except prestans.exception.Base as exception:
                 if issubclass(exception.__class__, prestans.exception.HandlerException):
@@ -987,6 +990,11 @@ class RequestHandler(object):
 
     def delete(self, *args):
         unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.DELETE)
+        unimplemented_verb_error.request = self.request
+        raise unimplemented_verb_error
+
+    def delete(self, *args):
+        unimplemented_verb_error = prestans.exception.UnimplementedVerbError(prestans.http.VERB.OPTIONS)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
