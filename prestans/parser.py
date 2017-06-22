@@ -633,7 +633,7 @@ class Config(object):
     adjacent to the HTTP verb.
     """
 
-    def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None):
+    def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None, OPTIONS=None):
 
         for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
             if verb is not None and not isinstance(verb, VerbConfig):

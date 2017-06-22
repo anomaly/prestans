@@ -910,7 +910,7 @@ class RequestHandler(object):
                 elif request_method == prestans.http.VERB.DELETE:
                     self.delete(*self._args)
                 elif request_method == prestans.http.VERB.OPTIONS:
-                    self.delete(*self._args)
+                    self.options(*self._args)
             #: Re-raise all prestans exceptions
             except prestans.exception.Base as exception:
                 if issubclass(exception.__class__, prestans.exception.HandlerException):
