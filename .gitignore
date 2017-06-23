@@ -4,12 +4,15 @@
 *.bak
 venv
 
+.idea
+
 # C extensions
 *.so
 
 # Packages
 *.egg
 *.egg-info
+.eggs/
 dist
 build
 eggs

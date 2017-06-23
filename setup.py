@@ -77,7 +77,9 @@ setup(name='prestans',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['WebOb==1.4',],
+    install_requires=['WebOb==1.4'],
+    tests_require=['pytest'],
+    setup_requires=['pytest-runner'],
     extras_require={
         "devel": ["Jinja2"]
     },
