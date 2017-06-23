@@ -633,7 +633,7 @@ class Config(object):
     adjacent to the HTTP verb.
     """
 
-    def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None):
+    def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None, OPTIONS=None):
 
         for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
             if verb is not None and not isinstance(verb, VerbConfig):
@@ -647,6 +647,7 @@ class Config(object):
         self._configs[prestans.http.VERB.PUT] = PUT
         self._configs[prestans.http.VERB.PATCH] = PATCH
         self._configs[prestans.http.VERB.DELETE] = DELETE
+        self._configs[prestans.http.VERB.OPTIONS] = OPTIONS
 
     def get_config_for_verb(self, verb):
         return self._configs[verb]
@@ -674,3 +675,7 @@ class Config(object):
     @property
     def delete(self):
         return self._configs[prestans.http.VERB.DELETE]
+
+    @property
+    def options(self):
+        return self._configs[prestans.http.VERB.OPTIONS]
