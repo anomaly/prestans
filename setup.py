@@ -34,7 +34,8 @@ from setuptools import setup, find_packages
 
 from prestans import __version__
 
-setup(name='prestans',
+setup(
+    name='prestans',
     version=__version__,
     description='A WSGI compliant REST micro-framework',
     url='https://github.com/anomaly/prestans.git',
@@ -52,7 +53,7 @@ setup(name='prestans',
     - Support for multiple dialects, including formalised patterns for binary content 
     - Handlers maps HTTP verbs to implemented class methods, complimented  with custom 
     request parser and response writer (built on top of WebOb)
-    - Unforgivingly strict parsing of requests and responses to ensure data integrity
+    - Strict parsing of requests and responses to ensure data integrity
     - Helper methods to ease transformation of persistent objects to REST responses
     - Pluggable integration to authentication
 
@@ -78,10 +79,13 @@ setup(name='prestans',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=['WebOb>=1.7'],
-    tests_require=['pytest'],
+    tests_require=[
+        'pytest',
+        'pytest-cov'
+    ],
     setup_requires=['pytest-runner'],
     extras_require={
         "devel": ["Jinja2"]
     },
-    include_package_data = True
+    include_package_data=True
 )

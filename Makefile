@@ -2,6 +2,10 @@
 test:
 	python setup.py test
 
+.PHONY: coverage
+coverage:
+	py.test --cov-report term-missing:skip-covered --cov-config .coveragerc --cov=prestans tests
+
 .PHONY: dist
 dist:
 	python setup.py sdist bdist_wheel
@@ -10,6 +14,7 @@ dist:
 release:
 	python setup.py sdist bdist_wheel upload
 
+.PHONY: clean
 clean:
 	python setup.py clean
 	if [ -a .eggs ]; then rm -rf .eggs; fi;
