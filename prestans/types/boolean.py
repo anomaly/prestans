@@ -29,48 +29,51 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-__all__ = ['Base', 'JSON', 'XMLPlist']
-
-import prestans.exception
+from prestans import exception
+from prestans.types import DataType
 
 
-class Base(object):
+class Boolean(DataType):
 
-    def loads(self, input_string):
-        raise NotImplementedError
+    def __init__(self, default=None, required=True, description=None):
 
-    def content_type(self):
-        raise NotImplementedError
+        self._default = default
+        self._required = required
+        self._description = description
 
+    @property
+    def default(self):
+        return self._default
 
-class JSON(Base):
+    def blueprint(self):
 
-    def loads(self, input_string):
-        import json
+        blueprint = dict()
+        blueprint['type'] = 'boolean'
+
+        constraints = dict()
+        constraints['default'] = self._default
+        constraints['required'] = self._required
+        constraints['description'] = self._description
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
+    def validate(self, value):
+
+        _validated_value = None
+
+        if self._required and self._default is None and value is None:
+            raise exception.RequiredAttributeError()
+        elif self._required and value is None:
+            value = self._default
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            value = self._default
 
         try:
-            parsed_json = json.loads(input_string)
+            _validated_value = bool(value)
         except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError('JSON')
-            
-        return parsed_json
-        
-    def content_type(self):
-        return 'application/json'
+            raise exception.ParseFailedError()
 
-
-class XMLPlist(Base):
-
-    def loads(self, input_string):
-        import plistlib
-
-        try:
-            unserialized_plist = plistlib.readPlistFromString(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError("XML/Plist")
-
-        return unserialized_plist
-
-    def content_type(self):
-        return 'application/xml'
+        return _validated_value

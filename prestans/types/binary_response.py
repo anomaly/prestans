@@ -30,47 +30,66 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['Base', 'JSON', 'XMLPlist']
 
-import prestans.exception
+class BinaryResponse(object):
+    """
+    Body Response Template to transfer binary files.
+    """
 
+    def __init__(self, mime_type=None, file_name=None, as_attachment=True, contents=None):
 
-class Base(object):
+        if mime_type is not None:
+            self._mime_type = mime_type.encode('ascii', 'ignore')
+        else:
+            self._mime_type = mime_type
 
-    def loads(self, input_string):
-        raise NotImplementedError
+        if file_name is not None:
+            self._file_name = file_name.encode('ascii', 'ignore')
+        else:
+            self._file_name = file_name
 
-    def content_type(self):
-        raise NotImplementedError
+        self._as_attachment = as_attachment
+        self._contents = contents
 
+    @property
+    def mime_type(self):
+        return self._mime_type
 
-class JSON(Base):
+    @mime_type.setter
+    def mime_type(self, value):
+        self._mime_type = value.encode('ascii', 'ignore')
 
-    def loads(self, input_string):
-        import json
+    @property
+    def file_name(self):
+        return self._file_name
 
-        try:
-            parsed_json = json.loads(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError('JSON')
-            
-        return parsed_json
-        
-    def content_type(self):
-        return 'application/json'
+    @file_name.setter
+    def file_name(self, value):
+        self._file_name = value.encode('ascii', 'ignore')
 
+    @property
+    def as_attachment(self):
+        return self._as_attachment
 
-class XMLPlist(Base):
+    @as_attachment.setter
+    def as_attachment(self, value):
+        self._as_attachment = value
 
-    def loads(self, input_string):
-        import plistlib
+    @property
+    def contents(self):
+        return self._contents
 
-        try:
-            unserialized_plist = plistlib.readPlistFromString(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError("XML/Plist")
+    @contents.setter
+    def contents(self, value):
+        self._contents = value
 
-        return unserialized_plist
+    @property
+    def content_length(self):
+        if self._contents is None:
+            return 0
+        return len(self._contents)
 
-    def content_type(self):
-        return 'application/xml'
+    def validate(self):
+        return self._mime_type is not None and \
+               self._file_name is not None and \
+               self.content_length > 0

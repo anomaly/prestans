@@ -43,6 +43,7 @@ import prestans.exception
 import prestans.serializer
 import prestans.deserializer
 
+
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
@@ -133,7 +134,7 @@ class Request(webob.Request):
     @parameter_set.setter
     def parameter_set(self, value):
         """
-        Mutators for parameter_set
+        Mutator for parameter_set
         """
         self._parameter_set = value
 
@@ -183,7 +184,6 @@ class Request(webob.Request):
                     (deserializer.__module__, deserializer.__class__.__name__))
 
         self._deserializers = self._deserializers + deserializers
-
 
     def get_response_attribute_filter(self, template_filter, template_model=None):
         """
@@ -290,8 +290,7 @@ class Response(webob.Response):
                 self._selected_serializer = serializer
                 return
 
-        raise prestans.exception.UnsupportedVocabularyError(mime_type,\
-            self.supported_mime_types_str)
+        raise prestans.exception.UnsupportedVocabularyError(mime_type, self.supported_mime_types_str)
 
     #:
     #: is an instance of prestans.types.DataType; mostly a subclass of
@@ -549,11 +548,11 @@ class Response(webob.Response):
         #: Overridden so webob's __str__ skips serializing the body
         super(Response, self).__str__(skip_body=True)
 
-#:
-#: DictionaryResponse serializes dictionaries using the selected_serializer
-#:
 
 class DictionaryResponse(Response):
+    """
+    DictionaryResponse serializes dictionaries using the selected_serializer
+    """
 
     #:
     #: body; overrides webob.Response line 324
@@ -601,6 +600,7 @@ class DictionaryResponse(Response):
         self.content_length = len(stringified_body)
 
         return [stringified_body]
+
 
 class ErrorResponse(webob.Response):
     """
@@ -696,14 +696,13 @@ class RequestHandler(object):
         if self.__parser_config__ is None:
             self.__parser_config__ = prestans.parser.Config()
 
-
         self._args = args
         self._request = request
         self._response = response
         self._logger = logger
         self._debug = debug
 
-        #: Initalization used elsewhere
+        # initialization used elsewhere
         self.provider_authentication = None
 
     @property
@@ -1020,7 +1019,7 @@ class BlueprintHandler(RequestHandler):
 
         blueprint_groups = dict()
 
-        # Intterogate each handler
+        # interrogate each handler
         for regexp, handler_class in self.route_map:
 
             # Ignore discovery handler
@@ -1107,8 +1106,8 @@ class RequestRouter(object):
         else:
             self._logger = logger
 
-        #: Set logger level, API can override this
-        if self._debug == True:
+        # set logger level, API can override this
+        if self._debug:
             self._logger.setLevel(logging.DEBUG)
         else:
             self._logger.setLevel(logging.ERROR)
@@ -1150,7 +1149,7 @@ class RequestRouter(object):
 
     def __call__(self, environ, start_response):
 
-        #: Say hello
+        # say hello
         self.logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % \
             (self._application_name, len(self._routes), prestans.__version__, \
                 self._charset, self._debug))
@@ -1195,9 +1194,9 @@ class RequestRouter(object):
             #: Check if the requested URL has a valid registered handler
             for regexp, handler_class in route_map:
 
-                # if not 'PATH_INFO' in environ.keys():
-
-                match = regexp.match(environ.get("PATH_INFO", "")) # if absent, can assume to be empty string # https://www.python.org/dev/peps/pep-3333/#environ-variables
+                # if absent, can assume to be empty string
+                # https://www.python.org/dev/peps/pep-3333/#environ-variables
+                match = regexp.match(environ.get("PATH_INFO", ""))
 
                 #: If we've found a match; ensure its a handler subclass and return it's callable
                 if match:

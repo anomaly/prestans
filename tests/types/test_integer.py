@@ -25,12 +25,21 @@ class IntegerUnitTest(unittest.TestCase):
         self.assertEqual(not_required.validate(None), None)
 
     def test_default(self):
-        default = Integer(default=6)
-        self.assertEqual(default.validate(None), 6)
-        self.assertEqual(default.validate(5), 5)
+        integer = Integer()
+        self.assertIsNone(integer.default)
+
+        integer = Integer(default=6)
+        self.assertEquals(integer.default, 6)
+        self.assertEqual(integer.validate(None), 6)
+        self.assertEqual(integer.validate(5), 5)
 
     def test_minimum(self):
+        integer = Integer()
+        self.assertIsNone(integer.minimum)
+
         positive_range = Integer(minimum=1, maximum=5)
+        self.assertEquals(positive_range.minimum, 1)
+        self.assertEquals(positive_range.maximum, 5)
         self.assertRaises(LessThanMinimumError, positive_range.validate, -2)
         self.assertRaises(LessThanMinimumError, positive_range.validate, -1)
         self.assertRaises(LessThanMinimumError, positive_range.validate, 0)
@@ -39,6 +48,8 @@ class IntegerUnitTest(unittest.TestCase):
         self.assertEqual(positive_range.validate(3), 3)
 
         negative_range = Integer(minimum=-5, maximum=-1)
+        self.assertEquals(negative_range.minimum, -5)
+        self.assertEquals(negative_range.maximum, -1)
         self.assertRaises(LessThanMinimumError, negative_range.validate, -8)
         self.assertRaises(LessThanMinimumError, negative_range.validate, -7)
         self.assertRaises(LessThanMinimumError, negative_range.validate, -6)
@@ -51,6 +62,9 @@ class IntegerUnitTest(unittest.TestCase):
         self.assertEqual(zero_min_range.validate(0), 0)
 
     def text_maximum(self):
+        integer = Integer()
+        self.assertIsNone(integer.maximum)
+
         positive_range = Integer(minimum=1, maximum=5)
         self.assertEqual(positive_range.validate(0), 0)
         self.assertEqual(positive_range.validate(3), 3)
@@ -73,8 +87,11 @@ class IntegerUnitTest(unittest.TestCase):
         self.assertRaises(MoreThanMaximumError, zero_max_range.validate, 1)
 
     def test_choices(self):
-        choices = Integer(choices=[1,5])
-        self.assertRaises(InvalidChoiceError, choices.validate, 3)
-        self.assertRaises(InvalidChoiceError, choices.validate, 4)
-        self.assertEqual(choices.validate(1), 1)
-        self.assertEqual(choices.validate(5), 5)
+        integer = Integer()
+        self.assertIsNone(integer.choices)
+
+        integer = Integer(choices=[1,5])
+        self.assertRaises(InvalidChoiceError, integer.validate, 3)
+        self.assertRaises(InvalidChoiceError, integer.validate, 4)
+        self.assertEqual(integer.validate(1), 1)
+        self.assertEqual(integer.validate(5), 5)

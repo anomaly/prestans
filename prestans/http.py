@@ -36,6 +36,7 @@ __all__ = ['VERB', 'STATUS']
 #: This file mostly contains constants for HTTP
 #:
 
+
 class VERB:
     """ 
     Encapsulates HTTP Verbs supported by the prestans framework in accordance
@@ -56,6 +57,7 @@ class VERB:
     @classmethod
     def is_supported_verb(cls, method):
         return method in [VERB.GET, VERB.HEAD, VERB.POST, VERB.PUT, VERB.PATCH, VERB.DELETE, VERB.OPTIONS]
+
 
 class STATUS:
     """
@@ -123,4 +125,3 @@ class STATUS:
     SERVICE_UNAVAILABLE         = 503
     GATEWAY_TIMEOUT             = 504
     UNSUPPORTED_HTTP_VERSION    = 505
-    

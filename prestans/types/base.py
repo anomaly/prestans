@@ -30,47 +30,35 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__all__ = ['Base', 'JSON', 'XMLPlist']
 
-import prestans.exception
+class DataType(object):
 
-
-class Base(object):
-
-    def loads(self, input_string):
-        raise NotImplementedError
-
-    def content_type(self):
+    def validate(self, value):
         raise NotImplementedError
 
 
-class JSON(Base):
+class DataStructure(DataType):
+    """
+    Wrappers on Python types generally represented as structures e.g DateTime
 
-    def loads(self, input_string):
-        import json
+    as_serializable methods signature for %DataStructure is different to that of DataCollection
+    it requires a value to be passed in, this is because the python type of structures is
+    difference to what gets serialized.
 
-        try:
-            parsed_json = json.loads(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError('JSON')
-            
-        return parsed_json
-        
-    def content_type(self):
-        return 'application/json'
+    E.g DateTime serializes itself as a ISO string
+    """
+
+    def as_serializable(self, value):
+        raise NotImplementedError
 
 
-class XMLPlist(Base):
+class DataCollection(DataType):
 
-    def loads(self, input_string):
-        import plistlib
+    def validate(self, value, attribute_filter=None):
+        raise NotImplementedError
 
-        try:
-            unserialized_plist = plistlib.readPlistFromString(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError("XML/Plist")
+    def as_serializable(self, attribute_filter=None):
+        raise NotImplementedError
 
-        return unserialized_plist
-
-    def content_type(self):
-        return 'application/xml'
+    def get_attribute_filter(self):
+        raise NotImplementedError

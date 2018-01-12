@@ -29,48 +29,21 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from prestans.types.base import DataCollection
+from prestans.types.base import DataStructure
+from prestans.types.base import DataType
 
-__all__ = ['Base', 'JSON', 'XMLPlist']
+from prestans.types.boolean import Boolean
+from prestans.types.float import Float
+from prestans.types.string_prestans import String
+from prestans.types.integer import Integer
 
-import prestans.exception
+from prestans.types.date import Date
+from prestans.types.datetime_prestans import DateTime
+from prestans.types.time_prestans import Time
 
+from prestans.types.array import Array
+from prestans.types.model import Model
+from prestans.types.data_url_file import DataURLFile
 
-class Base(object):
-
-    def loads(self, input_string):
-        raise NotImplementedError
-
-    def content_type(self):
-        raise NotImplementedError
-
-
-class JSON(Base):
-
-    def loads(self, input_string):
-        import json
-
-        try:
-            parsed_json = json.loads(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError('JSON')
-            
-        return parsed_json
-        
-    def content_type(self):
-        return 'application/json'
-
-
-class XMLPlist(Base):
-
-    def loads(self, input_string):
-        import plistlib
-
-        try:
-            unserialized_plist = plistlib.readPlistFromString(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError("XML/Plist")
-
-        return unserialized_plist
-
-    def content_type(self):
-        return 'application/xml'
+from prestans.types.binary_response import BinaryResponse

@@ -29,18 +29,15 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-"""
-Parser
-"""
-
 __all__ = ['Config', 'VerbConfig', 'AttributeFilter', 'ParameterSet']
 
 import inspect
 
-import prestans.types
-import prestans.http
-import prestans.exception
+from prestans import exception
+from prestans import http
+from prestans.types import DataCollection
+from prestans.types import Array, Date, DateTime, Float, Integer, String
+
 
 class ParameterSet(object):
     """
@@ -61,26 +58,26 @@ class ParameterSet(object):
         # Fields
         fields = dict()
 
-        # Inspects the attributes of a parameter set and tries to validate the input
+        # inspects the attributes of a parameter set and tries to validate the input
         for attribute_name, type_instance in self.__class__.__dict__.iteritems():
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            # Must be one of the following types
-            if not isinstance(type_instance, prestans.types.String) and \
-            not isinstance(type_instance, prestans.types.Float) and \
-            not isinstance(type_instance, prestans.types.Integer) and \
-            not isinstance(type_instance, prestans.types.Date) and \
-            not isinstance(type_instance, prestans.types.DateTime) and \
-            not isinstance(type_instance, prestans.types.Array):
+            # must be one of the following types
+            if not isinstance(type_instance, String) and \
+               not isinstance(type_instance, Float) and \
+               not isinstance(type_instance, Integer) and \
+               not isinstance(type_instance, Date) and \
+               not isinstance(type_instance, DateTime) and \
+               not isinstance(type_instance, Array):
                 raise TypeError("%s should be subclass of\
                  prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
-            if isinstance(type_instance, prestans.types.Array):
-                if not isinstance(type_instance.element_template, prestans.types.String) and \
-                not isinstance(type_instance.element_template, prestans.types.Float) and \
-                not isinstance(type_instance.element_template, prestans.types.Integer):
+            if isinstance(type_instance, Array):
+                if not isinstance(type_instance.element_template, String) and \
+                   not isinstance(type_instance.element_template, Float) and \
+                   not isinstance(type_instance.element_template, Integer):
                     raise TypeError("%s should be subclass of \
                         prestans.types.String/Integer/Float/Array" % attribute_name)
 
@@ -110,20 +107,20 @@ class ParameterSet(object):
                 continue
 
             #: Must be one of the following types
-            if not isinstance(type_instance, prestans.types.String) and \
-            not isinstance(type_instance, prestans.types.Float) and \
-            not isinstance(type_instance, prestans.types.Integer) and \
-            not isinstance(type_instance, prestans.types.Date) and \
-            not isinstance(type_instance, prestans.types.DateTime) and \
-            not isinstance(type_instance, prestans.types.Array):
+            if not isinstance(type_instance, String) and \
+               not isinstance(type_instance, Float) and \
+               not isinstance(type_instance, Integer) and \
+               not isinstance(type_instance, Date) and \
+               not isinstance(type_instance, DateTime) and \
+               not isinstance(type_instance, Array):
                 raise TypeError("%s should be of type \
                     prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
-            if issubclass(type_instance.__class__, prestans.types.Array):
+            if issubclass(type_instance.__class__, Array):
 
-                if not isinstance(type_instance.element_template, prestans.types.String) and \
-                not isinstance(type_instance.element_template, prestans.types.Float) and \
-                not isinstance(type_instance.element_template, prestans.types.Integer):
+                if not isinstance(type_instance.element_template, String) and \
+                   not isinstance(type_instance.element_template, Float) and \
+                   not isinstance(type_instance.element_template, Integer):
                     raise TypeError("%s elements should be of \
                         type prestans.types.String/Integer/Float" % attribute_name)
 
@@ -131,7 +128,7 @@ class ParameterSet(object):
 
                 #: Get input from parameters
                 #: Empty list returned if key is missing for getall
-                if issubclass(type_instance.__class__, prestans.types.Array):
+                if issubclass(type_instance.__class__, Array):
                     validation_input = request.params.getall(attribute_name)
                 #: Key error thrown if key is missing for getone
                 else:
@@ -146,8 +143,8 @@ class ParameterSet(object):
 
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
-            except prestans.exception.DataValidationException, exp:
-                raise prestans.exception.ValidationError(
+            except exception.DataValidationException, exp:
+                raise exception.ValidationError(
                     message=str(exp),
                     attribute_name=attribute_name,
                     value=validation_input,
@@ -176,10 +173,10 @@ class AttributeFilter(object):
         wrapper for Model's get_attribute_filter
         """
 
-        if not isinstance(model_instance, prestans.types.DataCollection):
+        if not isinstance(model_instance, DataCollection):
             raise TypeError("model_instance must be a sublcass of \
                 prestans.types.DataCollection, %s given" % (model_instance.__class__.__name__))
-        elif isinstance(model_instance, prestans.types.Array) and model_instance.is_scalar:
+        elif isinstance(model_instance, Array) and model_instance.is_scalar:
             return AttributeFilter(is_array_scalar=True)
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
@@ -208,12 +205,11 @@ class AttributeFilter(object):
             else:
                 raise KeyError(name)
 
-
     def conforms_to_template_filter(self, template_filter):
         """
         Check AttributeFilter conforms to the rules set by the template
 
-         - If self, has attributes that template_fitler does not contain, throw Exception
+         - If self, has attributes that template_filter does not contain, throw Exception
          - If sub list found, perform the first check
          - If self has a value for an attribute, assign to final AttributeFilter
          - If not found, assign value from template
@@ -221,7 +217,7 @@ class AttributeFilter(object):
 
         if not isinstance(template_filter, self.__class__):
             raise TypeError("AttributeFilter can only check conformance against \
-                another template filter, %s provided" % (template_filter.__class__.__name__))
+                another template filter, %s provided" % template_filter.__class__.__name__)
 
         #:
         #: Keys from the template
@@ -235,7 +231,7 @@ class AttributeFilter(object):
         #:
         unwanted_keys = set(this_filter_keys) - set(template_filter_keys)
         if len(unwanted_keys) > 0:
-            raise prestans.exception.AttributeFilterDiffers(list(unwanted_keys))
+            raise exception.AttributeFilterDiffers(list(unwanted_keys))
 
         #:
         #: 2. Make a attribute_filter that we send back
@@ -256,10 +252,9 @@ class AttributeFilter(object):
                 #: with value of true
                 #:
                 if isinstance(value, bool) and \
-                value is True and \
-                isinstance(getattr(template_filter, template_key), AttributeFilter):
-                    setattr(evaluated_attribute_filter, template_key, \
-                        getattr(template_filter, template_key))
+                   value is True and \
+                   isinstance(getattr(template_filter, template_key), AttributeFilter):
+                    setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
                 elif isinstance(value, bool):
                     setattr(evaluated_attribute_filter, template_key, value)
                 elif isinstance(value, self.__class__):
@@ -413,7 +408,7 @@ class AttributeFilter(object):
 
             rewrite_map = template_model.attribute_rewrite_reverse_map()
 
-            if not isinstance(template_model, prestans.types.DataCollection):
+            if not isinstance(template_model, DataCollection):
                 raise TypeError("template_model should be a prestans model in AttributeFilter \
                     init (from dictionary), %s provided" % template_model.__class__.__name__)
 
@@ -441,7 +436,7 @@ class AttributeFilter(object):
 
                 unwanted_keys = list()
                 unwanted_keys.append(target_key)
-                raise prestans.exception.AttributeFilterDiffers(unwanted_keys)
+                raise exception.AttributeFilterDiffers(unwanted_keys)
 
             #:
             #: Either keep the value of wrap it up with AttributeFilter
@@ -456,11 +451,10 @@ class AttributeFilter(object):
                     sub_map = getattr(template_model, target_key)
 
                     #: prestans Array support
-                    if isinstance(sub_map, prestans.types.Array):
+                    if isinstance(sub_map, Array):
                         sub_map = sub_map.element_template
 
-                setattr(self, target_key, \
-                    AttributeFilter(from_dictionary=value, template_model=sub_map))
+                setattr(self, target_key, AttributeFilter(from_dictionary=value, template_model=sub_map))
 
     def __setattr__(self, key, value):
         """
@@ -527,13 +521,13 @@ class VerbConfig(object):
 
         #: response_template; required parameter
         if response_template is not None and \
-        (not isinstance(response_template, prestans.types.DataCollection) and\
-         not isinstance(response_template, prestans.types.BinaryResponse)):
+        (not isinstance(response_template, DataCollection) and \
+         not isinstance(response_template, BinaryResponse)):
             raise TypeError("response_template of type %s must be an instance of \
                 a prestans.types.DataCollection subclass" % response_template.__class__.__name__)
 
         if response_template is not None and \
-        isinstance(response_template, prestans.types.DataCollection):
+        isinstance(response_template, DataCollection):
             self.response_attribute_filter_template = AttributeFilter.\
             from_model(model_instance=response_template,\
                 default_value=response_attribute_filter_default_value)
@@ -558,7 +552,7 @@ class VerbConfig(object):
 
         #: body_template
         if body_template is not None and not \
-        isinstance(body_template, prestans.types.DataCollection):
+           isinstance(body_template, DataCollection):
             raise TypeError(
                 "body_template of type %s must be an instance of \
                 a prestans.types.DataCollection subclass" % body_template.__class__.__name__)
@@ -624,6 +618,7 @@ class VerbConfig(object):
     def request_attribute_filter(self):
         return self._request_attribute_filter
 
+
 class Config(object):
     """
     Configuration that's attached to each handler to define rules for each
@@ -641,41 +636,41 @@ class Config(object):
 
         self._configs = dict()
 
-        self._configs[prestans.http.VERB.GET] = GET
-        self._configs[prestans.http.VERB.HEAD] = HEAD
-        self._configs[prestans.http.VERB.POST] = POST
-        self._configs[prestans.http.VERB.PUT] = PUT
-        self._configs[prestans.http.VERB.PATCH] = PATCH
-        self._configs[prestans.http.VERB.DELETE] = DELETE
-        self._configs[prestans.http.VERB.OPTIONS] = OPTIONS
+        self._configs[http.VERB.GET] = GET
+        self._configs[http.VERB.HEAD] = HEAD
+        self._configs[http.VERB.POST] = POST
+        self._configs[http.VERB.PUT] = PUT
+        self._configs[http.VERB.PATCH] = PATCH
+        self._configs[http.VERB.DELETE] = DELETE
+        self._configs[http.VERB.OPTIONS] = OPTIONS
 
     def get_config_for_verb(self, verb):
         return self._configs[verb]
 
     @property
     def get(self):
-        return self._configs[prestans.http.VERB.GET]
+        return self._configs[http.VERB.GET]
 
     @property
     def head(self):
-        return self._configs[prestans.http.VERB.HEAD]
+        return self._configs[http.VERB.HEAD]
 
     @property
     def post(self):
-        return self._configs[prestans.http.VERB.POST]
+        return self._configs[http.VERB.POST]
 
     @property
     def put(self):
-        return self._configs[prestans.http.VERB.PUT]
+        return self._configs[http.VERB.PUT]
 
     @property
     def patch(self):
-        return self._configs[prestans.http.VERB.PATCH]
+        return self._configs[http.VERB.PATCH]
 
     @property
     def delete(self):
-        return self._configs[prestans.http.VERB.DELETE]
+        return self._configs[http.VERB.DELETE]
 
     @property
     def options(self):
-        return self._configs[prestans.http.VERB.OPTIONS]
+        return self._configs[http.VERB.OPTIONS]

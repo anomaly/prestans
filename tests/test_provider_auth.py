@@ -39,29 +39,28 @@ import prestans.rest
 
 class BaseUnitTest(unittest.TestCase):
 
-    def setUp(self):
-
-        self.auth = prestans.provider.auth.Base()
-
     def test_debug(self):
-        self.assertEqual(self.auth.debug, False)
-        self.auth.debug = True
-        self.assertEqual(self.auth.debug, True)
+        auth = prestans.provider.auth.Base()
+        self.assertEqual(auth.debug, False)
+
+        auth.debug = True
+        self.assertEqual(auth.debug, True)
 
     def test_current_user_has_role(self):
-        self.assertRaises(NotImplementedError, self.auth.current_user_has_role, "Admin")
+        auth = prestans.provider.auth.Base()
+        self.assertRaises(NotImplementedError, auth.current_user_has_role, "Admin")
 
     def test_is_authenticated_user(self):
-        self.assertRaises(NotImplementedError, self.auth.is_authenticated_user)
+        auth = prestans.provider.auth.Base()
+        self.assertRaises(NotImplementedError, auth.is_authenticated_user)
 
     def test_is_authorized_user(self):
-        self.assertRaises(NotImplementedError, self.auth.is_authorized_user, None)
+        auth = prestans.provider.auth.Base()
+        self.assertRaises(NotImplementedError, auth.is_authorized_user, None)
 
     def test_get_current_user(self):
-        self.assertRaises(NotImplementedError, self.auth.get_current_user)
-
-    def tearDown(self):
-        pass
+        auth = prestans.provider.auth.Base()
+        self.assertRaises(NotImplementedError, auth.get_current_user)
 
 
 class AdminRoleProvider(prestans.provider.auth.Base):

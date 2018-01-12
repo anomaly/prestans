@@ -81,7 +81,8 @@ setup(
     install_requires=['WebOb>=1.7'],
     tests_require=[
         'pytest',
-        'pytest-cov'
+        'pytest-cov',
+        'mock'
     ],
     setup_requires=['pytest-runner'],
     extras_require={

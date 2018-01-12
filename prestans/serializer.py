@@ -34,6 +34,7 @@ __all__ = ['Base', 'JSON', 'XMLPlist']
 
 import prestans.exception
 
+
 class Base(object):
 
     def dumps(self, serializable_object):
@@ -85,5 +86,3 @@ class XMLPlist(Base):
 
     def content_type(self):
         return 'application/xml'
-
-
