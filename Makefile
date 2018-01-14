@@ -2,6 +2,10 @@
 test:
 	python setup.py test
 
+.PHONY: tests
+tests:
+	tox
+
 .PHONY: coverage
 coverage:
 	py.test --cov-report term-missing:skip-covered --cov-config .coveragerc --cov=prestans tests

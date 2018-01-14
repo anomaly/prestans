@@ -82,7 +82,8 @@ setup(
     tests_require=[
         'pytest',
         'pytest-cov',
-        'mock'
+        'mock',
+        'tox'
     ],
     setup_requires=['pytest-runner'],
     extras_require={
