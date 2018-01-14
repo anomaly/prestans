@@ -44,7 +44,14 @@ class Time(DataStructure):
 
     def __init__(self, default=None, required=True, format=DEFAULT_FORMAT, description=None):
 
-        self._default = default
+        if isinstance(default, time) or \
+           default == self.NOW or \
+           default == self.UTC_NOW or \
+           default is None:
+            self._default = default
+        else:
+            raise TypeError("default must be one of time, Time.NOW or Time.UTC_NOW")
+
         self._required = required
         self._format = format
         self._description = description
@@ -87,22 +94,16 @@ class Time(DataStructure):
 
         _validated_value = None
 
-        if self._required and self._default is None and value is None:
+        # no need to do any validation if None, not required and default provided
+        if not self._required and self._default is None and value is None:
+            return value
+        elif self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
-        elif self._required and value is None:
+        elif value is None and self._default is not None:
             if self._default == Time.NOW:
-                value = datetime.now().time()
+                value = datetime.now()
             elif self._default == Time.UTC_NOW:
-                value = datetime.utcnow().time()
-            else:
-                value = self._default
-        elif not self._required and self._default is None and value is None:
-            return _validated_value
-        elif not self._required and value is None:
-            if self._default == Time.NOW:
-                value = datetime.now().time()
-            elif self._default == Time.UTC_NOW:
-                value = datetime.utcnow().time()
+                value = datetime.utcnow()
             else:
                 value = self._default
 

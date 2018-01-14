@@ -24,6 +24,9 @@ class TimeUnitTest(unittest.TestCase):
         default_time = Time(default=time(11, 11, 11))
         self.assertEquals(default_time.default, time(11, 11, 11))
 
+        self.assertRaises(TypeError, Time, default="string")
+        self.assertRaises(TypeError, Time, default=23)
+
     def test_required(self):
         time_type = Time()
         self.assertTrue(time_type.required)
@@ -66,22 +69,61 @@ class TimeUnitTest(unittest.TestCase):
         self.assertEquals(blueprint["constraints"]["format"], "%H:%M:%S %p")
         self.assertEquals(blueprint["constraints"]["description"], "description")
 
-    @patch("datetime.datetime.utcnow", return_value=UTC_NOW)
-    @patch("datetime.datetime.now", return_value=NOW)
-    def test_validate(self, now, utc_now):
+    def test_validate(self):
+
+        # test that not required accepts None
+        not_required = Time(required=False)
+        self.assertEquals(not_required.validate(None), None)
+
+        # test that required throws exception for None
         required = Time(required=True)
         self.assertRaises(exception.RequiredAttributeError, required.validate, None)
 
+        # test that required accepts time value
         default_time = Time(required=True, default=time(11, 11, 11))
         self.assertEquals(default_time.validate(None), time(11, 11, 11))
 
-        default_now = Time(required=True, default=Time.NOW)
-        now.assert_called()
-        self.assertEquals(default_now.validate(None), NOW)
+        # test that required makes use of NOW constant
+        with patch('prestans.types.time_prestans.datetime') as datetime:
+            datetime.now.return_value = NOW
 
-        default_utc_now = Time(required=True, default=Time.UTC_NOW)
-        utc_now.assert_called()
-        self.assertEquals(default_utc_now.validate(None), UTC_NOW)
+            default_now = Time(required=True, default=Time.NOW)
+            self.assertEquals(default_now.validate(None), NOW)
+            datetime.now.assert_called()
+
+        # test that not required makes use of NOW constant
+        with patch('prestans.types.time_prestans.datetime') as datetime:
+            datetime.now.return_value = NOW
+
+            default_now = Time(required=False, default=Time.NOW)
+            self.assertEquals(default_now.validate(None), NOW)
+            datetime.now.assert_called()
+
+        # test that required makes use of UTC_NOW constant
+        with patch('prestans.types.time_prestans.datetime') as datetime:
+            datetime.utcnow.return_value = UTC_NOW
+
+            default_utc_now = Time(required=True, default=Time.UTC_NOW)
+            self.assertEquals(default_utc_now.validate(None), UTC_NOW)
+            datetime.utcnow.assert_called()
+
+        # test that not required makes use of UTC_NOW constant
+        with patch('prestans.types.time_prestans.datetime') as datetime:
+            datetime.utcnow.return_value = UTC_NOW
+
+            default_utc_now = Time(required=False, default=Time.UTC_NOW)
+            self.assertEquals(default_utc_now.validate(None), UTC_NOW)
+            datetime.utcnow.assert_called()
+
+        # test that invalid type is rejected
+        invalid_type = Time()
+        self.assertRaises(exception.ParseFailedError, invalid_type.validate, 345)
+
+        # test that invalid string is rejected
+        self.assertRaises(exception.ParseFailedError, Time().validate, "invalid")
+
+        # test that valid string can be parsed
+        self.assertEquals(Time().validate("12:34:00"), time(12, 34, 00))
 
     def test_as_serializable(self):
         default_format = Time()
