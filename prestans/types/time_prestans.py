@@ -112,7 +112,7 @@ class Time(DataStructure):
         elif isinstance(value, str) or isinstance(value, unicode):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
-            except ValueError, exp:
+            except ValueError as exp:
                 raise exception.ParseFailedError("time parsing failed %s" % exp)
         else:
             raise exception.ParseFailedError("cannot parse value of type %s" \
