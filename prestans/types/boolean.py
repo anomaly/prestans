@@ -37,13 +37,25 @@ class Boolean(DataType):
 
     def __init__(self, default=None, required=True, description=None):
 
-        self._default = default
+        if default is None or \
+           isinstance(default, bool):
+            self._default = default
+        else:
+            raise TypeError("default must be of type bool or None")
         self._required = required
         self._description = description
 
     @property
+    def required(self):
+        return self._required
+
+    @property
     def default(self):
         return self._default
+
+    @property
+    def description(self):
+        return self._description
 
     def blueprint(self):
 
@@ -51,29 +63,23 @@ class Boolean(DataType):
         blueprint['type'] = 'boolean'
 
         constraints = dict()
-        constraints['default'] = self._default
-        constraints['required'] = self._required
-        constraints['description'] = self._description
+        constraints['default'] = self.default
+        constraints['required'] = self.required
+        constraints['description'] = self.description
 
         blueprint['constraints'] = constraints
         return blueprint
 
     def validate(self, value):
 
-        _validated_value = None
-
-        if self._required and self._default is None and value is None:
+        if not self._required and self._default is None and value is None:
+            return None
+        elif self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
-        elif self._required and value is None:
-            value = self._default
-        elif not self._required and self._default is None and value is None:
-            return _validated_value
-        elif not self._required and value is None:
+        elif value is None and self.default is not None:
             value = self._default
 
-        try:
-            _validated_value = bool(value)
-        except Exception, exp:
+        if not isinstance(value, bool):
             raise exception.ParseFailedError()
 
-        return _validated_value
+        return value
