@@ -39,7 +39,7 @@ class Float(DataType):
                  choices=None, description=None):
 
         if minimum and maximum and minimum > maximum:
-            pass
+            raise ValueError("maximum cannot be less than minimum")
 
         self._default = default
         self._minimum = minimum
@@ -47,6 +47,10 @@ class Float(DataType):
         self._required = required
         self._choices = choices
         self._description = description
+
+    @property
+    def default(self):
+        return self._default
 
     @property
     def minimum(self):
@@ -57,12 +61,16 @@ class Float(DataType):
         return self._maximum
 
     @property
-    def default(self):
-        return self._default
+    def required(self):
+        return self._required
 
     @property
     def choices(self):
         return self._choices
+
+    @property
+    def description(self):
+        return self._description
 
     def blueprint(self):
 
@@ -82,14 +90,12 @@ class Float(DataType):
 
     def validate(self, value):
 
-        _validated_value = None
-
+        if not self._required and self._default is None and value is None:
+            return None
         if self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
         elif self._required and value is None:
             value = self._default
-        elif not self._required and self._default is None and value is None:
-            return _validated_value
         elif not self._required and value is None:
             value = self._default
 

@@ -86,8 +86,10 @@ class IntegerUnitTest(unittest.TestCase):
         integer = Integer(required=False)
         self.assertEquals(integer.validate(None), None)
 
+        # check required raises exception for None
         self.assertRaises(exception.RequiredAttributeError, Integer().validate, None)
 
+        # check default values being applied
         self.assertEquals(Integer(required=True, default=5).validate(None), 5)
         self.assertEquals(Integer(required=False, default=6).validate(None), 6)
 
