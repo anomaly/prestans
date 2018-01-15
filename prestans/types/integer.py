@@ -41,12 +41,18 @@ class Integer(DataType):
         if minimum and maximum and minimum > maximum:
             raise ValueError("maximum cannot be less than minimum")
 
+        # todo: check default in choices
+
         self._default = default
         self._minimum = minimum
         self._maximum = maximum
         self._required = required
         self._choices = choices
         self._description = description
+
+    @property
+    def default(self):
+        return self._default
 
     @property
     def minimum(self):
@@ -57,8 +63,8 @@ class Integer(DataType):
         return self._maximum
 
     @property
-    def default(self):
-        return self._default
+    def required(self):
+        return self._required
 
     @property
     def choices(self):
@@ -74,12 +80,12 @@ class Integer(DataType):
         blueprint['type'] = 'integer'
 
         constraints = dict()
-        constraints['default'] = self._default
-        constraints['minimum'] = self._minimum
-        constraints['maximum'] = self._maximum
-        constraints['required'] = self._required
-        constraints['choices'] = self._choices
-        constraints['description'] = self._description
+        constraints['default'] = self.default
+        constraints['minimum'] = self.minimum
+        constraints['maximum'] = self.maximum
+        constraints['required'] = self.required
+        constraints['choices'] = self.choices
+        constraints['description'] = self.description
 
         blueprint['constraints'] = constraints
 
@@ -87,15 +93,11 @@ class Integer(DataType):
 
     def validate(self, value):
 
-        _validated_value = None
-
-        if self._required and self._default is None and value is None:
+        if not self._required and self._default is None and value is None:
+            return None
+        elif self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
-        elif self._required and value is None:
-            value = self._default
-        elif not self._required and self._default is None and value is None:
-            return _validated_value
-        elif not self._required and value is None:
+        elif self._default is not None and value is None:
             value = self._default
 
         try:
@@ -103,7 +105,7 @@ class Integer(DataType):
                 _validated_value = long(value)
             else:
                 _validated_value = int(value)
-        except Exception as exp:
+        except Exception:
             raise exception.ParseFailedError("encoding failed: value is not an integer or a long")
 
         if _validated_value is not None and self._minimum is not None and _validated_value < self._minimum:

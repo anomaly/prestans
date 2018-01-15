@@ -44,6 +44,7 @@ class DataURLFileUnitTest(unittest.TestCase):
         self.assertEquals(blueprint["constraints"]["allowed_mime_types"], ["image/png"])
         self.assertEquals(blueprint["constraints"]["description"], "description")
 
+    @unittest.skip
     def test_mime_type(self):
         red_dot = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
         data_url_file = DataURLFile()
