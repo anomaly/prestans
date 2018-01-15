@@ -95,7 +95,7 @@ class Float(DataType):
 
         try:
             _validated_value = float(value)
-        except Exception, exp:
+        except Exception as exp:
             raise exception.ParseFailedError("float encoding failed %s" % exp)
 
         if _validated_value is not None and self._minimum is not None and _validated_value < self._minimum:

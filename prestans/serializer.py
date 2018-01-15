@@ -32,7 +32,8 @@
 
 __all__ = ['Base', 'JSON', 'XMLPlist']
 
-import prestans.exception
+from prestans import exception
+from prestans.types import DataCollection
 
 
 class Base(object):
@@ -55,10 +56,10 @@ class JSON(Base):
         try:
             return json.dumps(serializable_object, ensure_ascii=False)
         except Exception as exp:
-            raise prestans.exception.SerializationFailedError('JSON: %s' % exp)
+            raise exception.SerializationFailedError("JSON: %s" % exp)
 
     def handler_body_type(self):
-        return prestans.types.DataCollection
+        return DataCollection
 
     def content_type(self):
         return 'application/json'
@@ -77,12 +78,12 @@ class XMLPlist(Base):
         try:
             plist_str = plistlib.writePlistToString(serializable_object)
         except Exception as exp:
-            raise prestans.exception.SerializationFailedError('XMLPlist: %s' % exp)
+            raise exception.SerializationFailedError("XMLPlist: %s" % exp)
 
         return plist_str
 
     def handler_body_type(self):
-        return prestans.types.DataCollection
+        return DataCollection
 
     def content_type(self):
         return 'application/xml'

@@ -171,12 +171,12 @@ class Model(DataCollection):
                 try:
                     value = None
 
-                    if arguments.has_key(attribute_name):
+                    if attribute_name in arguments:
                         value = arguments[attribute_name]
 
                     self.__dict__[attribute_name] = type_instance.validate(value)
 
-                except exception.DataValidationException, exp:
+                except exception.DataValidationException as exp:
                     self.__dict__[attribute_name] = None
 
     def get_attribute_keys(self):
@@ -214,8 +214,7 @@ class Model(DataCollection):
                 continue
 
             if isinstance(type_instance, DataCollection):
-                setattr(attribute_filter, attribute_name, \
-                        type_instance.get_attribute_filter(default_value))
+                setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
             else:
                 setattr(attribute_filter, attribute_name, default_value)
 

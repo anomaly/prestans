@@ -53,21 +53,31 @@ class DataURLFile(DataStructure):
         import uuid
         return uuid.uuid4().hex
 
-    def __init__(self, required=True, allowed_mime_types=[], description=None):
+    def __init__(self, required=True, allowed_mime_types=None, description=None):
+
+        if allowed_mime_types is None:
+            allowed_mime_types = []
+        elif isinstance(allowed_mime_types, str):
+            allowed_mime_types = [allowed_mime_types]
 
         self._required = required
         self._allowed_mime_types = allowed_mime_types
         self._description = description
 
-        if isinstance(allowed_mime_types, str):
-            self._allowed_mime_types = [allowed_mime_types]
-
         self._mime_type = None
         self._file_contents = None
 
     @property
+    def required(self):
+        return self._required
+
+    @property
     def allowed_mime_types(self):
         return self._allowed_mime_types
+
+    @property
+    def description(self):
+        return self._description
 
     def blueprint(self):
 
@@ -108,7 +118,7 @@ class DataURLFile(DataStructure):
             data_url, delimiter, base64_content = value.partition(',')
             _validated_value._mime_type = data_url.replace(';base64', '').replace('data:', '')
             _validated_value._file_contents = base64.b64decode(base64_content)
-        except Exception, exp:
+        except Exception as exp:
             raise exception.ParseFailedError("data url file encoding failed %s" % exp)
 
         if self._allowed_mime_types and len(self._allowed_mime_types) > 0 \
@@ -121,7 +131,7 @@ class DataURLFile(DataStructure):
         """
         Writes file to a particular location
 
-        This won't work for cloud environments like Google's Appengine, use with caution
+        This won't work for cloud environments like Google's App Engine, use with caution
         ensure to catch exceptions so you can provide informed feedback.
 
         prestans does not mask File IO exceptions so your handler can respond better.

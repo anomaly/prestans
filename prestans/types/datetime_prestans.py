@@ -106,7 +106,7 @@ class DateTime(DataStructure):
         elif type(value) == str or type(value) == unicode:
             try:
                 _validated_value = datetime.strptime(value, self._format)
-            except ValueError, exp:
+            except ValueError as exp:
                 raise exception.ParseFailedError("date time parsing failed %s" % exp)
         else:
             raise exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)

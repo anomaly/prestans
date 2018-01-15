@@ -1,10 +1,6 @@
 import unittest
 
-from prestans.exception import InvalidChoiceError
-from prestans.exception import LessThanMinimumError
-from prestans.exception import MoreThanMaximumError
-from prestans.exception import ParseFailedError
-from prestans.exception import RequiredAttributeError
+from prestans import exception
 from prestans.types import Float
 
 
@@ -12,11 +8,11 @@ class FloatUnitTest(unittest.TestCase):
 
     def test_types(self):
         types = Float()
-        self.assertRaises(ParseFailedError, types.validate, "string")
+        self.assertRaises(exception.ParseFailedError, types.validate, "string")
 
     def test_required(self):
         required = Float(required=True)
-        self.assertRaises(RequiredAttributeError, required.validate, None)
+        self.assertRaises(exception.RequiredAttributeError, required.validate, None)
         self.assertEqual(required.validate(1.0), 1.0)
 
     def test_not_required(self):
@@ -31,14 +27,14 @@ class FloatUnitTest(unittest.TestCase):
 
     def test_minimum(self):
         positive_range = Float(minimum=1.0, maximum=5.0)
-        self.assertRaises(LessThanMinimumError, positive_range.validate, 0.0)
-        self.assertRaises(LessThanMinimumError, positive_range.validate, 0.5)
+        self.assertRaises(exception.LessThanMinimumError, positive_range.validate, 0.0)
+        self.assertRaises(exception.LessThanMinimumError, positive_range.validate, 0.5)
         self.assertEqual(positive_range.validate(1.0), 1.0)
         self.assertEqual(positive_range.validate(1.5), 1.5)
 
         negative_range = Float(minimum=-5.0, maximum=-1.0)
-        self.assertRaises(LessThanMinimumError, negative_range.validate, -7.0)
-        self.assertRaises(LessThanMinimumError, negative_range.validate, -6.0)
+        self.assertRaises(exception.LessThanMinimumError, negative_range.validate, -7.0)
+        self.assertRaises(exception.LessThanMinimumError, negative_range.validate, -6.0)
         self.assertEqual(negative_range.validate(-5.0), -5.0)
         self.assertEqual(negative_range.validate(-4.0), -4.0)
 
@@ -47,20 +43,20 @@ class FloatUnitTest(unittest.TestCase):
         self.assertEqual(positive_range.validate(4.0), 4.0)
         self.assertEqual(positive_range.validate(4.5), 4.5)
         self.assertEqual(positive_range.validate(5.0), 5.0)
-        self.assertRaises(MoreThanMaximumError, positive_range.validate, 6.5)
-        self.assertRaises(MoreThanMaximumError, positive_range.validate, 7.0)
+        self.assertRaises(exception.MoreThanMaximumError, positive_range.validate, 6.5)
+        self.assertRaises(exception.MoreThanMaximumError, positive_range.validate, 7.0)
 
         negative_range = Float(minimum=-5.0, maximum=-1.0)
         self.assertEqual(negative_range.validate(-3.0), -3.0)
         self.assertEqual(negative_range.validate(-2.0), -2.0)
         self.assertEqual(negative_range.validate(-1.0), -1.0)
-        self.assertRaises(MoreThanMaximumError, negative_range.validate, -0.5)
-        self.assertRaises(MoreThanMaximumError, negative_range.validate, 0.0)
+        self.assertRaises(exception.MoreThanMaximumError, negative_range.validate, -0.5)
+        self.assertRaises(exception.MoreThanMaximumError, negative_range.validate, 0.0)
 
     def test_choices(self):
         choices = Float(choices=[1.0, 3.0])
-        self.assertRaises(InvalidChoiceError, choices.validate, 0.0)
-        self.assertRaises(InvalidChoiceError, choices.validate, 2.0)
-        self.assertRaises(InvalidChoiceError, choices.validate, 4.0)
+        self.assertRaises(exception.InvalidChoiceError, choices.validate, 0.0)
+        self.assertRaises(exception.InvalidChoiceError, choices.validate, 2.0)
+        self.assertRaises(exception.InvalidChoiceError, choices.validate, 4.0)
         self.assertEqual(choices.validate(1.0), 1.0)
         self.assertEqual(choices.validate(3.0), 3.0)

@@ -41,7 +41,7 @@ from prestans.types import Array, Date, DateTime, Float, Integer, String
 
 class ParameterSet(object):
     """
-    ParameterSet is a group of Dataprestans.types that are expected as GET parameters
+    ParameterSet is a group of prestans.types that are expected as GET parameters
 
     ParameterSet defines rules and patterns in which they are acceptable.
     while ParserRuleSet is responsible for running the parse mechanism.
@@ -143,7 +143,7 @@ class ParameterSet(object):
 
                 setattr(validated_parameter_set, attribute_name, validation_result)
 
-            except exception.DataValidationException, exp:
+            except exception.DataValidationException as exp:
                 raise exception.ValidationError(
                     message=str(exp),
                     attribute_name=attribute_name,
@@ -489,8 +489,8 @@ class VerbConfig(object):
     subclass of prestans.types.DataCollection.
     """
 
-    def __init__(self, response_template=None, response_attribute_filter_default_value=False,\
-        parameter_sets=None, body_template=None, request_attribute_filter=None):
+    def __init__(self, response_template=None, response_attribute_filter_default_value=False,
+                 parameter_sets=None, body_template=None, request_attribute_filter=None):
 
         """
         Each handler has a meta attribute called __verb_config__ this must be an instance

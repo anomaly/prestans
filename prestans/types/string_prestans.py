@@ -134,7 +134,7 @@ class String(DataType):
                 _validated_value = u''.join(value).encode(self._utf_encoding).strip()
             else:
                 _validated_value = str(value)
-        except Exception, exp:
+        except Exception as exp:
             raise exception.ParseFailedError("unicode or string encoding failed, %s" % exp)
 
         if self._trim:
