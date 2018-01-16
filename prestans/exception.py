@@ -67,8 +67,7 @@ __all__ = [
     'Forbidden'
 ]
 
-import prestans
-import prestans.http
+from prestans.http import STATUS
 
 
 class Base(Exception):
@@ -127,7 +126,7 @@ class UnsupportedVocabularyError(Base):
 
     def __init__(self, accept_header, supported_types):
 
-        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _code = STATUS.NOT_IMPLEMENTED
         _message = "Unsupported vocabulary in the Accept header"
         super(UnsupportedVocabularyError, self).__init__(_code, _message)
 
@@ -141,7 +140,7 @@ class UnsupportedContentTypeError(Base):
 
     def __init__(self, requested_mime_type, content_type):
 
-        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _code = STATUS.NOT_IMPLEMENTED
         _message = "Unsupported Content-Type in Request"
         super(UnsupportedContentTypeError, self).__init__(_code, _message)
 
@@ -163,7 +162,7 @@ class ValidationError(Base):
     """
     def __init__(self, message, attribute_name, value, blueprint):
 
-        super(ValidationError, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
+        super(ValidationError, self).__init__(STATUS.BAD_REQUEST, message)
         self._attribute_name = attribute_name
         self._value = str(value)
 
@@ -251,8 +250,8 @@ class ResponseException(HandlerException):
     in prestans.http
     """
     def __init__(self, code, message, response_model=None):
-
-        if response_model and not isinstance(response_model, prestans.types.Model):
+        from prestans.types import Model
+        if response_model and not isinstance(response_model, Model):
             raise TypeError("%s not a subclass of prestans.types.Model" % response_model.__class__.__name__)
 
         self._response_model = response_model
@@ -271,7 +270,7 @@ class UnimplementedVerbError(RequestException):
 
     def __init__(self, verb_name):
 
-        _code = prestans.http.STATUS.NOT_IMPLEMENTED
+        _code = STATUS.NOT_IMPLEMENTED
         _message = "API does not implement the HTTP Verb"
         super(UnimplementedVerbError, self).__init__(_code, _message)
 
@@ -284,7 +283,7 @@ class NoEndpointError(RequestException):
 
     def __init__(self):
 
-        _code = prestans.http.STATUS.NOT_FOUND
+        _code = STATUS.NOT_FOUND
         _message = "API does not provide this end-point"
         super(NoEndpointError, self).__init__(_code, _message)
 
@@ -293,7 +292,7 @@ class AuthenticationError(RequestException):
 
     def __init__(self, message=None):
 
-        _code = prestans.http.STATUS.UNAUTHORIZED
+        _code = STATUS.UNAUTHORIZED
 
         _message = message
         if _message is None:
@@ -306,7 +305,7 @@ class AuthorizationError(RequestException):
 
     def __init__(self, role_name):
 
-        _code = prestans.http.STATUS.FORBIDDEN
+        _code = STATUS.FORBIDDEN
         _message = "%s is not allowed to access this resource" % role_name
         super(AuthorizationError, self).__init__(_code, _message)
 
@@ -315,7 +314,7 @@ class SerializationFailedError(RequestException):
 
     def __init__(self, format):
 
-        _code = prestans.http.STATUS.NOT_FOUND
+        _code = STATUS.NOT_FOUND
         _message = "Serialization failed: %s" % format
         super(SerializationFailedError, self).__init__(_code, _message)
 
@@ -324,7 +323,7 @@ class DeSerializationFailedError(RequestException):
 
     def __init__(self, format):
 
-        _code = prestans.http.STATUS.NOT_FOUND
+        _code = STATUS.NOT_FOUND
         _message = "DeSerialization failed: %s" % format
         super(DeSerializationFailedError, self).__init__(_code, _message)
 
@@ -337,7 +336,7 @@ class AttributeFilterDiffers(RequestException):
 
     def __init__(self, attribute_list):
 
-        _code = prestans.http.STATUS.BAD_REQUEST
+        _code = STATUS.BAD_REQUEST
         _message = "attribute filter does not contain attributes (%s)\
         that are not part of template" % (', '.join(attribute_list))
 
@@ -358,7 +357,7 @@ class InconsistentPersistentDataError(Base):
     """
 
     def __init__(self, attribute_name, exception_message):
-        _code = prestans.http.STATUS.INTERNAL_SERVER_ERROR
+        _code = STATUS.INTERNAL_SERVER_ERROR
         _message = "Data Adapter failed to validate stored data on the server"
         super(InconsistentPersistentDataError, self).__init__(_code, _message)
 
@@ -380,7 +379,7 @@ class InconsistentPersistentDataError(Base):
 class DataValidationException(Base):
 
     def __init__(self, message):
-        super(DataValidationException, self).__init__(prestans.http.STATUS.BAD_REQUEST, message)
+        super(DataValidationException, self).__init__(STATUS.BAD_REQUEST, message)
 
 
 class RequiredAttributeError(DataValidationException):
@@ -463,8 +462,8 @@ class InvalidMetaValueError(DataValidationException):
 
 class UnregisteredAdapterError(DataValidationException):
 
-    def __init__(self):
-        _message = "no registered adapters for data model"
+    def __init__(self, model_name):
+        _message = "no registered adapters for data model %s" % model_name
         super(UnregisteredAdapterError, self).__init__(_message)
 
 #:
@@ -477,54 +476,54 @@ class UnregisteredAdapterError(DataValidationException):
 class ServiceUnavailable(ResponseException):
 
     def __init__(self, message="Service Unavailable", response_model=None):
-        _code = prestans.http.STATUS.SERVICE_UNAVAILABLE
+        _code = STATUS.SERVICE_UNAVAILABLE
         super(ServiceUnavailable, self).__init__(_code, message, response_model)
 
 
 class BadRequest(ResponseException):
 
     def __init__(self, message="Bad Request", response_model=None):
-        _code = prestans.http.STATUS.BAD_REQUEST
+        _code = STATUS.BAD_REQUEST
         super(BadRequest, self).__init__(_code, message, response_model)
 
 
 class Conflict(ResponseException):
 
     def __init__(self, message="Conflict", response_model=None):
-        _code = prestans.http.STATUS.CONFLICT
+        _code = STATUS.CONFLICT
         super(Conflict, self).__init__(_code, message, response_model)
 
 
 class NotFound(ResponseException):
 
     def __init__(self, message="Not Found", response_model=None):
-        _code = prestans.http.STATUS.NOT_FOUND
+        _code = STATUS.NOT_FOUND
         super(NotFound, self).__init__(_code, message, response_model)
 
 
 class Unauthorized(ResponseException):
 
     def __init__(self, message="Unauthorized", response_model=None):
-        _code = prestans.http.STATUS.UNAUTHORIZED
+        _code = STATUS.UNAUTHORIZED
         super(Unauthorized, self).__init__(_code, message, response_model)
 
 
 class MovedPermanently(ResponseException):
 
     def __init__(self, message="Moved Permanently", response_model=None):
-        _code = prestans.http.STATUS.MOVED_PERMANENTLY
+        _code = STATUS.MOVED_PERMANENTLY
         super(MovedPermanently, self).__init__(_code, message, response_model)
 
 
 class PaymentRequired(ResponseException):
 
     def __init__(self, message="Payment Required", response_model=None):
-        _code = prestans.http.STATUS.PAYMENT_REQUIRED
+        _code = STATUS.PAYMENT_REQUIRED
         super(PaymentRequired, self).__init__(_code, message, response_model)
 
 
 class Forbidden(ResponseException):
 
     def __init__(self, message="Forbidden", response_model=None):
-        _code = prestans.http.STATUS.FORBIDDEN
+        _code = STATUS.FORBIDDEN
         super(Forbidden, self).__init__(_code, message, response_model)
