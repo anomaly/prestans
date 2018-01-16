@@ -35,6 +35,7 @@ import inspect
 
 from prestans import exception
 from prestans import http
+from prestans.types import BinaryResponse
 from prestans.types import DataCollection
 from prestans.types import Array, Date, DateTime, Float, Integer, String
 
@@ -71,14 +72,14 @@ class ParameterSet(object):
                not isinstance(type_instance, Date) and \
                not isinstance(type_instance, DateTime) and \
                not isinstance(type_instance, Array):
-                raise TypeError("%s should be subclass of\
+                raise TypeError("%s should be instance of\
                  prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if isinstance(type_instance, Array):
                 if not isinstance(type_instance.element_template, String) and \
                    not isinstance(type_instance.element_template, Float) and \
                    not isinstance(type_instance.element_template, Integer):
-                    raise TypeError("%s should be subclass of \
+                    raise TypeError("%s should be instance of \
                         prestans.types.String/Integer/Float/Array" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
@@ -167,6 +168,22 @@ class AttributeFilter(object):
       }
     """
 
+    def __init__(self, from_dictionary=None, template_model=None, is_array_scalar=False, **kwargs):
+        """
+        Creates an attribute filter object, optionally populates from a
+        dictionary of booleans
+        """
+
+        if from_dictionary:
+            self._init_from_dictionary(from_dictionary, template_model)
+
+        #: kwargs support
+        for name, value in kwargs.iteritems():
+            if self.__dict__.has_key(name):
+                setattr(self, name, value)
+            else:
+                raise KeyError(name)
+
     @classmethod
     def from_model(cls, model_instance, default_value=False, **kwargs):
         """
@@ -188,22 +205,6 @@ class AttributeFilter(object):
                 raise KeyError(name)
 
         return attribute_filter_instance
-
-    def __init__(self, from_dictionary=None, template_model=None, is_array_scalar=False, **kwargs):
-        """
-        Creates an attribute filter object, optionally populates from a
-        dictionary of booleans
-        """
-
-        if from_dictionary:
-            self._init_from_dictionary(from_dictionary, template_model)
-
-        #: kwargs support
-        for name, value in kwargs.iteritems():
-            if self.__dict__.has_key(name):
-                setattr(self, name, value)
-            else:
-                raise KeyError(name)
 
     def conforms_to_template_filter(self, template_filter):
         """
@@ -373,7 +374,6 @@ class AttributeFilter(object):
             elif isinstance(type_instance, self.__class__):
                 type_instance.set_all_attribute_values(value)
 
-
     def as_dict(self):
         """
         turns attribute filter object into python dictionary
@@ -429,18 +429,14 @@ class AttributeFilter(object):
                 raise TypeError("AttributeFilter input for key %s must be \
                     boolean or dict, %s provided" % (key, value.__class__.__name__))
 
-            #:
-            #: Ensure that the key exists in the template model
-            #:
+            # Ensure that the key exists in the template model
             if template_model is not None and not template_model.has_key(target_key):
 
                 unwanted_keys = list()
                 unwanted_keys.append(target_key)
                 raise exception.AttributeFilterDiffers(unwanted_keys)
 
-            #:
-            #: Either keep the value of wrap it up with AttributeFilter
-            #:
+            # Either keep the value of wrap it up with AttributeFilter
             if isinstance(value, bool):
                 setattr(self, target_key, value)
             elif isinstance(value, dict):
@@ -450,7 +446,7 @@ class AttributeFilter(object):
 
                     sub_map = getattr(template_model, target_key)
 
-                    #: prestans Array support
+                    # prestans Array support
                     if isinstance(sub_map, Array):
                         sub_map = sub_map.element_template
 
@@ -485,7 +481,7 @@ class VerbConfig(object):
     These rules are used by prestans to validate requests and responses before
     handing over execution control to your handler.
 
-    All verbs in use must provide atleast a response_template which should be a
+    All verbs in use must provide at least a response_template which should be a
     subclass of prestans.types.DataCollection.
     """
 
@@ -519,10 +515,9 @@ class VerbConfig(object):
 
         self._response_attribute_filter_template = None
 
-        #: response_template; required parameter
+        # response_template; required parameter
         if response_template is not None and \
-        (not isinstance(response_template, DataCollection) and \
-         not isinstance(response_template, BinaryResponse)):
+           (not isinstance(response_template, DataCollection) and not isinstance(response_template, BinaryResponse)):
             raise TypeError("response_template of type %s must be an instance of \
                 a prestans.types.DataCollection subclass" % response_template.__class__.__name__)
 
@@ -536,7 +531,7 @@ class VerbConfig(object):
 
         self._response_template = response_template
 
-        #: parameter_sets turn a single object into a list
+        # parameter_sets turn a single object into a list
         if isinstance(parameter_sets, ParameterSet):
             parameter_sets = [parameter_sets]
 
@@ -550,7 +545,7 @@ class VerbConfig(object):
         else:
             self._parameter_sets = list()
 
-        #: body_template
+        # body_template
         if body_template is not None and not \
            isinstance(body_template, DataCollection):
             raise TypeError(
@@ -559,9 +554,9 @@ class VerbConfig(object):
 
         self._body_template = body_template
 
-        #: request_attribute_filter
+        # request_attribute_filter
         if request_attribute_filter is not None and \
-        not isinstance(request_attribute_filter, AttributeFilter):
+           not isinstance(request_attribute_filter, AttributeFilter):
             raise TypeError("request_attribute_filter of type %s must an instance \
             of prestans.parser.AttributeFilter" % request_attribute_filter.__class__.__name__)
 
@@ -630,7 +625,7 @@ class Config(object):
 
     def __init__(self, GET=None, HEAD=None, POST=None, PUT=None, PATCH=None, DELETE=None, OPTIONS=None):
 
-        for verb in [GET, HEAD, POST, PUT, PATCH, DELETE]:
+        for verb in [GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS]:
             if verb is not None and not isinstance(verb, VerbConfig):
                 raise TypeError("All Parser configs should be of type prestans.parser.VerbConfig")
 
