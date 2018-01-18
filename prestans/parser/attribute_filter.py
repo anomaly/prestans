@@ -261,6 +261,7 @@ class AttributeFilter(object):
         if not isinstance(from_dictionary, dict):
             raise TypeError("from_dictionary must be of type dict, %s \
                 provided" % from_dictionary.__class__.__name__)
+
         rewrite_map = None
         if template_model is not None:
 
@@ -310,11 +311,6 @@ class AttributeFilter(object):
         """
         Overrides setattr to allow only booleans or an AttributeFilter
         """
-
-        # Set internal fields
-        if key[0:1] == "_":
-            self.__dict__[key] = value
-            return
 
         # Values should either be boolean or type of self
         if isinstance(value, bool) and key in self.__dict__ and isinstance(self.__dict__[key], self.__class__):

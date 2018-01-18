@@ -1,5 +1,6 @@
 import unittest
 
+from prestans import exception
 from prestans.parser import AttributeFilter
 from prestans import types
 
@@ -64,7 +65,14 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertRaises(KeyError, AttributeFilter.from_model, model_instance=MyModel(), missing=True)
 
     def test_conforms_to_template_filter(self):
-        pass
+        self.assertRaises(TypeError, AttributeFilter().conforms_to_template_filter, "string")
+
+        filter_a = AttributeFilter({"a": True, "b": {"a": True}})
+        filter_b = AttributeFilter({"a": False, "b": {"a": False}})
+        filter_c = AttributeFilter({"a": True, "b": False, "c": False})
+        self.assertRaises(exception.AttributeFilterDiffers, filter_a.conforms_to_template_filter(filter_c))
+
+        self.assertTrue(filter_a.conforms_to_template_filter(filter_b))
 
     def test_keys(self):
         # test created from dict
@@ -209,7 +217,7 @@ class AttributeFilterTest(unittest.TestCase):
         filter_b = AttributeFilter(dict_b)
         self.assertEquals(filter_b.as_dict(), dict_b)
 
-    @unittest.skip("currently broken")
+    @unittest.skip("currently failing")
     def test_init_from_dictionary(self):
         self.assertRaises(TypeError, AttributeFilter, "string")
 
@@ -247,8 +255,8 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertFalse(attribute_filter.is_attribute_visible("c"))
         self.assertTrue(attribute_filter.is_attribute_visible("d"))
 
-        self.assertRaises(TypeError, attribute_filter.a, "string")
-        self.assertRaises(TypeError, attribute_filter.b, None)
+        self.assertRaises(TypeError, attribute_filter.__setattr__ , "a", "string")
+        self.assertRaises(TypeError, attribute_filter.__setattr__, "missing", None)
 
     def test_from_model_boolean_array(self):
         boolean_array = types.Array(element_template=types.Boolean())
