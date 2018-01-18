@@ -56,14 +56,9 @@ class Model(DataCollection):
         """
 
         self._required = required
-        self._default = default
         self._description = description
 
         self._create_instance_attributes(kwargs)
-
-    # todo: consider removing this
-    def default(self):
-        return self._default
 
     def attribute_count(self):
 
@@ -139,7 +134,7 @@ class Model(DataCollection):
                 )
             return
 
-        raise KeyError("No key named %s; in instance of type %s " % (key, self.__class__.__name__))
+        raise KeyError("No key named: %s in instance of type: %s" % (key, self.__class__.__name__))
 
     def _create_instance_attributes(self, arguments):
         """
@@ -229,9 +224,6 @@ class Model(DataCollection):
             this is done by the serializer
             """
             raise exception.RequiredAttributeError()
-
-        if not value and self._default:
-            return self._default
 
         if not self._required and not value:
             """
@@ -385,7 +377,7 @@ class Model(DataCollection):
     def _generate_attribute_token_rewrite_map(self, model_class_members):
 
         rewrite_tokens = self._generate_attribute_tokens(model_class_members)
-        minified_tokens = self._generate_minfied_keys(len(rewrite_tokens))
+        minified_tokens = self._generate_minified_keys(len(rewrite_tokens))
 
         return dict(zip(rewrite_tokens, minified_tokens))
 
@@ -408,7 +400,7 @@ class Model(DataCollection):
 
         return rewrite_tokens
 
-    def _generate_minfied_keys(self, length=26, prefix=''):
+    def _generate_minified_keys(self, length=26, prefix=''):
 
         minified_keys = list()
 
@@ -428,7 +420,7 @@ class Model(DataCollection):
                 if sublist_length > 26:
                     sublist_length = 26
 
-                sublist = self._generate_minfied_keys(sublist_length, generated_char)
+                sublist = self._generate_minified_keys(sublist_length, generated_char)
                 minified_keys = minified_keys + sublist
                 overflow = overflow - len(sublist)
 
@@ -437,12 +429,15 @@ class Model(DataCollection):
 
         return minified_keys
 
-    def _generate_attribute_key(self, val):
-        return string.lowercase[val%26]*(val/26+1)
-
-    #:
-    #: Serialization
-    #:
+    @classmethod
+    def _generate_attribute_key(cls, val):
+        """
+        :param val:
+        :type val: int
+        :return:
+        :rtype: str
+        """
+        return string.lowercase[val % 26] * (val / 26 + 1)
 
     def as_serializable(self, attribute_filter=None, minified=False):
         """
@@ -451,6 +446,11 @@ class Model(DataCollection):
         will respect the visibility.
 
         The response is used by serializers to return data to client
+
+        :param attribute_filter:
+        :type attribute_filter: prestans.parser.AttributeFilter
+        :param minified:
+        :type minified: bool
         """
         from prestans.parser import AttributeFilter
 
