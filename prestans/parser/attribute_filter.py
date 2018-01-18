@@ -160,16 +160,20 @@ class AttributeFilter(object):
 
     def is_attribute_visible(self, key):
         """
-        returns True if an attribute is visible
+        Returns True if an attribute is visible
         If attribute is an instance of AttributeFilter, it returns True if all attributes
         of the sub filter are visible.
+
+        :param key: name of attribute to check
+        :type key: str
+        :return: whether attribute is visible
+        :rtype: bool
         """
         if self.has_key(key):
             attribute_status = getattr(self, key)
-            if isinstance(attribute_status, bool) and attribute_status == True:
+            if isinstance(attribute_status, bool) and attribute_status is True:
                 return True
-            elif isinstance(attribute_status, self.__class__) and \
-                    attribute_status.are_any_attributes_visible():
+            elif isinstance(attribute_status, self.__class__) and attribute_status.are_all_attributes_visible():
                 return True
 
         return False
@@ -184,10 +188,9 @@ class AttributeFilter(object):
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
 
-            if isinstance(type_instance, bool) and type_instance == True:
+            if isinstance(type_instance, bool) and type_instance is True:
                 return True
-            elif isinstance(type_instance, self.__class__) and \
-                    type_instance.are_all_attributes_visible() == True:
+            elif isinstance(type_instance, self.__class__) and type_instance.are_all_attributes_visible() is True:
                 return True
 
         return False
@@ -203,10 +206,9 @@ class AttributeFilter(object):
                 # Ignore parameters with __ and if they are methods
                 continue
 
-            if isinstance(type_instance, bool) and type_instance == False:
+            if isinstance(type_instance, bool) and type_instance is False:
                 return False
-            elif isinstance(type_instance, self.__class__) and \
-                    type_instance.are_all_attributes_visible() == False:
+            elif isinstance(type_instance, self.__class__) and type_instance.are_all_attributes_visible() is False:
                 return False
 
         return True
@@ -248,8 +250,12 @@ class AttributeFilter(object):
 
     def _init_from_dictionary(self, from_dictionary, template_model=None):
         """
-        Private helper to init values from a dictionary, wraps chidlren into
+        Private helper to init values from a dictionary, wraps children into
         AttributeFilter objects
+
+        :param from_dictionary: dictionary to get attribute names and visibility from
+        :type from_dictionary: dict
+        :param template_model: DataCollection
         """
 
         if not isinstance(from_dictionary, dict):
@@ -258,25 +264,21 @@ class AttributeFilter(object):
         rewrite_map = None
         if template_model is not None:
 
-            rewrite_map = template_model.attribute_rewrite_reverse_map()
-
             if not isinstance(template_model, DataCollection):
                 raise TypeError("template_model should be a prestans model in AttributeFilter \
                     init (from dictionary), %s provided" % template_model.__class__.__name__)
+
+            rewrite_map = template_model.attribute_rewrite_reverse_map()
 
         for key, value in from_dictionary.iteritems():
 
             target_key = key
 
-            #:
-            #: Minification support
-            #:
+            # minify support
             if rewrite_map is not None:
                 target_key = rewrite_map[key]
 
-            #:
-            #: Check to see we can work with the value
-            #:
+            # check to see we can work with the value
             if not isinstance(value, (bool, dict)):
                 raise TypeError("AttributeFilter input for key %s must be \
                     boolean or dict, %s provided" % (key, value.__class__.__name__))
@@ -315,8 +317,7 @@ class AttributeFilter(object):
             return
 
         # Values should either be boolean or type of self
-        if isinstance(value, bool) and key in self.__dict__ and \
-                isinstance(self.__dict__[key], self.__class__):
+        if isinstance(value, bool) and key in self.__dict__ and isinstance(self.__dict__[key], self.__class__):
             self.__dict__[key].set_all_attribute_values(value)
             return
         elif isinstance(value, (bool, self.__class__)):

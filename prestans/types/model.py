@@ -61,12 +61,13 @@ class Model(DataCollection):
 
         self._create_instance_attributes(kwargs)
 
+    # todo: consider removing this
     def default(self):
         return self._default
 
     def attribute_count(self):
 
-        count = 0
+        attribute_count = 0
         model_class_members = inspect.getmembers(self.__class__)
 
         for attribute_name, type_instance in model_class_members:
@@ -75,9 +76,9 @@ class Model(DataCollection):
                 continue
 
             if isinstance(type_instance, DataType):
-                _attribute_keys.append(attribute_name)
+                attribute_count += 1
 
-        return count
+        return attribute_count
 
     def blueprint(self):
 
@@ -293,11 +294,13 @@ class Model(DataCollection):
 
         return _model_instance
 
-    #:
-    #: Rewrite map generation
-    #:
-
     def attribute_rewrite_map(self):
+        """
+        Example: long_name -> a_b
+
+        :return: the rewrite map
+        :rtype: dict
+        """
 
         rewrite_map = dict()
         model_class_members = inspect.getmembers(self.__class__)
@@ -323,6 +326,12 @@ class Model(DataCollection):
         return rewrite_map
 
     def attribute_rewrite_reverse_map(self):
+        """
+        Example:
+
+        :return: the reverse rewrite map
+        :rtype: dict
+        """
 
         rewrite_map = dict()
         model_class_members = inspect.getmembers(self.__class__)

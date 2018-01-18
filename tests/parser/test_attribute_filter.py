@@ -72,7 +72,13 @@ class AttributeFilterTest(unittest.TestCase):
         from_dict_keys = from_dict.keys()
         self.assertEquals(from_dict_keys, ["a", "b", "c"])
 
-        # todo: test created from model
+        # test created from model
+        class MyModel(types.Model):
+            name = types.String()
+            tags = types.Array(element_template=types.String())
+
+        from_model = AttributeFilter.from_model(model_instance=MyModel())
+        self.assertEquals(from_model.keys(), ["name", "tags"])
 
     def test_has_key(self):
         # from dict
@@ -83,47 +89,179 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertFalse(from_dict.has_key("d"))
 
         # from model
+        class MyModel(types.Model):
+            name = types.String()
+            tags = types.Array(element_template=types.String())
+
+        from_model = AttributeFilter.from_model(model_instance=MyModel())
+        self.assertTrue(from_model.has_key("name"))
+        self.assertTrue(from_model.has_key("tags"))
+        self.assertFalse(from_model.has_key("age"))
 
     def test_is_filter_at_key(self):
-        pass
+
+        class SubModel(types.Model):
+            name = types.String()
+
+        class ModelWithSub(types.Model):
+            tags = types.Array(element_template=types.String())
+            sub_model = SubModel()
+
+        attribute_filter = AttributeFilter.from_model(model_instance=ModelWithSub())
+        self.assertTrue(attribute_filter.is_filter_at_key("sub_model"))
+        self.assertFalse(attribute_filter.is_filter_at_key("tags"))
 
     def test_is_attribute_visible(self):
-        pass
+
+        dict_a = {
+            "a": True,
+            "b": False,
+            "c": True,
+            "d": {
+                "a": True,
+                "b": False
+            }
+        }
+
+        filter_a = AttributeFilter(dict_a)
+        self.assertTrue(filter_a.is_attribute_visible("a"))
+        self.assertFalse(filter_a.is_attribute_visible("b"))
+        self.assertTrue(filter_a.is_attribute_visible("c"))
+        self.assertFalse(filter_a.is_attribute_visible("d"))
+
+        dict_b = {
+            "a": True,
+            "b": False,
+            "c": True,
+            "d": {
+                "a": True,
+                "b": True
+            }
+        }
+
+        filter_b = AttributeFilter(dict_b)
+        self.assertTrue(filter_b.is_attribute_visible("a"))
+        self.assertFalse(filter_b.is_attribute_visible("b"))
+        self.assertTrue(filter_b.is_attribute_visible("c"))
+        self.assertTrue(filter_b.is_attribute_visible("d"))
 
     def test_are_any_attributes_visible(self):
-        pass
+        some_visible = AttributeFilter({"a": True, "b": False, "c": True})
+        self.assertTrue(some_visible.are_any_attributes_visible())
+
+        none_visible = AttributeFilter({"a": False, "b": False, "c": False})
+        self.assertFalse(none_visible.are_any_attributes_visible())
+
+        sub_visible = AttributeFilter({"a": {"a": True}, "b": False, "c": True})
+        self.assertTrue(sub_visible.are_any_attributes_visible())
 
     def test_are_all_attributes_visible(self):
-        pass
+        all_visible = AttributeFilter({"a": True, "b": True, "c": True})
+        self.assertTrue(all_visible.are_all_attributes_visible())
+
+        some_invisible = AttributeFilter({"a": True, "b": True, "c": False})
+        self.assertFalse(some_invisible.are_all_attributes_visible())
+
+        sub_visible = AttributeFilter({"a": {"a": True}, "b": True, "c": True})
+        self.assertTrue(sub_visible.are_all_attributes_visible())
+
+        sub_invisible = AttributeFilter({"a": {"a": False}, "b": True, "c": True})
+        self.assertFalse(sub_invisible.are_all_attributes_visible())
 
     def test_set_all_attribute_values(self):
-        pass
+        mixed = {"a": True, "b": False, "c": True, "d": {"a": False}}
+        attribute_filter = AttributeFilter(mixed)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertFalse(attribute_filter.is_attribute_visible("d"))
+        attribute_filter.set_all_attribute_values(True)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertTrue(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertTrue(attribute_filter.is_attribute_visible("d"))
+        attribute_filter.set_all_attribute_values(False)
+        self.assertFalse(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertFalse(attribute_filter.is_attribute_visible("c"))
+        self.assertFalse(attribute_filter.is_attribute_visible("d"))
 
     def test_as_dict(self):
-        pass
+        dict_a = {
+            "a": False,
+            "b": True,
+            "c": {
+                "a": True,
+                "b": False
+            }
+        }
+        filter_a = AttributeFilter(dict_a)
+        self.assertEquals(filter_a.as_dict(), dict_a)
 
+        dict_b = {
+            "a": False,
+            "b": {
+                "a": False,
+                "b": True
+            },
+            "c": False
+        }
+        filter_b = AttributeFilter(dict_b)
+        self.assertEquals(filter_b.as_dict(), dict_b)
+
+    @unittest.skip("currently broken")
     def test_init_from_dictionary(self):
-        pass
+        self.assertRaises(TypeError, AttributeFilter, "string")
+
+        class MyModel(types.Model):
+            name = types.String()
+
+        self.assertRaises(TypeError, AttributeFilter, {"name": True}, template_model="string")
+
+        attribute_filter = AttributeFilter({"name": True}, template_model=MyModel())
+
+        self.assertRaises(TypeError, AttributeFilter, {"name": "string"})
 
     def test_setattr(self):
-        pass
+        source_dict = {
+            "a": True,
+            "b": False,
+            "c": True,
+            "d": {
+                "a": True,
+                "b": False
+            }
+        }
 
+        attribute_filter = AttributeFilter(source_dict)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertFalse(attribute_filter.is_attribute_visible("d"))
+        attribute_filter.a = False
+        attribute_filter.b = True
+        attribute_filter.c = False
+        attribute_filter.d = True
+        self.assertFalse(attribute_filter.is_attribute_visible("a"))
+        self.assertTrue(attribute_filter.is_attribute_visible("b"))
+        self.assertFalse(attribute_filter.is_attribute_visible("c"))
+        self.assertTrue(attribute_filter.is_attribute_visible("d"))
 
-def test_from_model_boolean_array():
-    boolean_array = types.Array(element_template=types.Boolean())
-    AttributeFilter.from_model(model_instance=boolean_array, default_value=True)
+        self.assertRaises(TypeError, attribute_filter.a, "string")
+        self.assertRaises(TypeError, attribute_filter.b, None)
 
+    def test_from_model_boolean_array(self):
+        boolean_array = types.Array(element_template=types.Boolean())
+        AttributeFilter.from_model(model_instance=boolean_array, default_value=True)
 
-def test_from_model_float_array():
-    float_array = types.Array(element_template=types.Float())
-    AttributeFilter.from_model(model_instance=float_array, default_value=True)
+    def test_from_model_float_array(self):
+        float_array = types.Array(element_template=types.Float())
+        AttributeFilter.from_model(model_instance=float_array, default_value=True)
 
+    def test_from_model_integer_array(self):
+        integer_array = types.Array(element_template=types.Integer())
+        AttributeFilter.from_model(model_instance=integer_array, default_value=True)
 
-def test_from_model_integer_array():
-    integer_array = types.Array(element_template=types.Integer())
-    AttributeFilter.from_model(model_instance=integer_array, default_value=True)
-
-
-def test_from_model_string_array():
-    string_array = types.Array(element_template=types.String())
-    AttributeFilter.from_model(model_instance=string_array, default_value=True)
+    def test_from_model_string_array(self):
+        string_array = types.Array(element_template=types.String())
+        AttributeFilter.from_model(model_instance=string_array, default_value=True)

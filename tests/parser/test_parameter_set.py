@@ -65,11 +65,16 @@ class ParameterSetTest(unittest.TestCase):
         self.assertRaises(TypeError, BadAttribute().validate, request)
 
     def test_model_array_rejected(self):
+        from webob.request import Request
+        request = Request({})
+
         class MyModel(types.Model):
             name = types.String()
 
         class ModelArray(ParameterSet):
-            model_array = types.Array(element_template=types.Boolean())
+            model_array = types.Array(element_template=MyModel())
+
+        self.assertRaises(TypeError, ModelArray().validate, request)
 
     def test_boolean_array_rejected(self):
         from webob.request import Request

@@ -1,12 +1,62 @@
 import unittest
 
 from prestans import types
+from prestans.parser import AttributeFilter
+from prestans.parser import ParameterSet
 from prestans.parser import VerbConfig
 
 
 class VerbConfigTest(unittest.TestCase):
 
-    def test_init(self):
+    def test_init_response_template(self):
+        class MyModel(types.Model):
+            pass
+
+        my_model = MyModel()
+        verb_config = VerbConfig(response_template=my_model)
+        self.assertEquals(verb_config.response_template, my_model)
+
+        # todo: check correct attribute filter template is generated
+        # self.assertEquals(verb_config.response_attribute_filter_template, AttributeFilter.from_model(
+        #     model_instance=MyModel(),
+        #     default_value=False
+        # ))
+
+        binary_response = types.BinaryResponse()
+        self.assertEquals(VerbConfig(response_template=binary_response).response_template, binary_response)
+
+        self.assertRaises(TypeError, VerbConfig, response_template="string")
+
+    def test_init_response_attribute_filter_default_value(self):
+        pass
+
+    def test_init_parameter_sets_single(self):
+        param_set = ParameterSet()
+
+        self.assertRaises(TypeError, VerbConfig, parameter_sets="string")
+
+        verb_config = VerbConfig(parameter_sets=param_set)
+        self.assertEquals(verb_config.parameter_sets, [param_set])
+
+    def test_init_parameter_sets_array(self):
+        param_set1 = ParameterSet()
+        param_set2 = ParameterSet()
+
+        self.assertRaises(TypeError, VerbConfig, parameter_sets=[param_set1, "string"])
+
+        verb_config = VerbConfig(parameter_sets=[param_set1, param_set2])
+        self.assertEquals(verb_config.parameter_sets, [param_set1, param_set2])
+
+    def test_init_body_template(self):
+        class MyModel(types.Model):
+            pass
+
+        my_model = MyModel()
+        self.assertEquals(VerbConfig(body_template=my_model).body_template, my_model)
+
+        self.assertRaises(TypeError, VerbConfig, body_template="string")
+
+    def test_init_request_attribute_filter(self):
         pass
 
     def test_blueprint(self):
@@ -20,8 +70,12 @@ class VerbConfigTest(unittest.TestCase):
         class MyModel(types.Model):
             pass
 
+        class MyParamSet(ParameterSet):
+            pass
+
+        param_set = MyParamSet()
         response_template = MyModel()
-        parameter_sets = []
+        parameter_sets = [param_set, param_set]
         body_template = MyModel()
         request_attribute_filter = None
 
@@ -32,7 +86,7 @@ class VerbConfigTest(unittest.TestCase):
         )
         blueprint = verb_config.blueprint()
         self.assertEquals(blueprint["response_template"], response_template.blueprint())
-        self.assertEquals(blueprint["parameter_sets"], parameter_sets)
+        self.assertEquals(blueprint["parameter_sets"], [param_set.blueprint(), param_set.blueprint()])
         self.assertEquals(blueprint["body_template"], body_template.blueprint())
 
     def test_response_template(self):
@@ -61,22 +115,22 @@ class VerbConfigTest(unittest.TestCase):
     def test_request_attribute_filter(self):
         pass
 
+    def test_boolean_array(self):
+        boolean_array = types.Array(element_template=types.Boolean())
+        verb_config = VerbConfig(response_template=boolean_array)
+        self.assertEquals(verb_config.response_template, boolean_array)
 
-def test_verb_config_boolean_array():
-    boolean_array = types.Array(element_template=types.Boolean())
-    VerbConfig(response_template=boolean_array)
+    def test_float_array(self):
+        float_array = types.Array(element_template=types.Float())
+        verb_config = VerbConfig(response_template=float_array)
+        self.assertEquals(verb_config.response_template, float_array)
 
+    def test_integer_array(self):
+        integer_array = types.Array(element_template=types.Integer())
+        verb_config = VerbConfig(response_template=integer_array)
+        self.assertEquals(verb_config.response_template, integer_array)
 
-def test_verb_config_float_array():
-    float_array = types.Array(element_template=types.Float())
-    VerbConfig(response_template=float_array)
-
-
-def test_verb_config_integer_array():
-    integer_array = types.Array(element_template=types.Integer())
-    VerbConfig(response_template=integer_array)
-
-
-def test_verb_config_string_array():
-    string_array = types.Array(element_template=types.String())
-    VerbConfig(response_template=string_array)
+    def test_string_array(self):
+        string_array = types.Array(element_template=types.String())
+        verb_config = VerbConfig(response_template=string_array)
+        self.assertEquals(verb_config.response_template, string_array)

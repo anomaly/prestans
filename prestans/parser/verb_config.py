@@ -50,20 +50,21 @@ class VerbConfig(object):
             raise TypeError("response_template of type %s must be an instance of \
                 a prestans.types.DataCollection subclass" % response_template.__class__.__name__)
 
-        if response_template is not None and \
-                isinstance(response_template, DataCollection):
-            self.response_attribute_filter_template = AttributeFilter. \
-                from_model(model_instance=response_template, \
-                           default_value=response_attribute_filter_default_value)
+        if response_template is not None and isinstance(response_template, DataCollection):
+            self.response_attribute_filter_template = AttributeFilter.from_model(
+                model_instance=response_template,
+                default_value=response_attribute_filter_default_value
+            )
         else:
             self.response_attribute_filter_template = None
 
         self._response_template = response_template
 
-        # parameter_sets turn a single object into a list
-        if isinstance(parameter_sets, ParameterSet):
+        # turn parameter_sets single object into a list
+        if parameter_sets is not None and not isinstance(parameter_sets, list):
             parameter_sets = [parameter_sets]
 
+        # check that all parameter sets are of valid type
         if isinstance(parameter_sets, list):
             for parameter_set in parameter_sets:
                 if not isinstance(parameter_set, ParameterSet):
