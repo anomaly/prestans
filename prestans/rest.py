@@ -82,7 +82,7 @@ class Request(webob.Request):
 
         if self.body_template is None:
             raise AttributeError("access to request.parsed_body is not \
-                allowed when body_tempalte is set to None")
+                allowed when body_template is set to None")
 
         return self._parsed_body
 
@@ -176,12 +176,17 @@ class Request(webob.Request):
 
     def register_deserializers(self, deserializers):
 
-        for deserializer in self._deserializers:
+        if not isinstance(deserializers, list):
+            deserializers = [deserializers]
+
+        # todo: should this prevent duplicates for mime-types?
+
+        for deserializer in deserializers:
 
             if not isinstance(deserializer, prestans.deserializer.Base):
-                raise TypeError("registered deserializer %s.%s does not \
-                    inherit from prestans.serializer.DeSerializer" % \
-                    (deserializer.__module__, deserializer.__class__.__name__))
+                msg = "registered deserializer %s does not inherit from prestans.serializer.DeSerializer" % \
+                      deserializer.__class__.__name__
+                raise TypeError(msg)
 
         self._deserializers = self._deserializers + deserializers
 
@@ -202,7 +207,7 @@ class Request(webob.Request):
         json_deserializer = prestans.deserializer.JSON()
         attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
-        #: Construct an AttributeFilter
+        # construct an AttributeFilter
         attribute_filter = prestans.parser.AttributeFilter(
             from_dictionary=attribute_list_dictionary,
             template_model=template_model

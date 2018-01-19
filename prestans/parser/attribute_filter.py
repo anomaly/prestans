@@ -25,7 +25,7 @@ class AttributeFilter(object):
         dictionary of booleans
         """
         # todo: is_array_scalar currently does nothing, fix or remove
-        # todo: adding it as property breaks keys and other method with currently implementation
+        # todo: adding it as property breaks keys and other methods in current implementation
 
         if from_dictionary:
             self._init_from_dictionary(from_dictionary, template_model)
@@ -67,47 +67,38 @@ class AttributeFilter(object):
          - If sub list found, perform the first check
          - If self has a value for an attribute, assign to final AttributeFilter
          - If not found, assign value from template
+
+         todo: rename as current name is mis-leading
         """
 
         if not isinstance(template_filter, self.__class__):
             raise TypeError("AttributeFilter can only check conformance against \
                 another template filter, %s provided" % template_filter.__class__.__name__)
 
-        #:
-        #: Keys from the template
-        #:
+        # keys from the template
         template_filter_keys = template_filter.keys()
         # Keys from the object itself
         this_filter_keys = self.keys()
 
-        #:
-        #: 1. Check to see if the client has provided unwanted keys
-        #:
+        # 1. Check to see if the client has provided unwanted keys
         unwanted_keys = set(this_filter_keys) - set(template_filter_keys)
         if len(unwanted_keys) > 0:
             raise exception.AttributeFilterDiffers(list(unwanted_keys))
 
-        #:
-        #: 2. Make a attribute_filter that we send back
-        #:
+        # 2. Make a attribute_filter that we send back
         evaluated_attribute_filter = AttributeFilter()
 
-        #:
-        #: 3. Evaluate the differences between the two, with template_filter as the standard
-        #:
+        # 3. Evaluate the differences between the two, with template_filter as the standard
         for template_key in template_filter_keys:
 
             if template_key in this_filter_keys:
 
                 value = getattr(self, template_key)
 
-                #:
-                #: If sub filter and boolean provided with of true, create default filter
-                #: with value of true
-                #:
+                # if sub filter and boolean provided with of true, create default filter with value of true
                 if isinstance(value, bool) and \
-                        value is True and \
-                        isinstance(getattr(template_filter, template_key), AttributeFilter):
+                   value is True and \
+                   isinstance(getattr(template_filter, template_key), AttributeFilter):
                     setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
                 elif isinstance(value, bool):
                     setattr(evaluated_attribute_filter, template_key, value)
@@ -115,11 +106,12 @@ class AttributeFilter(object):
                     # Attribute lists sort themselves out, to produce sub Attribute Filters
                     template_sub_list = getattr(template_filter, template_key)
                     this_sub_list = getattr(self, template_key)
-                    setattr(evaluated_attribute_filter, template_key, \
-                            this_sub_list.conforms_to_template_filter(template_sub_list))
+                    setattr(
+                        evaluated_attribute_filter, template_key,
+                        this_sub_list.conforms_to_template_filter(template_sub_list)
+                    )
             else:
-                setattr(evaluated_attribute_filter, template_key, \
-                        getattr(template_filter, template_key))
+                setattr(evaluated_attribute_filter, template_key, getattr(template_filter, template_key))
 
         return evaluated_attribute_filter
 
@@ -148,7 +140,7 @@ class AttributeFilter(object):
 
     def is_filter_at_key(self, key):
         """
-        return True if attribute is a subfilter
+        return True if attribute is a sub filter
         """
 
         if self.has_key(key):
@@ -255,7 +247,8 @@ class AttributeFilter(object):
 
         :param from_dictionary: dictionary to get attribute names and visibility from
         :type from_dictionary: dict
-        :param template_model: DataCollection
+        :param template_model:
+        :type template_model: DataCollection
         """
 
         if not isinstance(from_dictionary, dict):
@@ -266,8 +259,8 @@ class AttributeFilter(object):
         if template_model is not None:
 
             if not isinstance(template_model, DataCollection):
-                raise TypeError("template_model should be a prestans model in AttributeFilter \
-                    init (from dictionary), %s provided" % template_model.__class__.__name__)
+                msg = "template_model should be a prestans model %s provided" % template_model.__class__.__name__
+                raise TypeError(msg)
 
             rewrite_map = template_model.attribute_rewrite_reverse_map()
 
@@ -279,17 +272,17 @@ class AttributeFilter(object):
             if rewrite_map is not None:
                 target_key = rewrite_map[key]
 
-            # check to see we can work with the value
-            if not isinstance(value, (bool, dict)):
-                raise TypeError("AttributeFilter input for key %s must be \
-                    boolean or dict, %s provided" % (key, value.__class__.__name__))
-
-            # Ensure that the key exists in the template model
+            # ensure that the key exists in the template model
             if template_model is not None and not template_model.has_key(target_key):
 
                 unwanted_keys = list()
                 unwanted_keys.append(target_key)
                 raise exception.AttributeFilterDiffers(unwanted_keys)
+
+            # check to see we can work with the value
+            if not isinstance(value, (bool, dict)):
+                raise TypeError("AttributeFilter input for key %s must be \
+                    boolean or dict, %s provided" % (key, value.__class__.__name__))
 
             # Either keep the value of wrap it up with AttributeFilter
             if isinstance(value, bool):

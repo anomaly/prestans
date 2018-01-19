@@ -65,14 +65,24 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertRaises(KeyError, AttributeFilter.from_model, model_instance=MyModel(), missing=True)
 
     def test_conforms_to_template_filter(self):
+
+        # check exception raised if template is not an AttributeFilter
         self.assertRaises(TypeError, AttributeFilter().conforms_to_template_filter, "string")
 
-        filter_a = AttributeFilter({"a": True, "b": {"a": True}})
-        filter_b = AttributeFilter({"a": False, "b": {"a": False}})
-        filter_c = AttributeFilter({"a": True, "b": False, "c": False})
-        self.assertRaises(exception.AttributeFilterDiffers, filter_a.conforms_to_template_filter(filter_c))
+        filter_a = AttributeFilter({"a": True, "b": {"a": True}, "c": False})
+        filter_b = AttributeFilter({"a": False, "b": {"a": False}, "d": True})
 
-        self.assertTrue(filter_a.conforms_to_template_filter(filter_b))
+        # check exception raised if keys differ
+        self.assertRaises(exception.AttributeFilterDiffers, filter_a.conforms_to_template_filter, filter_b)
+
+        filter_c = AttributeFilter({"a": False, "b": {"a": False}, "c": False})
+
+        # check that source values are copied across to template
+        merged_filter = filter_a.conforms_to_template_filter(filter_c)
+        self.assertTrue(merged_filter.is_attribute_visible("a"))
+        self.assertTrue(merged_filter.is_attribute_visible("b"))
+        self.assertTrue(merged_filter.b.is_attribute_visible("a"))
+        self.assertFalse(merged_filter.is_attribute_visible("c"))
 
     def test_keys(self):
         # test created from dict
@@ -217,18 +227,27 @@ class AttributeFilterTest(unittest.TestCase):
         filter_b = AttributeFilter(dict_b)
         self.assertEquals(filter_b.as_dict(), dict_b)
 
-    @unittest.skip("currently failing")
     def test_init_from_dictionary(self):
         self.assertRaises(TypeError, AttributeFilter, "string")
 
         class MyModel(types.Model):
             name = types.String()
+            tags = types.Array(element_template=types.String())
 
         self.assertRaises(TypeError, AttributeFilter, {"name": True}, template_model="string")
-
-        attribute_filter = AttributeFilter({"name": True}, template_model=MyModel())
-
         self.assertRaises(TypeError, AttributeFilter, {"name": "string"})
+
+        # check that filter is correctly reversed
+        attribute_filter = AttributeFilter({"a": True}, template_model=MyModel())
+        self.assertTrue(attribute_filter.is_attribute_visible("name"))
+
+        # todo: check that exception is throw when invalid keys are passed
+        # self.assertRaises(
+        #     exception.AttributeFilterDiffers,
+        #     AttributeFilter,
+        #     from_dictionary={"a": True, "c": False},
+        #     template_model=MyModel()
+        # )
 
     def test_setattr(self):
         source_dict = {

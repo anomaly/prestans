@@ -46,12 +46,12 @@ class VERB:
     HEAD is similar to a GET but it does not return a response.
     """
 
-    GET     = "GET"
-    HEAD    = "HEAD"
-    POST    = "POST"
-    PUT     = "PUT"
-    PATCH   = "PATCH"
-    DELETE  = "DELETE"
+    GET = "GET"
+    HEAD = "HEAD"
+    POST = "POST"
+    PUT = "PUT"
+    PATCH = "PATCH"
+    DELETE = "DELETE"
     OPTIONS = "OPTIONS"
 
     @classmethod
