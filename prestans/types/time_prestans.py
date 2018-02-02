@@ -115,8 +115,7 @@ class Time(DataStructure):
             except ValueError as exp:
                 raise exception.ParseFailedError("time parsing failed %s" % exp)
         else:
-            raise exception.ParseFailedError("cannot parse value of type %s" \
-                                                      % value.__class__.__name__)
+            raise exception.ParseFailedError("cannot parse value of type %s" % value.__class__.__name__)
 
         return _validated_value
 

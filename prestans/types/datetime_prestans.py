@@ -29,6 +29,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from datetime import datetime as datetime_type
 from datetime import datetime
 
 from prestans import exception
@@ -37,13 +38,21 @@ from prestans.types import DataStructure
 
 class DateTime(DataStructure):
 
-    class CONSTANT:
-        NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
+    DEFAULT_FORMAT = "%Y-%m-%d %H:%M:%S"
+    NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_NOW'
+    UTC_NOW = '_PRESTANS_CONSTANT_MODEL_DATETIME_UTC_NOW'
 
-    def __init__(self, default=None, required=True, format="%Y-%m-%d %H:%M:%S",
+    def __init__(self, default=None, required=True, format=DEFAULT_FORMAT,
                  timezone=False, utc=False, description=None):
 
-        self._default = default
+        if isinstance(default, datetime_type) or \
+                default == self.NOW or \
+                default == self.UTC_NOW or \
+                default is None:
+            self._default = default
+        else:
+            raise TypeError("default must be one of datetime, DateTime.NOW or DateTime.UTC_NOW")
+
         self._required = required
         self._timezone = timezone
         self._utc = utc
@@ -53,6 +62,10 @@ class DateTime(DataStructure):
     @property
     def default(self):
         return self._default
+
+    @property
+    def required(self):
+        return self._required
 
     @property
     def format(self):
@@ -65,6 +78,10 @@ class DateTime(DataStructure):
     @property
     def utc(self):
         return self._utc
+
+    @property
+    def description(self):
+        return self._description
 
     def blueprint(self):
 
@@ -89,21 +106,26 @@ class DateTime(DataStructure):
         if self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
         elif self._required and value is None:
-            if self._default == DateTime.CONSTANT.NOW:
+            if self._default == DateTime.NOW:
                 value = datetime.now()
-            else:
-                value = self._default
-        elif not self._required and self._default is None and value is None:
-            return _validated_value
-        elif not self._required and value is None:
-            if self._default == DateTime.CONSTANT.NOW:
-                value = datetime.now()
+            elif self._default == DateTime.UTC_NOW:
+                value = datetime.utcnow()
             else:
                 value = self._default
 
-        if type(value) == datetime:
+        elif not self._required and self._default is None and value is None:
+            return _validated_value
+        elif not self._required and value is None:
+            if self._default == DateTime.NOW:
+                value = datetime.now()
+            elif self._default == DateTime.UTC_NOW:
+                value = datetime.utcnow()
+            else:
+                value = self._default
+
+        if isinstance(value, datetime_type):
             _validated_value = value
-        elif type(value) == str or type(value) == unicode:
+        elif isinstance(value, str) or isinstance(value, unicode):
             try:
                 _validated_value = datetime.strptime(value, self._format)
             except ValueError as exp:
