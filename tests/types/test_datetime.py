@@ -28,15 +28,14 @@ class DateTimeUnitTest(unittest.TestCase):
         self.assertRaises(TypeError, DateTime, default=23)
 
     def test_required(self):
-        datetime_type = DateTime()
-        self.assertTrue(datetime_type.required)
+        required_default = DateTime()
+        self.assertTrue(required_default.required)
 
-        datetime_type = DateTime(required=True)
-        self.assertTrue(datetime_type.required)
+        required_true = DateTime(required=True)
+        self.assertTrue(required_true.required)
 
-    def test_not_required(self):
-        datetime_type = DateTime(required=False)
-        self.assertFalse(datetime_type.required)
+        required_false = DateTime(required=False)
+        self.assertFalse(required_false.required)
 
     def test_format(self):
         default_format = DateTime()

@@ -30,6 +30,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 from datetime import date
+from datetime import date as date_type
 from datetime import datetime
 
 from prestans import exception
@@ -38,12 +39,18 @@ from prestans.types import DataStructure
 
 class Date(DataStructure):
 
-    class CONSTANT:
-        TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
+    DEFAULT_FORMAT = "%Y-%m-%d"
+    TODAY = '_PRESTANS_CONSTANT_MODEL_DATE_TODAY'
 
-    def __init__(self, default=None, required=True, format="%Y-%m-%d", description=None):
+    def __init__(self, default=None, required=True, format=DEFAULT_FORMAT, description=None):
 
-        self._default = default
+        if isinstance(default, date_type) or \
+                default == self.TODAY or \
+                default is None:
+            self._default = default
+        else:
+            raise TypeError("default must be one of date, Date.TODAY")
+
         self._required = required
         self._format = format
         self._description = description
@@ -53,8 +60,16 @@ class Date(DataStructure):
         return self._default
 
     @property
+    def required(self):
+        return self._required
+
+    @property
     def format(self):
         return self._format
+
+    @property
+    def description(self):
+        return self._description
 
     def blueprint(self):
 
@@ -77,19 +92,19 @@ class Date(DataStructure):
         if self._required and self._default is None and value is None:
             raise exception.RequiredAttributeError()
         elif self._required and value is None:
-            if self._default == Date.CONSTANT.TODAY:
+            if self._default == Date.TODAY:
                 value = date.today()
             else:
                 value = self._default
         elif not self._required and self._default is None and value is None:
             return _validated_value
         elif not self._required and value is None:
-            if self._default == Date.CONSTANT.TODAY:
+            if self._default == Date.TODAY:
                 value = date.today()
             else:
                 value = self._default
 
-        if type(value) == date:
+        if isinstance(value, date_type):
             _validated_value = value
         elif type(value) == str or type(value) == unicode:
             try:
@@ -103,7 +118,7 @@ class Date(DataStructure):
 
     def as_serializable(self, value):
 
-        if not type(value) == date:
+        if not isinstance(value, date_type):
             raise exception.InvalidTypeError(value, 'datetime.date')
 
         return value.strftime(self._format)
