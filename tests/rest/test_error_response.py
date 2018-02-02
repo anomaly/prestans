@@ -1,10 +1,17 @@
 import unittest
 
+from prestans import exception
+from prestans.rest import ErrorResponse
+from prestans.serializer import JSON
+
 
 class ErrorResponseTest(unittest.TestCase):
 
     def test_init(self):
-        pass
+        raised_exception = exception.NoEndpointError()
+        json_serializer = JSON()
+
+        error_response = ErrorResponse(raised_exception, json_serializer)
 
     def test_trace(self):
         pass
