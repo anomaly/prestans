@@ -87,12 +87,18 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertTrue(merged_filter.b.is_attribute_visible("a"))
         self.assertFalse(merged_filter.is_attribute_visible("c"))
 
-    def test_keys(self):
+    def test_keys_empty(self):
+        empty_dict = AttributeFilter()
+        empty_dict_keys = empty_dict.keys()
+        self.assertEquals(empty_dict_keys, [])
+
+    def test_keys_dict(self):
         # test created from dict
         from_dict = AttributeFilter({"a": True, "b": False, "c": True})
         from_dict_keys = from_dict.keys()
         self.assertEquals(from_dict_keys, ["a", "b", "c"])
 
+    def test_keys_from_model(self):
         # test created from model
         class MyModel(types.Model):
             name = types.String()

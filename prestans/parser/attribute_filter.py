@@ -51,7 +51,7 @@ class AttributeFilter(object):
 
         #: kwargs support
         for name, value in iter(kwargs.items()):
-            if name in attribute_filter_instance.__dict__:
+            if name in attribute_filter_instance:
                 setattr(attribute_filter_instance, name, value)
             else:
                 raise KeyError(name)
@@ -116,15 +116,18 @@ class AttributeFilter(object):
 
     def keys(self):
         """
-        returns a list of usable keys
+        :returns: a list of usable keys
+        :rtype: list
+
         """
 
         keys = list()
 
         for attribute_name, type_instance in inspect.getmembers(self):
 
+            # ignore parameters with __ and if they are methods
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods
+
                 continue
 
             keys.append(attribute_name)

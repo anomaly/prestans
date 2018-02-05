@@ -60,15 +60,21 @@ class Model(DataCollection):
 
         self._create_instance_attributes(kwargs)
 
+    def getmembers(self):
+        """
+        :return: list of members as name, type tuples
+        :rtype: list
+        """
+        return filter(
+            lambda m: not m[0].startswith("__") and not inspect.isfunction(m[1]) and not inspect.ismethod(m[1]),
+            inspect.getmembers(self.__class__)
+        )
+
     def attribute_count(self):
 
         attribute_count = 0
-        model_class_members = inspect.getmembers(self.__class__)
 
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataType):
                 attribute_count += 1
@@ -89,12 +95,7 @@ class Model(DataCollection):
         blueprint['constraints'] = constraints
 
         fields = dict()
-        model_class_members = inspect.getmembers(self.__class__)
-
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be of a DataType subclass" % attribute_name)
@@ -110,10 +111,8 @@ class Model(DataCollection):
             self.__dict__[key] = value
             return
 
-        model_class_members = inspect.getmembers(self.__class__)
-
         validator = None
-        for attribute_name, type_instance in model_class_members:
+        for attribute_name, type_instance in self.getmembers():
             if attribute_name == key:
                 validator = type_instance
 
@@ -147,12 +146,7 @@ class Model(DataCollection):
         DataType instances are initialized to None or default value.
         """
 
-        model_class_members = inspect.getmembers(self.__class__)
-
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataCollection):
                 self.__dict__[attribute_name] = copy.deepcopy(type_instance)
@@ -185,12 +179,7 @@ class Model(DataCollection):
 
         _attribute_keys = list()
 
-        model_class_members = inspect.getmembers(self.__class__)
-
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataType):
                 _attribute_keys.append(attribute_name)
@@ -202,12 +191,7 @@ class Model(DataCollection):
 
         attribute_filter = AttributeFilter()
 
-        _model_class_members = inspect.getmembers(self.__class__)
-
-        for attribute_name, type_instance in _model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataCollection):
                 setattr(attribute_filter, attribute_name, type_instance.get_attribute_filter(default_value))
@@ -232,14 +216,10 @@ class Model(DataCollection):
             return None
 
         _model_instance = self.__class__()
-        _model_class_members = inspect.getmembers(self.__class__)
 
         rewrite_map = self.attribute_rewrite_map()
 
-        for attribute_name, type_instance in _model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if attribute_filter and not attribute_filter.is_attribute_visible(attribute_name):
                 _model_instance.__dict__[attribute_name] = None
@@ -295,14 +275,9 @@ class Model(DataCollection):
         """
 
         rewrite_map = dict()
-        model_class_members = inspect.getmembers(self.__class__)
+        token_rewrite_map = self._generate_attribute_token_rewrite_map()
 
-        token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
-
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataType):
                 attribute_tokens = attribute_name.split('_')
@@ -319,29 +294,25 @@ class Model(DataCollection):
 
     def attribute_rewrite_reverse_map(self):
         """
-        Example:
+        Example: a_b -> long_name
 
         :return: the reverse rewrite map
         :rtype: dict
         """
 
         rewrite_map = dict()
-        model_class_members = inspect.getmembers(self.__class__)
 
-        token_rewrite_map = self._generate_attribute_token_rewrite_map(model_class_members)
+        token_rewrite_map = self._generate_attribute_token_rewrite_map()
 
-        for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataType):
-                attribute_tokens = attribute_name.split('_')
 
+                attribute_tokens = attribute_name.split('_')
                 rewritten_attribute_name = ''
                 for token in attribute_tokens:
                     rewritten_attribute_name += token_rewrite_map[token] + "_"
-                #: Remove the trailing underscore
+                # remove the trailing underscore
                 rewritten_attribute_name = rewritten_attribute_name[:-1]
 
                 rewrite_map[rewritten_attribute_name] = attribute_name
@@ -349,8 +320,6 @@ class Model(DataCollection):
         return rewrite_map
 
     def __contains__(self, attribute_name):
-
-        # members = inspect.getmembers(self)
 
         has_key = attribute_name in self.__class__.__dict__
 
@@ -374,9 +343,9 @@ class Model(DataCollection):
 
         return has_key
 
-    def _generate_attribute_token_rewrite_map(self, model_class_members):
+    def _generate_attribute_token_rewrite_map(self):
 
-        rewrite_tokens = self._generate_attribute_tokens(model_class_members)
+        rewrite_tokens = self._generate_attribute_tokens(self.getmembers())
         minified_tokens = self._generate_minified_keys(len(rewrite_tokens))
 
         return dict(zip(rewrite_tokens, minified_tokens))
@@ -387,9 +356,6 @@ class Model(DataCollection):
 
         #: Create a list of tokens
         for attribute_name, type_instance in model_class_members:
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
 
             if isinstance(type_instance, DataType):
                 rewrite_tokens = rewrite_tokens + attribute_name.split('_')
@@ -455,16 +421,12 @@ class Model(DataCollection):
         from prestans.parser import AttributeFilter
 
         model_dictionary = dict()
-        model_class_members = inspect.getmembers(self.__class__)
 
         rewrite_map = self.attribute_rewrite_map()
 
-        for attribute_name, type_instance in model_class_members:
+        for attribute_name, type_instance in self.getmembers():
 
             serialized_attribute_name = attribute_name
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
 
             if isinstance(attribute_filter, AttributeFilter) and \
                not attribute_filter.is_attribute_visible(attribute_name):

@@ -59,13 +59,14 @@ class VerbConfigTest(unittest.TestCase):
     def test_init_request_attribute_filter(self):
         pass
 
-    def test_blueprint(self):
-        verb_config = VerbConfig()
-        blueprint = verb_config.blueprint()
+    def test_blueprint_default(self):
+        blueprint = VerbConfig().blueprint()
         self.assertIsNone(blueprint["response_template"])
         self.assertEquals(blueprint["parameter_sets"], [])
         self.assertIsNone(blueprint["body_template"])
         self.assertIsNone(blueprint["request_attribute_filter"])
+
+    def test_blueprint(self):
 
         class MyModel(types.Model):
             pass

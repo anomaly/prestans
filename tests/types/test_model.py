@@ -83,6 +83,7 @@ class ModelUnitTest(unittest.TestCase):
         self.assertEquals(blueprint["fields"]["first_name"], MyModel.first_name.blueprint())
         self.assertEquals(blueprint["fields"]["last_name"], MyModel.last_name.blueprint())
 
+    def test_blueprint_bad_attribute(self):
         class ModelWithBadAttribute(types.Model):
             name = "string"
 
@@ -108,6 +109,10 @@ class ModelUnitTest(unittest.TestCase):
 
         my_model = MyModel()
         self.assertEquals(my_model.get_attribute_keys(), ["name", "tags"])
+
+    def test_get_attribute_filter_base(self):
+        attribute_filter = types.Model().get_attribute_filter()
+        self.assertEquals(attribute_filter.keys(), [])
 
     def test_get_attribute_filter(self):
         class SubModel(types.Model):
