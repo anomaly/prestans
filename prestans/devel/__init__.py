@@ -40,6 +40,7 @@ import os
 from prestans import exception
 from prestans import __version__
 
+
 class ArgParserFactory(object):
     """
     Argument parser factory.
@@ -70,7 +71,7 @@ class ArgParserFactory(object):
 
     def _add_generate_sub_commands(self):
         """
-        Subcommands for generating models for usage by clients.
+        Sub commands for generating models for usage by clients.
         Currently supports Google Closure.
         """
 
@@ -123,6 +124,7 @@ class ArgParserFactory(object):
             help="filter namespace to use with template e.g prestans.data.filter"
             )
 
+
 class CommandDispatcher(object):
     """
     Processes the user's commands.
@@ -159,4 +161,3 @@ class CommandDispatcher(object):
             output_directory=self._args.output)
 
         preplate.run()
-        
