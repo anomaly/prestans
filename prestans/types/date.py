@@ -104,9 +104,11 @@ class Date(DataStructure):
             else:
                 value = self._default
 
+        from prestans.util import string_types
+
         if isinstance(value, date_type):
             _validated_value = value
-        elif type(value) == str or type(value) == unicode:
+        elif isinstance(value, string_types):
             try:
                 _validated_value = datetime.strptime(value, self._format).date()
             except ValueError as exp:

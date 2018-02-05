@@ -103,9 +103,5 @@ class IntegerUnitTest(unittest.TestCase):
         self.assertRaises(exception.InvalidChoiceError, Integer(choices=[1, 3, 5]).validate, 2)
         self.assertEquals(Integer(choices=[2, 4]).validate(4), 4)
 
-        # check long integer
-        long_value = long(4)
-        self.assertEquals(Integer().validate(long_value), long_value)
-
         # check non-integer raise parse error
         self.assertRaises(exception.ParseFailedError, Integer().validate, "string")

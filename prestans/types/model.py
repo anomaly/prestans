@@ -310,7 +310,7 @@ class Model(DataCollection):
                 rewritten_attribute_name = ''
                 for token in attribute_tokens:
                     rewritten_attribute_name += token_rewrite_map[token] + "_"
-                #: Remove the trailing underscore
+                # remove the trailing underscore
                 rewritten_attribute_name = rewritten_attribute_name[:-1]
 
                 rewrite_map[attribute_name] = rewritten_attribute_name
@@ -348,11 +348,11 @@ class Model(DataCollection):
 
         return rewrite_map
 
-    def has_key(self, attribute_name):
+    def __contains__(self, attribute_name):
 
-        members = inspect.getmembers(self)
+        # members = inspect.getmembers(self)
 
-        has_key = self.__class__.__dict__.has_key(attribute_name)
+        has_key = attribute_name in self.__class__.__dict__
 
         if not has_key:
 
@@ -365,7 +365,7 @@ class Model(DataCollection):
                 base_class = base_classes.pop()
 
                 # we found it clear the list
-                if base_class.__dict__.has_key(attribute_name):
+                if attribute_name in base_class.__dict__:
                     has_key = True
                     base_classes = list()
                 # add any more base classes from this class
@@ -437,7 +437,7 @@ class Model(DataCollection):
         :return:
         :rtype: str
         """
-        return string.lowercase[val % 26] * (val / 26 + 1)
+        return string.ascii_lowercase[val % 26] * (val // 26 + 1)
 
     def as_serializable(self, attribute_filter=None, minified=False):
         """
@@ -474,15 +474,14 @@ class Model(DataCollection):
             if minified is True:
                 serialized_attribute_name = rewrite_map[attribute_name]
 
-            if not self.__dict__.has_key(attribute_name) or self.__dict__[attribute_name] is None:
+            if attribute_name not in self.__dict__ or self.__dict__[attribute_name] is None:
                 model_dictionary[serialized_attribute_name] = None
                 continue
 
             if isinstance(type_instance, DataCollection):
 
                 sub_attribute_filter = None
-                if isinstance(attribute_filter, AttributeFilter) and \
-                   attribute_filter.has_key(attribute_name):
+                if isinstance(attribute_filter, AttributeFilter) and attribute_name in attribute_filter:
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
                 model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name]. \

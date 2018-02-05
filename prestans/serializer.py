@@ -29,11 +29,12 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-__all__ = ['Base', 'JSON', 'XMLPlist']
+import sys
 
 from prestans import exception
 from prestans.types import DataCollection
+
+__all__ = ['JSON', 'XMLPlist']
 
 
 class Base(object):
@@ -67,8 +68,11 @@ class JSON(Base):
 
 class XMLPlist(Base):
     """
-    Uses Apple's Property List format to serialize collections 
-    to XML. Refer to http://docs.python.org/2/library/plistlib.html
+    Uses Apple's Property List format to serialize collections to XML.
+
+    Refer to:
+     - https://docs.python.org/2/library/plistlib.html
+     - https://docs.python.org/3/library/plistlib.html
     """
 
     def dumps(self, serializable_object):
@@ -76,7 +80,10 @@ class XMLPlist(Base):
         import plistlib
 
         try:
-            plist_str = plistlib.writePlistToString(serializable_object)
+            if sys.version_info < (3,):
+                plist_str = plistlib.writePlistToString(serializable_object)
+            else:
+                plist_str = plistlib.dumps(serializable_object)
         except Exception as exp:
             raise exception.SerializationFailedError("XMLPlist: %s" % exp)
 

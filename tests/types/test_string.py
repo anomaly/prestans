@@ -1,47 +1,27 @@
 import unittest
 
-from prestans.exception import InvalidChoiceError
-from prestans.exception import InvalidFormatError
-from prestans.exception import MinimumLengthError
-from prestans.exception import MaximumLengthError
-from prestans.exception import RequiredAttributeError
+from prestans import exception
 from prestans.types import String
 
 
 class StringUnitTest(unittest.TestCase):
 
     def test_required(self):
-        string = String(required=True)
-        self.assertTrue(string.required)
-        self.assertRaises(RequiredAttributeError, string.validate, None)
-        self.assertRaises(RequiredAttributeError, string.validate, "")
-        self.assertEqual(string.validate("apple"), "apple")
+        required_default = String()
+        self.assertTrue(required_default.required)
 
-    def test_not_required(self):
-        string = String(required=False)
-        self.assertFalse(string.required)
-        self.assertEqual(string.validate("apple"), "apple")
-        self.assertEqual(string.validate(""), "")
-        self.assertEqual(string.validate(None), None)
+        required_true = String(required=True)
+        self.assertTrue(required_true.required)
 
-    def test_invalid_types(self):
-        types = String()
-        self.assertEqual(types.validate("orange"), "orange")
-        self.assertEqual(types.validate(1), "1")
-        self.assertEqual(types.validate(1.0), "1.0")
-        self.assertEqual(types.validate(True), "True")
+        required_false = String(required=False)
+        self.assertFalse(required_false.required)
 
     def test_default(self):
-        default = "orange"
-        string = String(required=True, default=default)
-        self.assertEquals(string.default, default)
-        self.assertEqual(string.validate(None), "orange")
-        self.assertEqual(string.validate("apple"), "apple")
+        default_default = String()
+        self.assertIsNone(default_default.default)
 
-        string = String(required=False, default=default)
-        self.assertEquals(string.default, default)
-        self.assertEquals(string.validate(None), "orange")
-        self.assertEquals(string.validate("apple"), "apple")
+        default_value = String(required=True, default="orange")
+        self.assertEquals(default_value.default, "orange")
 
     def test_min_less_than_max(self):
         self.assertRaises(ValueError, String, min_length=2, max_length=1)
@@ -52,7 +32,7 @@ class StringUnitTest(unittest.TestCase):
     def test_min_length(self):
         string = String(min_length=5, max_length=7)
         self.assertEquals(string.min_length, 5)
-        self.assertRaises(MinimumLengthError, string.validate, "1234")
+        self.assertRaises(exception.MinimumLengthError, string.validate, "1234")
         self.assertEqual(string.validate("12345"), "12345")
 
     def test_non_positive_max_length(self):
@@ -61,15 +41,15 @@ class StringUnitTest(unittest.TestCase):
     def test_max_length(self):
         string = String(min_length=5, max_length=7)
         self.assertEquals(string.max_length, 7)
-        self.assertRaises(MaximumLengthError, string.validate, "123456789")
+        self.assertRaises(exception.MaximumLengthError, string.validate, "123456789")
         self.assertEqual(string.validate("1234567"), "1234567")
 
     def test_format(self):
         format_string = "[0-9]{2}[a-z]{5}[0-9]{3}"
         string = String(format=format_string)
         self.assertEquals(string.format, format_string)
-        self.assertRaises(InvalidFormatError, string.validate, "cat")
-        self.assertRaises(InvalidFormatError, string.validate, "ab45678as")
+        self.assertRaises(exception.InvalidFormatError, string.validate, "cat")
+        self.assertRaises(exception.InvalidFormatError, string.validate, "ab45678as")
         self.assertEqual(string.validate("12abcde123"), "12abcde123")
         self.assertEqual(string.validate("89uwxyz789"), "89uwxyz789")
 
@@ -77,8 +57,8 @@ class StringUnitTest(unittest.TestCase):
         choices = ["apple", "banana"]
         string = String(choices=choices)
         self.assertEquals(string.choices, choices)
-        self.assertRaises(InvalidChoiceError, string.validate, "orange")
-        self.assertRaises(InvalidChoiceError, string.validate, "grape")
+        self.assertRaises(exception.InvalidChoiceError, string.validate, "orange")
+        self.assertRaises(exception.InvalidChoiceError, string.validate, "grape")
 
         self.assertEqual(string.validate("apple"), "apple")
         self.assertEqual(string.validate("banana"), "banana")
@@ -128,3 +108,38 @@ class StringUnitTest(unittest.TestCase):
         self.assertEquals(blueprint["constraints"]["utf_encoding"], string.utf_encoding)
         self.assertEquals(blueprint["constraints"]["description"], string.description)
         self.assertEquals(blueprint["constraints"]["trim"], string.trim)
+
+    def test_validate(self):
+
+        # test required
+        self.assertRaises(exception.RequiredAttributeError, String(required=True).validate, None)
+        self.assertRaises(exception.RequiredAttributeError, String(required=True).validate, "")
+        self.assertEqual(String(required=True).validate("apple"), "apple")
+
+        # test not required
+        self.assertEqual(String(required=False).validate("apple"), "apple")
+        self.assertEqual(String(required=False).validate(""), "")
+        self.assertEqual(String(required=False).validate(None), None)
+
+        # test invalid types
+        self.assertEqual(String().validate("orange"), "orange")
+        self.assertEqual(String().validate(1), "1")
+        self.assertEqual(String().validate(1.0), "1.0")
+        self.assertEqual(String().validate(True), "True")
+
+        # test default required
+        self.assertEqual(String(required=True, default="orange").validate(None), "orange")
+        self.assertEqual(String(required=True, default="orange").validate("apple"), "apple")
+
+        # test default not required
+        self.assertEquals(String(required=False, default="orange").validate(None), "orange")
+        self.assertEquals(String(required=False, default="orange").validate("apple"), "apple")
+
+        # test unicode encode
+        self.assertEquals(String().validate(u"unicode"), u"unicode")
+
+        # test str parse
+        self.assertEquals(String().validate("string"), "string")
+
+        # test int
+        self.assertEquals(String().validate(1234), "1234")

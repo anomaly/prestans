@@ -325,11 +325,11 @@ class AttributeMetaData(object):
     @property
     def default(self):
         # dates are checked first otherwise string will catch them
-        if self._default == prestans.types.DateTime.CONSTANT.NOW:
+        if self._default == prestans.types.DateTime.NOW:
             return "prestans.types.DateTime.NOW"
-        elif self._default == prestans.types.Date.CONSTANT.TODAY:
+        elif self._default == prestans.types.Date.TODAY:
             return "prestans.types.Date.TODAY"
-        elif self._default == prestans.types.Time.CONSTANT.NOW:
+        elif self._default == prestans.types.Time.NOW:
             return "prestans.types.Time.NOW"
         elif self._default is None:
             return "null"
@@ -472,7 +472,7 @@ class Model(Base):
             self._dependencies = list()
             self._attribute_string = ""
 
-            for field_name, field_blueprint in model_blueprint['fields'].iteritems():
+            for field_name, field_blueprint in iter(model_blueprint['fields'].items()):
 
                 attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)                
                 attributes.append(attribute)
@@ -523,7 +523,7 @@ class Filter(Base):
             self._dependencies = list()
             self._attribute_string = ""
 
-            for field_name, field_blueprint in model_blueprint['fields'].iteritems():
+            for field_name, field_blueprint in iter(model_blueprint['fields'].items()):
 
                 attribute = AttributeMetaData(name=field_name, blueprint=field_blueprint)
                 attributes.append(attribute)

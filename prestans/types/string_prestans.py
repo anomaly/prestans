@@ -130,8 +130,10 @@ class String(DataType):
             value = self._default
 
         try:
-            if isinstance(value, unicode):
-                _validated_value = u''.join(value).encode(self._utf_encoding).strip()
+            from prestans.util import string_types
+
+            if isinstance(value, string_types):
+                _validated_value = value
             else:
                 _validated_value = str(value)
         except Exception as exp:

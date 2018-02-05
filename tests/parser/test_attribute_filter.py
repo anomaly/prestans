@@ -22,9 +22,12 @@ class AttributeFilterTest(unittest.TestCase):
         # self.assertFalse(AttributeFilter(is_array_scalar=False).is_array_scalar)
 
         # check keyword args
-        keywords_args = AttributeFilter({"true": True, "changed_to_false": True}, changed_to_false=False)
-        self.assertTrue(keywords_args.true)
-        self.assertFalse(keywords_args.changed_to_false)
+        kwargs = AttributeFilter({"true": True, "changed_to_false": True}, changed_to_false=False)
+        self.assertTrue(kwargs.true)
+        self.assertFalse(kwargs.changed_to_false)
+
+        # check missing keyword arg
+        self.assertRaises(KeyError, AttributeFilter, {"true": True, "false": False}, missing=True)
 
     def test_from_model(self):
 
@@ -98,13 +101,13 @@ class AttributeFilterTest(unittest.TestCase):
         from_model = AttributeFilter.from_model(model_instance=MyModel())
         self.assertEquals(from_model.keys(), ["name", "tags"])
 
-    def test_has_key(self):
+    def test_contains(self):
         # from dict
         from_dict = AttributeFilter({"a": True, "b": False, "c": True})
-        self.assertTrue(from_dict.has_key("a"))
-        self.assertTrue(from_dict.has_key("b"))
-        self.assertTrue(from_dict.has_key("c"))
-        self.assertFalse(from_dict.has_key("d"))
+        self.assertTrue("a" in from_dict)
+        self.assertTrue("b" in from_dict)
+        self.assertTrue("c" in from_dict)
+        self.assertFalse("d" in from_dict)
 
         # from model
         class MyModel(types.Model):
@@ -112,9 +115,9 @@ class AttributeFilterTest(unittest.TestCase):
             tags = types.Array(element_template=types.String())
 
         from_model = AttributeFilter.from_model(model_instance=MyModel())
-        self.assertTrue(from_model.has_key("name"))
-        self.assertTrue(from_model.has_key("tags"))
-        self.assertFalse(from_model.has_key("age"))
+        self.assertTrue("name" in from_model)
+        self.assertTrue("tags" in from_model)
+        self.assertFalse("age" in from_model)
 
     def test_is_filter_at_key(self):
 

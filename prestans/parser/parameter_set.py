@@ -55,7 +55,7 @@ class ParameterSet(object):
         fields = dict()
 
         # inspects the attributes of a parameter set and tries to validate the input
-        for attribute_name, type_instance in self.__class__.__dict__.iteritems():
+        for attribute_name, type_instance in iter(self.__class__.__dict__.items()):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 continue
@@ -98,7 +98,7 @@ class ParameterSet(object):
         validated_parameter_set = self.__class__()
 
         # Inspects the attributes of a parameter set and tries to validate the input
-        for attribute_name, type_instance in self.__class__.__dict__.iteritems():
+        for attribute_name, type_instance in iter(self.__class__.__dict__.items()):
 
             if attribute_name.startswith('__') or inspect.ismethod(type_instance):
                 # Ignore parameters with __ and if they are methods

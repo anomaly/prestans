@@ -29,6 +29,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from prestans.http import STATUS
 
 __all__ = [
     'UnsupportedVocabularyError',
@@ -67,8 +68,6 @@ __all__ = [
     'Forbidden'
 ]
 
-from prestans.http import STATUS
-
 
 class Base(Exception):
 
@@ -97,11 +96,11 @@ class Base(Exception):
     def message(self):
         return self._message
 
-    def __unicode__(self):
-        return unicode(self._message)
+    # def __unicode__(self):
+    #     return unicode(self._message)
 
     def __str__(self):
-        return unicode(self._message).encode('utf-8')
+        return str(self._message)
 
 #:
 #: These are top level exceptions that layout tell prestans how
@@ -186,7 +185,7 @@ class ValidationError(Base):
 
     def __str__(self):
         _loggable_message = "%s %s" % (self._attribute_name, self._message)
-        return unicode(_loggable_message).encode('utf-8')
+        return str(_loggable_message).encode('utf-8')
 
 
 class HandlerException(Base):

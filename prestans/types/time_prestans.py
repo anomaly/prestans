@@ -91,6 +91,7 @@ class Time(DataStructure):
         return blueprint
 
     def validate(self, value):
+        from prestans.util import string_types
 
         _validated_value = None
 
@@ -109,7 +110,7 @@ class Time(DataStructure):
 
         if isinstance(value, time):
             _validated_value = value
-        elif isinstance(value, str) or isinstance(value, unicode):
+        elif isinstance(value, string_types):
             try:
                 _validated_value = datetime.strptime(value, self._format).time()
             except ValueError as exp:

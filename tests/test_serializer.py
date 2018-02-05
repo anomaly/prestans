@@ -1,5 +1,6 @@
 import json
 import plistlib
+import sys
 import unittest
 
 from prestans import exception
@@ -40,9 +41,15 @@ class SerializerJSONUnitTest(unittest.TestCase):
 
 class SerializerPListUnitTest(unittest.TestCase):
 
-    def test_dumps_success(self):
+    @unittest.skipIf(sys.version_info >= (3,), "python2 only")
+    def test_dumps_success_py2(self):
         self.assertEqual(XMLPlist().dumps({}), plistlib.writePlistToString({}))
         self.assertEqual(XMLPlist().dumps({"key": "value"}), plistlib.writePlistToString({"key": "value"}))
+
+    @unittest.skipIf(sys.version_info < (3,), "python3 only")
+    def test_dumps_success_py3(self):
+        self.assertEqual(XMLPlist().dumps({}), plistlib.dumps({}))
+        self.assertEqual(XMLPlist().dumps({"key": "value"}), plistlib.dumps({"key": "value"}))
 
     @unittest.skip
     def test_dumps_fail(self):

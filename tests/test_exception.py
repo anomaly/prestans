@@ -24,11 +24,6 @@ class ExceptionBase(unittest.TestCase):
         base_value = exception.Base(http_status=STATUS.OK, message="message")
         self.assertEquals(base_value.message, "message")
 
-    def test_unicode(self):
-        base = exception.Base(http_status=STATUS.OK, message="message")
-        self.assertEquals(base.http_status, STATUS.OK)
-        self.assertEquals(unicode(base.message), "message")
-
     def test_str(self):
         base = exception.Base(http_status=STATUS.OK, message="message")
         self.assertEquals(base.http_status, STATUS.OK)

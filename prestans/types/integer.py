@@ -101,8 +101,10 @@ class Integer(DataType):
             value = self._default
 
         try:
-            if isinstance(value, long):
-                _validated_value = long(value)
+            from prestans.util import integer_types
+
+            if isinstance(value, integer_types):
+                _validated_value = value
             else:
                 _validated_value = int(value)
         except Exception:

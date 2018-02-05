@@ -30,9 +30,8 @@ class AttributeFilter(object):
         if from_dictionary:
             self._init_from_dictionary(from_dictionary, template_model)
 
-        #: kwargs support
-        for name, value in kwargs.iteritems():
-            if self.__dict__.has_key(name):
+        for name, value in iter(kwargs.items()):
+            if name in self.__dict__:
                 setattr(self, name, value)
             else:
                 raise KeyError(name)
@@ -51,8 +50,8 @@ class AttributeFilter(object):
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
         #: kwargs support
-        for name, value in kwargs.iteritems():
-            if attribute_filter_instance.__dict__.has_key(name):
+        for name, value in iter(kwargs.items()):
+            if name in attribute_filter_instance.__dict__:
                 setattr(attribute_filter_instance, name, value)
             else:
                 raise KeyError(name)
@@ -132,18 +131,15 @@ class AttributeFilter(object):
 
         return keys
 
-    def has_key(self, key):
-        """
-        contains a particular key, wrapper on self.__dict__.key
-        """
-        return self.__dict__.has_key(key)
+    def __contains__(self, key):
+        return key in self.__dict__
 
     def is_filter_at_key(self, key):
         """
         return True if attribute is a sub filter
         """
 
-        if self.has_key(key):
+        if key in self:
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, self.__class__):
                 return True
@@ -161,7 +157,7 @@ class AttributeFilter(object):
         :return: whether attribute is visible
         :rtype: bool
         """
-        if self.has_key(key):
+        if key in self:
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, bool) and attribute_status is True:
                 return True
@@ -264,7 +260,7 @@ class AttributeFilter(object):
 
             rewrite_map = template_model.attribute_rewrite_reverse_map()
 
-        for key, value in from_dictionary.iteritems():
+        for key, value in iter(from_dictionary.items()):
 
             target_key = key
 
@@ -273,7 +269,7 @@ class AttributeFilter(object):
                 target_key = rewrite_map[key]
 
             # ensure that the key exists in the template model
-            if template_model is not None and not template_model.has_key(target_key):
+            if template_model is not None and target_key not in template_model:
 
                 unwanted_keys = list()
                 unwanted_keys.append(target_key)

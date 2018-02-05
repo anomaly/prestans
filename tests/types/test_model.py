@@ -162,7 +162,7 @@ class ModelUnitTest(unittest.TestCase):
         my_model = MyModel()
         self.assertEquals(my_model.attribute_rewrite_reverse_map(), reverse_map)
 
-    def test_has_key(self):
+    def test_contains(self):
 
         class SubModel(types.Model):
             pass
@@ -175,38 +175,38 @@ class ModelUnitTest(unittest.TestCase):
             sub = SubModel()
             sub_array = types.Array(element_template=SubModel())
         my_model = MyModel()
-        self.assertTrue(my_model.has_key("name"))
-        self.assertTrue(my_model.has_key("birthday"))
-        self.assertTrue(my_model.has_key("tags"))
-        self.assertTrue(my_model.has_key("sub"))
-        self.assertTrue(my_model.has_key("sub_array"))
-        self.assertFalse(my_model.has_key("missing"))
+        self.assertTrue("name" in my_model)
+        self.assertTrue("birthday" in my_model)
+        self.assertTrue("tags" in my_model)
+        self.assertTrue("sub" in my_model)
+        self.assertTrue("sub_array" in my_model)
+        self.assertFalse("missing"in my_model)
 
         # check if keys can be found in model and base class
         class ModelWithSingleBase(MyModel):
             extra = types.String()
 
         single_base = ModelWithSingleBase()
-        self.assertTrue(single_base.has_key("name"))
-        self.assertTrue(single_base.has_key("birthday"))
-        self.assertTrue(single_base.has_key("tags"))
-        self.assertTrue(single_base.has_key("sub"))
-        self.assertTrue(single_base.has_key("sub_array"))
-        self.assertTrue(single_base.has_key("extra"))
-        self.assertFalse(single_base.has_key("missing"))
+        self.assertTrue("name" in single_base)
+        self.assertTrue("birthday" in single_base)
+        self.assertTrue("tags" in single_base)
+        self.assertTrue("sub" in single_base)
+        self.assertTrue("sub_array" in single_base)
+        self.assertTrue("extra" in single_base)
+        self.assertFalse("missing" in single_base)
 
         class ModelWithMultiBase(ModelWithSingleBase):
             another = types.String()
 
         multi_base = ModelWithMultiBase()
-        self.assertTrue(multi_base.has_key("name"))
-        self.assertTrue(multi_base.has_key("birthday"))
-        self.assertTrue(multi_base.has_key("tags"))
-        self.assertTrue(multi_base.has_key("sub"))
-        self.assertTrue(multi_base.has_key("sub_array"))
-        self.assertTrue(multi_base.has_key("extra"))
-        self.assertTrue(multi_base.has_key("another"))
-        self.assertFalse(multi_base.has_key("missing"))
+        self.assertTrue("name" in multi_base)
+        self.assertTrue("birthday" in multi_base)
+        self.assertTrue("tags" in multi_base)
+        self.assertTrue("sub" in multi_base)
+        self.assertTrue("sub_array" in multi_base)
+        self.assertTrue("extra" in multi_base)
+        self.assertTrue("another" in multi_base)
+        self.assertFalse("missing" in multi_base)
 
     def test__generate_attribute_token_rewrite_map(self):
         pass
