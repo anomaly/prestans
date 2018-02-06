@@ -256,12 +256,13 @@ class AttributeMetaData(object):
             self._max_length = blueprint['constraints']['max_length']
             self._client_class_name = "Array"
 
-            if blueprint['type'] == 'model':
+            element_template_blueprint = blueprint['constraints']['element_template']
+            if element_template_blueprint['type'] == 'model':
                 self._element_template_is_model = True
-                self._element_template = blueprint['constraints']['model_template']
+                self._element_template = element_template_blueprint['constraints']['model_template']
             else:
                 self._element_template_is_model = False
-                self._element_template = BasicTypeElementTemplate(blueprint=blueprint)
+                self._element_template = BasicTypeElementTemplate(blueprint=element_template_blueprint)
 
     @property
     def name(self):
