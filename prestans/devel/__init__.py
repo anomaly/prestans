@@ -37,7 +37,7 @@ __all__ = []
 import argparse
 import os
 
-from prestans import exception
+from prestans.devel import exception
 from prestans import __version__
 
 

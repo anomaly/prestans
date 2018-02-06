@@ -47,9 +47,9 @@ def udl_to_cc(text, ignore_first=False):
 
 class BasicTypeElementTemplate(object):
 
-    def __init__(self, blueprint_type, blueprint):
+    def __init__(self, blueprint):
         
-        self._blueprint_type = blueprint_type
+        self._blueprint_type = blueprint["type"]
         self._required = None
         self._default = None
         self._minimum = None
@@ -60,32 +60,34 @@ class BasicTypeElementTemplate(object):
         self._format = None
         self._trim = None
 
+        constraints = blueprint["constraints"]
+
         if self._blueprint_type == "string":
-            self._required = blueprint['required']
-            self._min_length = blueprint['min_length']
-            self._max_length = blueprint['max_length']
-            self._default = blueprint['default']
-            self._choices = blueprint['choices']
-            self._format = blueprint['format']
-            self._trim = blueprint['trim']
+            self._required = constraints['required']
+            self._min_length = constraints['min_length']
+            self._max_length = constraints['max_length']
+            self._default = constraints['default']
+            self._choices = constraints['choices']
+            self._format = constraints['format']
+            self._trim = constraints['trim']
             self._client_class_name = "String"
         elif self._blueprint_type == 'integer':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
-            self._minimum = blueprint['minimum']
-            self._maximum = blueprint['maximum']
-            self._choices = blueprint['choices']
+            self._required = constraints['required']
+            self._default = constraints['default']
+            self._minimum = constraints['minimum']
+            self._maximum = constraints['maximum']
+            self._choices = constraints['choices']
             self._client_class_name = "Integer"
         elif self._blueprint_type == 'float':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
-            self._minimum = blueprint['minimum']
-            self._maximum = blueprint['maximum']
-            self._choices = blueprint['choices']
+            self._required = constraints['required']
+            self._default = constraints['default']
+            self._minimum = constraints['minimum']
+            self._maximum = constraints['maximum']
+            self._choices = constraints['choices']
             self._client_class_name = "Float"
         elif self._blueprint_type == 'boolean':
-            self._required = blueprint['required']
-            self._default = blueprint['default']
+            self._required = constraints['required']
+            self._default = constraints['default']
             self._client_class_name = "Boolean"
 
         if self._required is None:
@@ -125,7 +127,7 @@ class BasicTypeElementTemplate(object):
         if self._default is None:
             return "null"
         elif type(self._default) == str:
-            return "\"%s\"" % (self._default)
+            return "\"%s\"" % self._default
         elif type(self._default) == bool:
             if self._default:
                 return "true"
@@ -254,17 +256,12 @@ class AttributeMetaData(object):
             self._max_length = blueprint['constraints']['max_length']
             self._client_class_name = "Array"
 
-            element_template = blueprint['constraints']['element_template']
-
-            if element_template['type'] == 'model':
+            if blueprint['type'] == 'model':
                 self._element_template_is_model = True
-                self._element_template = element_template['constraints']['model_template']
+                self._element_template = blueprint['constraints']['model_template']
             else:
                 self._element_template_is_model = False
-                self._element_template = BasicTypeElementTemplate(
-                    blueprint_type=element_template['type'],
-                    blueprint=element_template['constraints']
-                )
+                self._element_template = BasicTypeElementTemplate(blueprint=blueprint)
 
     @property
     def name(self):

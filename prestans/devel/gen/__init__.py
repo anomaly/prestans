@@ -30,7 +30,6 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 import inspect
-import jinja2
 import os
 import sys
 
@@ -66,7 +65,6 @@ class Inspector(object):
                 field_blueprint['map_name'] = type_instance().attribute_rewrite_map()[field_name]
             blueprints.append(blueprint)
 
-
         return blueprints
 
 
@@ -79,20 +77,59 @@ class Preplate(object):
         self._namespace = namespace
         self._filter_namespace = filter_namespace
         self._output_directory = output_directory
-        loader = jinja2.PackageLoader('prestans', 'devel/gen/templates')
-        self._template_engine = jinja2.Environment(trim_blocks=True, loader=loader)
+
+        from jinja2 import Environment
+        from jinja2 import PackageLoader
+
+        loader = PackageLoader('prestans', 'devel/gen/templates')
+        self._template_engine = Environment(trim_blocks=True, loader=loader)
         self._template_engine.globals["isinstance"] = isinstance
         self._template_engine.globals["list"] = list
+
+    @property
+    def template_type(self):
+        return self._template_type
+
+    @property
+    def model_file(self):
+        return self._model_file
+
+    @property
+    def namespace(self):
+        return self._namespace
+
+    @property
+    def filter_namespace(self):
+        return self._filter_namespace
+
+    @property
+    def output_directory(self):
+        return self._output_directory
+
+    @property
+    def template_engine(self):
+        return self._template_engine
 
     def run(self):
 
         template = None
         if self._template_type == "closure.model":
-            template = prestans.devel.gen.closure.Model(template_engine=self._template_engine, 
-                model_file=self._model_file, namespace=self._namespace, filter_namespace=self._filter_namespace, output_directory=self._output_directory)
+            from prestans.devel.gen.closure import Model
+            template = Model(
+                template_engine=self._template_engine,
+                model_file=self._model_file,
+                namespace=self._namespace,
+                filter_namespace=self._filter_namespace,
+                output_directory=self._output_directory
+            )
         elif self._template_type == "closure.filter":
-            template = prestans.devel.gen.closure.Filter(template_engine=self._template_engine, 
-                model_file=self._model_file, namespace=self._namespace, output_directory=self._output_directory)
+            from prestans.devel.gen.closure import Filter
+            template = Filter(
+                template_engine=self._template_engine,
+                model_file=self._model_file,
+                namespace=self._namespace,
+                output_directory=self._output_directory
+            )
 
         if template is None:
             return 1
