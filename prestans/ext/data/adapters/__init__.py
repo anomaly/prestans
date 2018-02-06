@@ -32,6 +32,7 @@
 
 import inspect
 
+
 class ModelAdapter(object):
     
     def __init__(self, rest_model_class, persistent_model_class):
@@ -49,6 +50,7 @@ class ModelAdapter(object):
     def adapt_persistent_to_rest(self, persistent_object):
         raise AssertionError("adapt_persistent_to_rest direct use not allowed")
 
+
 class AdapterRegistryManager:
     """
     AdapterRegistryManager keeps track of rest to persistent model maps
@@ -64,15 +66,13 @@ class AdapterRegistryManager:
     def register_adapter(self, model_adapter):
         
         if not isinstance(model_adapter, ModelAdapter):
-            raise TypeError("Registry recd instance of type %s is not a ModelAdapter" 
+            raise TypeError("Registry received instance of type %s is not a ModelAdapter"
                 % model_adapter.__class__.__name__)
         
         rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
         persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
-        
-        #:
-        #: Store references to how a rest model maps to a persistent model and vice versa 
-        #:
+
+        # store references to how a rest model maps to a persistent model and vice versa
         self._persistent_map[persistent_class_signature] = model_adapter
         self._rest_map[rest_class_signature] = model_adapter
         
@@ -95,7 +95,5 @@ class AdapterRegistryManager:
         return self._rest_map[class_signature]
 
 
-#:
-#: Singleton instantiated if adapeter package is imported
-#:
+# singleton instantiated if adapter package is imported
 registry = AdapterRegistryManager()

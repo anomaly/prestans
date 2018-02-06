@@ -43,21 +43,19 @@ import prestans.parser
 
 from prestans.ext.data import adapters
 
-#:
-#: Adapt an instance
-#:
+
 def adapt_persistent_instance(persistent_object, target_rest_class=None, attribute_filter=None):
     """
     Adapts a single persistent instance to a REST model; at present this is a
     common method for all persistent backends.
 
-    This might be moved to backend specific packages if the need arrises
+    This might be moved to backend specific packages if the need arises
 
     Refer to: https://groups.google.com/forum/#!topic/prestans-discuss/dO1yx8f60as
     for discussion on this feature
     """
 
-    #: Try and get the adapter and the REST class for the persistent object 
+    # try and get the adapter and the REST class for the persistent object
     if target_rest_class is None:
         adapter_instance = adapters.registry.get_adapter_for_persistent_model(persistent_object)
     else:
@@ -72,25 +70,23 @@ def adapt_persistent_instance(persistent_object, target_rest_class=None, attribu
 
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 
-#:
-#: Adapt an instance
-#:
+
 def adapt_persistent_collection(persistent_collection, target_rest_class=None, attribute_filter=None):
         
-    #: Ensure that colleciton is iterable and has atleast one element 
+    # ensure that collection is iterable and has at least one element
     persistent_collection_length = 0
     
-    #: Attempt to reliably detect the length of the persistent_collection 
+    # attempt to reliably detect the length of the persistent_collection
     if persistent_collection and isinstance(persistent_collection, (list, tuple)):
         persistent_collection_length = len(persistent_collection)
     elif persistent_collection and persistent_collection.__module__ == "sqlalchemy.orm.query":
         persistent_collection_length = persistent_collection.count()
         
-    #: If the persistent_collection is empty then return a blank array 
+    # if the persistent_collection is empty then return a blank array
     if persistent_collection_length == 0:
         return prestans.types.Array(element_template=target_rest_class())
         
-    #: Try and get the adapter and the REST class for the persistent object 
+    # try and get the adapter and the REST class for the persistent object
     if target_rest_class is None:
         adapter_instance = adapters.registry.get_adapter_for_persistent_model(persistent_collection[0])
     else:
@@ -106,9 +102,10 @@ def adapt_persistent_collection(persistent_collection, target_rest_class=None, a
         
     return adapted_models
     
+
 class ModelAdapter(adapters.ModelAdapter):
     """
-    Provide a brige between REST models and SQLAlchemy objects
+    Provide a bridge between REST models and SQLAlchemy objects
     """
     
     def adapt_persistent_to_rest(self, persistent_object, attribute_filter=None):
@@ -131,7 +128,7 @@ class ModelAdapter(adapters.ModelAdapter):
                     try:
                         setattr(rest_model_instance, attribute_key, None)
                     #: Catch any exception thrown from setattr to give a useable error message
-                    except TypeError, exp:
+                    except TypeError as exp:
                         raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
 
                 continue
@@ -181,16 +178,16 @@ class ModelAdapter(adapters.ModelAdapter):
 
                         #: Check if there is a sub model filter
                         sub_attribute_filter = None
-                        if isinstance(attribute_filter, prestans.parser.AttributeFilter) and attribute_filter.has_key(attribute_key):
+                        if isinstance(attribute_filter, prestans.parser.AttributeFilter) and attribute_key in attribute_filter:
                             sub_attribute_filter = getattr(attribute_filter, attribute_key)
 
                         adapted_rest_model = model_adapter.adapt_persistent_to_rest(persistent_attr_value, sub_attribute_filter)
 
                     setattr(rest_model_instance, attribute_key, adapted_rest_model)
                     
-                except TypeError, exp:
+                except TypeError as exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                except prestans.exception.DataValidationException, exp:
+                except prestans.exception.DataValidationException as exp:
                     raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
                 
             else:
@@ -199,9 +196,9 @@ class ModelAdapter(adapters.ModelAdapter):
                 try:
                     persistent_attr_value = getattr(persistent_object, attribute_key)
                     setattr(rest_model_instance, attribute_key, persistent_attr_value)
-                except TypeError, exp:
+                except TypeError as exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                except prestans.exception.DataValidationException, exp:
+                except prestans.exception.DataValidationException as exp:
                     raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
 
         return rest_model_instance
