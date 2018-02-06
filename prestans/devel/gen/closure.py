@@ -197,6 +197,8 @@ class AttributeMetaData(object):
         self._trim = None
 
         self._blueprint_type = blueprint['type']
+
+        # todo: move or make this cleaner
         self._map_name = blueprint['map_name']
 
         # basic types
@@ -410,6 +412,7 @@ class Base(object):
         self._dependencies = list()
         self._attribute_string = ""
 
+    # todo: move this to Filter class
     def add_filter_dependency(self, attribute):
 
         dependency = None
@@ -421,9 +424,9 @@ class Base(object):
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)
 
+    # todo: move this to Model class
     def add_model_dependency(self, attribute):
 
-        dependency = None
         if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
             dependency = "%s.%s" % (self._namespace, attribute.element_template)
         elif attribute.blueprint_type == 'array':
@@ -436,7 +439,7 @@ class Base(object):
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)
 
-    # used in filters
+    # todo: move this to Filter class
     def add_attribute_string(self, attribute):
         if attribute.blueprint_type == 'model':
             self._attribute_string += "this.%s_.anyFieldsEnabled() || " % attribute.ccif
