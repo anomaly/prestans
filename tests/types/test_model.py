@@ -313,7 +313,7 @@ class ModelUnitTest(unittest.TestCase):
         self.assertEquals(serialized["g"]["a"], "name")
         self.assertEquals(serialized["h"], "12:13:14")
 
-    def test_as_serializable_filtered(self):
+    def test_as_serializable_filtered_default_true(self):
         from datetime import date
         from datetime import datetime
         from datetime import time
@@ -356,3 +356,64 @@ class ModelUnitTest(unittest.TestCase):
         self.assertEquals(serialized["datetime"], "2018-01-18 13:14:15")
         self.assertEquals(serialized["time"], "12:13:14")
         self.assertEquals(serialized["sub"]["name"], "name")
+
+    def test_as_serializable_filtered_default_false(self):
+        from datetime import date
+        from datetime import datetime
+        from datetime import time
+        from prestans.parser import AttributeFilter
+
+        class SubModel(types.Model):
+            name = types.String()
+
+        class MyModel(types.Model):
+            boolean = types.Boolean()
+            date = types.Date()
+            datetime = types.DateTime()
+            float = types.Float()
+            integer = types.Integer()
+            string = types.String()
+            sub = SubModel()
+            time = types.Time()
+
+        my_model = MyModel()
+        my_model.boolean = True
+        my_model.float = 33.3
+        my_model.integer = 22
+        my_model.string = "string"
+        my_model.date = date(2018, 1, 18)
+        my_model.datetime = datetime(2018, 1, 18, 13, 14, 15)
+        my_model.time = time(12, 13, 14)
+        my_model.sub.name = "name"
+
+        attribute_filter = AttributeFilter.from_model(MyModel(), False)
+        attribute_filter.float = True
+        attribute_filter.string = True
+
+        serialized = my_model.as_serializable(attribute_filter=attribute_filter)
+        self.assertEquals(serialized, {"float": 33.3, "string": "string"})
+
+        attribute_filter = AttributeFilter.from_model(MyModel(), False)
+        attribute_filter.sub.name = True
+
+        serialized = my_model.as_serializable(attribute_filter=attribute_filter)
+        self.assertEquals(serialized, {"sub": {"name": "name"}})
+
+    def test_as_serializable_filtered_only_child_of_type_model(self):
+        from prestans.parser import AttributeFilter
+
+        class SubModel(types.Model):
+            name = types.String()
+
+        class ParentModel(types.Model):
+            sub = SubModel()
+
+        attribute_filter = AttributeFilter.from_model(ParentModel(), False)
+        attribute_filter.sub.name = True
+
+        parent_model = ParentModel()
+        parent_model.sub.name = "james"
+
+        serialized = parent_model.as_serializable(attribute_filter=attribute_filter)
+        self.assertEquals(serialized, {"sub": {"name": "james"}})
+
