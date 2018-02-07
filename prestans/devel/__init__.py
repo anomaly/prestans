@@ -32,13 +32,14 @@
 """
 Contains development tools for prestans.
 """
-__all__ = []
+__all__ = ["ArgParserFactory", "CommandDispatcher"]
 
 import argparse
 import os
 
 from prestans import exception
 from prestans import __version__
+
 
 class ArgParserFactory(object):
     """
@@ -123,6 +124,7 @@ class ArgParserFactory(object):
             help="filter namespace to use with template e.g prestans.data.filter"
             )
 
+
 class CommandDispatcher(object):
     """
     Processes the user's commands.
@@ -150,8 +152,8 @@ class CommandDispatcher(object):
         if not os.path.isfile(self._args.model_path):
             raise exception.Base("failed to read model file %s" % self._args.model_path)
 
-        import prestans.devel.gen
-        preplate = prestans.devel.gen.Preplate(
+        from prestans.devel.gen import Preplate
+        preplate = Preplate(
             template_type=self._args.template,
             model_file=self._args.model_path,
             namespace=self._args.namespace,
@@ -159,4 +161,3 @@ class CommandDispatcher(object):
             output_directory=self._args.output)
 
         preplate.run()
-        
