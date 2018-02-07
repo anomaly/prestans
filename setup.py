@@ -65,7 +65,8 @@ setup(
     maintainer='Anomaly Software',
     maintainer_email='support@anomaly.net.au',
     platforms=['any'],
-    scripts=['prestans/bin/pride'],
+    entry_points={'console_scripts': ['pride = prestans.bin.pride:main']},
+    # scripts=['prestans/bin/pride'],
     packages=find_packages(),
     classifiers=[
         'Environment :: Web Environment',
