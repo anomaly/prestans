@@ -29,14 +29,20 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 import inspect
+
+from prestans.types import Model
 
 
 class ModelAdapter(object):
     
     def __init__(self, rest_model_class, persistent_model_class):
-        self._rest_model_class = rest_model_class
+
+        if issubclass(rest_model_class, Model):
+            self._rest_model_class = rest_model_class
+        else:
+            raise TypeError("rest_model_class must be sub class of prestans.types.Model")
+
         self._persistent_model_class = persistent_model_class
 
     @property
@@ -48,10 +54,10 @@ class ModelAdapter(object):
         return self._rest_model_class
             
     def adapt_persistent_to_rest(self, persistent_object):
-        raise AssertionError("adapt_persistent_to_rest direct use not allowed")
+        raise NotImplementedError("adapt_persistent_to_rest direct use not allowed")
 
 
-class AdapterRegistryManager:
+class AdapterRegistryManager(object):
     """
     AdapterRegistryManager keeps track of rest to persistent model maps
 
@@ -63,33 +69,48 @@ class AdapterRegistryManager:
         self._persistent_map = dict()
         self._rest_map = dict()
 
+    @classmethod
+    def generate_signature(cls, class_or_instance):
+        if inspect.isclass(class_or_instance):
+            return class_or_instance.__module__ + "." + class_or_instance.__name__
+        else:
+            return class_or_instance.__class__.__module__ + "." + class_or_instance.__class__.__name__
+
     def register_adapter(self, model_adapter):
         
         if not isinstance(model_adapter, ModelAdapter):
-            raise TypeError("Registry received instance of type %s is not a ModelAdapter"
-                % model_adapter.__class__.__name__)
+            msg = "Registry received instance of type %s is not a ModelAdapter" % model_adapter.__class__.__name__
+            raise TypeError(msg)
         
-        rest_class_signature = model_adapter.rest_model_class.__module__ + "." + model_adapter.rest_model_class.__name__
-        persistent_class_signature = model_adapter.persistent_model_class.__module__ + "." + model_adapter.persistent_model_class.__name__
+        rest_class_signature = self.generate_signature(model_adapter.rest_model_class)
+        persistent_class_signature = self.generate_signature(model_adapter.persistent_model_class)
 
         # store references to how a rest model maps to a persistent model and vice versa
         self._persistent_map[persistent_class_signature] = model_adapter
         self._rest_map[rest_class_signature] = model_adapter
         
     def get_adapter_for_persistent_model(self, persistent_model):
+        """
+        :param persistent_model: instance of persistent model
+        :return: the matching model adapter
+        :rtype: ModelAdapter
+        """
+        class_signature = self.generate_signature(persistent_model)
         
-        class_signature = persistent_model.__class__.__module__ + "." + persistent_model.__class__.__name__
-        
-        if not self._persistent_map.has_key(class_signature) :
+        if class_signature not in self._persistent_map:
             raise TypeError("No registered Data Adapter for class %s" % class_signature)
 
         return self._persistent_map[class_signature]
         
     def get_adapter_for_rest_model(self, rest_model):
+        """
+        :param rest_model: instance of REST model
+        :return: the matching model adapter
+        :rtype: ModelAdapter
+        """
+        class_signature = self.generate_signature(rest_model)
         
-        class_signature = rest_model.__class__.__module__ + "." + rest_model.__class__.__name__
-        
-        if not self._rest_map.has_key(class_signature):
+        if class_signature not in self._rest_map:
             raise TypeError("No registered Data Adapter for class %s" % class_signature)
 
         return self._rest_map[class_signature]

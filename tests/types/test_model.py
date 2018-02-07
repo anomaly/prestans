@@ -90,15 +90,31 @@ class ModelUnitTest(unittest.TestCase):
         self.assertRaises(TypeError, ModelWithBadAttribute().blueprint)
 
     def test_setattr(self):
+        class SubModel(types.Model):
+            string = types.String()
+
         class MyModel(types.Model):
-            name = types.String()
+            boolean = types.Boolean()
+            float = types.Float()
             age = types.Integer(maximum=120)
+            name = types.String()
+
+            sub_model = SubModel()
+
+        sub_model = SubModel()
+        sub_model.string = "string"
+        self.assertEquals(sub_model.string, "string")
 
         my_model = MyModel()
+        my_model.boolean = True
         my_model.name = "name"
         my_model.age = 21
+        my_model.sub_model = sub_model
+        self.assertEquals(my_model.boolean, True)
         self.assertEquals(my_model.name, "name")
         self.assertEquals(my_model.age, 21)
+        self.assertEquals(my_model.sub_model, sub_model)
+        self.assertEquals(my_model.sub_model.string, "string")
         self.assertRaises(KeyError, my_model.__setattr__, "missing", "missing")
         self.assertRaises(exception.ValidationError, my_model.__setattr__, "age", 121)
 
