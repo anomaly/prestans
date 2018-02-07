@@ -235,19 +235,23 @@ class ModelUnitTest(unittest.TestCase):
     def test__generate_attribute_tokens(self):
         pass
 
-    def test__generate_minified_keys(self):
-        pass
+    def test_generate_minified_keys(self):
+        self.assertEquals(types.Model.generate_minified_keys(3), ["a", "b", "c"])
+        self.assertEquals(types.Model.generate_minified_keys(5), ["a", "b", "c", "d", "e"])
+
+        self.assertEquals(types.Model.generate_minified_keys(3, "_"), ["_a", "_b", "_c"])
+        self.assertEquals(types.Model.generate_minified_keys(5, "_"), ["_a", "_b", "_c", "_d", "_e"])
 
     def test__generate_attribute_key(self):
-        self.assertEquals(types.Model._generate_attribute_key(0), "a")
-        self.assertEquals(types.Model._generate_attribute_key(1), "b")
-        self.assertEquals(types.Model._generate_attribute_key(25), "z")
-        self.assertEquals(types.Model._generate_attribute_key(26), "aa")
-        self.assertEquals(types.Model._generate_attribute_key(27), "bb")
-        self.assertEquals(types.Model._generate_attribute_key(51), "zz")
-        self.assertEquals(types.Model._generate_attribute_key(52), "aaa")
-        self.assertEquals(types.Model._generate_attribute_key(54), "ccc")
-        self.assertEquals(types.Model._generate_attribute_key(77), "zzz")
+        self.assertEquals(types.Model.generate_attribute_key(0), "a")
+        self.assertEquals(types.Model.generate_attribute_key(1), "b")
+        self.assertEquals(types.Model.generate_attribute_key(25), "z")
+        self.assertEquals(types.Model.generate_attribute_key(26), "aa")
+        self.assertEquals(types.Model.generate_attribute_key(27), "bb")
+        self.assertEquals(types.Model.generate_attribute_key(51), "zz")
+        self.assertEquals(types.Model.generate_attribute_key(52), "aaa")
+        self.assertEquals(types.Model.generate_attribute_key(54), "ccc")
+        self.assertEquals(types.Model.generate_attribute_key(77), "zzz")
 
     def test_as_serializable(self):
         from datetime import date

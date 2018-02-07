@@ -232,7 +232,7 @@ class Model(DataCollection):
 
             input_value_key = attribute_name
 
-            #: Minification support
+            # minification support
             if minified is True:
                 input_value_key = rewrite_map[attribute_name]
 
@@ -346,7 +346,7 @@ class Model(DataCollection):
     def _generate_attribute_token_rewrite_map(self):
 
         rewrite_tokens = self._generate_attribute_tokens(self.getmembers())
-        minified_tokens = self._generate_minified_keys(len(rewrite_tokens))
+        minified_tokens = self.generate_minified_keys(len(rewrite_tokens))
 
         return dict(zip(rewrite_tokens, minified_tokens))
 
@@ -354,19 +354,20 @@ class Model(DataCollection):
 
         rewrite_tokens = list()
 
-        #: Create a list of tokens
+        # create a list of tokens
         for attribute_name, type_instance in model_class_members:
 
             if isinstance(type_instance, DataType):
                 rewrite_tokens = rewrite_tokens + attribute_name.split('_')
 
-        #: Remove duplicated; sort alphabetically for the algorithm to work
+        # remove duplicated; sort alphabetically for the algorithm to work
         rewrite_tokens = list(set(rewrite_tokens))
         rewrite_tokens.sort()
 
         return rewrite_tokens
 
-    def _generate_minified_keys(self, length=26, prefix=''):
+    @classmethod
+    def generate_minified_keys(cls, length=26, prefix=''):
 
         minified_keys = list()
 
@@ -377,7 +378,7 @@ class Model(DataCollection):
 
         for index in range(0, length):
 
-            generated_char = self._generate_attribute_key(index)
+            generated_char = cls.generate_attribute_key(index)
             minified_keys.append(prefix + generated_char)
 
             if overflow > 0:
@@ -386,7 +387,7 @@ class Model(DataCollection):
                 if sublist_length > 26:
                     sublist_length = 26
 
-                sublist = self._generate_minified_keys(sublist_length, generated_char)
+                sublist = cls.generate_minified_keys(sublist_length, generated_char)
                 minified_keys = minified_keys + sublist
                 overflow = overflow - len(sublist)
 
@@ -396,7 +397,7 @@ class Model(DataCollection):
         return minified_keys
 
     @classmethod
-    def _generate_attribute_key(cls, val):
+    def generate_attribute_key(cls, val):
         """
         :param val:
         :type val: int
