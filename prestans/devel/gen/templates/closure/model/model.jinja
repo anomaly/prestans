@@ -306,9 +306,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject();
     {% else %}
         if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}()
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}();
         else if(!goog.isDef(opt_filter))
-            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}()
+            jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}();
     {% endif %}
     {% endfor %}
     }
@@ -346,9 +346,9 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
             jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
     {% else %}
         if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
-            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}()
+            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}();
         else if(!goog.isDef(opt_filter))
-            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}()
+            jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}();
     {% endif %}
     {% endfor %}
     }
