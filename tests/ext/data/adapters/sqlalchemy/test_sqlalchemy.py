@@ -36,7 +36,6 @@ class SQLAlchemyDataAdaptersTest(unittest.TestCase):
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, RESTModel, attribute_filter)
         self.assertEquals(adapted_model.boolean, False)
 
-    @unittest.skip
     def test_adapt_persistent_instance_single_child_of_type_model(self):
 
         class RESTModel(types.Model):
@@ -58,6 +57,7 @@ class SQLAlchemyDataAdaptersTest(unittest.TestCase):
 
         class PersistentModelWithChild(object):
 
+            @property
             def sub_model(self):
                 return PersistentModel()
 
