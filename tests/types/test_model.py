@@ -118,6 +118,17 @@ class ModelUnitTest(unittest.TestCase):
         self.assertRaises(KeyError, my_model.__setattr__, "missing", "missing")
         self.assertRaises(exception.ValidationError, my_model.__setattr__, "age", 121)
 
+    def test_create_instance_attributes(self):
+        class MyModel(types.Model):
+            string = types.String(default="default")
+            nothing = None
+
+        my_model = MyModel()
+        self.assertEquals(my_model.string, "default")
+        my_model = MyModel(string="string")
+        self.assertEquals(my_model.string, "string")
+        self.assertIsNone(my_model.nothing)
+
     def test_get_attribute_keys(self):
         class MyModel(types.Model):
             name = types.String()
@@ -152,6 +163,7 @@ class ModelUnitTest(unittest.TestCase):
             pass
 
         self.assertRaises(exception.RequiredAttributeError, MyModel(required=True).validate, None)
+        self.assertEquals(MyModel(required=False).validate(None), None)
 
     def test_attribute_rewrite_map(self):
         class MyModel(types.Model):
@@ -229,11 +241,34 @@ class ModelUnitTest(unittest.TestCase):
         self.assertTrue("another" in multi_base)
         self.assertFalse("missing" in multi_base)
 
-    def test__generate_attribute_token_rewrite_map(self):
-        pass
+    def test_generate_attribute_token_rewrite_map(self):
+        class MyModel(types.Model):
+            boolean = types.Boolean()
+            float = types.Float()
+            integer = types.Integer()
+            string = types.String()
 
-    def test__generate_attribute_tokens(self):
-        pass
+        my_model = MyModel()
+        rewrite_map = my_model.generate_attribute_token_rewrite_map()
+        self.assertEquals(
+            rewrite_map,
+            {
+                "boolean": "a",
+                "float": "b",
+                "integer": "c",
+                "string": "d"
+            }
+        )
+
+    def test_generate_attribute_tokens(self):
+        class MyModel(types.Model):
+            boolean = types.Boolean()
+            float = types.Float()
+            integer = types.Integer()
+            string = types.String()
+        my_model = MyModel()
+        tokens = my_model.generate_attribute_tokens()
+        self.assertEquals(tokens, ["boolean", "float", "integer", "string"])
 
     def test_generate_minified_keys(self):
         self.assertEquals(types.Model.generate_minified_keys(3), ["a", "b", "c"])
@@ -241,6 +276,23 @@ class ModelUnitTest(unittest.TestCase):
 
         self.assertEquals(types.Model.generate_minified_keys(3, "_"), ["_a", "_b", "_c"])
         self.assertEquals(types.Model.generate_minified_keys(5, "_"), ["_a", "_b", "_c", "_d", "_e"])
+
+        self.assertEquals(types.Model.generate_minified_keys(29), [
+            "a", "b", "c", "d", "e", "f", "g", "h", "i",
+            "j", "k", "l", "m", "n", "o", "p", "q", "r",
+            "s", "t", "u", "v", "w", "x", "y", "z",
+            "aa", "ab", "ac"
+        ])
+
+        self.assertEquals(types.Model.generate_minified_keys(55), [
+            "a", "b", "c", "d", "e", "f", "g", "h", "i",
+            "j", "k", "l", "m", "n", "o", "p", "q", "r",
+            "s", "t", "u", "v", "w", "x", "y", "z",
+            "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai",
+            "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar",
+            "as", "at", "au", "av", "aw", "ax", "ay", "az",
+            "ba", "bb", "bc"
+        ])
 
     def test__generate_attribute_key(self):
         self.assertEquals(types.Model.generate_attribute_key(0), "a")

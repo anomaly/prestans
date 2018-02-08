@@ -275,7 +275,7 @@ class Model(DataCollection):
         """
 
         rewrite_map = dict()
-        token_rewrite_map = self._generate_attribute_token_rewrite_map()
+        token_rewrite_map = self.generate_attribute_token_rewrite_map()
 
         for attribute_name, type_instance in self.getmembers():
 
@@ -302,7 +302,7 @@ class Model(DataCollection):
 
         rewrite_map = dict()
 
-        token_rewrite_map = self._generate_attribute_token_rewrite_map()
+        token_rewrite_map = self.generate_attribute_token_rewrite_map()
 
         for attribute_name, type_instance in self.getmembers():
 
@@ -343,19 +343,19 @@ class Model(DataCollection):
 
         return has_key
 
-    def _generate_attribute_token_rewrite_map(self):
+    def generate_attribute_token_rewrite_map(self):
 
-        rewrite_tokens = self._generate_attribute_tokens(self.getmembers())
+        rewrite_tokens = self.generate_attribute_tokens()
         minified_tokens = self.generate_minified_keys(len(rewrite_tokens))
 
         return dict(zip(rewrite_tokens, minified_tokens))
 
-    def _generate_attribute_tokens(self, model_class_members):
+    def generate_attribute_tokens(self):
 
         rewrite_tokens = list()
 
         # create a list of tokens
-        for attribute_name, type_instance in model_class_members:
+        for attribute_name, type_instance in self.getmembers():
 
             if isinstance(type_instance, DataType):
                 rewrite_tokens = rewrite_tokens + attribute_name.split('_')
