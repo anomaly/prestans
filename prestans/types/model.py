@@ -201,6 +201,16 @@ class Model(DataCollection):
         return attribute_filter
 
     def validate(self, value, attribute_filter=None, minified=False):
+        """
+        :param value:
+        :type value: dict
+        :param attribute_filter:
+        :type: prestans.parser.AttributeFilter
+        :param minified:
+        :type minified: bool
+        :return: the validated model
+        :rtype: Model
+        """
 
         if self._required and (value is None or not isinstance(value, dict)):
             """
@@ -236,7 +246,7 @@ class Model(DataCollection):
             if minified is True:
                 input_value_key = rewrite_map[attribute_name]
 
-            if value.has_key(input_value_key):
+            if input_value_key in value:
                 validation_input = value[input_value_key]
 
             try:

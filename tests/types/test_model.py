@@ -1,6 +1,7 @@
 import unittest
 
 from prestans import exception
+from prestans.parser import AttributeFilter
 from prestans import types
 
 
@@ -155,15 +156,6 @@ class ModelUnitTest(unittest.TestCase):
         self.assertTrue(attribute_filter.sub)
         self.assertTrue(attribute_filter.sub.colour)
         self.assertEquals(attribute_filter.keys(), ["name", "sub"])
-
-    def test_validate(self):
-
-        # check validate fails when None is passed to required
-        class MyModel(types.Model):
-            pass
-
-        self.assertRaises(exception.RequiredAttributeError, MyModel(required=True).validate, None)
-        self.assertEquals(MyModel(required=False).validate(None), None)
 
     def test_attribute_rewrite_map(self):
         class MyModel(types.Model):
@@ -489,3 +481,55 @@ class ModelUnitTest(unittest.TestCase):
         serialized = parent_model.as_serializable(attribute_filter=attribute_filter)
         self.assertEquals(serialized, {"sub": {"name": "james"}})
 
+
+class ModelValidate(unittest.TestCase):
+    def test_required_rejects_none(self):
+
+        class MyModel(types.Model):
+            pass
+
+        self.assertRaises(exception.RequiredAttributeError, MyModel(required=True).validate, None)
+
+    def test_required_rejects_non_dict_type(self):
+
+        class MyModel(types.Model):
+            pass
+
+        self.assertRaises(exception.RequiredAttributeError, MyModel(required=True).validate, "string")
+        self.assertRaises(exception.RequiredAttributeError, MyModel(required=True).validate, 3.33)
+
+    def test_not_required_accepts_none(self):
+        class MyModel(types.Model):
+            pass
+
+        self.assertEquals(MyModel(required=False).validate(None), None)
+
+    def test_sets_none_for_invisible_attributes(self):
+        class MyModel(types.Model):
+            visible = types.String(default="visible")
+            invisible = types.String(default="invisible")
+
+        my_model = MyModel()
+        self.assertEquals(my_model.visible, "visible")
+        self.assertEquals(my_model.invisible, "invisible")
+
+        attribute_filter = AttributeFilter.from_model(MyModel(), default_value=False)
+        attribute_filter.visible = True
+
+        validated = my_model.validate({}, attribute_filter)
+        self.assertEquals(validated.visible, "visible")
+        self.assertIsNone(validated.invisible)
+
+        attribute_filter.visible = False
+        attribute_filter.invisible = True
+
+        validated = my_model.validate({}, attribute_filter)
+        self.assertIsNone(validated.visible)
+        self.assertEquals(validated.invisible, "invisible")
+
+    def test_rejects_bad_attribute_type(self):
+
+        class MyModel(types.Model):
+            bad_attribute_type = "string"
+
+        self.assertRaises(TypeError, MyModel().validate, {})
