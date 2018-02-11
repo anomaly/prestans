@@ -28,9 +28,11 @@ class SerializerJSONUnitTest(unittest.TestCase):
         self.assertEqual(JSON().dumps({}), json.dumps({}))
         self.assertEqual(JSON().dumps({"key": "value"}), json.dumps({"key": "value"}))
 
-    @unittest.skip
     def test_dumps_fail(self):
-        self.assertRaises(exception.SerializationFailedError, JSON().dumps, "string")
+        class PythonObject(object):
+            pass
+
+        self.assertRaises(exception.SerializationFailedError, JSON().dumps, PythonObject)
 
     def test_handler_body_type(self):
         self.assertEquals(JSON().handler_body_type(), DataCollection)
@@ -51,9 +53,19 @@ class SerializerPListUnitTest(unittest.TestCase):
         self.assertEqual(XMLPlist().dumps({}), plistlib.dumps({}))
         self.assertEqual(XMLPlist().dumps({"key": "value"}), plistlib.dumps({"key": "value"}))
 
-    @unittest.skip
-    def test_dumps_fail(self):
-        self.assertRaises(exception.SerializationFailedError, XMLPlist().dumps, "string")
+    @unittest.skipIf(sys.version_info >= (3,), "python2 only")
+    def test_dumps_fail_py2(self):
+        class PythonObject(object):
+            pass
+
+        self.assertRaises(exception.SerializationFailedError, XMLPlist().dumps, PythonObject)
+
+    @unittest.skipIf(sys.version_info < (3,), "python3 only")
+    def test_dumps_fail_py3(self):
+        class PythonObject(object):
+            pass
+
+        self.assertRaises(exception.SerializationFailedError, XMLPlist().dumps, PythonObject)
 
     def test_handler_body_type(self):
         self.assertEquals(XMLPlist().handler_body_type(), DataCollection)

@@ -34,7 +34,7 @@ import sys
 from prestans import exception
 from prestans.types import DataCollection
 
-__all__ = ['JSON', 'XMLPlist']
+__all__ = ['Base', 'JSON', 'XMLPlist']
 
 
 class Base(object):
