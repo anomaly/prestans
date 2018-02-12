@@ -29,65 +29,79 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-import logging
 import unittest
 
-import prestans.provider.auth
-import prestans.rest
+from prestans import exception
+from prestans.http import STATUS
+from prestans.http import VERB
+from prestans.provider.auth import Base
+from prestans.provider.auth import access_required
+from prestans.provider.auth import login_required
+from prestans.provider.auth import role_required
+from prestans.provider import Config
+from prestans.rest import Request
+from prestans.rest import RequestHandler
+from prestans.rest import Response
 
 
 class BaseUnitTest(unittest.TestCase):
 
     def test_debug(self):
-        auth = prestans.provider.auth.Base()
-        self.assertEqual(auth.debug, False)
+        base = Base()
+        self.assertEqual(base.debug, False)
 
-        auth.debug = True
-        self.assertEqual(auth.debug, True)
+        base.debug = True
+        self.assertEqual(base.debug, True)
+
+    def test_request(self):
+        base = Base()
+        self.assertIsNone(base.request)
+
+        base.request = True
+        self.assertEqual(base.request, True)
 
     def test_current_user_has_role(self):
-        auth = prestans.provider.auth.Base()
-        self.assertRaises(NotImplementedError, auth.current_user_has_role, "Admin")
+        base = Base()
+        self.assertRaises(NotImplementedError, base.current_user_has_role, "Admin")
 
     def test_is_authenticated_user(self):
-        auth = prestans.provider.auth.Base()
-        self.assertRaises(NotImplementedError, auth.is_authenticated_user)
+        base = Base()
+        self.assertRaises(NotImplementedError, base.is_authenticated_user)
 
     def test_is_authorized_user(self):
-        auth = prestans.provider.auth.Base()
-        self.assertRaises(NotImplementedError, auth.is_authorized_user, None)
+        base = Base()
+        self.assertRaises(NotImplementedError, base.is_authorized_user, None)
 
     def test_get_current_user(self):
-        auth = prestans.provider.auth.Base()
-        self.assertRaises(NotImplementedError, auth.get_current_user)
+        base = Base()
+        self.assertRaises(NotImplementedError, base.get_current_user)
 
 
-class AdminRoleProvider(prestans.provider.auth.Base):
+class AdminRoleProvider(Base):
     
     def current_user_has_role(self, role_name):
         return role_name == "Admin"
 
 
-class AuthenticatedProvider(prestans.provider.auth.Base):
+class AuthenticatedProvider(Base):
 
     def is_authenticated_user(self):
         return True
 
 
-class UnauthenticatedProvider(prestans.provider.auth.Base):
+class UnauthenticatedProvider(Base):
 
     def is_authenticated_user(self):
         return False
 
 
-class AuthorizedProvider(prestans.provider.auth.Base):
+class AuthorizedProvider(Base):
 
     def is_authorized_user(self, config):
         return True
 
 
-class UnauthorizedProvider(prestans.provider.auth.Base):
+class UnauthorizedProvider(Base):
 
     def is_authorized_user(self, config):
         return False
@@ -120,160 +134,337 @@ class CustomUnitTest(unittest.TestCase):
         self.assertEqual(self.authorized.is_authorized_user(None), True)
         self.assertEqual(self.unauthorized.is_authorized_user(None), False)
 
-    def tearDown(self):
-        pass
-
-
-class AuthenticatedHandlerProvider(prestans.provider.auth.Base):
-    
-    def is_authenticated_user(self):
-        return True
-
-    def current_user_has_role(self, role_name):
-        return role_name == "Admin"
-
-
-class UnauthenticatedHandlerProvider(prestans.provider.auth.Base):
-    
-    def is_authenticated_user(self):
-        return False
-
-
-class HandlerWithoutProvider(prestans.rest.RequestHandler):
-
-    @prestans.provider.auth.login_required
-    def get(self):
-        pass
-
-
-class AuthenticatedHandler(prestans.rest.RequestHandler):
-    
-    __provider_config__ = prestans.provider.Config(
-        authentication=AuthenticatedHandlerProvider()
-    )
-
-    @prestans.provider.auth.login_required
-    def get(self):
-        self.response.status = prestans.http.STATUS.NO_CONTENT
-
-    @prestans.provider.auth.role_required("Admin")
-    def post(self):
-        self.response.status = prestans.http.STATUS.NO_CONTENT
-
-    @prestans.provider.auth.role_required("Manager")
-    def put(self):
-        self.response.status = prestans.http.STATUS.NO_CONTENT
-
-
-class UnauthenticatedHandler(prestans.rest.RequestHandler):
-    
-    __provider_config__ = prestans.provider.Config(
-        authentication=UnauthenticatedHandlerProvider()
-    )
-
-    @prestans.provider.auth.login_required
-    def get(self):
-        self.response.status = prestans.http.STATUS.NO_CONTENT
-
 
 def start_response(status, headers):
     pass
 
 
-class HandlerUnitTest(unittest.TestCase):
+class LoginRequiredUnitTest(unittest.TestCase):
 
     def setUp(self):
 
+        import logging
         logging.basicConfig()
-        logger = logging.getLogger("prestans")
+        self.logger = logging.getLogger("prestans")
 
-        charset="utf-8"
-        serializers=[prestans.deserializer.JSON()]
-        default_serializer=prestans.deserializer.JSON()
+        from prestans.deserializer import JSON
+        self.charset = "utf-8"
+        self.serializers = [JSON()]
+        self.default_serializer = JSON()
 
-        self.get_environ = {"REQUEST_METHOD": prestans.http.VERB.GET}
-        self.post_environ = {"REQUEST_METHOD": prestans.http.VERB.POST}
-        self.put_environ = {"REQUEST_METHOD": prestans.http.VERB.PUT}
+        self.get_environ = {"REQUEST_METHOD": VERB.GET}
 
-        get_request = prestans.rest.Request(
+        self.get_request = Request(
+            environ=self.get_environ,
+            charset=self.charset,
+            logger=self.logger,
+            deserializers=self.serializers,
+            default_deserializer=self.default_serializer
+        )
+
+        self.response = Response(
+            charset=self.charset,
+            logger=self.logger,
+            serializers=self.serializers,
+            default_serializer=self.default_serializer
+        )
+
+        class HandlerWithoutProvider(RequestHandler):
+
+            @login_required
+            def get(self):
+                pass
+
+        self.handler_without_provider = HandlerWithoutProvider
+
+        class AuthenticatedProvider(Base):
+
+            def is_authenticated_user(self):
+                return True
+
+        class AuthenticatedHandler(RequestHandler):
+
+            __provider_config__ = Config(
+                authentication=AuthenticatedProvider()
+            )
+
+            @login_required
+            def get(self):
+                self.response.status = STATUS.NO_CONTENT
+
+        self.authenticated_handler = AuthenticatedHandler
+
+        class UnauthenticatedProvider(Base):
+
+            def is_authenticated_user(self):
+                return False
+
+        class UnauthenticatedHandler(RequestHandler):
+
+            __provider_config__ = Config(
+                authentication=UnauthenticatedProvider()
+            )
+
+            @login_required
+            def get(self):
+                self.response.status = STATUS.NO_CONTENT
+
+        self.unauthenticated_handler = UnauthenticatedHandler
+
+    def test_login_required_no_provider_raises_exception(self):
+        handler = self.handler_without_provider(
+            args=[],
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
+            debug=True
+        )
+
+        self.assertRaises(exception.AuthenticationError, handler, self.get_environ, start_response)
+
+    def test_login_required_unauthenticated_raises_exception(self):
+        handler = self.unauthenticated_handler(
+            args=[],
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
+            debug=True
+        )
+
+        self.assertRaises(exception.AuthenticationError, handler, self.get_environ, start_response)
+
+    def test_login_required_authenticated(self):
+        handler = self.authenticated_handler(
+            args=[],
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
+            debug=True
+        )
+
+        self.assertIsInstance(handler(self.get_environ, start_response), list)
+
+
+class RoleRequiredUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        import logging
+        logging.basicConfig()
+        self.logger = logging.getLogger("prestans")
+
+        from prestans.deserializer import JSON
+        charset = "utf-8"
+        serializers = [JSON()]
+        default_serializer = JSON()
+
+        self.get_environ = {"REQUEST_METHOD": VERB.GET}
+        self.post_environ = {"REQUEST_METHOD": VERB.POST}
+        self.put_environ = {"REQUEST_METHOD": VERB.PUT}
+
+        self.get_request = Request(
             environ=self.get_environ,
             charset=charset,
-            logger=logger,
+            logger=self.logger,
             deserializers=serializers,
             default_deserializer=default_serializer
         )
 
-        post_request = prestans.rest.Request(
+        self.post_request = Request(
             environ=self.post_environ,
             charset=charset,
-            logger=logger,
+            logger=self.logger,
             deserializers=serializers,
             default_deserializer=default_serializer
         )
 
-        put_request = prestans.rest.Request(
+        self.put_request = Request(
             environ=self.put_environ,
             charset=charset,
-            logger=logger,
+            logger=self.logger,
             deserializers=serializers,
             default_deserializer=default_serializer
         )
 
-        response = prestans.rest.Response(
+        self.response = Response(
             charset=charset,
-            logger=logger,
+            logger=self.logger,
             serializers=serializers,
             default_serializer=default_serializer
         )
 
-        self.authenticated_handler = AuthenticatedHandler(
+        class AuthProvider(Base):
+
+            def current_user_has_role(self, role_name):
+                return role_name == "Admin"
+
+        class HandlerWithoutProvider(RequestHandler):
+
+            @role_required("Admin")
+            def get(self):
+                pass
+
+        self.handler_without_provider = HandlerWithoutProvider
+
+        class HandlerWithProvider(RequestHandler):
+
+            __provider_config__ = Config(
+                authentication=AuthProvider()
+            )
+
+            @role_required(None)
+            def get(self):
+                self.response.status = STATUS.NO_CONTENT
+
+            @role_required("Manager")
+            def post(self):
+                self.response.status = STATUS.NO_CONTENT
+
+            @role_required("Admin")
+            def put(self):
+                self.response.status = STATUS.NO_CONTENT
+
+        self.handler_with_provider = HandlerWithProvider
+
+    def test_role_required_no_provider_raises_exception(self):
+        handler = self.handler_without_provider(
             args=[],
-            request=get_request,
-            response=response,
-            logger=logger,
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
             debug=True
         )
 
-        self.unauthenticated_handler = UnauthenticatedHandler(
+        self.assertRaises(exception.AuthenticationError, handler, self.get_environ, start_response)
+
+    def test_role_required_none_raises_authorization_error(self):
+        handler = self.handler_with_provider(
             args=[],
-            request=get_request,
-            response=response,
-            logger=logger,
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
             debug=True
         )
 
-        self.correct_role_handler = AuthenticatedHandler(
+        self.assertRaises(exception.AuthorizationError, handler, self.get_environ, start_response)
+
+    def test_role_required_incorrect_role_raises_exception(self):
+        handler = self.handler_with_provider(
             args=[],
-            request=post_request,
-            response=response,
-            logger=logger,
+            request=self.post_request,
+            response=self.response,
+            logger=self.logger,
             debug=True
         )
 
-        self.incorrect_role_handler = AuthenticatedHandler(
+        self.assertRaises(exception.AuthorizationError, handler, self.post_environ, start_response)
+
+    def test_role_required_success(self):
+        handler = self.handler_with_provider(
             args=[],
-            request=put_request,
-            response=response,
-            logger=logger,
+            request=self.put_request,
+            response=self.response,
+            logger=self.logger,
             debug=True
         )
 
-        self.handler_without_provider = HandlerWithoutProvider(
+        self.assertIsInstance(handler(self.put_environ, start_response), list)
+
+
+class AccessRequiredUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        import logging
+        logging.basicConfig()
+        self.logger = logging.getLogger("prestans")
+
+        from prestans.deserializer import JSON
+        charset = "utf-8"
+        serializers = [JSON()]
+        default_serializer = JSON()
+
+        class AuthProvider(Base):
+
+            def is_authorized_user(self, config):
+                return config["name"] == "Jack"
+
+        class HandlerWithoutProvider(RequestHandler):
+
+            @access_required({"name": "Jack"})
+            def get(self):
+                self.response.status = STATUS.NO_CONTENT
+        self.handler_without_provider = HandlerWithoutProvider
+
+        class HandlerWithProvider(RequestHandler):
+
+            __provider_config__ = Config(
+                authentication=AuthProvider()
+            )
+
+            @access_required({"name": "Jack"})
+            def get(self):
+                self.response.status = STATUS.NO_CONTENT
+
+            @access_required({"name": "Jill"})
+            def post(self):
+                self.response.status = STATUS.NO_CONTENT
+
+        self.handler_with_provider = HandlerWithProvider
+
+        self.get_environ = {"REQUEST_METHOD": VERB.GET}
+        self.post_environ = {"REQUEST_METHOD": VERB.POST}
+
+        self.get_request = Request(
+            environ=self.get_environ,
+            charset=charset,
+            logger=self.logger,
+            deserializers=serializers,
+            default_deserializer=default_serializer
+        )
+
+        self.post_request = Request(
+            environ=self.post_environ,
+            charset=charset,
+            logger=self.logger,
+            deserializers=serializers,
+            default_deserializer=default_serializer
+        )
+
+        self.response = Response(
+            charset=charset,
+            logger=self.logger,
+            serializers=serializers,
+            default_serializer=default_serializer
+        )
+
+    def test_access_required_no_provider_raises_exception(self):
+        handler = self.handler_without_provider(
             args=[],
-            request=get_request,
-            response=response,
-            logger=logger,
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
             debug=True
         )
 
-    def test_login_required(self):
-        self.assertRaises(prestans.exception.AuthenticationError, self.handler_without_provider, self.get_environ, start_response)
-        self.assertRaises(prestans.exception.AuthenticationError, self.unauthenticated_handler, self.get_environ, start_response)
-        self.assertIsInstance(self.authenticated_handler(self.get_environ, start_response), list)
+        self.assertRaises(exception.AuthenticationError, handler, self.get_environ, start_response)
 
-    def test_current_user_has_role(self):
-        self.assertRaises(prestans.exception.AuthorizationError, self.incorrect_role_handler, self.post_environ, start_response)
-        self.assertIsInstance(self.correct_role_handler(self.put_environ, start_response), list)
+    def test_access_required_unauthorized_raises_exception(self):
+        handler = self.handler_with_provider(
+            args=[],
+            request=self.post_request,
+            response=self.response,
+            logger=self.logger,
+            debug=True
+        )
 
-    def tearDown(self):
-        pass
+        self.assertRaises(exception.AuthorizationError, handler, self.post_environ, start_response)
+
+    def test_access_required_success(self):
+        handler = self.handler_with_provider(
+            args=[],
+            request=self.get_request,
+            response=self.response,
+            logger=self.logger,
+            debug=True
+        )
+
+        self.assertIsInstance(handler(self.get_environ, start_response), list)
