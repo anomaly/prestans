@@ -58,6 +58,17 @@ class AttributeFilter(object):
 
         return attribute_filter_instance
 
+    def blueprint(self):
+        """
+        :return: blueprint
+        :rtype: dict
+        """
+        blueprint = dict()
+        for key in self.keys():
+            blueprint[key] = self.is_attribute_visible(key)
+
+        return blueprint
+
     def conforms_to_template_filter(self, template_filter):
         """
         Check AttributeFilter conforms to the rules set by the template

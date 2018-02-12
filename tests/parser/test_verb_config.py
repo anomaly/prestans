@@ -57,7 +57,11 @@ class VerbConfigTest(unittest.TestCase):
         self.assertRaises(TypeError, VerbConfig, body_template="string")
 
     def test_init_request_attribute_filter(self):
-        pass
+        self.assertIsNone(VerbConfig().request_attribute_filter)
+
+        attribute_filter = AttributeFilter()
+        self.assertEquals(VerbConfig(request_attribute_filter=attribute_filter).request_attribute_filter, attribute_filter)
+        self.assertRaises(TypeError, VerbConfig, request_attribute_filter="string")
 
     def test_blueprint_default(self):
         blueprint = VerbConfig().blueprint()
@@ -78,17 +82,19 @@ class VerbConfigTest(unittest.TestCase):
         response_template = MyModel()
         parameter_sets = [param_set, param_set]
         body_template = MyModel()
-        request_attribute_filter = None
+        attribute_filter = AttributeFilter({"name": True})
 
         verb_config = VerbConfig(
             response_template=response_template,
             parameter_sets=parameter_sets,
-            body_template=body_template
+            body_template=body_template,
+            request_attribute_filter=attribute_filter
         )
         blueprint = verb_config.blueprint()
         self.assertEquals(blueprint["response_template"], response_template.blueprint())
         self.assertEquals(blueprint["parameter_sets"], [param_set.blueprint(), param_set.blueprint()])
         self.assertEquals(blueprint["body_template"], body_template.blueprint())
+        self.assertEquals(blueprint["request_attribute_filter"], attribute_filter.blueprint())
 
     def test_response_template(self):
 

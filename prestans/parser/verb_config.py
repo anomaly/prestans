@@ -86,7 +86,7 @@ class VerbConfig(object):
 
         # request_attribute_filter
         if request_attribute_filter is not None and \
-                not isinstance(request_attribute_filter, AttributeFilter):
+           not isinstance(request_attribute_filter, AttributeFilter):
             raise TypeError("request_attribute_filter of type %s must an instance \
             of prestans.parser.AttributeFilter" % request_attribute_filter.__class__.__name__)
 
@@ -112,8 +112,7 @@ class VerbConfig(object):
             verb_config_blueprint['body_template'] = self._body_template
 
         if self._request_attribute_filter is not None:
-            verb_config_blueprint['request_attribute_filter'] = \
-                self._request_attribute_filter.blueprint()
+            verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter.blueprint()
         else:
             verb_config_blueprint['request_attribute_filter'] = self._request_attribute_filter
 
