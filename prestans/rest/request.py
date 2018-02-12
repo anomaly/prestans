@@ -10,7 +10,7 @@ from prestans.types import DataCollection
 class Request(webob.Request):
     """
     Request is parsed REST Request; it's inherits and relies on Webob.Request to
-    do the heavy lifiting of parsing HTTP requests. It adds on top parsing of
+    do the heavy lifting of parsing HTTP requests. It adds on top parsing of
     REST bodies and parameter sets based on rules set by the prestans app.
 
     It's responsible for making sense of the prestans headers and making them

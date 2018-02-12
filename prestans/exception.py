@@ -132,7 +132,7 @@ class UnsupportedVocabularyError(Base):
         self.push_trace({
             'accept_header': str(accept_header),
             'supported_types': supported_types
-            })
+        })
 
 
 class UnsupportedContentTypeError(Base):
@@ -173,15 +173,7 @@ class ValidationError(Base):
             'value': self._value,
             'message': self._message,
             'blueprint': blueprint
-            })
-
-    #:
-    #: The following are overridden to ensure sensible logging messages
-    #:
-
-    def __unicode__(self):
-        _loggable_message = "%s %s" % (self._attribute_name, self._message)
-        return unicode(_loggable_message)
+        })
 
     def __str__(self):
         _loggable_message = "%s %s" % (self._attribute_name, self._message)
@@ -218,9 +210,6 @@ class HandlerException(Base):
                 self.request.user_agent,
                 self._message
             )
-
-    def __unicode__(self):
-        return self.log_message
 
     def __str__(self):
         return self.log_message.encode('utf-8')
@@ -259,10 +248,6 @@ class ResponseException(HandlerException):
     @property
     def response_model(self):
         return self._response_model
-
-#:
-#: Parser Exception
-#:
 
 
 class UnimplementedVerbError(RequestException):
@@ -336,8 +321,9 @@ class AttributeFilterDiffers(RequestException):
     def __init__(self, attribute_list):
 
         _code = STATUS.BAD_REQUEST
-        _message = "attribute filter does not contain attributes (%s)\
-        that are not part of template" % (', '.join(attribute_list))
+        _message = "attribute filter does not contain attributes (%s) that are not part of template" % (
+            ', '.join(attribute_list)
+        )
 
         super(AttributeFilterDiffers, self).__init__(_code, _message)
 
@@ -367,12 +353,9 @@ class InconsistentPersistentDataError(Base):
             'attribute_name': attribute_name
             })
 
+    # todo: why does this differ from the standard message?
     def __str__(self):
         return "DataAdapter failed to adapt %s, %s" % (self._attribute_name, self.message)
-
-#:
-#: Data Validation
-#:
 
 
 class DataValidationException(Base):
@@ -405,15 +388,14 @@ class LessThanMinimumError(DataValidationException):
 class MoreThanMaximumError(DataValidationException):
 
     def __init__(self, value, allowed_max):
-        _message = "%s is more than the allowed maximum %i" % (str(value), allowed_max)
+        _message = "%s is more than the allowed maximum of %i" % (str(value), allowed_max)
         super(MoreThanMaximumError, self).__init__(_message)
 
 
 class InvalidChoiceError(DataValidationException):
 
     def __init__(self, value, allowed_choices):
-        _message = "value %s is not one of these\
-        choices %s" % (str(value), str(allowed_choices).strip('[]'))
+        _message = "value %s is not one of these choices %s" % (str(value), str(allowed_choices).strip('[]'))
         super(InvalidChoiceError, self).__init__(_message)
 
 
