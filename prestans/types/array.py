@@ -41,22 +41,19 @@ from prestans.types import String
 
 class Array(DataCollection):
 
-    def __init__(self, default=None, required=True, element_template=None, \
+    def __init__(self, required=True,element_template=None,
                  min_length=None, max_length=None, description=None):
 
         if not isinstance(element_template, DataType):
-            raise TypeError("Array element_template must a DataType subclass; %s given" % \
-                            element_template.__class__.__name__)
+            msg = "Array element_template must a DataType subclass; %s given" % element_template.__class__.__name__
+            raise TypeError(msg)
 
-        #:
-        #: Force required to be True if basic type in  use
-        #:
+        # force required to be True if basic type in  use
         if isinstance(element_template, DataType) \
                 and not isinstance(element_template, DataCollection) \
                 and not isinstance(element_template, DataStructure):
             element_template._required = True
 
-        self._default = default
         self._required = required
         self._element_template = element_template
         self._min_length = min_length
@@ -79,7 +76,7 @@ class Array(DataCollection):
     def __getitem__(self, index):
         return self._array_elements[index]
 
-    def __constains__(self, item):
+    def __contains__(self, item):
         return item in self._array_elements
 
     @property
@@ -91,17 +88,17 @@ class Array(DataCollection):
         return self._min_length
 
     @property
-    def default(self):
-        return self._default
-
-    @property
-    def element_template(self):
-        return self._element_template
+    def description(self):
+        return self._description
 
     @property
     def is_scalar(self):
         return isinstance(self._element_template, Float) or isinstance(self._element_template, Boolean) or \
                isinstance(self._element_template, Integer) or isinstance(self._element_template, String)
+
+    @property
+    def element_template(self):
+        return self._element_template
 
     @element_template.setter
     def element_template(self, value):
@@ -113,7 +110,6 @@ class Array(DataCollection):
         blueprint['type'] = 'array'
 
         constraints = dict()
-        # constraints['default'] = self._default
         constraints['required'] = self._required
         constraints['min_length'] = self._min_length
         constraints['max_length'] = self._max_length
@@ -143,11 +139,9 @@ class Array(DataCollection):
         for array_element in value:
 
             if isinstance(self._element_template, DataCollection):
-                validated_array_element = self._element_template. \
-                    validate(array_element, attribute_filter)
+                validated_array_element = self._element_template.validate(array_element, attribute_filter)
             else:
-                validated_array_element = self._element_template. \
-                    validate(array_element)
+                validated_array_element = self._element_template.validate(array_element)
 
             _validated_value.append(validated_array_element)
 
@@ -169,13 +163,15 @@ class Array(DataCollection):
 
         # check for basic types supported by array
         if isinstance(self._element_template, String) or \
-                isinstance(self._element_template, Integer) or \
-                isinstance(self._element_template, Float) or \
-                isinstance(self._element_template, Boolean):
+           isinstance(self._element_template, Integer) or \
+           isinstance(self._element_template, Float) or \
+           isinstance(self._element_template, Boolean):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
-            raise TypeError("prestans array elements must be of type %s; given %s" \
-                            % (self._element_template.__class__.__name__, value.__class__.__name__))
+            msg = "prestans array elements must be of type %s; given %s" % (
+                self._element_template.__class__.__name__, value.__class__.__name__
+            )
+            raise TypeError(msg)
 
         self._array_elements.append(value)
 
@@ -196,9 +192,11 @@ class Array(DataCollection):
 
         return _result_array
 
+    # todo: what happens if element_template is None?
     def attribute_rewrite_map(self):
         return self._element_template.attribute_rewrite_map()
 
+    # todo: wheat happens if element_tempalte is None?
     def attribute_rewrite_reverse_map(self):
         return self._element_template.attribute_rewrite_reverse_map()
 
