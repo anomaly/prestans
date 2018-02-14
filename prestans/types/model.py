@@ -202,11 +202,11 @@ class Model(DataCollection):
 
     def validate(self, value, attribute_filter=None, minified=False):
         """
-        :param value:
-        :type value: dict
+        :param value: serializable input to validate
+        :type value: dict | None
         :param attribute_filter:
-        :type: prestans.parser.AttributeFilter
-        :param minified:
+        :type: prestans.parser.AttributeFilter | None
+        :param minified: whether or not the input is minified
         :type minified: bool
         :return: the validated model
         :rtype: Model
@@ -229,11 +229,16 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
+        import logging
         for attribute_name, type_instance in self.getmembers():
 
             if attribute_filter and not attribute_filter.is_attribute_visible(attribute_name):
                 _model_instance.__dict__[attribute_name] = None
+
+                logging.error("skipping "+attribute_name)
                 continue
+
+            logging.error("checking "+attribute_name)
 
             if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
@@ -253,7 +258,7 @@ class Model(DataCollection):
 
                 if isinstance(type_instance, DataCollection):
                     sub_attribute_filter = None
-                    if attribute_filter and attribute_filter.has_key(attribute_name):
+                    if attribute_filter and attribute_name in attribute_filter:
                         sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
                     validated_object = type_instance.validate(

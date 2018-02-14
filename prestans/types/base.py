@@ -33,6 +33,9 @@
 
 class DataType(object):
 
+    def blueprint(self):
+        raise NotImplementedError
+
     def validate(self, value):
         raise NotImplementedError
 
@@ -48,17 +51,32 @@ class DataStructure(DataType):
     E.g DateTime serializes itself as a ISO string
     """
 
+    def blueprint(self):
+        raise NotImplementedError
+
+    def validate(self, value):
+        raise NotImplementedError
+
     def as_serializable(self, value):
         raise NotImplementedError
 
 
 class DataCollection(DataType):
 
-    def validate(self, value, attribute_filter=None):
+    def blueprint(self):
+        raise NotImplementedError
+
+    def validate(self, value, attribute_filter=None, minified=False):
         raise NotImplementedError
 
     def as_serializable(self, attribute_filter=None):
         raise NotImplementedError
 
-    def get_attribute_filter(self):
+    def attribute_rewrite_map(self):
+        raise NotImplementedError
+
+    def attribute_rewrite_reverse_map(self):
+        raise NotImplementedError
+
+    def get_attribute_filter(self, default_value=False):
         raise NotImplementedError

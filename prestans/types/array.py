@@ -33,29 +33,46 @@ from prestans import exception
 from prestans.types import DataCollection
 from prestans.types import DataStructure
 from prestans.types import DataType
+
 from prestans.types import Boolean
 from prestans.types import Float
 from prestans.types import Integer
 from prestans.types import String
+
+from prestans.types import Date
+from prestans.types import DateTime
+from prestans.types import Time
 
 
 class Array(DataCollection):
 
     def __init__(self, required=True,element_template=None,
                  min_length=None, max_length=None, description=None):
+        """
+        :param required:
+        :type required: bool
+        :param element_template:
+        :param min_length:
+        :type min_length: int
+        :param max_length:
+        :type max_length: int
+        :param description:
+        :type description: str
+        """
 
         if not isinstance(element_template, DataType):
             msg = "Array element_template must a DataType subclass; %s given" % element_template.__class__.__name__
             raise TypeError(msg)
 
+        self._element_template = element_template  # type: DataType
+
         # force required to be True if basic type in  use
-        if isinstance(element_template, DataType) \
-                and not isinstance(element_template, DataCollection) \
-                and not isinstance(element_template, DataStructure):
+        if isinstance(element_template, DataType) and \
+           not isinstance(element_template, DataCollection) and \
+           not isinstance(element_template, DataStructure):
             element_template._required = True
 
         self._required = required
-        self._element_template = element_template
         self._min_length = min_length
         self._max_length = max_length
         self._description = description
@@ -123,6 +140,15 @@ class Array(DataCollection):
         self._array_elements.remove(value)
 
     def validate(self, value, attribute_filter=None, minified=False):
+        """
+        :param value:
+        :type value: list | None
+        :param attribute_filter:
+        :type attribute_filter: prestans.parser.AttributeFilter
+        :param minified:
+        :type minified: bool
+        :return:
+        """
 
         if not self._required and not value:
             return None
@@ -139,7 +165,7 @@ class Array(DataCollection):
         for array_element in value:
 
             if isinstance(self._element_template, DataCollection):
-                validated_array_element = self._element_template.validate(array_element, attribute_filter)
+                validated_array_element = self._element_template.validate(array_element, attribute_filter, minified)
             else:
                 validated_array_element = self._element_template.validate(array_element)
 
@@ -162,10 +188,14 @@ class Array(DataCollection):
             return
 
         # check for basic types supported by array
-        if isinstance(self._element_template, String) or \
-           isinstance(self._element_template, Integer) or \
+        if isinstance(self._element_template, Boolean) or \
            isinstance(self._element_template, Float) or \
-           isinstance(self._element_template, Boolean):
+           isinstance(self._element_template, Integer) or \
+           isinstance(self._element_template, String):
+            value = self._element_template.__class__().validate(value)
+        elif isinstance(self._element_template, Date) or \
+             isinstance(self._element_template, DateTime) or \
+             isinstance(self._element_template, Time):
             value = self._element_template.__class__().validate(value)
         elif not isinstance(value, self._element_template.__class__):
             msg = "prestans array elements must be of type %s; given %s" % (
@@ -181,10 +211,10 @@ class Array(DataCollection):
 
         for array_element in self._array_elements:
 
-            if isinstance(array_element, DataCollection):
+            if isinstance(self._element_template, DataCollection):
                 serialized_value = array_element.as_serializable(attribute_filter, minified)
                 _result_array.append(serialized_value)
-            elif isinstance(array_element, DataStructure):
+            elif isinstance(self._element_template, DataStructure):
                 serialized_value = self._element_template.as_serializable(array_element)
                 _result_array.append(serialized_value)
             elif isinstance(self._element_template, DataType):
@@ -192,13 +222,17 @@ class Array(DataCollection):
 
         return _result_array
 
-    # todo: what happens if element_template is None?
     def attribute_rewrite_map(self):
-        return self._element_template.attribute_rewrite_map()
+        if isinstance(self._element_template, DataCollection):
+            return self._element_template.attribute_rewrite_map()
+        else:
+            return None
 
-    # todo: wheat happens if element_tempalte is None?
     def attribute_rewrite_reverse_map(self):
-        return self._element_template.attribute_rewrite_reverse_map()
+        if isinstance(self._element_template, DataCollection):
+            return self._element_template.attribute_rewrite_reverse_map()
+        else:
+            return None
 
     def get_attribute_filter(self, default_value=False):
 
@@ -206,8 +240,7 @@ class Array(DataCollection):
 
         if isinstance(self._element_template, DataCollection):
             attribute_filter = self._element_template.get_attribute_filter(default_value)
-        elif isinstance(self._element_template, DataType) or \
-                isinstance(self._element_template, DataStructure):
+        elif isinstance(self._element_template, DataType) or isinstance(self._element_template, DataStructure):
             attribute_filter = default_value
 
         return attribute_filter

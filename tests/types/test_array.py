@@ -8,10 +8,15 @@ class ArrayUnitTest(unittest.TestCase):
 
     def test_len(self):
         array = types.Array(element_template=types.Integer())
-        self.assertEquals(len(array), 0)
 
+        self.assertEquals(len(array), 0)
         array.append(1)
         self.assertEquals(len(array), 1)
+        array.append(2)
+        self.assertEquals(len(array), 2)
+
+
+class ArrayIter(unittest.TestCase):
 
     def test_iter(self):
         elements = ["a", "b", "c"]
@@ -26,12 +31,18 @@ class ArrayUnitTest(unittest.TestCase):
             self.assertEquals(element, elements[index])
             index += 1
 
+
+class ArrayGetItem(unittest.TestCase):
+
     def test_getitem(self):
         array = types.Array(element_template=types.Integer())
         self.assertRaises(IndexError, array.__getitem__, 0)
 
         array.append(1)
         self.assertEquals(array[0], 1)
+
+
+class ArrayContains(unittest.TestCase):
 
     def test_contains(self):
         array = types.Array(element_template=types.Integer())
@@ -40,42 +51,103 @@ class ArrayUnitTest(unittest.TestCase):
         array.append(1)
         self.assertTrue(1 in array)
 
-    def test_max_length(self):
-        default_max = types.Array(element_template=types.Integer())
-        self.assertIsNone(default_max.max_length)
 
-        custom_max = types.Array(element_template=types.Integer(), max_length=2)
-        self.assertEquals(custom_max.max_length, 2)
+class ArrayMaxLength(unittest.TestCase):
 
-    def test_min_length(self):
-        default_min = types.Array(element_template=types.Integer())
-        self.assertIsNone(default_min.min_length)
+    def test_default(self):
+        self.assertIsNone(types.Array(element_template=types.Boolean()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Float()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Integer()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Integer()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Date()).max_length)
+        self.assertIsNone(types.Array(element_template=types.DateTime()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Time()).max_length)
+        self.assertIsNone(types.Array(element_template=types.Model()).max_length)
 
-        custom_min = types.Array(element_template=types.Integer(), min_length=1)
-        self.assertEquals(custom_min.min_length, 1)
+    def test_custom(self):
+        self.assertEquals(types.Array(element_template=types.Boolean(), max_length=1).max_length, 1)
+        self.assertEquals(types.Array(element_template=types.Float(), max_length=2).max_length, 2)
+        self.assertEquals(types.Array(element_template=types.Integer(), max_length=3).max_length, 3)
+        self.assertEquals(types.Array(element_template=types.String(), max_length=4).max_length, 4)
+        self.assertEquals(types.Array(element_template=types.Date(), max_length=5).max_length, 5)
+        self.assertEquals(types.Array(element_template=types.DateTime(), max_length=6).max_length, 6)
+        self.assertEquals(types.Array(element_template=types.Time(), max_length=7).max_length, 7)
+        self.assertEquals(types.Array(element_template=types.Model(), max_length=8).max_length, 8)
 
-    def test_description(self):
-        default_description = types.Array(element_template=types.Integer())
-        self.assertIsNone(default_description.description)
 
-        custom_description = types.Array(element_template=types.Integer(), description="description")
-        self.assertEquals(custom_description.description, "description")
+class ArrayMinLength(unittest.TestCase):
 
-    def test_is_scalar(self):
-        string_array = types.Array(element_template=types.String())
-        self.assertTrue(string_array.is_scalar)
+    def test_default(self):
+        self.assertIsNone(types.Array(element_template=types.Boolean()).min_length)
+        self.assertIsNone(types.Array(element_template=types.Float()).min_length)
+        self.assertIsNone(types.Array(element_template=types.Integer()).min_length)
+        self.assertIsNone(types.Array(element_template=types.String()).min_length)
+        self.assertIsNone(types.Array(element_template=types.Date()).min_length)
+        self.assertIsNone(types.Array(element_template=types.DateTime()).min_length)
+        self.assertIsNone(types.Array(element_template=types.Time()).min_length)
+        self.assertIsNone(types.Array(element_template=types.Model()).min_length)
 
-        integer_array = types.Array(element_template=types.Integer())
-        self.assertTrue(integer_array.is_scalar)
+    def test_custom(self):
+        self.assertEquals(types.Array(element_template=types.Boolean(), min_length=1).min_length, 1)
+        self.assertEquals(types.Array(element_template=types.Float(), min_length=2).min_length, 2)
+        self.assertEquals(types.Array(element_template=types.Integer(), min_length=3).min_length, 3)
+        self.assertEquals(types.Array(element_template=types.String(), min_length=4).min_length, 4)
+        self.assertEquals(types.Array(element_template=types.Date(), min_length=5).min_length, 5)
+        self.assertEquals(types.Array(element_template=types.DateTime(), min_length=6).min_length, 6)
+        self.assertEquals(types.Array(element_template=types.Time(), min_length=7).min_length, 7)
+        self.assertEquals(types.Array(element_template=types.Model(), min_length=8).min_length, 8)
 
-        boolean_array = types.Array(element_template=types.Boolean())
-        self.assertTrue(boolean_array.is_scalar)
 
-        float_array = types.Array(element_template=types.Float())
-        self.assertTrue(float_array.is_scalar)
+class ArrayDescription(unittest.TestCase):
 
-        model_array = types.Array(element_template=types.Model())
-        self.assertFalse(model_array.is_scalar)
+    def test_default(self):
+        self.assertIsNone(types.Array(element_template=types.Boolean()).description)
+        self.assertIsNone(types.Array(element_template=types.Float()).description)
+        self.assertIsNone(types.Array(element_template=types.Integer()).description)
+        self.assertIsNone(types.Array(element_template=types.String()).description)
+        self.assertIsNone(types.Array(element_template=types.Date()).description)
+        self.assertIsNone(types.Array(element_template=types.DateTime()).description)
+        self.assertIsNone(types.Array(element_template=types.Time()).description)
+        self.assertIsNone(types.Array(element_template=types.Model()).description)
+
+    def test_custom(self):
+        boolean_array = types.Array(element_template=types.Boolean(), description="boolean")
+        self.assertEquals(boolean_array.description, "boolean")
+
+        float_array = types.Array(element_template=types.Float(), description="float")
+        self.assertEquals(float_array.description, "float")
+
+        integer_array = types.Array(element_template=types.Integer(), description="integer")
+        self.assertEquals(integer_array.description, "integer")
+
+        string_array = types.Array(element_template=types.String(), description="string")
+        self.assertEquals(string_array.description, "string")
+
+        date_array = types.Array(element_template=types.Date(), description="date")
+        self.assertEquals(date_array.description, "date")
+
+        datetime_array = types.Array(element_template=types.DateTime(), description="datetime")
+        self.assertEquals(datetime_array.description, "datetime")
+
+        time_array = types.Array(element_template=types.Date(), description="time")
+        self.assertEquals(time_array.description, "time")
+
+
+class ArrayIsScalar(unittest.TestCase):
+
+    def test_data_type(self):
+        self.assertTrue(types.Array(element_template=types.Boolean()).is_scalar)
+        self.assertTrue(types.Array(element_template=types.Float()).is_scalar)
+        self.assertTrue(types.Array(element_template=types.Integer()).is_scalar)
+        self.assertTrue(types.Array(element_template=types.String()).is_scalar)
+
+    def test_data_structure(self):
+        self.assertFalse(types.Array(element_template=types.Date()).is_scalar)
+        self.assertFalse(types.Array(element_template=types.DateTime()).is_scalar)
+        self.assertFalse(types.Array(element_template=types.Time()).is_scalar)
+
+    def test_data_collection(self):
+        self.assertFalse(types.Array(element_template=types.Model()).is_scalar)
 
     def test_element_template(self):
         float_element_template = types.Float()
@@ -113,6 +185,9 @@ class ArrayUnitTest(unittest.TestCase):
         self.assertEquals(blueprint_custom["constraints"]["element_template"], types.String(default="cat").blueprint())
         self.assertEquals(blueprint_custom["constraints"]["description"], "description")
 
+
+class ArrayRemove(unittest.TestCase):
+
     def test_remove(self):
         array = types.Array(element_template=types.String())
         array.append("dog")
@@ -122,6 +197,9 @@ class ArrayUnitTest(unittest.TestCase):
         self.assertEquals(len(array), 1)
         array.remove("cat")
         self.assertEquals(len(array), 0)
+
+
+class ArrayAppend(unittest.TestCase):
 
     def test_append_data_type(self):
         array = types.Array(element_template=types.String())
@@ -138,7 +216,7 @@ class ArrayUnitTest(unittest.TestCase):
 
     def test_append_model(self):
         class MyModel(types.Model):
-            pass
+            name = types.String()
 
         array = types.Array(element_template=MyModel())
         self.assertEquals(len(array), 0)
@@ -146,9 +224,12 @@ class ArrayUnitTest(unittest.TestCase):
         self.assertRaises(TypeError, array.append, "string")
         self.assertEquals(len(array), 0)
 
-        my_model = MyModel()
-        array.append(my_model)
-        self.assertEquals(len(array), 1)
+        my_model = MyModel(name="alice")
+        validated = array.validate([my_model.as_serializable()])
+        self.assertEquals(validated.as_serializable(), [{"name": "alice"}])
+
+
+class ArrayValidate(unittest.TestCase):
 
     def test_validate_not_required_returns_none(self):
         array = types.Array(required=False, element_template=types.String())
@@ -175,9 +256,20 @@ class ArrayUnitTest(unittest.TestCase):
         pass
 
     def test_validate_minified(self):
-        pass
+        class Person(types.Model):
+            first_name = types.String()
+            last_name = types.String()
+        persons = types.Array(element_template=Person())
+        persons.append(Person(first_name="John", last_name="Smith"))
 
-    def test_as_serializable_basic_types(self):
+        persons_validated = persons.validate(persons.as_serializable(minified=True), minified=True)
+        self.assertEquals(persons_validated.as_serializable(minified=True), [{"a_c": "John", "b_c": "Smith"}])
+        self.assertEquals(persons_validated.as_serializable(), [{"first_name": "John", "last_name": "Smith"}])
+
+
+class ArrayAsSerializable(unittest.TestCase):
+
+    def test_data_type(self):
         array_empty = types.Array(element_template=types.String())
         self.assertEquals(array_empty.as_serializable(), [])
 
@@ -186,7 +278,17 @@ class ArrayUnitTest(unittest.TestCase):
         array_strings.append("dog")
         self.assertEquals(array_strings.as_serializable(), ["cat", "dog"])
 
-    def test_as_serializable_model(self):
+    def test_data_structure(self):
+        from datetime import date
+        array_empty = types.Array(element_template=types.Date())
+        self.assertEquals(array_empty.as_serializable(), [])
+
+        array_dates = types.Array(element_template=types.Date())
+        array_dates.append(date(2018, 1, 1))
+        array_dates.append("2018-01-02")
+        self.assertEquals(array_dates.as_serializable(), ["2018-01-01", "2018-01-02"])
+
+    def test_data_collection(self):
         class MyModel(types.Model):
             name = types.String()
         array_model = types.Array(element_template=MyModel())
@@ -203,7 +305,7 @@ class ArrayUnitTest(unittest.TestCase):
             ]
         )
 
-    def test_as_serializable_sub_model(self):
+    def test_sub_model(self):
 
         class MyModel(types.Model):
             name = types.String()
@@ -232,7 +334,7 @@ class ArrayUnitTest(unittest.TestCase):
             ]
         )
 
-    def test_as_serializable_sub_array_data_type(self):
+    def test_sub_array_data_type(self):
         class MyModel(types.Model):
             name = types.String()
             tags = types.Array(element_template=types.String())
@@ -251,7 +353,7 @@ class ArrayUnitTest(unittest.TestCase):
             ]
         )
 
-    def test_as_serializable_sub_array_model(self):
+    def test_sub_array_model(self):
 
         class SubModel(types.Model):
             name = types.String()
@@ -274,13 +376,27 @@ class ArrayUnitTest(unittest.TestCase):
             ]
         )
 
-    def test_as_serializable_filtered(self):
+    def test_filtered(self):
         pass
 
-    def test_as_serializable_minified(self):
+    def test_minified(self):
         pass
 
-    def test_attribute_rewrite_map(self):
+
+class ArrayAttributeRewriteMap(unittest.TestCase):
+
+    def test_data_type(self):
+        self.assertIsNone(types.Array(element_template=types.Boolean()).attribute_rewrite_map())
+        self.assertIsNone(types.Array(element_template=types.Float()).attribute_rewrite_map())
+        self.assertIsNone(types.Array(element_template=types.Integer()).attribute_rewrite_map())
+        self.assertIsNone(types.Array(element_template=types.String()).attribute_rewrite_map())
+
+    def test_data_structure(self):
+        self.assertIsNone(types.Array(element_template=types.Date()).attribute_rewrite_map())
+        self.assertIsNone(types.Array(element_template=types.DateTime()).attribute_rewrite_map())
+        self.assertIsNone(types.Array(element_template=types.Time()).attribute_rewrite_map())
+
+    def test_data_collection(self):
         class MyModel(types.Model):
             cat = types.String()
             dog = types.String()
@@ -288,7 +404,21 @@ class ArrayUnitTest(unittest.TestCase):
         array = types.Array(element_template=MyModel())
         self.assertEquals(array.attribute_rewrite_map(), MyModel().attribute_rewrite_map())
 
-    def test_attribute_rewrite_reverse_map(self):
+
+class ArrayAttributeRewriteReverseMap(unittest.TestCase):
+
+    def test_data_type(self):
+        self.assertIsNone(types.Array(element_template=types.Boolean()).attribute_rewrite_reverse_map())
+        self.assertIsNone(types.Array(element_template=types.Float()).attribute_rewrite_reverse_map())
+        self.assertIsNone(types.Array(element_template=types.Integer()).attribute_rewrite_reverse_map())
+        self.assertIsNone(types.Array(element_template=types.String()).attribute_rewrite_reverse_map())
+
+    def test_data_structure(self):
+        self.assertIsNone(types.Array(element_template=types.Date()).attribute_rewrite_reverse_map())
+        self.assertIsNone(types.Array(element_template=types.DateTime()).attribute_rewrite_reverse_map())
+        self.assertIsNone(types.Array(element_template=types.Time()).attribute_rewrite_reverse_map())
+
+    def test_data_collection(self):
         class MyModel(types.Model):
             cat = types.String()
             dog = types.String()
@@ -296,13 +426,47 @@ class ArrayUnitTest(unittest.TestCase):
         array = types.Array(element_template=MyModel())
         self.assertEquals(array.attribute_rewrite_reverse_map(), MyModel().attribute_rewrite_reverse_map())
 
-    def test_get_attribute_filter_basic_types(self):
-        array = types.Array(element_template=types.String())
-        self.assertFalse(array.get_attribute_filter())
-        self.assertFalse(array.get_attribute_filter(False))
-        self.assertTrue(array.get_attribute_filter(True))
 
-    def test_get_attribute_filter_models(self):
+class ArrayGetAttributeFilter(unittest.TestCase):
+
+    def test_data_type(self):
+        boolean_array = types.Array(element_template=types.Boolean())
+        self.assertFalse(boolean_array.get_attribute_filter())
+        self.assertFalse(boolean_array.get_attribute_filter(False))
+        self.assertTrue(boolean_array.get_attribute_filter(True))
+
+        float_array = types.Array(element_template=types.Float())
+        self.assertFalse(float_array.get_attribute_filter())
+        self.assertFalse(float_array.get_attribute_filter(False))
+        self.assertTrue(float_array.get_attribute_filter(True))
+
+        integer_array = types.Array(element_template=types.Integer())
+        self.assertFalse(integer_array.get_attribute_filter())
+        self.assertFalse(integer_array.get_attribute_filter(False))
+        self.assertTrue(integer_array.get_attribute_filter(True))
+
+        string_array = types.Array(element_template=types.String())
+        self.assertFalse(string_array.get_attribute_filter())
+        self.assertFalse(string_array.get_attribute_filter(False))
+        self.assertTrue(string_array.get_attribute_filter(True))
+
+    def test_data_structure(self):
+        date_array = types.Array(element_template=types.Date())
+        self.assertFalse(date_array.get_attribute_filter())
+        self.assertFalse(date_array.get_attribute_filter(False))
+        self.assertTrue(date_array.get_attribute_filter(True))
+
+        datetime_array = types.Array(element_template=types.DateTime())
+        self.assertFalse(datetime_array.get_attribute_filter())
+        self.assertFalse(datetime_array.get_attribute_filter(False))
+        self.assertTrue(datetime_array.get_attribute_filter(True))
+
+        time_array = types.Array(element_template=types.Time())
+        self.assertFalse(time_array.get_attribute_filter())
+        self.assertFalse(time_array.get_attribute_filter(False))
+        self.assertTrue(time_array.get_attribute_filter(True))
+
+    def test_data_collection(self):
         class MyModel(types.Model):
             cat = types.String()
 
