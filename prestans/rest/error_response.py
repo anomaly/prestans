@@ -1,3 +1,4 @@
+import sys
 import webob
 
 from prestans import __version__
@@ -66,4 +67,8 @@ class ErrorResponse(webob.Response):
         self.content_length = len(body_as_string)
 
         start_response(self.status, self.headerlist)
-        return [body_as_string]
+
+        if sys.version_info >= (3,):
+            return [body_as_string.encode("utf-8")]
+        else:
+            return [body_as_string]

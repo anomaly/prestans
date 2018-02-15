@@ -1,3 +1,4 @@
+import sys
 import webob
 
 from prestans import __version__
@@ -298,7 +299,11 @@ class Response(webob.Response):
             self.content_length = len(stringified_body)
 
             start_response(self.status, self.headerlist)
-            return [stringified_body]
+
+            if sys.version_info >= (3,):
+                return [stringified_body.encode("utf-8")]
+            else:
+                return [stringified_body]
 
         elif isinstance(self._app_iter, BinaryResponse):
 

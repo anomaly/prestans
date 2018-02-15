@@ -229,16 +229,12 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
-        import logging
         for attribute_name, type_instance in self.getmembers():
 
             if attribute_filter and not attribute_filter.is_attribute_visible(attribute_name):
                 _model_instance.__dict__[attribute_name] = None
 
-                logging.error("skipping "+attribute_name)
                 continue
-
-            logging.error("checking "+attribute_name)
 
             if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
