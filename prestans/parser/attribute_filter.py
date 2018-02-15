@@ -49,7 +49,7 @@ class AttributeFilter(object):
             return AttributeFilter(is_array_scalar=True)
         attribute_filter_instance = model_instance.get_attribute_filter(default_value)
 
-        #: kwargs support
+        # kwargs support
         for name, value in iter(kwargs.items()):
             if name in attribute_filter_instance:
                 setattr(attribute_filter_instance, name, value)
@@ -175,7 +175,7 @@ class AttributeFilter(object):
             attribute_status = getattr(self, key)
             if isinstance(attribute_status, bool) and attribute_status is True:
                 return True
-            elif isinstance(attribute_status, self.__class__) and attribute_status.are_all_attributes_visible():
+            elif isinstance(attribute_status, self.__class__) and attribute_status.are_any_attributes_visible():
                 return True
 
         return False

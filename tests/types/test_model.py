@@ -590,9 +590,8 @@ class ModelValidate(unittest.TestCase):
         )
         self.assertEquals(validated.name, None)
         self.assertEquals(validated.percent, 33.3)
-        # self.assertEquals(validated.child.name, None)
+        self.assertEquals(validated.child.name, None)
         self.assertEquals(validated.child.age, 30)
-
 
     def test_minified_true(self):
         class Person(types.Model):

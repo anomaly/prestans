@@ -107,15 +107,17 @@ class AttributeFilterTest(unittest.TestCase):
         from_model = AttributeFilter.from_model(model_instance=MyModel())
         self.assertEquals(from_model.keys(), ["name", "tags"])
 
-    def test_contains(self):
-        # from dict
+
+class AttributeFilterContains(unittest.TestCase):
+
+    def test_from_dict(self):
         from_dict = AttributeFilter({"a": True, "b": False, "c": True})
         self.assertTrue("a" in from_dict)
         self.assertTrue("b" in from_dict)
         self.assertTrue("c" in from_dict)
         self.assertFalse("d" in from_dict)
 
-        # from model
+    def test_from_model(self):
         class MyModel(types.Model):
             name = types.String()
             tags = types.Array(element_template=types.String())
@@ -124,6 +126,9 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertTrue("name" in from_model)
         self.assertTrue("tags" in from_model)
         self.assertFalse("age" in from_model)
+
+
+class AttributeFilterIsFilterAtKey(unittest.TestCase):
 
     def test_is_filter_at_key(self):
 
@@ -138,25 +143,47 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertTrue(attribute_filter.is_filter_at_key("sub_model"))
         self.assertFalse(attribute_filter.is_filter_at_key("tags"))
 
-    def test_is_attribute_visible(self):
 
-        dict_a = {
+class AttributeFilterIsAttributeVisible(unittest.TestCase):
+
+    def test_true_returns_true(self):
+        values = {
             "a": True,
-            "b": False,
-            "c": True,
-            "d": {
-                "a": True,
-                "b": False
-            }
+            "b": True,
+            "c": True
         }
 
-        filter_a = AttributeFilter(dict_a)
-        self.assertTrue(filter_a.is_attribute_visible("a"))
-        self.assertFalse(filter_a.is_attribute_visible("b"))
-        self.assertTrue(filter_a.is_attribute_visible("c"))
-        self.assertFalse(filter_a.is_attribute_visible("d"))
+        attribute_filter = AttributeFilter(values)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertTrue(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
 
-        dict_b = {
+    def test_false_returns_false(self):
+        values = {
+            "a": False,
+            "b": False,
+            "c": False
+        }
+
+        attribute_filter = AttributeFilter(values)
+        self.assertFalse(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertFalse(attribute_filter.is_attribute_visible("c"))
+
+    def test_mixed_returns_correct(self):
+        values = {
+            "a": False,
+            "b": True,
+            "c": False
+        }
+
+        attribute_filter = AttributeFilter(values)
+        self.assertFalse(attribute_filter.is_attribute_visible("a"))
+        self.assertTrue(attribute_filter.is_attribute_visible("b"))
+        self.assertFalse(attribute_filter.is_attribute_visible("c"))
+
+    def test_fully_visible_sub_filter_returns_true(self):
+        values = {
             "a": True,
             "b": False,
             "c": True,
@@ -166,34 +193,94 @@ class AttributeFilterTest(unittest.TestCase):
             }
         }
 
-        filter_b = AttributeFilter(dict_b)
-        self.assertTrue(filter_b.is_attribute_visible("a"))
-        self.assertFalse(filter_b.is_attribute_visible("b"))
-        self.assertTrue(filter_b.is_attribute_visible("c"))
-        self.assertTrue(filter_b.is_attribute_visible("d"))
+        attribute_filter = AttributeFilter(values)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertTrue(attribute_filter.is_attribute_visible("d"))
 
-    def test_are_any_attributes_visible(self):
-        some_visible = AttributeFilter({"a": True, "b": False, "c": True})
-        self.assertTrue(some_visible.are_any_attributes_visible())
+    def test_fully_invisible_sub_filter_returns_false(self):
+        values = {
+            "a": True,
+            "b": False,
+            "c": True,
+            "d": {
+                "a": False,
+                "b": False
+            }
+        }
 
-        none_visible = AttributeFilter({"a": False, "b": False, "c": False})
-        self.assertFalse(none_visible.are_any_attributes_visible())
+        attribute_filter = AttributeFilter(values)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertFalse(attribute_filter.is_attribute_visible("d"))
 
-        sub_visible = AttributeFilter({"a": {"a": True}, "b": False, "c": True})
-        self.assertTrue(sub_visible.are_any_attributes_visible())
+    def test_partially_visible_sub_filter_returns_true(self):
+        values = {
+            "a": True,
+            "b": False,
+            "c": True,
+            "d": {
+                "a": True,
+                "b": False
+            }
+        }
 
-    def test_are_all_attributes_visible(self):
-        all_visible = AttributeFilter({"a": True, "b": True, "c": True})
-        self.assertTrue(all_visible.are_all_attributes_visible())
+        attribute_filter = AttributeFilter(values)
+        self.assertTrue(attribute_filter.is_attribute_visible("a"))
+        self.assertFalse(attribute_filter.is_attribute_visible("b"))
+        self.assertTrue(attribute_filter.is_attribute_visible("c"))
+        self.assertTrue(attribute_filter.is_attribute_visible("d"))
 
-        some_invisible = AttributeFilter({"a": True, "b": True, "c": False})
-        self.assertFalse(some_invisible.are_all_attributes_visible())
 
-        sub_visible = AttributeFilter({"a": {"a": True}, "b": True, "c": True})
-        self.assertTrue(sub_visible.are_all_attributes_visible())
+class AttributeFilterAreAnyAttributesVisible(unittest.TestCase):
 
-        sub_invisible = AttributeFilter({"a": {"a": False}, "b": True, "c": True})
-        self.assertFalse(sub_invisible.are_all_attributes_visible())
+    def test_all_true_returns_true(self):
+        attribute_filter = AttributeFilter({"a": True, "b": True, "c": True})
+        self.assertTrue(attribute_filter.are_any_attributes_visible())
+
+    def test_any_true_returns_true(self):
+        attribute_filter = AttributeFilter({"a": True, "b": False, "c": True})
+        self.assertTrue(attribute_filter.are_any_attributes_visible())
+
+    def test_all_false_returns_false(self):
+        attribute_filter = AttributeFilter({"a": False, "b": False, "c": False})
+        self.assertFalse(attribute_filter.are_any_attributes_visible())
+
+    def test_visible_sub_filter_returns_true(self):
+        attribute_filter = AttributeFilter({"a": {"a": True}, "b": False, "c": False})
+        self.assertTrue(attribute_filter.are_any_attributes_visible())
+
+    def test_invisible_sub_filter_returns_false(self):
+        attribute_filter = AttributeFilter({"a": {"a": False}, "b": False, "c": False})
+        self.assertFalse(attribute_filter.are_any_attributes_visible())
+
+
+class AttributeFilterAreAllAttributesVisible(unittest.TestCase):
+
+    def test_all_true_returns_true(self):
+        attribute_filter = AttributeFilter({"a": True, "b": True, "c": True})
+        self.assertTrue(attribute_filter.are_all_attributes_visible())
+
+    def test_all_false_returns_false(self):
+        attribute_filter = AttributeFilter({"a": False, "b": False, "c": False})
+        self.assertFalse(attribute_filter.are_all_attributes_visible())
+
+    def test_any_false_returns_false(self):
+        attribute_filter = AttributeFilter({"a": True, "b": True, "c": False})
+        self.assertFalse(attribute_filter.are_all_attributes_visible())
+
+    def test_visible_sub_filter_returns_true(self):
+        attribute_filter = AttributeFilter({"a": {"a": True}, "b": True, "c": True})
+        self.assertTrue(attribute_filter.are_all_attributes_visible())
+
+    def test_invisible_sub_filter_returns_false(self):
+        attribute_filter = AttributeFilter({"a": {"a": False}, "b": True, "c": True})
+        self.assertFalse(attribute_filter.are_all_attributes_visible())
+
+
+class AttributeFilterSetAllAttributeValues(unittest.TestCase):
 
     def test_set_all_attribute_values(self):
         mixed = {"a": True, "b": False, "c": True, "d": {"a": False}}
@@ -212,6 +299,9 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertFalse(attribute_filter.is_attribute_visible("b"))
         self.assertFalse(attribute_filter.is_attribute_visible("c"))
         self.assertFalse(attribute_filter.is_attribute_visible("d"))
+
+
+class AttributeFilterAsDict(unittest.TestCase):
 
     def test_as_dict(self):
         dict_a = {
@@ -236,6 +326,9 @@ class AttributeFilterTest(unittest.TestCase):
         filter_b = AttributeFilter(dict_b)
         self.assertEquals(filter_b.as_dict(), dict_b)
 
+
+class AttributeFilterInitFromDictionary(unittest.TestCase):
+
     def test_init_from_dictionary(self):
         self.assertRaises(TypeError, AttributeFilter, "string")
 
@@ -258,8 +351,11 @@ class AttributeFilterTest(unittest.TestCase):
         #     template_model=MyModel()
         # )
 
+
+class AttributeFilterSetAttr(unittest.TestCase):
+
     def test_setattr(self):
-        source_dict = {
+        values = {
             "a": True,
             "b": False,
             "c": True,
@@ -269,19 +365,19 @@ class AttributeFilterTest(unittest.TestCase):
             }
         }
 
-        attribute_filter = AttributeFilter(source_dict)
+        attribute_filter = AttributeFilter(values)
         self.assertTrue(attribute_filter.is_attribute_visible("a"))
         self.assertFalse(attribute_filter.is_attribute_visible("b"))
         self.assertTrue(attribute_filter.is_attribute_visible("c"))
-        self.assertFalse(attribute_filter.is_attribute_visible("d"))
+        self.assertTrue(attribute_filter.is_attribute_visible("d"))
         attribute_filter.a = False
         attribute_filter.b = True
         attribute_filter.c = False
-        attribute_filter.d = True
+        attribute_filter.d = False
         self.assertFalse(attribute_filter.is_attribute_visible("a"))
         self.assertTrue(attribute_filter.is_attribute_visible("b"))
         self.assertFalse(attribute_filter.is_attribute_visible("c"))
-        self.assertTrue(attribute_filter.is_attribute_visible("d"))
+        self.assertFalse(attribute_filter.is_attribute_visible("d"))
 
         self.assertRaises(TypeError, attribute_filter.__setattr__ , "a", "string")
         self.assertRaises(TypeError, attribute_filter.__setattr__, "missing", None)
