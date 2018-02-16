@@ -41,7 +41,11 @@ class Response(webob.Response):
         #: http://stackoverflow.com/q/3561381
         #: http://tools.ietf.org/html/draft-saintandre-xdash-00
         #:
-        self.headers.add('Prestans-Version', __version__)
+        from prestans import __version__ as version
+        if not isinstance(version, str):
+            version = version.encode("latin1")
+
+        self.headers.add('Prestans-Version', version)
 
     @property
     def minify(self):
@@ -290,22 +294,19 @@ class Response(webob.Response):
             #: attempt serializing via registered serializer
             stringified_body = self._selected_serializer.dumps(serializable_body)
 
-            if not isinstance(stringified_body, str):
-                msg = "%s dumps must return a python str not %s" % (
-                    self._selected_serializer.__class__.__name__,
-                    stringified_body.__class__.__name__
-                )
-                raise TypeError(msg)
+            # if not isinstance(stringified_body, str):
+            #     msg = "%s dumps must return a python str not %s" % (
+            #         self._selected_serializer.__class__.__name__,
+            #         stringified_body.__class__.__name__
+            #     )
+            #     raise TypeError(msg)
 
             #: set content_length
             self.content_length = len(stringified_body)
 
             start_response(self.status, self.headerlist)
 
-            if sys.version_info >= (3,):
-                return [stringified_body.encode("utf-8")]
-            else:
-                return [stringified_body]
+            return [stringified_body.encode("utf-8")]
 
         elif isinstance(self._app_iter, BinaryResponse):
 
@@ -327,15 +328,17 @@ class Response(webob.Response):
 
             #: Add content disposition header
             if self._app_iter.as_attachment:
-                self.headers.add(
-                    "Content-Disposition",
-                    "attachment; filename=\"%s\"" % self._app_iter.file_name
-                )
+                attachment = "attachment; filename=\"%s\"" % self._app_iter.file_name
+                if not isinstance(attachment, str):
+                    attachment = attachment.encode("latin1")
+
+                self.headers.add("Content-Disposition", attachment)
             else:
-                self.headers.add(
-                    "Content-Disposition",
-                    "inline; filename=\"%s\"" % self._app_iter.file_name
-                )
+                inline = "inline; filename=\"%s\"" % self._app_iter.file_name
+                if not isinstance(inline, str):
+                    inline = inline.encode("latin1")
+
+                self.headers.add("Content-Disposition", inline)
 
             #: Write out response
             self.content_length = self._app_iter.content_length

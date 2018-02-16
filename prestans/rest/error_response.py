@@ -1,7 +1,6 @@
 import sys
 import webob
 
-from prestans import __version__
 from prestans import exception
 
 
@@ -34,7 +33,11 @@ class ErrorResponse(webob.Response):
         # IETF hash dropped the X- prefix for custom headers
         # http://stackoverflow.com/q/3561381
         # http://tools.ietf.org/html/draft-saintandre-xdash-00
-        self.headers.add('Prestans-Version', __version__)
+
+        from prestans import __version__ as version
+        if not isinstance(version, str):
+            version = version.encode("latin1")
+        self.headers.add('Prestans-Version', version)
 
         self.content_type = self._serializer.content_type()
         self.status = raised_exception.http_status
@@ -68,7 +71,4 @@ class ErrorResponse(webob.Response):
 
         start_response(self.status, self.headerlist)
 
-        if sys.version_info >= (3,):
-            return [body_as_string.encode("utf-8")]
-        else:
-            return [body_as_string]
+        return [body_as_string.encode("utf-8")]
