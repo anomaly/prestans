@@ -176,8 +176,7 @@ class ValidationError(Base):
         })
 
     def __str__(self):
-        _loggable_message = "%s %s" % (self._attribute_name, self._message)
-        return str(_loggable_message).encode('utf-8')
+        return "%s %s" % (self._attribute_name, self._message)
 
 
 class HandlerException(Base):
@@ -212,7 +211,7 @@ class HandlerException(Base):
             )
 
     def __str__(self):
-        return self.log_message.encode('utf-8')
+        return self.log_message
 
 
 class RequestException(HandlerException):

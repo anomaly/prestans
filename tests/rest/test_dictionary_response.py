@@ -56,5 +56,5 @@ class DictionaryResponseTest(unittest.TestCase):
 
         dict_response.register_serializers([BadSerializer()])
         dict_response._set_serializer_by_mime_type("bad/serializer")
-        self.assertRaises(TypeError, dict_response, {}, start_response)
+        self.assertRaises(TypeError, dict_response.__call__, environ={}, start_response=start_response)
 

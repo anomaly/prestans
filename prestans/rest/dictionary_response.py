@@ -6,7 +6,8 @@ class DictionaryResponse(Response):
     DictionaryResponse serializes dictionaries using the selected_serializer
     """
 
-    def _body__get(self):
+    @property
+    def body(self):
         """
         Overridden response does not support md5, text or json properties. _app_iter
         is set using rules defined by prestans.
@@ -17,7 +18,8 @@ class DictionaryResponse(Response):
         """
         return self._app_iter
 
-    def _body__set(self, value):
+    @body.setter
+    def body(self, value):
 
         # value should be a dict
         if not isinstance(value, dict):
@@ -28,14 +30,18 @@ class DictionaryResponse(Response):
         #: deffer the content_length property to be set by getter
         self._app_iter = value
 
-    body = property(_body__get, _body__set, _body__set)
-
     def __call__(self, environ, start_response):
+
+        if not isinstance(self.body, dict):
+            raise TypeError("body is not a dict")
 
         start_response(self.status, self.headerlist)
 
         # attempt serializing via registered serializer
         body_as_string = self._selected_serializer.dumps(self.body)
+
+        import logging
+        logging.error(body_as_string)
 
         if not isinstance(body_as_string, str):
             raise TypeError("%s dumps must return a python str not %s" % (

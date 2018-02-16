@@ -59,11 +59,11 @@ class ErrorResponse(webob.Response):
             body_as_string = self._serializer.dumps(self._exception.response_model.as_serializable())
         # pack into default format for error response
         else:
-            error_dict = dict()
-
-            error_dict['code'] = self.status_int
-            error_dict['message'] = self._message
-            error_dict['trace'] = self._stack_trace
+            error_dict = {
+                "code": self.status_int,
+                "message": self._message,
+                "trace": self._stack_trace
+            }
 
             body_as_string = self._serializer.dumps(error_dict)
 

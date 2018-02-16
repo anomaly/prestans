@@ -28,7 +28,7 @@ class ErrorResponseTest(unittest.TestCase):
 
         self.assertEquals(
             error_response(environ, start_response),
-            ['{"message": "API does not provide this end-point", "code": 404, "trace": []}']
+            [b'{"code": 404, "message": "API does not provide this end-point", "trace": []}']
         )
 
     def test_call_custom(self):
@@ -55,4 +55,4 @@ class ErrorResponseTest(unittest.TestCase):
 
         environ = {}
 
-        self.assertEquals(error_response(environ, start_response), ['{"custom_message": "custom"}'])
+        self.assertEquals(error_response(environ, start_response), [b'{"custom_message": "custom"}'])

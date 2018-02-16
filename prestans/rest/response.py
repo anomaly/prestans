@@ -173,7 +173,8 @@ class Response(webob.Response):
     #: body; overrides webob.Response line 324
     #:
 
-    def _body__get(self):
+    @property
+    def body(self):
         """
         Overridden response does not support md5, text or json properties. _app_iter
         is set using rules defined by prestans.
@@ -189,7 +190,8 @@ class Response(webob.Response):
 
         return self._app_iter
 
-    def _body__set(self, value):
+    @body.setter
+    def body(self, value):
 
         #: If not response template; we have to assume its NO_CONTENT
         #: hence do not allow setting the body
@@ -219,7 +221,7 @@ class Response(webob.Response):
         #: deffer the content_length property to be set by getter
         self._app_iter = value
 
-    body = property(_body__get, _body__set, _body__set)
+    # body = property(_body__get, _body__set, _body__set)
 
     def register_serializers(self, serializers):
         """

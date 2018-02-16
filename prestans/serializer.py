@@ -55,7 +55,7 @@ class JSON(Base):
         
         import json
         try:
-            return json.dumps(serializable_object, ensure_ascii=False)
+            return json.dumps(serializable_object, ensure_ascii=False, sort_keys=True)
         except Exception as exp:
             raise exception.SerializationFailedError("JSON: %s" % exp)
 
