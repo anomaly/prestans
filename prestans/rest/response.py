@@ -291,9 +291,11 @@ class Response(webob.Response):
             stringified_body = self._selected_serializer.dumps(serializable_body)
 
             if not isinstance(stringified_body, str):
-                raise TypeError("%s dumps must return a python str \
-                    not %s" % (self._selected_serializer.__class__.__name__, \
-                               stringified_body.__class__.__name__))
+                msg = "%s dumps must return a python str not %s" % (
+                    self._selected_serializer.__class__.__name__,
+                    stringified_body.__class__.__name__
+                )
+                raise TypeError(msg)
 
             #: set content_length
             self.content_length = len(stringified_body)
@@ -310,9 +312,12 @@ class Response(webob.Response):
             if self._app_iter.content_length == 0 or \
                     self._app_iter.mime_type is None or \
                     self._app_iter.file_name is None:
-                self.logger.warn("Failed to write binar response with content_length \
-                    %i; mime_type %s; file_name %s" % (self._app_iter.content_length, \
-                                                       self._app_iter.mime_type, self._app_iter.file_name))
+                msg = "Failed to write binary response with content_length %i; mime_type %s; file_name %s" % (
+                    self._app_iter.content_length,
+                    self._app_iter.mime_type,
+                    self._app_iter.file_name
+                )
+                self.logger.warn(msg)
                 self.status = STATUS.INTERNAL_SERVER_ERROR
                 self.content_type = "text/plain"
                 return []
@@ -322,11 +327,15 @@ class Response(webob.Response):
 
             #: Add content disposition header
             if self._app_iter.as_attachment:
-                self.headers.add('Content-Disposition', \
-                                 "attachment; filename=\"%s\"" % self._app_iter.file_name)
+                self.headers.add(
+                    "Content-Disposition",
+                    "attachment; filename=\"%s\"" % self._app_iter.file_name
+                )
             else:
-                self.headers.add('Content-Disposition', \
-                                 "inline; filename=\"%s\"" % self._app_iter.file_name)
+                self.headers.add(
+                    "Content-Disposition",
+                    "inline; filename=\"%s\"" % self._app_iter.file_name
+                )
 
             #: Write out response
             self.content_length = self._app_iter.content_length
