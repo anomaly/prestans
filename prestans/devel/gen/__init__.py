@@ -55,13 +55,13 @@ class Inspector(object):
             print ("\nFailed to process %s, %s" % (self._model_file, import_error))
             sys.exit(1)
 
-        for name, type_instance in models.__dict__.iteritems():
+        for name, type_instance in iter(models.__dict__.items()):
             if name.startswith('__') or inspect.ismethod(type_instance) or not inspect.isclass(type_instance) or\
              not issubclass(type_instance, prestans.types.Model):
                 continue
 
             blueprint = type_instance().blueprint()
-            for field_name, field_blueprint in blueprint['fields'].iteritems():
+            for field_name, field_blueprint in iter(blueprint['fields'].items()):
                 field_blueprint['map_name'] = type_instance().attribute_rewrite_map()[field_name]
             blueprints.append(blueprint)
 
