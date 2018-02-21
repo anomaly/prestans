@@ -154,7 +154,7 @@ class RESTRequestParsedBody(unittest.TestCase):
             first_name = types.String()
             last_name = types.String()
 
-        request.body = '{"first_name": "John", "last_name": "Smith"}'
+        request.body = b'{"first_name": "John", "last_name": "Smith"}'
         request.body_template = Person()
         self.assertTrue(isinstance(request.parsed_body, Person))
         self.assertEquals(request.parsed_body.first_name, "John")

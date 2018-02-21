@@ -19,7 +19,6 @@ class BinaryResponseUnitTest(unittest.TestCase):
         binary_response.mime_type = mime_type_b
         self.assertEquals(binary_response.mime_type, mime_type_b)
 
-
     def test_file_name(self):
         binary_response = BinaryResponse()
         self.assertIsNone(binary_response.file_name)

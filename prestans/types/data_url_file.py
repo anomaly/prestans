@@ -143,4 +143,4 @@ class DataURLFile(DataStructure):
 
     def as_serializable(self, value):
         #: This is passed in a DataURLFile and we construct a String back from it
-        return "data:%s;base64,%s" % (value.mime_type, value.base64_contents)
+        return "data:%s;base64,%s" % (value.mime_type, value.base64_contents.decode("utf-8"))

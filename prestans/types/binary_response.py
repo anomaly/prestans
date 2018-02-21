@@ -38,15 +38,8 @@ class BinaryResponse(object):
 
     def __init__(self, mime_type=None, file_name=None, as_attachment=True, contents=None):
 
-        if mime_type is not None:
-            self._mime_type = mime_type.encode('ascii', 'ignore')
-        else:
-            self._mime_type = mime_type
-
-        if file_name is not None:
-            self._file_name = file_name.encode('ascii', 'ignore')
-        else:
-            self._file_name = file_name
+        self.mime_type = mime_type
+        self.file_name = file_name
 
         self._as_attachment = as_attachment
         self._contents = contents
@@ -57,7 +50,7 @@ class BinaryResponse(object):
 
     @mime_type.setter
     def mime_type(self, value):
-        self._mime_type = value.encode('ascii', 'ignore')
+        self._mime_type = value
 
     @property
     def file_name(self):
@@ -65,7 +58,7 @@ class BinaryResponse(object):
 
     @file_name.setter
     def file_name(self, value):
-        self._file_name = value.encode('ascii', 'ignore')
+        self._file_name = value
 
     @property
     def as_attachment(self):
