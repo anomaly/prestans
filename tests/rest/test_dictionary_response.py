@@ -73,7 +73,7 @@ class DictionaryResponseCall(unittest.TestCase):
         self.assertEquals(response, ['{"key": "value"}'])
         self.assertEquals(dict_response.content_length, 16)
 
-    def test_call_serializer_returns_non_string_type_raise_type_error(self):
+    def test_call_serializer_returns_non_string_type_raises_type_error(self):
         from prestans.serializer import Base
 
         dict_response = DictionaryResponse(
@@ -83,6 +83,7 @@ class DictionaryResponseCall(unittest.TestCase):
             default_serializer=JSON()
         )
         dict_response._set_serializer_by_mime_type("application/json")
+        dict_response.body = {"key": "value"}
 
         class BadSerializer(Base):
 
@@ -98,6 +99,9 @@ class DictionaryResponseCall(unittest.TestCase):
         def start_response(status, headerlist):
             pass
 
-        dict_response.register_serializers([BadSerializer()])
+        bad_serializer = BadSerializer()
+
+        dict_response.register_serializers([bad_serializer])
         dict_response._set_serializer_by_mime_type("bad/serializer")
+        self.assertEquals(dict_response.selected_serializer, bad_serializer)
         self.assertRaises(TypeError, dict_response.__call__, environ={}, start_response=start_response)

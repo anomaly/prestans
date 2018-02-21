@@ -42,8 +42,8 @@ from prestans.rest import Request
 from prestans import types
 
 
-class RESTRequestTest(unittest.TestCase):
-    def test_method(self):
+class RESTRequestMethod(unittest.TestCase):
+    def test_get(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.GET},
             charset="utf-8",
@@ -53,6 +53,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.GET)
 
+    def test_head(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.HEAD},
             charset="utf-8",
@@ -62,6 +63,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.HEAD)
 
+    def test_post(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.POST},
             charset="utf-8",
@@ -71,6 +73,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.POST)
 
+    def test_put(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.PUT},
             charset="utf-8",
@@ -80,6 +83,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.PUT)
 
+    def test_patch(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.PATCH},
             charset="utf-8",
@@ -89,15 +93,17 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.PATCH)
 
+    def test_delete(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.DELETE},
             charset="utf-8",
             logger=logging.getLogger(),
-            deserializers=[JSON],
-            default_deserializer=JSON
+            deserializers=[JSON()],
+            default_deserializer=JSON()
         )
         self.assertEquals(request.method, VERB.DELETE)
 
+    def test_options(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.OPTIONS},
             charset="utf-8",
@@ -107,18 +113,22 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.method, VERB.OPTIONS)
 
-    def test_logger(self):
+
+class RESTRequestLogger(unittest.TestCase):
+    def test_logger_passed_via_init(self):
         custom_logger = logging.getLogger("custom")
         request = Request(
             environ={"REQUEST_METHOD": VERB.GET},
             charset="utf-8",
             logger=custom_logger,
-            deserializers=[JSON],
-            default_deserializer=JSON
+            deserializers=[JSON()],
+            default_deserializer=JSON()
         )
         self.assertEquals(request.logger, custom_logger)
 
-    def test_parsed_body(self):
+
+class RESTRequestParsedBody(unittest.TestCase):
+    def test_none_raises_attribute_error(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.POST},
             charset="utf-8",
@@ -128,6 +138,30 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertRaises(AttributeError, getattr, request, "parsed_body")
 
+    def test_get_body(self):
+        request = Request(
+            environ={
+                "REQUEST_METHOD": VERB.POST,
+                "CONTENT_TYPE": "application/json"
+            },
+            charset="utf-8",
+            logger=logging.getLogger(),
+            deserializers=[JSON()],
+            default_deserializer=JSON()
+        )
+
+        class Person(types.Model):
+            first_name = types.String()
+            last_name = types.String()
+
+        request.body = '{"first_name": "John", "last_name": "Smith"}'
+        request.body_template = Person()
+        self.assertTrue(isinstance(request.parsed_body, Person))
+        self.assertEquals(request.parsed_body.first_name, "John")
+        self.assertEquals(request.parsed_body.last_name, "Smith")
+
+
+class RESTRequestSupportedMimeTypes(unittest.TestCase):
     def test_supported_mime_types(self):
         json_dsz = JSON()
         plist_dsz = XMLPlist()
@@ -172,6 +206,8 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.supported_mime_types_str, json_dsz.content_type()+","+plist_dsz.content_type())
 
+
+class RESTRequestSelectedDeserializer(unittest.TestCase):
     def test_selected_deserializer(self):
         request = Request(
             environ={"REQUEST_METHOD": VERB.POST},
@@ -182,6 +218,8 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertIsNone(request.selected_deserializer)
 
+
+class RESTRequestDefaultDeserializer(unittest.TestCase):
     def test_default_deserializer(self):
         json_dsz = JSON()
 
@@ -194,6 +232,8 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertEquals(request.default_deserializer, json_dsz)
 
+
+class RESTRequestSetDeserializerByMimeType(unittest.TestCase):
     def test_set_deserializer_by_mime_type(self):
         json_dsz = JSON()
         plist_dsz = XMLPlist()
@@ -212,6 +252,8 @@ class RESTRequestTest(unittest.TestCase):
         self.assertEquals(request.selected_deserializer, plist_dsz)
         self.assertRaises(exception.UnsupportedContentTypeError, request.set_deserializer_by_mime_type, "text/plain")
 
+
+class RESTRequestAttributeFilter(unittest.TestCase):
     def test_attribute_filter(self):
         attribute_filter = AttributeFilter()
         request = Request(
@@ -224,6 +266,8 @@ class RESTRequestTest(unittest.TestCase):
         request.attribute_filter = attribute_filter
         self.assertEquals(request.attribute_filter, attribute_filter)
 
+
+class RESTRequestParameterSet(unittest.TestCase):
     def test_parameter_set(self):
         parameter_set = ParameterSet()
         request = Request(
@@ -236,6 +280,8 @@ class RESTRequestTest(unittest.TestCase):
         request.parameter_set = parameter_set
         self.assertEquals(request.parameter_set, parameter_set)
 
+
+class RESTRequestBodyTemplate(unittest.TestCase):
     def test_body_template(self):
         class Login(types.Model):
             email = types.String()
@@ -269,6 +315,8 @@ class RESTRequestTest(unittest.TestCase):
         # check that exception raised for non DataCollection sub class
         self.assertRaises(AssertionError, setattr, post_request, "body_template", "string")
 
+
+class RESTRequestRegisterDeserializers(unittest.TestCase):
     def test_register_deserializers(self):
         json_dsz = JSON()
         plist_dsz = XMLPlist()
@@ -288,10 +336,57 @@ class RESTRequestTest(unittest.TestCase):
 
         self.assertRaises(TypeError, request.register_deserializers, "string")
 
-    def test_get_response_attribute_filter(self):
-        pass
 
-    def test_is_minified(self):
+class RESTRequestGetResponseAttributeFilter(unittest.TestCase):
+
+    def test_template_filter_none_returns_none(self):
+        request = Request(
+            environ={
+                "REQUEST_METHOD": VERB.GET
+            },
+            charset="utf-8",
+            logger=logging.getLogger(),
+            deserializers=[JSON()],
+            default_deserializer=JSON()
+        )
+        self.assertIsNone(request.get_response_attribute_filter(template_filter=None))
+
+    def test_header_not_found_returns_none(self):
+        request = Request(
+            environ={
+                "REQUEST_METHOD": VERB.GET
+            },
+            charset="utf-8",
+            logger=logging.getLogger(),
+            deserializers=[JSON()],
+            default_deserializer=JSON()
+        )
+        self.assertIsNone(request.get_response_attribute_filter(template_filter=AttributeFilter()))
+
+    def test_header_correctly_parsed(self):
+        request = Request(
+            environ={
+                "REQUEST_METHOD": VERB.GET,
+                "HTTP_PRESTANS_RESPONSE_ATTRIBUTE_LIST": '{"first_name": true, "last_name": false}'
+            },
+            charset="utf-8",
+            logger=logging.getLogger(),
+            deserializers=[JSON()],
+            default_deserializer=JSON()
+        )
+
+        class Person(types.Model):
+            first_name = types.String()
+            last_name = types.String()
+
+        response_filter = request.get_response_attribute_filter(template_filter=AttributeFilter.from_model(Person()))
+        self.assertIsInstance(response_filter, AttributeFilter)
+        self.assertTrue(response_filter.first_name)
+        self.assertFalse(response_filter.last_name)
+
+
+class RESTRequestIsMinified(unittest.TestCase):
+    def test_default_false(self):
         is_minified_missing = Request(
             environ={
                 "REQUEST_METHOD": VERB.POST
@@ -303,6 +398,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertFalse(is_minified_missing.is_minified)
 
+    def test_on_is_true(self):
         is_minified_on = Request(
             environ={
                 "REQUEST_METHOD": VERB.POST,
@@ -315,6 +411,7 @@ class RESTRequestTest(unittest.TestCase):
         )
         self.assertTrue(is_minified_on.is_minified)
 
+    def test_off_is_false(self):
         is_minified_off = Request(
             environ={
                 "REQUEST_METHOD": VERB.POST,

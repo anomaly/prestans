@@ -158,15 +158,23 @@ class Request(webob.Request):
         Prestans-Response-Attribute-List can contain a client's requested
         definition for attributes required in the response. This should match
         the response_attribute_filter_template?
+
+        :param template_filter:
+        :param template_model: the expected model that this filter corresponds to
+        :return:
+        :rtype: None | AttributeFilter
         """
 
-        if template_filter is None or not 'Prestans-Response-Attribute-List' in self.headers:
+        if template_filter is None:
             return None
 
-        #: Header not set results in a None
+        if 'Prestans-Response-Attribute-List' not in self.headers:
+            return None
+
+        # header not set results in a None
         attribute_list_str = self.headers['Prestans-Response-Attribute-List']
 
-        #: Deserialize the header contents using the selected header
+        # deserialize the header contents
         json_deserializer = deserializer.JSON()
         attribute_list_dictionary = json_deserializer.loads(attribute_list_str)
 
@@ -184,8 +192,12 @@ class Request(webob.Request):
 
     @property
     def is_minified(self):
+        """
+        :return:
+        :rtype: bool
+        """
 
-        if not 'Prestans-Minification' in self.headers:
+        if 'Prestans-Minification' not in self.headers:
             return False
 
         return self.headers['Prestans-Minification'].upper() == "ON"

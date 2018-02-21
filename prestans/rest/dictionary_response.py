@@ -40,9 +40,6 @@ class DictionaryResponse(Response):
         # attempt serializing via registered serializer
         body_as_string = self._selected_serializer.dumps(self.body)
 
-        import logging
-        logging.error(body_as_string)
-
         if not isinstance(body_as_string, str):
             raise TypeError("%s dumps must return a python str not %s" % (
                 self._selected_serializer.__class__.__name__,
