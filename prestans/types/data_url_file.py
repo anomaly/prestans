@@ -45,7 +45,7 @@ class DataURLFile(DataStructure):
     Example
     http://www.html5rocks.com/en/tutorials/file/dndfiles/
 
-    Meta information about the file upload is upto the implementing application
+    Meta information about the file upload is up to the implementing application
     """
 
     @classmethod
