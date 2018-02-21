@@ -143,3 +143,11 @@ class StringUnitTest(unittest.TestCase):
 
         # test int
         self.assertEquals(String().validate(1234), "1234")
+
+        # check custom str which is broken
+        class Custom(object):
+
+            def __str__(self):
+                return None
+
+        self.assertRaises(exception.ParseFailedError, String().validate, Custom())
