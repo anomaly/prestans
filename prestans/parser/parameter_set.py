@@ -43,6 +43,16 @@ class ParameterSet(object):
     while ParserRuleSet is responsible for running the parse mechanism.
     """
 
+    def getmembers(self):
+        """
+        :return: list of members as name, type tuples
+        :rtype: list
+        """
+        return filter(
+            lambda m: not m[0].startswith("__") and not inspect.isfunction(m[1]) and not inspect.ismethod(m[1]),
+            inspect.getmembers(self.__class__)
+        )
+
     def blueprint(self):
         """
         blueprint support, returns a partial dictionary
@@ -55,10 +65,7 @@ class ParameterSet(object):
         fields = dict()
 
         # inspects the attributes of a parameter set and tries to validate the input
-        for attribute_name, type_instance in iter(self.__class__.__dict__.items()):
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             # must be one of the following types
             if not isinstance(type_instance, String) and \
@@ -98,11 +105,7 @@ class ParameterSet(object):
         validated_parameter_set = self.__class__()
 
         # Inspects the attributes of a parameter set and tries to validate the input
-        for attribute_name, type_instance in iter(self.__class__.__dict__.items()):
-
-            if attribute_name.startswith('__') or inspect.ismethod(type_instance):
-                # Ignore parameters with __ and if they are methods
-                continue
+        for attribute_name, type_instance in self.getmembers():
 
             #: Must be one of the following types
             if not isinstance(type_instance, String) and \

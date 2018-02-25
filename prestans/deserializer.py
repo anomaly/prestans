@@ -49,6 +49,9 @@ class JSON(Base):
     def loads(self, input_string):
         import json
 
+        if isinstance(input_string, bytes):
+            input_string = input_string.decode()
+
         try:
             parsed_json = json.loads(input_string)
         except Exception as exp:

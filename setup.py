@@ -85,7 +85,8 @@ setup(
         'pytest',
         'pytest-cov',
         'mock',
-        'tox'
+        'tox',
+        'tox-pyenv'
     ],
     setup_requires=['pytest-runner'],
     extras_require={
