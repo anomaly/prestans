@@ -244,7 +244,7 @@ class RequestHandler(object):
                     self.options(*self._args)
             # re-raise all prestans exceptions
             except exception.Base as exp:
-                if issubclass(exception.__class__, exception.HandlerException):
+                if isinstance(exception, exception.HandlerException):
                     exp.request = self.request
 
                 raise exp
@@ -320,7 +320,7 @@ class RequestHandler(object):
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def delete(self, *args):
+    def options(self, *args):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.OPTIONS)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error

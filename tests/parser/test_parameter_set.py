@@ -4,9 +4,9 @@ from prestans.parser import ParameterSet
 from prestans import types
 
 
-class ParameterSetTest(unittest.TestCase):
+class ParameterSetBlueprint(unittest.TestCase):
 
-    def test_invalid_blueprint(self):
+    def test_invalid(self):
 
         class BadAttribute(ParameterSet):
             name = types.String()
@@ -21,7 +21,7 @@ class ParameterSetTest(unittest.TestCase):
         self.assertRaises(TypeError, BadAttribute().blueprint)
         self.assertRaises(TypeError, BadArray().blueprint)
 
-    def test_valid_blueprint(self):
+    def test_valid(self):
         class MyParameterSet(ParameterSet):
 
             name = types.String(
@@ -55,7 +55,10 @@ class ParameterSetTest(unittest.TestCase):
         self.assertEquals(tags_blueprint["type"], "array")
         # todo: fill this out with more checks
 
-    def test_validate(self):
+
+class ParameterSetValidate(unittest.TestCase):
+
+    def test_bad_attribute_raises_type_error(self):
         from webob.request import Request
         request = Request({})
 
@@ -64,7 +67,7 @@ class ParameterSetTest(unittest.TestCase):
 
         self.assertRaises(TypeError, BadAttribute().validate, request)
 
-    def test_model_array_rejected(self):
+    def test_model_array_raises_type_error(self):
         from webob.request import Request
         request = Request({})
 
@@ -76,7 +79,7 @@ class ParameterSetTest(unittest.TestCase):
 
         self.assertRaises(TypeError, ModelArray().validate, request)
 
-    def test_boolean_array_rejected(self):
+    def test_boolean_array_raises_type_error(self):
         from webob.request import Request
         request = Request({})
 
