@@ -297,6 +297,9 @@ class ModelUnitTest(unittest.TestCase):
         self.assertEquals(types.Model.generate_attribute_key(54), "ccc")
         self.assertEquals(types.Model.generate_attribute_key(77), "zzz")
 
+
+class ModelAsSerializable(unittest.TestCase):
+
     def test_as_serializable(self):
         from datetime import date
         from datetime import datetime
@@ -481,6 +484,17 @@ class ModelUnitTest(unittest.TestCase):
         serialized = parent_model.as_serializable(attribute_filter=attribute_filter)
         self.assertEquals(serialized, {"sub": {"name": "james"}})
 
+    def test_none_attributes_skips_further_checks(self):
+        class Person(types.Model):
+            first_name = types.String(required=True)
+            last_name = types.String(required=False)
+
+        person = Person(first_name="Carol")
+        serialized = person.as_serializable()
+        self.assertEquals(serialized["first_name"], "Carol")
+        self.assertEquals(serialized["last_name"], None)
+
+
 
 class ModelValidate(unittest.TestCase):
     def test_required_rejects_none(self):
@@ -552,7 +566,6 @@ class ModelValidate(unittest.TestCase):
         self.assertEquals(validated.name, "Nathan")
         self.assertEquals(validated.child.age, 30)
 
-    @unittest.skip
     def test_child_data_collection_filtered(self):
         class ChildModel(types.Model):
             name = types.String()
@@ -602,3 +615,11 @@ class ModelValidate(unittest.TestCase):
         person_validated = person.validate(person.as_serializable(minified=True), minified=True)
         self.assertEquals(person_validated.as_serializable(), {"first_name": "john", "last_name": "smith"})
         self.assertEquals(person_validated.as_serializable(minified=True), {"a_c": "john", "b_c": "smith"})
+
+    def test_child_failing_to_validate_raises_validation_error(self):
+        class Person(types.Model):
+            first_name = types.String(required=True)
+            last_name = types.String(required=True)
+
+        person = Person(first_name="john")
+        self.assertRaises(exception.ValidationError, Person().validate, person.as_serializable())
