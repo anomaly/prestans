@@ -33,30 +33,31 @@
 
 import os
 import sys
-import string
 import signal
-import getpass
-import base64
-import argparse
+
+from prestans.devel import ArgParserFactory
+from prestans.devel import CommandDispatcher
+from prestans.devel import exception
+
 
 def ctrlc_handler(signal, frame):
-    print ""
     sys.exit(2)
+
 
 def main():
 
     signal.signal(signal.SIGINT, ctrlc_handler)
 
-    #: Parse the command 
-    parser_factory = prestans.devel.ArgParserFactory()
+    # parse the command
+    parser_factory = ArgParserFactory()
     args = parser_factory.parse()
 
     try:
-        #: Dispatch the command to the right module
-        command_dispatcher = prestans.devel.CommandDispatcher(args)
+        # dispatch the command to the right module
+        command_dispatcher = CommandDispatcher(args)
         return command_dispatcher.dispatch()
-    except prestans.devel.exception.Base, exp:
-        print ("%s\n"  % exp)
+    except exception.Base as exp:
+        print ("%s\n" % exp)
         return exp.error_code
 
 
@@ -65,13 +66,8 @@ if __name__ == "__main__":
     directory = os.path.dirname(__file__)
     prestans_path = os.path.join(directory, "..", "..")
 
-    #:
-    #: While in development attempt to import prestans from top dir
-    #:
+    # while in development attempt to import prestans from top dir
     if os.path.isdir(prestans_path):
         sys.path.insert(0, prestans_path)
-
-    import prestans.devel
-    import prestans.devel.exception
 
     sys.exit(main())
