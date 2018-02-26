@@ -29,14 +29,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-
 __all__ = ['ModelAdapter']
 
-#:
-#: prestans.ext.data.adapters.datastore Google DataStore specific 
-#: implementation of Data Adapter
-#:
 
 import inspect
 
@@ -45,9 +39,7 @@ import prestans.parser
 
 from prestans.ext.data import adapters
 
-#:
-#: Helper methods
-#:
+
 def adapt_persistent_instance(persistent_object, target_rest_class=None, attribute_filter=None):
     """
     Adapts a single persistent instance to a REST model; at present this is a
@@ -74,25 +66,23 @@ def adapt_persistent_instance(persistent_object, target_rest_class=None, attribu
 
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 
-#:
-#: base implementation that translates record sets into prestans arrays
-#:
+
 def adapt_persistent_collection(persistent_collection, target_rest_class=None, attribute_filter=None):
         
-    #: Ensure that colleciton is iterable and has atleast one element
+    # ensure that collection is iterable and has at least one element
     persistent_collection_length = 0
         
-    #: Attempt to reliably detect the length of the persistent_collection
+    # attempt to reliably detect the length of the persistent_collection
     if persistent_collection and isinstance(persistent_collection, (list, tuple)):
         persistent_collection_length = len(persistent_collection)
     elif persistent_collection:
         persistent_collection_length = persistent_collection.count()
 
-    #: If the persistent_collection is empty then return a blank array 
+    # if the persistent_collection is empty then return a blank array
     if persistent_collection_length == 0:
         return prestans.types.Array(element_template=target_rest_class())
         
-    #: Try and get the adapter and the REST class for the persistent object 
+    # try and get the adapter and the REST class for the persistent object
     if target_rest_class is None:
         adapter_instance = adapters.registry.get_adapter_for_persistent_model(persistent_collection[0])
     else:
@@ -104,21 +94,25 @@ def adapt_persistent_collection(persistent_collection, target_rest_class=None, a
     adapted_models = prestans.types.Array(element_template=adapter_instance.rest_model_class())
     
     for persistent_object in persistent_collection:
-        adapted_models.append(adapter_instance.adapt_persistent_to_rest(persistent_object))
+        adapted_models.append(adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter))
         
     return adapted_models
- 
-#:
-#: Provide a brige between REST models and Google Datastore objects
-#:  
+
+
 class ModelAdapter(adapters.ModelAdapter):
-       
-    #: 
-    #: adapts a persistent model to a rest model by inspecting
-    #:
-    #: @todo test all data types provided by datastore
-    #:
+    """
+    Provides a bridge between REST models and Google Datastore objects
+    """
+
     def adapt_persistent_to_rest(self, persistent_object, attribute_filter=None):
+        """
+        adapts a persistent model to a rest model by inspecting
+
+        :param self:
+        :param persistent_object:
+        :param attribute_filter:
+        :return:
+        """
 
         rest_model_instance = self.rest_model_class()
         
@@ -177,9 +171,9 @@ class ModelAdapter(adapters.ModelAdapter):
                     
                     setattr(rest_model_instance, attribute_key, adapted_rest_model)
                     
-                except TypeError, exp:
+                except TypeError as exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                except prestans.exception.DataValidationException, exp:
+                except prestans.exception.DataValidationException as exp:
                     raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
 
             else:
@@ -188,9 +182,9 @@ class ModelAdapter(adapters.ModelAdapter):
                 try:
                     persistent_attr_value = getattr(persistent_object, attribute_key)
                     setattr(rest_model_instance, attribute_key, persistent_attr_value)
-                except TypeError, exp:
+                except TypeError as exp:
                     raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
-                except prestans.exception.DataValidationException, exp:
+                except prestans.exception.DataValidationException as exp:
                     raise prestans.exception.InconsistentPersistentDataError(attribute_key, str(exp))
             
         return rest_model_instance

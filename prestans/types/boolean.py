@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  prestans, A WSGI compliant REST micro-framework
 #  http://prestans.org
@@ -29,3 +29,57 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from prestans import exception
+from prestans.types import DataType
+
+
+class Boolean(DataType):
+
+    def __init__(self, default=None, required=True, description=None):
+
+        if default is None or \
+           isinstance(default, bool):
+            self._default = default
+        else:
+            raise TypeError("default must be of type bool or None")
+        self._required = required
+        self._description = description
+
+    @property
+    def required(self):
+        return self._required
+
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def description(self):
+        return self._description
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = 'boolean'
+
+        constraints = dict()
+        constraints['default'] = self.default
+        constraints['required'] = self.required
+        constraints['description'] = self.description
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
+    def validate(self, value):
+
+        if not self._required and self._default is None and value is None:
+            return None
+        elif self._required and self._default is None and value is None:
+            raise exception.RequiredAttributeError()
+        elif value is None and self.default is not None:
+            value = self._default
+
+        if not isinstance(value, bool):
+            raise exception.ParseFailedError()
+
+        return value

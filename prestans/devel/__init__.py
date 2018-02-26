@@ -37,7 +37,7 @@ __all__ = ["ArgParserFactory", "CommandDispatcher"]
 import argparse
 import os
 
-from prestans import exception
+from prestans.devel import exception
 from prestans import __version__
 
 
@@ -71,7 +71,7 @@ class ArgParserFactory(object):
 
     def _add_generate_sub_commands(self):
         """
-        Subcommands for generating models for usage by clients.
+        Sub commands for generating models for usage by clients.
         Currently supports Google Closure.
         """
 

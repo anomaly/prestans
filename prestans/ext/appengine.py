@@ -29,79 +29,74 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-__all__ = ['AppEngineAuthContextProvider']
-
-## @package prestans.appengine Providers Google AppEngine specific implementation of providers
-#
-# appengine is not imported as part of "all", this has to be explicity imported by the user.
-#
+__all__ = ["AppEngineAuthContextProvider", "AppEngineMemcacheProvider"]
 
 from prestans.provider import auth
 from prestans.provider import cache
-from prestans.provider import throttle
-
-from google.appengine.api import oauth
-from google.appengine.api import users
-from google.appengine.api import memcache
 
 import os
 
 _IS_DEVELOPMENT_SERVER = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
-#:
-#: Provides Authentication Context for Google's AppEngine Environment
-#:
-#:
-#: auth.AuthContextProvider implementation for Google AppEngine, uses google.appengine.api.users
-#: to determine logged in users and return a reference to the current user.
-#:
-#: Refer to decorators in handlers package for more information.
-#:
+
 class AppEngineAuthContextProvider(auth.Base):
-    
-    #:
-    #: Overriden is_authenticated_user for Google AppEngine
-    #: Uses google.appengine.api.users method get_current_user to check if a user is logged in 
-    #:
+    """
+    Provides Authentication Context for Google's AppEngine Environment
+
+    auth.AuthContextProvider implementation for Google AppEngine, uses google.appengine.api.users
+    to determine logged in users and return a reference to the current user.
+
+    Refer to decorators in handlers package for more information.
+    """
+
     def is_authenticated_user(self):
+        """
+        Override is_authenticated_user for Google AppEngine
+        Uses google.appengine.api.users method get_current_user to check if a user is logged in
+        """
+        from google.appengine.api import users
         return users.get_current_user() is not None
-      
-    #:  
-    #: Overriden get_current_user for Google AppEngine
-    #: Checks for oauth capable request first, if this fails fall back to standard users API
-    #:
+
     def get_current_user(self):
+        """
+        Override get_current_user for Google AppEngine
+        Checks for oauth capable request first, if this fails fall back to standard users API
+        """
+        from google.appengine.api import users
 
         if _IS_DEVELOPMENT_SERVER:
             return users.get_current_user()
         else:
+            from google.appengine.api import oauth
+
             try:
                 user = oauth.get_current_user()
-            except oauth.OAuthRequestError, exp:
+            except oauth.OAuthRequestError:
                 user = users.get_current_user()
             return user
-  
-#:      
-#: Provides a wrapper on AppEngine's memcache implementation 
-#:
+
+
 class AppEngineMemcacheProvider(cache.Base):
+    """
+    Provides a wrapper on AppEngine's memcache implementation.
+    """
     
-    def __init__(self, key_provider=None):
-        self.key_provider = key_provider
+    def get(self, key, namespace=None, for_cas=False):
+        from google.appengine.api import memcache
+        return memcache.get(key, namespace, for_cas)
     
-    def get(self, key):
-        memcache.get(key)       
-    
-    def set(self, key, value, expiry=60, namespace=None):
-        memcache.set(key, value, expiry)
+    def set(self, key, value, time=0, min_compress_len=0, namespace=None):
+        from google.appengine.api import memcache
+        return memcache.set(key, value, time, min_compress_len, namespace)
         
-    def add(self, key, value, expiry=60, namespace=None):
-        memcache.add(key, value, expiry, namespace)
+    def add(self, key, value, time=0, min_compress_len=0, namespace=None):
+        from google.appengine.api import memcache
+        return memcache.add(key, value, time, min_compress_len, namespace)
         
     def delete(self, key, seconds=0, namespace=None):
-        memcache.delete(key, seconds, namespace)
+        from google.appengine.api import memcache
+        return memcache.delete(key, seconds, namespace)
         
     def flush_all(self):
-        memcache.flush_all()
-
+        from google.appengine.api import memcache
+        return memcache.flush_all()
