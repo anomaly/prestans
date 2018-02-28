@@ -81,7 +81,7 @@ setup(
     ],
     install_requires=['WebOb>=1.7'],
     tests_require=[
-        'jinja2'
+        'jinja2',
         'pytest',
         'pytest-cov',
         'mock',
