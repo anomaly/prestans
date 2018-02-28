@@ -12,8 +12,8 @@ A WSGI compliant REST micro-framework.
         :alt: Documentation Status
 
 .. image:: https://travis-ci.org/anomaly/prestans.svg?branch=master&maxAge=2592000
-:target: https://travis-ci.org/anomaly/prestans/
-   :alt: build status
+        :target: https://travis-ci.org/anomaly/prestans/
+        :alt: build status
 
 Prestans is a REST micro-framework built right on top of WSGI, designed to perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" as you like.
 
