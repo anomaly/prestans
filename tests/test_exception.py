@@ -404,3 +404,11 @@ class ExceptionForbidden(unittest.TestCase):
         forbidden = exception.Forbidden()
         self.assertEquals(forbidden.http_status, STATUS.FORBIDDEN)
         self.assertEquals(forbidden.message, "Forbidden")
+
+
+class ExceptionInternalServerError(unittest.TestCase):
+
+    def test_init(self):
+        internal_server_error = exception.InternalServerError()
+        self.assertEquals(internal_server_error.http_status, STATUS.INTERNAL_SERVER_ERROR)
+        self.assertEquals(internal_server_error.message, "Internal Server Error")
