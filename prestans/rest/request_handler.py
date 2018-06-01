@@ -250,15 +250,7 @@ class RequestHandler(object):
                 raise exp
             # handle any non-prestans exceptions
             except Exception as exp:
-                if self.debug:
-                    raise
-                else:
-                    self.logger.exception("handler %s.%s; exception raised: %s" % ( \
-                        self.__module__,
-                        self.__class__,
-                        exp
-                    ))
-                    raise exception.ServiceUnavailable()
+                self.handler_raised_exception(exp)
             # always run the tear down method
             finally:
                 self.handler_did_run()
@@ -284,6 +276,20 @@ class RequestHandler(object):
 
     def handler_did_run(self):
         return None
+
+    #:
+    #: Default handler for a raised exception return service unavailable
+    #:
+    def handler_raised_exception(self, exp):
+        if self.debug:
+            raise exp
+        else:
+            self.logger.error("handler %s.%s; exception raised: %s" % (
+                self.__module__,
+                self.__class__,
+                exp
+            ))
+            raise exception.ServiceUnavailable()
 
     #:
     #: Placeholder functions for HTTP Verb; implementing handlers must override these
