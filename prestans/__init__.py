@@ -33,5 +33,5 @@ from __future__ import unicode_literals
 
 __all__ = ['http', 'types', 'rest', 'parser', 'serializer', 'deserializer', 'provider', 'ext', 'exception']
 
-__version_info__ = (2, 2, 0)
+__version_info__ = (2, 2, 1)
 __version__ = '.'.join(str(v) for v in __version_info__)
