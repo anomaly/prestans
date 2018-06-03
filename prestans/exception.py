@@ -507,3 +507,10 @@ class Forbidden(ResponseException):
     def __init__(self, message="Forbidden", response_model=None):
         _code = STATUS.FORBIDDEN
         super(Forbidden, self).__init__(_code, message, response_model)
+
+
+class InternalServerError(ResponseException):
+
+    def __init__(self, message="Internal Server Error", response_model=None):
+        _code = STATUS.INTERNAL_SERVER_ERROR
+        super(InternalServerError, self).__init__(_code, message, response_model)
