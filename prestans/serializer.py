@@ -29,10 +29,13 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+import sys
+
+from prestans import exception
+from prestans.types import DataCollection
 
 __all__ = ['Base', 'JSON', 'XMLPlist']
 
-import prestans.exception
 
 class Base(object):
 
@@ -52,12 +55,12 @@ class JSON(Base):
         
         import json
         try:
-            return json.dumps(serializable_object, ensure_ascii=False)
+            return json.dumps(serializable_object, ensure_ascii=False, sort_keys=True)
         except Exception as exp:
-            raise prestans.exception.SerializationFailedError('JSON: %s' % exp)
+            raise exception.SerializationFailedError("JSON: %s" % exp)
 
     def handler_body_type(self):
-        return prestans.types.DataCollection
+        return DataCollection
 
     def content_type(self):
         return 'application/json'
@@ -65,8 +68,11 @@ class JSON(Base):
 
 class XMLPlist(Base):
     """
-    Uses Apple's Property List format to serialize collections 
-    to XML. Refer to http://docs.python.org/2/library/plistlib.html
+    Uses Apple's Property List format to serialize collections to XML.
+
+    Refer to:
+     - https://docs.python.org/2/library/plistlib.html
+     - https://docs.python.org/3/library/plistlib.html
     """
 
     def dumps(self, serializable_object):
@@ -74,16 +80,17 @@ class XMLPlist(Base):
         import plistlib
 
         try:
-            plist_str = plistlib.writePlistToString(serializable_object)
+            if sys.version_info < (3,):
+                plist_str = plistlib.writePlistToString(serializable_object)
+            else:
+                plist_str = plistlib.dumps(serializable_object)
         except Exception as exp:
-            raise prestans.exception.SerializationFailedError('XMLPlist: %s' % exp)
+            raise exception.SerializationFailedError("XMLPlist: %s" % exp)
 
         return plist_str
 
     def handler_body_type(self):
-        return prestans.types.DataCollection
+        return DataCollection
 
     def content_type(self):
         return 'application/xml'
-
-

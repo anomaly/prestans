@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  prestans, A WSGI compliant REST micro-framework
 #  http://prestans.org
@@ -29,3 +30,44 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+import os
+import sys
+import signal
+
+from prestans.devel import ArgParserFactory
+from prestans.devel import CommandDispatcher
+from prestans.devel import exception
+
+
+def ctrlc_handler(signal, frame):
+    sys.exit(2)
+
+
+def main():
+
+    signal.signal(signal.SIGINT, ctrlc_handler)
+
+    # parse the command
+    parser_factory = ArgParserFactory()
+    args = parser_factory.parse()
+
+    try:
+        # dispatch the command to the right module
+        command_dispatcher = CommandDispatcher(args)
+        return command_dispatcher.dispatch()
+    except exception.Base as exp:
+        print ("%s\n" % exp)
+        return exp.error_code
+
+
+if __name__ == "__main__":
+
+    directory = os.path.dirname(__file__)
+    prestans_path = os.path.join(directory, "..", "..")
+
+    # while in development attempt to import prestans from top dir
+    if os.path.isdir(prestans_path):
+        sys.path.insert(0, prestans_path)
+
+    sys.exit(main())

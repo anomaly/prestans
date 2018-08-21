@@ -2,10 +2,6 @@ Prestans 2.0
 ============
 
 A WSGI compliant REST micro-framework.
-
-.. image:: https://img.shields.io/pypi/dm/prestans.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/prestans/
-    :alt: Download
     
 .. image:: https://badge.fury.io/py/prestans.svg
     :target: https://pypi.python.org/pypi/prestans/
@@ -14,6 +10,10 @@ A WSGI compliant REST micro-framework.
 .. image:: https://readthedocs.org/projects/prestans/badge/?version=latest
         :target: https://prestans.readthedocs.org/
         :alt: Documentation Status
+
+.. image:: https://travis-ci.org/anomaly/prestans.svg?branch=master&maxAge=2592000
+        :target: https://travis-ci.org/anomaly/prestans/
+        :alt: build status
 
 Prestans is a REST micro-framework built right on top of WSGI, designed to perform and co-exists with other middleware and frameworks that you employ. Our target audience are developers building large REST backends for use with pure Ajax (using a framework like Google Closure) or mobile applications. prestans is designed for you to "take as much or as little" as you like.
 

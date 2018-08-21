@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  prestans, A WSGI compliant REST micro-framework
@@ -30,48 +29,57 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-import os
-import sys
-import string
-import signal
-import getpass
-import base64
-import argparse
-
-def ctrlc_handler(signal, frame):
-    print ""
-    sys.exit(2)
-
-def main():
-
-    signal.signal(signal.SIGINT, ctrlc_handler)
-
-    #: Parse the command 
-    parser_factory = prestans.devel.ArgParserFactory()
-    args = parser_factory.parse()
-
-    try:
-        #: Dispatch the command to the right module
-        command_dispatcher = prestans.devel.CommandDispatcher(args)
-        return command_dispatcher.dispatch()
-    except prestans.devel.exception.Base, exp:
-        print ("%s\n"  % exp)
-        return exp.error_code
+from prestans import exception
+from prestans.types import DataType
 
 
-if __name__ == "__main__":
+class Boolean(DataType):
 
-    directory = os.path.dirname(__file__)
-    prestans_path = os.path.join(directory, "..", "..")
+    def __init__(self, default=None, required=True, description=None):
 
-    #:
-    #: While in development attempt to import prestans from top dir
-    #:
-    if os.path.isdir(prestans_path):
-        sys.path.insert(0, prestans_path)
+        if default is None or \
+           isinstance(default, bool):
+            self._default = default
+        else:
+            raise TypeError("default must be of type bool or None")
+        self._required = required
+        self._description = description
 
-    import prestans.devel
-    import prestans.devel.exception
+    @property
+    def required(self):
+        return self._required
 
-    sys.exit(main())
+    @property
+    def default(self):
+        return self._default
+
+    @property
+    def description(self):
+        return self._description
+
+    def blueprint(self):
+
+        blueprint = dict()
+        blueprint['type'] = 'boolean'
+
+        constraints = dict()
+        constraints['default'] = self.default
+        constraints['required'] = self.required
+        constraints['description'] = self.description
+
+        blueprint['constraints'] = constraints
+        return blueprint
+
+    def validate(self, value):
+
+        if not self._required and self._default is None and value is None:
+            return None
+        elif self._required and self._default is None and value is None:
+            raise exception.RequiredAttributeError()
+        elif value is None and self.default is not None:
+            value = self._default
+
+        if not isinstance(value, bool):
+            raise exception.ParseFailedError()
+
+        return value

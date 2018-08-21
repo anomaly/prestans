@@ -23,6 +23,7 @@ dist:
 release:
 	python setup.py sdist bdist_wheel upload
 
+.PHONY: clean
 clean:
 	python setup.py clean
 	if [ -a .eggs ]; then rm -rf .eggs; fi;

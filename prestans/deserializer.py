@@ -34,6 +34,7 @@ __all__ = ['Base', 'JSON', 'XMLPlist']
 
 import prestans.exception
 
+
 class Base(object):
 
     def loads(self, input_string):
@@ -46,14 +47,15 @@ class Base(object):
 class JSON(Base):
 
     def loads(self, input_string):
-
         import json
-        parsed_json = None
+
+        if isinstance(input_string, bytes):
+            input_string = input_string.decode()
 
         try:
             parsed_json = json.loads(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError('JSON')
+        except Exception as exp:
+            raise prestans.exception.DeSerializationFailedError("JSON: %s" % exp)
             
         return parsed_json
         
@@ -64,17 +66,14 @@ class JSON(Base):
 class XMLPlist(Base):
 
     def loads(self, input_string):
-        
         import plistlib
-        unserialized_plist = None
 
         try:
-            unserialized_plist = plistlib.readPlistFromString(input_string)
-        except Exception, exp:
-            raise prestans.exception.DeSerializationFailedError("XML/Plist")
+            plist_object = plistlib.readPlistFromString(input_string)
+        except Exception as exp:
+            raise prestans.exception.DeSerializationFailedError("XMLPlist: %s" % exp)
 
-        return unserialized_plist
+        return plist_object
 
     def content_type(self):
         return 'application/xml'
-        
