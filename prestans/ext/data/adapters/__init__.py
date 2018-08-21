@@ -85,26 +85,38 @@ class AdapterRegistryManager(object):
         rest_class_signature = self.generate_signature(model_adapter.rest_model_class)
         persistent_class_signature = self.generate_signature(model_adapter.persistent_model_class)
 
-        # store references to how a rest model maps to a persistent model and vice versa
-        self._persistent_map[persistent_class_signature] = model_adapter
+        # store references to rest model
         self._rest_map[rest_class_signature] = model_adapter
+
+        if persistent_class_signature not in self._persistent_map:
+            self._persistent_map[persistent_class_signature] = dict()
+        self._persistent_map[persistent_class_signature][rest_class_signature] = model_adapter
         
-    def get_adapter_for_persistent_model(self, persistent_model):
+    def get_adapter_for_persistent_model(self, persistent_model, rest_model=None):
         """
         :param persistent_model: instance of persistent model
         :return: the matching model adapter
         :rtype: ModelAdapter
         """
-        class_signature = self.generate_signature(persistent_model)
+        persistent_signature = self.generate_signature(persistent_model)
         
-        if class_signature not in self._persistent_map:
-            raise TypeError("No registered Data Adapter for class %s" % class_signature)
+        if persistent_signature in self._persistent_map:
+            sub_map = self._persistent_map[persistent_signature]
 
-        return self._persistent_map[class_signature]
+            # return the first match if REST model was not specified
+            if rest_model is None:
+                return next(iter(sub_map))
+            else:
+                rest_signature = self.generate_signature(persistent_model)
+                if rest_signature in sub_map:
+                    return self._persistent_map[persistent_signature][rest_signature]
+
+        raise TypeError("No registered Data Adapter for class %s" % persistent_signature)
         
     def get_adapter_for_rest_model(self, rest_model):
         """
         :param rest_model: instance of REST model
+        :param persistent_model: optional persistent model
         :return: the matching model adapter
         :rtype: ModelAdapter
         """
