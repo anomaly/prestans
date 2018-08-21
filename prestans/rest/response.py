@@ -140,15 +140,17 @@ class Response(webob.Response):
 
     def _content_type__set(self, value):
 
-        #: Check to see if response can support the requested mime type
-        if not isinstance(self._app_iter, BinaryResponse) and value not in self.supported_mime_types:
-            raise exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
+        # skip the mime type check if template is None status code is no content
+        if self.template is not None or self.status_code != STATUS.NO_CONTENT:
+            # Check to see if response can support the requested mime type
+            if not isinstance(self._app_iter, BinaryResponse) and value not in self.supported_mime_types:
+                raise exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
 
-        #: Keep a reference to the selected serializer
-        if not isinstance(self._app_iter, BinaryResponse):
-            self._set_serializer_by_mime_type(value)
+            # Keep a reference to the selected serializer
+            if not isinstance(self._app_iter, BinaryResponse):
+                self._set_serializer_by_mime_type(value)
 
-        if not value:
+        if not value or value is None:
             self._content_type__del()
             return
         if ';' not in value:
@@ -241,8 +243,10 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
-        #: prestans' equivalent of webob.Response line 1022
+        # prestans equivalent of webob.Response line 1022
         if self.template is None or self.status_code == STATUS.NO_CONTENT:
+
+            self.content_type = None
 
             start_response(self.status, self.headerlist)
 
@@ -325,7 +329,7 @@ class Response(webob.Response):
                 self.content_type = "text/plain"
                 return []
 
-            #: Content type
+            # set the content type
             self.content_type = self._app_iter.mime_type
 
             #: Add content disposition header
