@@ -2,6 +2,19 @@
 test:
 	python setup.py test
 
+.PHONY: tests-prep
+tests-prep:
+	pip install tox tox-pyenv
+	pyenv local 2.7.15 3.5.6 3.6.6 pypy2.7-6.0.0
+
+.PHONY: tests
+tests:
+	tox
+
+.PHONY: coverage
+coverage:
+	py.test --cov-report term-missing:skip-covered --cov-config .coveragerc --cov=prestans tests
+
 .PHONY: dist
 dist:
 	python setup.py sdist bdist_wheel
