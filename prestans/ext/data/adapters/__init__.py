@@ -228,9 +228,10 @@ class AdapterRegistryManager(object):
     """
     AdapterRegistryManager keeps track of rest to persistent model maps
 
-    AdapterRegistryManager should not be instantiated by the applications, a singleton
-    instance supplied by this package.
+    New AdapterRegistryManager's should not be instantiated by the application, a singleton
+    instance is supplied by this package.
     """
+    DEFAULT_REST_ADAPTER = "prestans_rest_default_adapter"
 
     def __init__(self):
         self._persistent_map = dict()
@@ -257,6 +258,10 @@ class AdapterRegistryManager(object):
 
         if persistent_class_signature not in self._persistent_map:
             self._persistent_map[persistent_class_signature] = dict()
+
+        # store a reference to the adapter under both REST signature and default key
+        # the default is always the last registered model (to match behaviour before this was patched)
+        self._persistent_map[persistent_class_signature][self.DEFAULT_REST_ADAPTER] = model_adapter
         self._persistent_map[persistent_class_signature][rest_class_signature] = model_adapter
 
     def register_persistent_rest_pair(self, persistent_model_class, rest_model_class):
@@ -290,8 +295,7 @@ class AdapterRegistryManager(object):
 
             # return the first match if REST model was not specified
             if rest_model is None:
-                rest_sig = next(iter(sub_map))
-                return self._persistent_map[persistent_signature][rest_sig]
+                return self._persistent_map[persistent_signature][self.DEFAULT_REST_ADAPTER]
             else:
                 rest_sig = self.generate_signature(rest_model)
                 if rest_sig in sub_map:

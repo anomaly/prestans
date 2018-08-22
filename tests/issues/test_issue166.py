@@ -43,8 +43,8 @@ class Issue166(unittest.TestCase):
     def test_default_rest_model_lookup(self):
 
         model_adapter = adapters.registry.get_adapter_for_persistent_model(UserPersistent())
-        self.assertEquals(model_adapter.rest_model_class, UserREST)
-        self.assertNotEquals(model_adapter.rest_model_class, AuthorREST)
+        self.assertEquals(model_adapter.rest_model_class, AuthorREST)
+        self.assertNotEquals(model_adapter.rest_model_class, UserREST)
 
     def test_specific_rest_model_lookup(self):
         model_adapter1 = adapters.registry.get_adapter_for_persistent_model(UserPersistent(), UserREST)
