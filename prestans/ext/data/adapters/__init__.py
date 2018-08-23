@@ -83,7 +83,11 @@ class ModelAdapter(object):
                         raise TypeError('Attribute %s, %s' % (attribute_key, str(exp)))
 
                 continue
-
+            # ignore class methods
+            elif inspect.ismethod(getattr(persistent_object, attribute_key)):
+                import logging
+                logging.error("ignoring method: "+attribute_key)
+                continue
             # attribute is not visible don't bother processing
             elif isinstance(attribute_filter, parser.AttributeFilter) and \
                     not attribute_filter.is_attribute_visible(attribute_key):
