@@ -86,7 +86,8 @@ setup(
         'pytest-cov',
         'mock',
         'tox',
-        'tox-pyenv'
+        'tox-pyenv',
+        'webtest'
     ],
     setup_requires=['pytest-runner'],
     extras_require={

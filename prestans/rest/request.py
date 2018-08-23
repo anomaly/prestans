@@ -47,6 +47,8 @@ class Request(webob.Request):
             raise AttributeError("access to request.parsed_body is not \
                 allowed when body_template is set to None")
 
+        self.parse_body()
+
         return self._parsed_body
 
     @property
@@ -122,20 +124,23 @@ class Request(webob.Request):
             return
 
         if not isinstance(value, DataCollection):
-            raise AssertionError("body_template must be an instance of \
-                prestans.types.DataCollection")
+            msg = "body_template must be an instance of %s.%s" % (DataCollection.__module__, DataCollection.__name__)
+            raise AssertionError(msg)
 
         self._body_template = value
 
-        #: Get a deserializer based on the Content-Type header
-        #: Do this here so the handler gets a chance to setup extra serializers
+        # get a deserializer based on the Content-Type header
+        # do this here so the handler gets a chance to setup extra serializers
         self.set_deserializer_by_mime_type(self.content_type)
 
-        #: Parse the body using the deserializer
-        unserialized_body = self.selected_deserializer.loads(self.body)
+    def parse_body(self):
 
-        #: Parse the body using the template and attribute_filter
-        self._parsed_body = value.validate(unserialized_body, self.attribute_filter, self.is_minified)
+        if self._parsed_body is None and self._body_template is not None:
+            # parse the body using the deserializer
+            unserialized_body = self.selected_deserializer.loads(self.body)
+
+            # valiate the body using the template and attribute_filter
+            self._parsed_body = self._body_template.validate(unserialized_body, self.attribute_filter, self.is_minified)
 
     def register_deserializers(self, deserializers):
 
