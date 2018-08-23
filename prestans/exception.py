@@ -495,6 +495,27 @@ class MovedPermanently(ResponseException):
         super(MovedPermanently, self).__init__(_code, message, response_model)
 
 
+class Redirect(ResponseException):
+
+    def __init__(self, code, url):
+        self._url = url
+        super(Redirect, self).__init__(code, "Redirect")
+
+    @property
+    def url(self):
+        return self._url
+
+
+class TemporaryRedirect(Redirect):
+    def __init__(self, url):
+        super(TemporaryRedirect, self).__init__(STATUS.TEMPORARY_REDIRECT, url)
+
+
+class PermanentRedirect(Redirect):
+    def __init__(self, url):
+        super(PermanentRedirect, self).__init__(STATUS.PERMANENT_REDIRECT, url)
+
+
 class PaymentRequired(ResponseException):
 
     def __init__(self, message="Payment Required", response_model=None):

@@ -242,6 +242,8 @@ class RequestHandler(object):
                     self.delete(*self._args)
                 elif request_method == VERB.OPTIONS:
                     self.options(*self._args)
+            except (exception.PermanentRedirect, exception.TemporaryRedirect) as exp:
+                self._redirect(exp.url, exp.http_status)
             # re-raise all prestans exceptions
             except exception.Base as exp:
                 if isinstance(exception, exception.HandlerException):
@@ -331,7 +333,15 @@ class RequestHandler(object):
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
-
+    def _redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
         self._response.status = status
         self._response.headers.add("Location", url)
+
+    def redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
+
+        self.logger.warn("direct use of %s.%s has been deprecated please raise an exception instead" % (
+            self.__module__,
+            "redirect"
+        ))
+
+        self._redirect(url, status)
