@@ -141,7 +141,8 @@ class Response(webob.Response):
     def _content_type__set(self, value):
 
         # skip the mime type check if template is None status code is no content
-        if self.template is not None or self.status_code != STATUS.NO_CONTENT:
+        if self.template is not None or \
+           self.status_code not in [STATUS.NO_CONTENT, STATUS.PERMANENT_REDIRECT, STATUS.TEMPORARY_REDIRECT]:
             # Check to see if response can support the requested mime type
             if not isinstance(self._app_iter, BinaryResponse) and value not in self.supported_mime_types:
                 raise exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
