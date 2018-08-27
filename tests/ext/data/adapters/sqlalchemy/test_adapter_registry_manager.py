@@ -91,4 +91,43 @@ class AdapterRegistryManagerTest(unittest.TestCase):
         self.assertRaises(TypeError, registry_manager.get_adapter_for_rest_model, RESTModelB)
         self.assertRaises(TypeError, registry_manager.get_adapter_for_persistent_model, PersistentModelB)
 
+    def test_register_persistent_rest_pair(self):
+        registry_manager = adapters.AdapterRegistryManager()
+        registry_manager.register_persistent_rest_pair(
+            persistent_model_class=PersistentModelA,
+            rest_model_class=RESTModelA
+        )
 
+        # fetch via the REST model
+        found_adapter = registry_manager.get_adapter_for_rest_model(RESTModelA())
+        self.assertEquals(found_adapter.rest_model_class, RESTModelA)
+        self.assertEquals(found_adapter.persistent_model_class, PersistentModelA)
+
+        # fetch via the persistent model
+        found_adapter = registry_manager.get_adapter_for_persistent_model(PersistentModelA())
+        self.assertEquals(found_adapter.rest_model_class, RESTModelA)
+        self.assertEquals(found_adapter.persistent_model_class, PersistentModelA)
+
+    def test_clear_registered_adapters(self):
+        registry_manager = adapters.AdapterRegistryManager()
+        registry_manager.register_adapter(adapters.ModelAdapter(
+            rest_model_class=RESTModelA,
+            persistent_model_class=PersistentModelA
+        ))
+
+        # fetch via the REST model
+        found_adapter = registry_manager.get_adapter_for_rest_model(RESTModelA())
+        self.assertEquals(found_adapter.rest_model_class, RESTModelA)
+        self.assertEquals(found_adapter.persistent_model_class, PersistentModelA)
+
+        # fetch via the persistent model
+        found_adapter = registry_manager.get_adapter_for_persistent_model(PersistentModelA())
+        self.assertEquals(found_adapter.rest_model_class, RESTModelA)
+        self.assertEquals(found_adapter.persistent_model_class, PersistentModelA)
+
+        # clear the registry
+        registry_manager.clear_registered_adapters()
+
+        # check they have been cleared
+        self.assertRaises(TypeError, registry_manager.get_adapter_for_rest_model, RESTModelA())
+        self.assertRaises(TypeError, registry_manager.get_adapter_for_persistent_model, PersistentModelA())
