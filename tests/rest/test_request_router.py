@@ -73,7 +73,7 @@ class RequestRouterTest(unittest.TestCase):
 
         expected_value = 123
 
-        self._test_routing_behavour(environ={
+        self._test_routing_behaviour(environ={
             "REQUEST_METHOD": prestans.http.VERB.GET,
             "SCRIPT_NAME": "/mountpoint/some/path/{}".format(expected_value),
             "PATH_INFO": "",
@@ -91,7 +91,7 @@ class RequestRouterTest(unittest.TestCase):
         with router ``TestRequestRouter``
         :return:
         """
-        self._test_routing_behavour(environ={
+        self._test_routing_behaviour(environ={
             "REQUEST_METHOD": prestans.http.VERB.GET,
             "SCRIPT_NAME": "/mountpoint",
             "PATH_INFO": "/some/path/{}".format(123),
@@ -105,7 +105,7 @@ class RequestRouterTest(unittest.TestCase):
         WSGIScriptAliasMatch /mountpoint/(.*) script.wsgi/$1
         :return:
         """
-        self._test_routing_behavour(environ={
+        self._test_routing_behaviour(environ={
             "REQUEST_METHOD": prestans.http.VERB.GET,
             "SCRIPT_NAME": "/mountpoint/",
             "PATH_INFO": "/some/path/{}".format(123),
@@ -122,7 +122,7 @@ class RequestRouterTest(unittest.TestCase):
         """
         expected_value = 123
 
-        self._test_routing_behavour(environ={
+        self._test_routing_behaviour(environ={
             "REQUEST_METHOD": prestans.http.VERB.GET,
             "SCRIPT_NAME": "/mountpoint/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
@@ -140,14 +140,14 @@ class RequestRouterTest(unittest.TestCase):
 
         expected_value = 123
 
-        self._test_routing_behavour(environ={
+        self._test_routing_behaviour(environ={
             "REQUEST_METHOD": prestans.http.VERB.GET,
             "PATH_INFO": "/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
             "SERVER_NAME": "localhost",
             "SERVER_PORT": "1234"})
 
-    def _test_routing_behavour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
+    def _test_routing_behaviour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
 
         test_router = prestans.rest.RequestRouter([
             (match, _UserHandler)

@@ -75,23 +75,33 @@ class Response(webob.Response):
     def default_serializer(self):
         return self._default_serializer
 
-    #: Used by content_type_set to set get a reference to the serializer object
     def _set_serializer_by_mime_type(self, mime_type):
+        """
+        :param mime_type:
+        :return:
+
+        used by content_type_set to set get a reference to the appropriate serializer
+        """
+
+        # ignore if binary response
+        if isinstance(self._app_iter, BinaryResponse):
+            self.logger.info("ignoring setting serializer for binary response")
+            return
 
         for available_serializer in self._serializers:
             if available_serializer.content_type() == mime_type:
                 self._selected_serializer = available_serializer
+                self.logger.info("set serializer for mime type: %s" % mime_type)
                 return
 
+        self.logger.info("could not find serializer for mime type: %s" % mime_type)
         raise exception.UnsupportedVocabularyError(mime_type, self.supported_mime_types_str)
-
-    #:
-    #: is an instance of prestans.types.DataType; mostly a subclass of
-    #: prestans.types.Model
-    #:
 
     @property
     def template(self):
+        """
+        is an instance of prestans.types.DataType; mostly a subclass of prestans.types.Model
+        """
         return self._template
 
     @template.setter
@@ -115,14 +125,10 @@ class Response(webob.Response):
     def attribute_filter(self, value):
 
         if value is not None and not isinstance(value, AttributeFilter):
-            raise TypeError("attribue_filter in response must be of \
-                type prestans.types.AttributeFilter")
+            msg = "attribue_filter in response must be of type prestans.types.AttributeFilter"
+            raise TypeError(msg)
 
         self._attribute_filter = value
-
-    #:
-    #: content_type; overrides webob.Response line 606
-    #:
 
     def _content_type__get(self):
         """
@@ -140,30 +146,26 @@ class Response(webob.Response):
 
     def _content_type__set(self, value):
 
-        # skip the mime type check if template is None status code is no content
-        if self.template is not None or \
-           self.status_code not in [STATUS.NO_CONTENT, STATUS.PERMANENT_REDIRECT, STATUS.TEMPORARY_REDIRECT]:
-            # Check to see if response can support the requested mime type
-            if not isinstance(self._app_iter, BinaryResponse) and value not in self.supported_mime_types:
-                raise exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
-
-            # Keep a reference to the selected serializer
-            if not isinstance(self._app_iter, BinaryResponse):
-                self._set_serializer_by_mime_type(value)
-
-        if not value or value is None:
+        # skip for responses that have no body
+        if self.status_code in [STATUS.NO_CONTENT, STATUS.PERMANENT_REDIRECT, STATUS.TEMPORARY_REDIRECT]:
+            self.logger.info("attempt to set Content-Type to %s being ignored due to empty response" % value)
             self._content_type__del()
-            return
-        if ';' not in value:
-            header = self.headers.get('Content-Type', '')
-            if ';' in header:
-                params = header.split(';', 1)[1]
-                value += ';' + params
-        self.headers['Content-Type'] = value
+        else:
+            self._set_serializer_by_mime_type(value)
+
+            if ';' not in value:
+                header = self.headers.get('Content-Type', '')
+                if ';' in header:
+                    params = header.split(';', 1)[1]
+                    value += ';' + params
+            self.headers['Content-Type'] = value
+
+            self.logger.info("Content-Type set to: %s" % value)
 
     def _content_type__del(self):
         self.headers.pop('Content-Type', None)
 
+    # content_type; overrides webob.Response line 606
     content_type = property(
         _content_type__get,
         _content_type__set,
@@ -171,11 +173,7 @@ class Response(webob.Response):
         doc=_content_type__get.__doc__
     )
 
-
-    #:
-    #: body; overrides webob.Response line 324
-    #:
-
+    # body; overrides webob.Response line 324
     @property
     def body(self):
         """
@@ -184,7 +182,7 @@ class Response(webob.Response):
 
         body getter will return the validated prestans model.
 
-        Webob does the heavy lifiting with headers.
+        webob does the heavy lifting with headers.
         """
 
         #: If template is null; return an empty iterable

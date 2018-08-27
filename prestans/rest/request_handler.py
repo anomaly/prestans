@@ -110,37 +110,32 @@ class RequestHandler(object):
         return handler_blueprint
 
     def _setup_serializers(self):
+        """
+        Auto set the return serializer based on Accept headers
+        http://docs.webob.org/en/latest/reference.html#header-getters
 
-        #:
-        #: Auto set the return serializer based on Accept headers
-        #: http://docs.webob.org/en/latest/reference.html#header-getters
-        #:
-
-        #: Intersection of requested types and supported types tells us if we
-        #: can in fact respond in one of the request formats
+        Intersection of requested types and supported types tells us if we
+        can in fact respond in one of the request formats
+        """
         best_accept_match = self.request.accept.best_match(
             self.response.supported_mime_types,
             default_match=self.response.default_serializer.content_type()
         )
 
-        if best_accept_match is None:
-            self.logger.error("unsupported mime type in request; accept header reads %s" % \
-                              self.request.accept)
-            raise exception.UnsupportedVocabularyError(
-                self.request.accept,
-                self.response.supported_mime_types_str
-            )
+        self.logger.info("%s determined as best match for accept header: %s" % (
+            best_accept_match,
+            self.request.accept
+        ))
 
-        #: If content_type is not acceptable it will raise UnsupportedVocabulary
+        # if content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = best_accept_match
 
     def __call__(self, environ, start_response):
 
         self.logger.info("handler %s.%s; callable execution start" % (self.__module__, self.__class__.__name__))
-        self.logger.info("setting default response to %s" % self.request.accept)
 
         try:
-            #: Register additional serializers and de-serializers
+            # register additional serializers and de-serializers
             self.request.register_deserializers(self.register_deserializers())
             self.response.register_serializers(self.register_serializers())
 
