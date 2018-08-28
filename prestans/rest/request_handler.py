@@ -21,7 +21,7 @@ class RequestHandler(object):
     __provider_config__ = None
     __parser_config__ = None
 
-    def __init__(self, args, request, response, logger, debug):
+    def __init__(self, args, kwargs, request, response, logger, debug):
 
         if self.__provider_config__ is None:
             self.__provider_config__ = provider.Config()
@@ -29,6 +29,7 @@ class RequestHandler(object):
             self.__parser_config__ = parser.Config()
 
         self._args = args
+        self._kwargs = kwargs
         self._request = request
         self._response = response
         self._logger = logger
@@ -224,19 +225,19 @@ class RequestHandler(object):
                 #: prestans sets a sensible HTTP status code
                 #:
                 if request_method == VERB.GET:
-                    self.get(*self._args)
+                    self.get(*self._args, **self._kwargs)
                 elif request_method == VERB.HEAD:
-                    self.head(*self._args)
+                    self.head(*self._args, **self._kwargs)
                 elif request_method == VERB.POST:
-                    self.post(*self._args)
+                    self.post(*self._args, **self._kwargs)
                 elif request_method == VERB.PUT:
-                    self.put(*self._args)
+                    self.put(*self._args, **self._kwargs)
                 elif request_method == VERB.PATCH:
-                    self.patch(*self._args)
+                    self.patch(*self._args, **self._kwargs)
                 elif request_method == VERB.DELETE:
-                    self.delete(*self._args)
+                    self.delete(*self._args, **self._kwargs)
                 elif request_method == VERB.OPTIONS:
-                    self.options(*self._args)
+                    self.options(*self._args, **self._kwargs)
             except (exception.PermanentRedirect, exception.TemporaryRedirect) as exp:
                 self._redirect(exp.url, exp.http_status)
             # re-raise all prestans exceptions
@@ -293,37 +294,37 @@ class RequestHandler(object):
     #: if not overridden prestans returns a Not Implemented error
     #:
 
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.GET)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def head(self, *args):
+    def head(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.HEAD)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def post(self, *args):
+    def post(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.POST)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def put(self, *args):
+    def put(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.PUT)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def patch(self, *args):
+    def patch(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.PATCH)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def delete(self, *args):
+    def delete(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.DELETE)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def options(self, *args):
+    def options(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.OPTIONS)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error

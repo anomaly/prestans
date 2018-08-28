@@ -99,7 +99,7 @@ def login_required(http_method_handler):
     """
 
     @wraps(http_method_handler)
-    def secure_http_method_handler(self, *args):
+    def secure_http_method_handler(self, *args, **kwargs):
 
         if not self.__provider_config__.authentication:
             _message = "Service available to authenticated users only, no auth context provider set in handler"
@@ -112,7 +112,7 @@ def login_required(http_method_handler):
             authentication_error.request = self.request
             raise authentication_error
 
-        http_method_handler(self, *args)
+        http_method_handler(self, *args, **kwargs)
 
     return secure_http_method_handler
 
@@ -128,7 +128,7 @@ def role_required(role_name=None):
     def _role_required(http_method_handler):
 
         @wraps(http_method_handler)
-        def secure_http_method_handler(self, *args):
+        def secure_http_method_handler(self, *args, **kwargs):
 
             # role name must be provided
             if role_name is None:
@@ -150,7 +150,7 @@ def role_required(role_name=None):
                 authorization_error.request = self.request
                 raise authorization_error
 
-            http_method_handler(self, *args)
+            http_method_handler(self, *args, **kwargs)
 
         return wraps(http_method_handler)(secure_http_method_handler)
 
@@ -164,7 +164,7 @@ def access_required(config=None):
 
     def _access_required(http_method_handler):
 
-        def secure_http_method_handler(self, *args):
+        def secure_http_method_handler(self, *args, **kwargs):
 
             # authentication context must be set
             if not self.__provider_config__.authentication:
@@ -180,7 +180,7 @@ def access_required(config=None):
                 authorization_error.request = self.request
                 raise authorization_error
 
-            http_method_handler(self, *args)
+            http_method_handler(self, *args, **kwargs)
 
         return wraps(http_method_handler)(secure_http_method_handler)
 
