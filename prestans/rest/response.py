@@ -1,7 +1,5 @@
-import sys
 import webob
 
-from prestans import __version__
 from prestans import exception
 from prestans.http import STATUS
 from prestans.parser import AttributeFilter
@@ -125,7 +123,7 @@ class Response(webob.Response):
     def attribute_filter(self, value):
 
         if value is not None and not isinstance(value, AttributeFilter):
-            msg = "attribue_filter in response must be of type prestans.types.AttributeFilter"
+            msg = "attribute_filter in response must be of type prestans.types.AttributeFilter"
             raise TypeError(msg)
 
         self._attribute_filter = value
@@ -202,20 +200,27 @@ class Response(webob.Response):
         #: value should be a subclass prestans.types.DataCollection
         if not isinstance(value, DataCollection) and \
                 not isinstance(value, BinaryResponse):
-            raise TypeError("%s is not a prestans.types.DataCollection \
-                or prestans.types.BinaryResponse subclass" % value.__class__.__name__)
+            msg = "%s is not a prestans.types.DataCollection or prestans.types.BinaryResponse subclass" % (
+                value.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: Ensure that it matches the return type template
         if not value.__class__ == self.template.__class__:
-            raise TypeError("body must of be type %s, given %s" % \
-                            (self.template.__class__.__name__, value.__class__.__name__))
+            msg = "body must of be type %s, given %s" % (
+                self.template.__class__.__name__,
+                value.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, Array) and \
-                not isinstance(value.element_template, self.template.element_template.__class__):
-            raise TypeError("array elements must of be \
-                type %s, given %s" % (self.template.element_template.__class__.__name__, \
-                                      value.element_template.__class__.__name__))
+           not isinstance(value.element_template, self.template.element_template.__class__):
+            msg = "array elements must of be type %s, given %s" % (
+                self.template.element_template.__class__.__name__,
+                value.element_template.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: _app_iter assigned to value
         #: we need to serialize the contents before we know the length
@@ -231,9 +236,11 @@ class Response(webob.Response):
         for new_serializer in serializers:
 
             if not isinstance(new_serializer, serializer.Base):
-                raise TypeError("registered serializer %s.%s does not inherit from \
-                    prestans.serializer.Serializer" % (new_serializer.__module__, \
-                                                       new_serializer.__class__.__name__))
+                msg = "registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % (
+                    new_serializer.__module__,
+                    new_serializer.__class__.__name__
+                )
+                raise TypeError(msg)
 
         self._serializers = self._serializers + serializers
 
@@ -250,21 +257,23 @@ class Response(webob.Response):
             start_response(self.status, self.headerlist)
 
             if self.template is not None:
-                self.logger.warn("handler returns No Content but has a \
-                    response_template; set template to None")
+                self.logger.warn("handler returns No Content but has a response_template; set template to None")
 
             return []
 
-        #: Ensure what we are able to serialize is serializable
+        # ensure what we are able to serialize is serializable
         if not isinstance(self._app_iter, DataCollection) and \
-                not isinstance(self._app_iter, BinaryResponse):
+           not isinstance(self._app_iter, BinaryResponse):
 
             if isinstance(self._app_iter, list):
-                type = "list"
+                app_iter_type = "list"
             else:
-                type = self._app_iter.__name__
+                app_iter_type = self._app_iter.__name__
 
-            raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % type)
+            msg = "handler returns content of type %s; not a prestans.types.DataCollection subclass" % (
+                app_iter_type
+            )
+            raise TypeError(msg)
 
         if isinstance(self._app_iter, DataCollection):
 

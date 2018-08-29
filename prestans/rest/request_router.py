@@ -137,8 +137,8 @@ class RequestRouter(object):
             default_deserializer=self._default_deserializer
         )
 
-        # initialise the Route map
-        route_map = self._init_route_map(self._routes)
+        # initialise the route map
+        route_map = self.generate_route_map(self._routes)
 
         try:
 
@@ -201,7 +201,7 @@ class RequestRouter(object):
 
                     return request_handler(environ, start_response)
 
-            #: Request does not have a matched handler
+            # request does not have a matched handler
             no_endpoint = exception.NoEndpointError()
             no_endpoint.request = request
             raise no_endpoint
@@ -211,20 +211,16 @@ class RequestRouter(object):
             error_response = ErrorResponse(exp, self._default_serializer)
             return error_response(environ, start_response)
 
-    def _init_route_map(self, routes):
+    @classmethod
+    def generate_route_map(cls, routes):
 
         parsed_handler_map = []
 
         for url, handler in routes:
 
-            try:
-                handler_name = handler.__name__
-            except AttributeError:
-                pass
-
             regexp = url
 
-            #: Patch regular expression if its incomplete
+            # patch regular expression if it is incomplete
             if not regexp.startswith('^'):
                 regexp = '^' + regexp
             if not regexp.endswith('$'):
@@ -239,6 +235,5 @@ class RequestRouter(object):
                 raise ValueError("%s URL is invalid, cannot mix named and un-named groups" % url)
             else:
                 parsed_handler_map.append((compiled_regex, handler))
-
 
         return parsed_handler_map

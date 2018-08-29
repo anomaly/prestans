@@ -253,8 +253,10 @@ class RequestHandler(object):
             finally:
                 self.handler_did_run()
 
-            self.logger.info("handler %s.%s; callable execution ends" % \
-                             (self.__module__, self.__class__.__name__))
+            self.logger.info("handler %s.%s; callable execution ends" % (
+                self.__module__,
+                self.__class__.__name__
+            ))
 
             return self.response(environ, start_response)
 
