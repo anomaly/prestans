@@ -320,7 +320,7 @@ class AttributeFilterDiffers(RequestException):
     def __init__(self, attribute_list):
 
         _code = STATUS.BAD_REQUEST
-        _message = "attribute filter does not contain attributes (%s) that are not part of template" % (
+        _message = "attribute filter contains attributes (%s) that are not part of template" % (
             ', '.join(attribute_list)
         )
 

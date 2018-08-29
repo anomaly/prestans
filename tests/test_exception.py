@@ -201,7 +201,7 @@ class ExceptionAttributeFilterDiffers(unittest.TestCase):
         self.assertEquals(attribute_filter_differs.http_status, STATUS.BAD_REQUEST)
         self.assertEquals(
             attribute_filter_differs.message,
-            "attribute filter does not contain attributes (cat, dog) that are not part of template"
+            "attribute filter contains attributes (cat, dog) that are not part of template"
         )
 
 
