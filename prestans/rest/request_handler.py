@@ -21,7 +21,7 @@ class RequestHandler(object):
     __provider_config__ = None
     __parser_config__ = None
 
-    def __init__(self, args, request, response, logger, debug):
+    def __init__(self, args, kwargs, request, response, logger, debug):
 
         if self.__provider_config__ is None:
             self.__provider_config__ = provider.Config()
@@ -29,6 +29,7 @@ class RequestHandler(object):
             self.__parser_config__ = parser.Config()
 
         self._args = args
+        self._kwargs = kwargs
         self._request = request
         self._response = response
         self._logger = logger
@@ -110,37 +111,32 @@ class RequestHandler(object):
         return handler_blueprint
 
     def _setup_serializers(self):
+        """
+        Auto set the return serializer based on Accept headers
+        http://docs.webob.org/en/latest/reference.html#header-getters
 
-        #:
-        #: Auto set the return serializer based on Accept headers
-        #: http://docs.webob.org/en/latest/reference.html#header-getters
-        #:
-
-        #: Intersection of requested types and supported types tells us if we
-        #: can in fact respond in one of the request formats
+        Intersection of requested types and supported types tells us if we
+        can in fact respond in one of the request formats
+        """
         best_accept_match = self.request.accept.best_match(
             self.response.supported_mime_types,
             default_match=self.response.default_serializer.content_type()
         )
 
-        if best_accept_match is None:
-            self.logger.error("unsupported mime type in request; accept header reads %s" % \
-                              self.request.accept)
-            raise exception.UnsupportedVocabularyError(
-                self.request.accept,
-                self.response.supported_mime_types_str
-            )
+        self.logger.info("%s determined as best match for accept header: %s" % (
+            best_accept_match,
+            self.request.accept
+        ))
 
-        #: If content_type is not acceptable it will raise UnsupportedVocabulary
+        # if content_type is not acceptable it will raise UnsupportedVocabulary
         self.response.content_type = best_accept_match
 
     def __call__(self, environ, start_response):
 
         self.logger.info("handler %s.%s; callable execution start" % (self.__module__, self.__class__.__name__))
-        self.logger.info("setting default response to %s" % self.request.accept)
 
         try:
-            #: Register additional serializers and de-serializers
+            # register additional serializers and de-serializers
             self.request.register_deserializers(self.register_deserializers())
             self.response.register_serializers(self.register_serializers())
 
@@ -229,19 +225,21 @@ class RequestHandler(object):
                 #: prestans sets a sensible HTTP status code
                 #:
                 if request_method == VERB.GET:
-                    self.get(*self._args)
+                    self.get(*self._args, **self._kwargs)
                 elif request_method == VERB.HEAD:
-                    self.head(*self._args)
+                    self.head(*self._args, **self._kwargs)
                 elif request_method == VERB.POST:
-                    self.post(*self._args)
+                    self.post(*self._args, **self._kwargs)
                 elif request_method == VERB.PUT:
-                    self.put(*self._args)
+                    self.put(*self._args, **self._kwargs)
                 elif request_method == VERB.PATCH:
-                    self.patch(*self._args)
+                    self.patch(*self._args, **self._kwargs)
                 elif request_method == VERB.DELETE:
-                    self.delete(*self._args)
+                    self.delete(*self._args, **self._kwargs)
                 elif request_method == VERB.OPTIONS:
-                    self.options(*self._args)
+                    self.options(*self._args, **self._kwargs)
+            except (exception.PermanentRedirect, exception.TemporaryRedirect) as exp:
+                self._redirect(exp.url, exp.http_status)
             # re-raise all prestans exceptions
             except exception.Base as exp:
                 if isinstance(exception, exception.HandlerException):
@@ -255,8 +253,10 @@ class RequestHandler(object):
             finally:
                 self.handler_did_run()
 
-            self.logger.info("handler %s.%s; callable execution ends" % \
-                             (self.__module__, self.__class__.__name__))
+            self.logger.info("handler %s.%s; callable execution ends" % (
+                self.__module__,
+                self.__class__.__name__
+            ))
 
             return self.response(environ, start_response)
 
@@ -296,42 +296,50 @@ class RequestHandler(object):
     #: if not overridden prestans returns a Not Implemented error
     #:
 
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.GET)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def head(self, *args):
+    def head(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.HEAD)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def post(self, *args):
+    def post(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.POST)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def put(self, *args):
+    def put(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.PUT)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def patch(self, *args):
+    def patch(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.PATCH)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def delete(self, *args):
+    def delete(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.DELETE)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def options(self, *args):
+    def options(self, *args, **kwargs):
         unimplemented_verb_error = exception.UnimplementedVerbError(VERB.OPTIONS)
         unimplemented_verb_error.request = self.request
         raise unimplemented_verb_error
 
-    def redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
-
+    def _redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
         self._response.status = status
         self._response.headers.add("Location", url)
+
+    def redirect(self, url, status=STATUS.TEMPORARY_REDIRECT):
+
+        self.logger.warn("direct use of %s.%s has been deprecated please raise an exception instead" % (
+            self.__module__,
+            "redirect"
+        ))
+
+        self._redirect(url, status)

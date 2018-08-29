@@ -92,18 +92,21 @@ class RequestRouter(object):
     def __call__(self, environ, start_response):
 
         # say hello
-        self.logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % \
-                         (self._application_name, len(self._routes), __version__, \
-                          self._charset, self._debug))
+        self.logger.info("%s exposes %i end-points; prestans %s; charset %s; debug %s" % (
+            self._application_name, len(self._routes), __version__,
+            self._charset, self._debug
+        ))
 
         # validate serializers and deserializers; are subclasses of prestans.serializer.Base
         _default_outgoing_mime_types = list()
         for available_serializer in self._serializers:
 
             if not isinstance(available_serializer, serializer.Base):
-                raise TypeError("registered serializer %s.%s does not \
-                    inherit from prestans.serializer.Serializer" % (available_serializer.__module__, \
-                                                                    available_serializer.__class__.__name__))
+                msg = "registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % (
+                    available_serializer.__module__,
+                    available_serializer.__class__.__name__
+                )
+                raise TypeError(msg)
 
             _default_outgoing_mime_types.append(available_serializer.content_type())
 
@@ -111,10 +114,11 @@ class RequestRouter(object):
         for available_deserializer in self._deserializers:
 
             if not isinstance(available_deserializer, deserializer.Base):
-                raise TypeError(
-                    "registered deserializer %s.%s does not inherit from \
-                    prestans.serializer.DeSerializer" \
-                    % (available_deserializer.__module__, available_deserializer.__class__.__name__))
+                msg = "registered deserializer %s.%s does not inherit from prestans.serializer.DeSerializer" % (
+                    available_deserializer.__module__,
+                    available_deserializer.__class__.__name__
+                )
+                raise TypeError(msg)
 
             _default_incoming_mime_types.append(available_deserializer.content_type())
 
@@ -133,8 +137,8 @@ class RequestRouter(object):
             default_deserializer=self._default_deserializer
         )
 
-        # initialise the Route map
-        route_map = self._init_route_map(self._routes)
+        # initialise the route map
+        route_map = self.generate_route_map(self._routes)
 
         try:
 
@@ -148,6 +152,18 @@ class RequestRouter(object):
                 # if we've found a match; ensure its a handler subclass and return it's callable
                 if match:
 
+                    # assemble the args and kwargs
+                    args = match.groups()
+                    kwargs = {}
+                    for key, value in iter(regexp.groupindex.items()):
+                        kwargs[key] = args[value - 1]
+
+                    if len(kwargs) > 0:
+                        args = ()
+
+                    self.logger.info(args)
+                    self.logger.info(kwargs)
+
                     if issubclass(handler_class, BlueprintHandler):
 
                         response = DictionaryResponse(
@@ -157,7 +173,8 @@ class RequestRouter(object):
                         )
 
                         request_handler = handler_class(
-                            args=match.groups(),
+                            args=args,
+                            kwargs=kwargs,
                             request=request,
                             response=response,
                             logger=self._logger,
@@ -174,7 +191,8 @@ class RequestRouter(object):
                         response.minify = request.is_minified
 
                         request_handler = handler_class(
-                            args=match.groups(),
+                            args=args,
+                            kwargs=kwargs,
                             request=request,
                             response=response,
                             logger=self._logger,
@@ -183,7 +201,7 @@ class RequestRouter(object):
 
                     return request_handler(environ, start_response)
 
-            #: Request does not have a matched handler
+            # request does not have a matched handler
             no_endpoint = exception.NoEndpointError()
             no_endpoint.request = request
             raise no_endpoint
@@ -193,24 +211,29 @@ class RequestRouter(object):
             error_response = ErrorResponse(exp, self._default_serializer)
             return error_response(environ, start_response)
 
-    def _init_route_map(self, routes):
+    @classmethod
+    def generate_route_map(cls, routes):
 
         parsed_handler_map = []
 
-        for regexp, handler in routes:
+        for url, handler in routes:
 
-            try:
-                handler_name = handler.__name__
-            except AttributeError:
-                pass
+            regexp = url
 
-            #: Patch regular expression if its incomplete
+            # patch regular expression if it is incomplete
             if not regexp.startswith('^'):
                 regexp = '^' + regexp
             if not regexp.endswith('$'):
                 regexp += '$'
 
             compiled_regex = re.compile(regexp)
-            parsed_handler_map.append((compiled_regex, handler))
+
+            arg_count = compiled_regex.groups
+            kwarg_count = len(compiled_regex.groupindex.items())
+
+            if arg_count != kwarg_count and kwarg_count > 0:
+                raise ValueError("%s URL is invalid, cannot mix named and un-named groups" % url)
+            else:
+                parsed_handler_map.append((compiled_regex, handler))
 
         return parsed_handler_map

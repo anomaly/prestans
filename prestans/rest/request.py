@@ -44,8 +44,10 @@ class Request(webob.Request):
     def parsed_body(self):
 
         if self.body_template is None:
-            raise AttributeError("access to request.parsed_body is not \
-                allowed when body_template is set to None")
+            msg = "access to request.parsed_body is not allowed when body_template is set to None"
+            raise AttributeError(msg)
+
+        self.parse_body()
 
         return self._parsed_body
 
@@ -65,8 +67,13 @@ class Request(webob.Request):
     def default_deserializer(self):
         return self._default_deserializer
 
-    #: Used by content_type_set to set get a referencey to the serializer object
     def set_deserializer_by_mime_type(self, mime_type):
+        """
+        :param mime_type:
+        :return:
+
+        Used by content_type_set to set get a reference to the serializer object
+        """
 
         for deserializer in self._deserializers:
             if deserializer.content_type() == mime_type:
@@ -122,20 +129,26 @@ class Request(webob.Request):
             return
 
         if not isinstance(value, DataCollection):
-            raise AssertionError("body_template must be an instance of \
-                prestans.types.DataCollection")
+            msg = "body_template must be an instance of %s.%s" % (
+                DataCollection.__module__,
+                DataCollection.__name__
+            )
+            raise AssertionError(msg)
 
         self._body_template = value
 
-        #: Get a deserializer based on the Content-Type header
-        #: Do this here so the handler gets a chance to setup extra serializers
+        # get a deserializer based on the Content-Type header
+        # do this here so the handler gets a chance to setup extra serializers
         self.set_deserializer_by_mime_type(self.content_type)
 
-        #: Parse the body using the deserializer
-        unserialized_body = self.selected_deserializer.loads(self.body)
+    def parse_body(self):
 
-        #: Parse the body using the template and attribute_filter
-        self._parsed_body = value.validate(unserialized_body, self.attribute_filter, self.is_minified)
+        if self._parsed_body is None and self._body_template is not None:
+            # parse the body using the deserializer
+            unserialized_body = self.selected_deserializer.loads(self.body)
+
+            # valiate the body using the template and attribute_filter
+            self._parsed_body = self._body_template.validate(unserialized_body, self.attribute_filter, self.is_minified)
 
     def register_deserializers(self, deserializers):
 
@@ -147,8 +160,9 @@ class Request(webob.Request):
         for new_deserializer in deserializers:
 
             if not isinstance(new_deserializer, deserializer.Base):
-                msg = "registered deserializer %s does not inherit from prestans.serializer.DeSerializer" % \
+                msg = "registered deserializer %s does not inherit from prestans.serializer.DeSerializer" % (
                       new_deserializer.__class__.__name__
+                )
                 raise TypeError(msg)
 
         self._deserializers = self._deserializers + deserializers

@@ -29,23 +29,21 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-import logging
 import unittest
 
-import prestans.rest
-
-LOGGER_MCLOGFACE = logging.Logger("temp", level='ERROR')
-LOGGER_MCLOGFACE.disabled = 50  # silence the logger
-
-
-class MyModel(prestans.types.Model):
-    id = prestans.types.Integer()
+from prestans.http import VERB
+from prestans import parser
+from prestans import rest
+from prestans import types
 
 
-class _UserHandler(prestans.rest.RequestHandler):
-    __parser_config__ = prestans.parser.Config(
-        GET=prestans.parser.VerbConfig(
+class MyModel(types.Model):
+    id = types.Integer()
+
+
+class _UserHandler(rest.RequestHandler):
+    __parser_config__ = parser.Config(
+        GET=parser.VerbConfig(
             response_template=MyModel(),
             response_attribute_filter_default_value=True
         )
@@ -63,7 +61,7 @@ class MockStartResponse:
         pass
 
 
-class RequestRouterTest(unittest.TestCase):
+class RequestRouterTestCase(unittest.TestCase):
     def test_script_alias_match_with_global_match_group_should_not_pass_call(self):
         """
         WSGIScriptAliasMatch /mountpoint(.*) script.wsgi
@@ -73,8 +71,8 @@ class RequestRouterTest(unittest.TestCase):
 
         expected_value = 123
 
-        self._test_routing_behavour(environ={
-            "REQUEST_METHOD": prestans.http.VERB.GET,
+        self._test_routing_behaviour(environ={
+            "REQUEST_METHOD": VERB.GET,
             "SCRIPT_NAME": "/mountpoint/some/path/{}".format(expected_value),
             "PATH_INFO": "",
             "wsgi.version": (1, 0),
@@ -91,8 +89,8 @@ class RequestRouterTest(unittest.TestCase):
         with router ``TestRequestRouter``
         :return:
         """
-        self._test_routing_behavour(environ={
-            "REQUEST_METHOD": prestans.http.VERB.GET,
+        self._test_routing_behaviour(environ={
+            "REQUEST_METHOD": VERB.GET,
             "SCRIPT_NAME": "/mountpoint",
             "PATH_INFO": "/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
@@ -105,8 +103,8 @@ class RequestRouterTest(unittest.TestCase):
         WSGIScriptAliasMatch /mountpoint/(.*) script.wsgi/$1
         :return:
         """
-        self._test_routing_behavour(environ={
-            "REQUEST_METHOD": prestans.http.VERB.GET,
+        self._test_routing_behaviour(environ={
+            "REQUEST_METHOD": VERB.GET,
             "SCRIPT_NAME": "/mountpoint/",
             "PATH_INFO": "/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
@@ -122,8 +120,8 @@ class RequestRouterTest(unittest.TestCase):
         """
         expected_value = 123
 
-        self._test_routing_behavour(environ={
-            "REQUEST_METHOD": prestans.http.VERB.GET,
+        self._test_routing_behaviour(environ={
+            "REQUEST_METHOD": VERB.GET,
             "SCRIPT_NAME": "/mountpoint/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
             "SERVER_NAME": "localhost",
@@ -140,21 +138,23 @@ class RequestRouterTest(unittest.TestCase):
 
         expected_value = 123
 
-        self._test_routing_behavour(environ={
-            "REQUEST_METHOD": prestans.http.VERB.GET,
+        self._test_routing_behaviour(environ={
+            "REQUEST_METHOD": VERB.GET,
             "PATH_INFO": "/some/path/{}".format(123),
             "wsgi.url_scheme": "http",
             "SERVER_NAME": "localhost",
             "SERVER_PORT": "1234"})
 
-    def _test_routing_behavour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
+    def _test_routing_behaviour(self, environ, should_pass=True, expected_value=123, match=r"/some/path/([0-9]+)"):
 
-        test_router = prestans.rest.RequestRouter([
+        from prestans.deserializer import JSON
+
+        test_router = rest.RequestRouter([
             (match, _UserHandler)
-        ], application_name="test-router", logger=LOGGER_MCLOGFACE)
+        ], application_name="test-router")
 
         response = test_router(environ=environ, start_response=MockStartResponse.__call__)
-        response_parsed = prestans.deserializer.JSON().loads(response[0])
+        response_parsed = JSON().loads(response[0])
         if should_pass:
             self.assert_should_find_route(environ, expected_value, match, response_parsed)
         else:
@@ -178,7 +178,3 @@ class RequestRouterTest(unittest.TestCase):
             route=match,
             assertion=assertion
         )
-
-
-if __name__ == '__main__':
-    unittest.main()

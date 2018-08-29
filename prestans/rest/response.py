@@ -1,7 +1,5 @@
-import sys
 import webob
 
-from prestans import __version__
 from prestans import exception
 from prestans.http import STATUS
 from prestans.parser import AttributeFilter
@@ -75,23 +73,33 @@ class Response(webob.Response):
     def default_serializer(self):
         return self._default_serializer
 
-    #: Used by content_type_set to set get a reference to the serializer object
     def _set_serializer_by_mime_type(self, mime_type):
+        """
+        :param mime_type:
+        :return:
+
+        used by content_type_set to set get a reference to the appropriate serializer
+        """
+
+        # ignore if binary response
+        if isinstance(self._app_iter, BinaryResponse):
+            self.logger.info("ignoring setting serializer for binary response")
+            return
 
         for available_serializer in self._serializers:
             if available_serializer.content_type() == mime_type:
                 self._selected_serializer = available_serializer
+                self.logger.info("set serializer for mime type: %s" % mime_type)
                 return
 
+        self.logger.info("could not find serializer for mime type: %s" % mime_type)
         raise exception.UnsupportedVocabularyError(mime_type, self.supported_mime_types_str)
-
-    #:
-    #: is an instance of prestans.types.DataType; mostly a subclass of
-    #: prestans.types.Model
-    #:
 
     @property
     def template(self):
+        """
+        is an instance of prestans.types.DataType; mostly a subclass of prestans.types.Model
+        """
         return self._template
 
     @template.setter
@@ -115,14 +123,10 @@ class Response(webob.Response):
     def attribute_filter(self, value):
 
         if value is not None and not isinstance(value, AttributeFilter):
-            raise TypeError("attribue_filter in response must be of \
-                type prestans.types.AttributeFilter")
+            msg = "attribute_filter in response must be of type prestans.types.AttributeFilter"
+            raise TypeError(msg)
 
         self._attribute_filter = value
-
-    #:
-    #: content_type; overrides webob.Response line 606
-    #:
 
     def _content_type__get(self):
         """
@@ -140,27 +144,26 @@ class Response(webob.Response):
 
     def _content_type__set(self, value):
 
-        #: Check to see if response can support the requested mime type
-        if not isinstance(self._app_iter, BinaryResponse) and value not in self.supported_mime_types:
-            raise exception.UnsupportedVocabularyError(value, self.supported_mime_types_str)
-
-        #: Keep a reference to the selected serializer
-        if not isinstance(self._app_iter, BinaryResponse):
+        # skip for responses that have no body
+        if self.status_code in [STATUS.NO_CONTENT, STATUS.PERMANENT_REDIRECT, STATUS.TEMPORARY_REDIRECT]:
+            self.logger.info("attempt to set Content-Type to %s being ignored due to empty response" % value)
+            self._content_type__del()
+        else:
             self._set_serializer_by_mime_type(value)
 
-        if not value:
-            self._content_type__del()
-            return
-        if ';' not in value:
-            header = self.headers.get('Content-Type', '')
-            if ';' in header:
-                params = header.split(';', 1)[1]
-                value += ';' + params
-        self.headers['Content-Type'] = value
+            if ';' not in value:
+                header = self.headers.get('Content-Type', '')
+                if ';' in header:
+                    params = header.split(';', 1)[1]
+                    value += ';' + params
+            self.headers['Content-Type'] = value
+
+            self.logger.info("Content-Type set to: %s" % value)
 
     def _content_type__del(self):
         self.headers.pop('Content-Type', None)
 
+    # content_type; overrides webob.Response line 606
     content_type = property(
         _content_type__get,
         _content_type__set,
@@ -168,11 +171,7 @@ class Response(webob.Response):
         doc=_content_type__get.__doc__
     )
 
-
-    #:
-    #: body; overrides webob.Response line 324
-    #:
-
+    # body; overrides webob.Response line 324
     @property
     def body(self):
         """
@@ -181,7 +180,7 @@ class Response(webob.Response):
 
         body getter will return the validated prestans model.
 
-        Webob does the heavy lifiting with headers.
+        webob does the heavy lifting with headers.
         """
 
         #: If template is null; return an empty iterable
@@ -201,20 +200,27 @@ class Response(webob.Response):
         #: value should be a subclass prestans.types.DataCollection
         if not isinstance(value, DataCollection) and \
                 not isinstance(value, BinaryResponse):
-            raise TypeError("%s is not a prestans.types.DataCollection \
-                or prestans.types.BinaryResponse subclass" % value.__class__.__name__)
+            msg = "%s is not a prestans.types.DataCollection or prestans.types.BinaryResponse subclass" % (
+                value.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: Ensure that it matches the return type template
         if not value.__class__ == self.template.__class__:
-            raise TypeError("body must of be type %s, given %s" % \
-                            (self.template.__class__.__name__, value.__class__.__name__))
+            msg = "body must of be type %s, given %s" % (
+                self.template.__class__.__name__,
+                value.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: If it's an array then ensure that element_template matches up
         if isinstance(self.template, Array) and \
-                not isinstance(value.element_template, self.template.element_template.__class__):
-            raise TypeError("array elements must of be \
-                type %s, given %s" % (self.template.element_template.__class__.__name__, \
-                                      value.element_template.__class__.__name__))
+           not isinstance(value.element_template, self.template.element_template.__class__):
+            msg = "array elements must of be type %s, given %s" % (
+                self.template.element_template.__class__.__name__,
+                value.element_template.__class__.__name__
+            )
+            raise TypeError(msg)
 
         #: _app_iter assigned to value
         #: we need to serialize the contents before we know the length
@@ -230,9 +236,11 @@ class Response(webob.Response):
         for new_serializer in serializers:
 
             if not isinstance(new_serializer, serializer.Base):
-                raise TypeError("registered serializer %s.%s does not inherit from \
-                    prestans.serializer.Serializer" % (new_serializer.__module__, \
-                                                       new_serializer.__class__.__name__))
+                msg = "registered serializer %s.%s does not inherit from prestans.serializer.Serializer" % (
+                    new_serializer.__module__,
+                    new_serializer.__class__.__name__
+                )
+                raise TypeError(msg)
 
         self._serializers = self._serializers + serializers
 
@@ -241,27 +249,31 @@ class Response(webob.Response):
         Overridden WSGI application interface
         """
 
-        #: prestans' equivalent of webob.Response line 1022
+        # prestans equivalent of webob.Response line 1022
         if self.template is None or self.status_code == STATUS.NO_CONTENT:
+
+            self.content_type = None
 
             start_response(self.status, self.headerlist)
 
             if self.template is not None:
-                self.logger.warn("handler returns No Content but has a \
-                    response_template; set template to None")
+                self.logger.warn("handler returns No Content but has a response_template; set template to None")
 
             return []
 
-        #: Ensure what we are able to serialize is serializable
+        # ensure what we are able to serialize is serializable
         if not isinstance(self._app_iter, DataCollection) and \
-                not isinstance(self._app_iter, BinaryResponse):
+           not isinstance(self._app_iter, BinaryResponse):
 
             if isinstance(self._app_iter, list):
-                type = "list"
+                app_iter_type = "list"
             else:
-                type = self._app_iter.__name__
+                app_iter_type = self._app_iter.__name__
 
-            raise TypeError("handler returns content of type %s; not a prestans.types.DataCollection subclass" % type)
+            msg = "handler returns content of type %s; not a prestans.types.DataCollection subclass" % (
+                app_iter_type
+            )
+            raise TypeError(msg)
 
         if isinstance(self._app_iter, DataCollection):
 
@@ -325,7 +337,7 @@ class Response(webob.Response):
                 self.content_type = "text/plain"
                 return []
 
-            #: Content type
+            # set the content type
             self.content_type = self._app_iter.mime_type
 
             #: Add content disposition header

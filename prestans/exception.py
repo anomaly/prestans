@@ -320,7 +320,7 @@ class AttributeFilterDiffers(RequestException):
     def __init__(self, attribute_list):
 
         _code = STATUS.BAD_REQUEST
-        _message = "attribute filter does not contain attributes (%s) that are not part of template" % (
+        _message = "attribute filter contains attributes (%s) that are not part of template" % (
             ', '.join(attribute_list)
         )
 
@@ -493,6 +493,27 @@ class MovedPermanently(ResponseException):
     def __init__(self, message="Moved Permanently", response_model=None):
         _code = STATUS.MOVED_PERMANENTLY
         super(MovedPermanently, self).__init__(_code, message, response_model)
+
+
+class Redirect(ResponseException):
+
+    def __init__(self, code, url):
+        self._url = url
+        super(Redirect, self).__init__(code, "Redirect")
+
+    @property
+    def url(self):
+        return self._url
+
+
+class TemporaryRedirect(Redirect):
+    def __init__(self, url):
+        super(TemporaryRedirect, self).__init__(STATUS.TEMPORARY_REDIRECT, url)
+
+
+class PermanentRedirect(Redirect):
+    def __init__(self, url):
+        super(PermanentRedirect, self).__init__(STATUS.PERMANENT_REDIRECT, url)
 
 
 class PaymentRequired(ResponseException):

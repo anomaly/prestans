@@ -214,6 +214,7 @@ class LoginRequiredUnitTest(unittest.TestCase):
     def test_login_required_no_provider_raises_exception(self):
         handler = self.handler_without_provider(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -225,6 +226,7 @@ class LoginRequiredUnitTest(unittest.TestCase):
     def test_login_required_unauthenticated_raises_exception(self):
         handler = self.unauthenticated_handler(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -236,6 +238,7 @@ class LoginRequiredUnitTest(unittest.TestCase):
     def test_login_required_authenticated(self):
         handler = self.authenticated_handler(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -328,6 +331,7 @@ class RoleRequiredUnitTest(unittest.TestCase):
     def test_role_required_no_provider_raises_exception(self):
         handler = self.handler_without_provider(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -339,6 +343,7 @@ class RoleRequiredUnitTest(unittest.TestCase):
     def test_role_required_none_raises_authorization_error(self):
         handler = self.handler_with_provider(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -350,6 +355,7 @@ class RoleRequiredUnitTest(unittest.TestCase):
     def test_role_required_incorrect_role_raises_exception(self):
         handler = self.handler_with_provider(
             args=[],
+            kwargs={},
             request=self.post_request,
             response=self.response,
             logger=self.logger,
@@ -361,6 +367,7 @@ class RoleRequiredUnitTest(unittest.TestCase):
     def test_role_required_success(self):
         handler = self.handler_with_provider(
             args=[],
+            kwargs={},
             request=self.put_request,
             response=self.response,
             logger=self.logger,
@@ -439,6 +446,7 @@ class AccessRequiredUnitTest(unittest.TestCase):
     def test_access_required_no_provider_raises_exception(self):
         handler = self.handler_without_provider(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
@@ -450,6 +458,7 @@ class AccessRequiredUnitTest(unittest.TestCase):
     def test_access_required_unauthorized_raises_exception(self):
         handler = self.handler_with_provider(
             args=[],
+            kwargs={},
             request=self.post_request,
             response=self.response,
             logger=self.logger,
@@ -461,6 +470,7 @@ class AccessRequiredUnitTest(unittest.TestCase):
     def test_access_required_success(self):
         handler = self.handler_with_provider(
             args=[],
+            kwargs={},
             request=self.get_request,
             response=self.response,
             logger=self.logger,
