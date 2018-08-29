@@ -161,9 +161,6 @@ class RequestRouter(object):
                     if len(kwargs) > 0:
                         args = ()
 
-                    self.logger.info(args)
-                    self.logger.info(kwargs)
-
                     if issubclass(handler_class, BlueprintHandler):
 
                         response = DictionaryResponse(
