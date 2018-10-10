@@ -282,17 +282,15 @@ class Response(webob.Response):
 
                 #: Warning to say nothing is visible
                 if not self.attribute_filter.are_any_attributes_visible():
-                    self.logger.warn("attribute_filter has all the attributes turned \
-                        off, handler will return an empty response")
+                    msg = "attribute_filter has all the attributes turned off, handler will return an empty response"
+                    self.logger.warn(msg)
 
                 #: Warning to say none of the fields match
                 model_attribute_filter = None
                 if isinstance(self._app_iter, Array):
-                    model_attribute_filter = AttributeFilter. \
-                        from_model(self._app_iter.element_template)
+                    model_attribute_filter = AttributeFilter.from_model(self._app_iter.element_template)
                 elif isinstance(self._app_iter, Model):
-                    model_attribute_filter = AttributeFilter. \
-                        from_model(self._app_iter)
+                    model_attribute_filter = AttributeFilter.from_model(self._app_iter)
 
                 if model_attribute_filter is not None:
                     try:
