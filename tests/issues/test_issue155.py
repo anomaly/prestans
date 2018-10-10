@@ -71,7 +71,6 @@ class NoAuthHandler(rest.RequestHandler):
         self.response.body = person
 
 
-@pytest.fixture
 def test_app():
     from webtest import TestApp
     from prestans.rest import RequestRouter

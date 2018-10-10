@@ -11,7 +11,6 @@ class NoContentHandler(RequestHandler):
         self.response.status = STATUS.NO_CONTENT
 
 
-@pytest.fixture
 def test_app():
     from webtest import TestApp
     from prestans.rest import RequestRouter

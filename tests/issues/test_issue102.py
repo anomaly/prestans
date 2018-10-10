@@ -18,7 +18,6 @@ class TemporaryRedirectHandler(rest.RequestHandler):
         raise exception.TemporaryRedirect("/temporary-new")
 
 
-@pytest.fixture
 def test_app():
     from webtest import TestApp
     from prestans.rest import RequestRouter
