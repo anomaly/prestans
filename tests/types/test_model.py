@@ -31,26 +31,26 @@ class ModelUnitTest(unittest.TestCase):
         self.assertIsNone(description_default._description)
 
         description_value = MyModel(description="description")
-        self.assertEquals(description_value._description, "description")
+        self.assertEqual(description_value._description, "description")
 
     def test_attribute_count(self):
         class EmptyModel(types.Model):
             pass
 
-        self.assertEquals(EmptyModel().attribute_count(), 0)
+        self.assertEqual(EmptyModel().attribute_count(), 0)
 
         class BasicTypesOnly(types.Model):
             name = types.String()
             age = types.Integer()
 
-        self.assertEquals(BasicTypesOnly().attribute_count(), 2)
+        self.assertEqual(BasicTypesOnly().attribute_count(), 2)
 
         class ModelWithArray(types.Model):
             name = types.String()
             age = types.Integer()
             tags = types.Array(element_template=types.String())
 
-        self.assertEquals(ModelWithArray().attribute_count(), 3)
+        self.assertEqual(ModelWithArray().attribute_count(), 3)
 
         class SubModel(types.Model):
             pass
@@ -60,7 +60,7 @@ class ModelUnitTest(unittest.TestCase):
             age = types.Integer()
             sub = SubModel()
 
-        self.assertEquals(ModelWithSub().attribute_count(), 3)
+        self.assertEqual(ModelWithSub().attribute_count(), 3)
 
         class ModelWithSubAndArray(types.Model):
             name = types.String()
@@ -68,7 +68,7 @@ class ModelUnitTest(unittest.TestCase):
             tags = types.Array(element_template=types.String())
             sub = SubModel()
 
-        self.assertEquals(ModelWithSubAndArray().attribute_count(), 4)
+        self.assertEqual(ModelWithSubAndArray().attribute_count(), 4)
 
     def test_blueprint(self):
         class MyModel(types.Model):
@@ -77,12 +77,12 @@ class ModelUnitTest(unittest.TestCase):
             last_name = types.String(required=False)
 
         blueprint = MyModel(required=False, description="description").blueprint()
-        self.assertEquals(blueprint["type"], "model")
-        self.assertEquals(blueprint["constraints"]["required"], False)
-        self.assertEquals(blueprint["constraints"]["description"], "description")
-        self.assertEquals(blueprint["fields"]["nick_name"], MyModel.nick_name.blueprint())
-        self.assertEquals(blueprint["fields"]["first_name"], MyModel.first_name.blueprint())
-        self.assertEquals(blueprint["fields"]["last_name"], MyModel.last_name.blueprint())
+        self.assertEqual(blueprint["type"], "model")
+        self.assertEqual(blueprint["constraints"]["required"], False)
+        self.assertEqual(blueprint["constraints"]["description"], "description")
+        self.assertEqual(blueprint["fields"]["nick_name"], MyModel.nick_name.blueprint())
+        self.assertEqual(blueprint["fields"]["first_name"], MyModel.first_name.blueprint())
+        self.assertEqual(blueprint["fields"]["last_name"], MyModel.last_name.blueprint())
 
     def test_blueprint_bad_attribute(self):
         class ModelWithBadAttribute(types.Model):
@@ -104,18 +104,18 @@ class ModelUnitTest(unittest.TestCase):
 
         sub_model = SubModel()
         sub_model.string = "string"
-        self.assertEquals(sub_model.string, "string")
+        self.assertEqual(sub_model.string, "string")
 
         my_model = MyModel()
         my_model.boolean = True
         my_model.name = "name"
         my_model.age = 21
         my_model.sub_model = sub_model
-        self.assertEquals(my_model.boolean, True)
-        self.assertEquals(my_model.name, "name")
-        self.assertEquals(my_model.age, 21)
-        self.assertEquals(my_model.sub_model, sub_model)
-        self.assertEquals(my_model.sub_model.string, "string")
+        self.assertEqual(my_model.boolean, True)
+        self.assertEqual(my_model.name, "name")
+        self.assertEqual(my_model.age, 21)
+        self.assertEqual(my_model.sub_model, sub_model)
+        self.assertEqual(my_model.sub_model.string, "string")
         self.assertRaises(KeyError, my_model.__setattr__, "missing", "missing")
         self.assertRaises(exception.ValidationError, my_model.__setattr__, "age", 121)
 
@@ -125,9 +125,9 @@ class ModelUnitTest(unittest.TestCase):
             nothing = None
 
         my_model = MyModel()
-        self.assertEquals(my_model.string, "default")
+        self.assertEqual(my_model.string, "default")
         my_model = MyModel(string="string")
-        self.assertEquals(my_model.string, "string")
+        self.assertEqual(my_model.string, "string")
         self.assertIsNone(my_model.nothing)
 
     def test_get_attribute_keys(self):
@@ -136,11 +136,11 @@ class ModelUnitTest(unittest.TestCase):
             tags = types.Array(element_template=types.String())
 
         my_model = MyModel()
-        self.assertEquals(my_model.get_attribute_keys(), ["name", "tags"])
+        self.assertEqual(my_model.get_attribute_keys(), ["name", "tags"])
 
     def test_get_attribute_filter_base(self):
         attribute_filter = types.Model().get_attribute_filter()
-        self.assertEquals(attribute_filter.keys(), [])
+        self.assertEqual(attribute_filter.keys(), [])
 
     def test_get_attribute_filter(self):
         class SubModel(types.Model):
@@ -155,7 +155,7 @@ class ModelUnitTest(unittest.TestCase):
         self.assertTrue(attribute_filter.name)
         self.assertTrue(attribute_filter.sub)
         self.assertTrue(attribute_filter.sub.colour)
-        self.assertEquals(attribute_filter.keys(), ["name", "sub"])
+        self.assertEqual(attribute_filter.keys(), ["name", "sub"])
 
     def test_attribute_rewrite_map(self):
         class MyModel(types.Model):
@@ -170,7 +170,7 @@ class ModelUnitTest(unittest.TestCase):
         }
 
         my_model = MyModel()
-        self.assertEquals(my_model.attribute_rewrite_map(), rewrite_map)
+        self.assertEqual(my_model.attribute_rewrite_map(), rewrite_map)
 
     def test_attribute_rewrite_reverse_map(self):
         class MyModel(types.Model):
@@ -185,7 +185,7 @@ class ModelUnitTest(unittest.TestCase):
         }
 
         my_model = MyModel()
-        self.assertEquals(my_model.attribute_rewrite_reverse_map(), reverse_map)
+        self.assertEqual(my_model.attribute_rewrite_reverse_map(), reverse_map)
 
     def test_contains(self):
 
@@ -242,7 +242,7 @@ class ModelUnitTest(unittest.TestCase):
 
         my_model = MyModel()
         rewrite_map = my_model.generate_attribute_token_rewrite_map()
-        self.assertEquals(
+        self.assertEqual(
             rewrite_map,
             {
                 "boolean": "a",
@@ -260,23 +260,23 @@ class ModelUnitTest(unittest.TestCase):
             string = types.String()
         my_model = MyModel()
         tokens = my_model.generate_attribute_tokens()
-        self.assertEquals(tokens, ["boolean", "float", "integer", "string"])
+        self.assertEqual(tokens, ["boolean", "float", "integer", "string"])
 
     def test_generate_minified_keys(self):
-        self.assertEquals(types.Model.generate_minified_keys(3), ["a", "b", "c"])
-        self.assertEquals(types.Model.generate_minified_keys(5), ["a", "b", "c", "d", "e"])
+        self.assertEqual(types.Model.generate_minified_keys(3), ["a", "b", "c"])
+        self.assertEqual(types.Model.generate_minified_keys(5), ["a", "b", "c", "d", "e"])
 
-        self.assertEquals(types.Model.generate_minified_keys(3, "_"), ["_a", "_b", "_c"])
-        self.assertEquals(types.Model.generate_minified_keys(5, "_"), ["_a", "_b", "_c", "_d", "_e"])
+        self.assertEqual(types.Model.generate_minified_keys(3, "_"), ["_a", "_b", "_c"])
+        self.assertEqual(types.Model.generate_minified_keys(5, "_"), ["_a", "_b", "_c", "_d", "_e"])
 
-        self.assertEquals(types.Model.generate_minified_keys(29), [
+        self.assertEqual(types.Model.generate_minified_keys(29), [
             "a", "b", "c", "d", "e", "f", "g", "h", "i",
             "j", "k", "l", "m", "n", "o", "p", "q", "r",
             "s", "t", "u", "v", "w", "x", "y", "z",
             "aa", "ab", "ac"
         ])
 
-        self.assertEquals(types.Model.generate_minified_keys(55), [
+        self.assertEqual(types.Model.generate_minified_keys(55), [
             "a", "b", "c", "d", "e", "f", "g", "h", "i",
             "j", "k", "l", "m", "n", "o", "p", "q", "r",
             "s", "t", "u", "v", "w", "x", "y", "z",
@@ -287,15 +287,15 @@ class ModelUnitTest(unittest.TestCase):
         ])
 
     def test__generate_attribute_key(self):
-        self.assertEquals(types.Model.generate_attribute_key(0), "a")
-        self.assertEquals(types.Model.generate_attribute_key(1), "b")
-        self.assertEquals(types.Model.generate_attribute_key(25), "z")
-        self.assertEquals(types.Model.generate_attribute_key(26), "aa")
-        self.assertEquals(types.Model.generate_attribute_key(27), "bb")
-        self.assertEquals(types.Model.generate_attribute_key(51), "zz")
-        self.assertEquals(types.Model.generate_attribute_key(52), "aaa")
-        self.assertEquals(types.Model.generate_attribute_key(54), "ccc")
-        self.assertEquals(types.Model.generate_attribute_key(77), "zzz")
+        self.assertEqual(types.Model.generate_attribute_key(0), "a")
+        self.assertEqual(types.Model.generate_attribute_key(1), "b")
+        self.assertEqual(types.Model.generate_attribute_key(25), "z")
+        self.assertEqual(types.Model.generate_attribute_key(26), "aa")
+        self.assertEqual(types.Model.generate_attribute_key(27), "bb")
+        self.assertEqual(types.Model.generate_attribute_key(51), "zz")
+        self.assertEqual(types.Model.generate_attribute_key(52), "aaa")
+        self.assertEqual(types.Model.generate_attribute_key(54), "ccc")
+        self.assertEqual(types.Model.generate_attribute_key(77), "zzz")
 
 
 class ModelAsSerializable(unittest.TestCase):
@@ -332,14 +332,14 @@ class ModelAsSerializable(unittest.TestCase):
 
         serialized = my_model.as_serializable()
         self.assertTrue(isinstance(serialized, dict))
-        self.assertEquals(serialized["boolean"], True)
-        self.assertEquals(serialized["float"], 33.3)
-        self.assertEquals(serialized["integer"], 22)
-        self.assertEquals(serialized["string"], "string")
-        self.assertEquals(serialized["date"], "2018-01-18")
-        self.assertEquals(serialized["datetime"], "2018-01-18 13:14:15")
-        self.assertEquals(serialized["time"], "12:13:14")
-        self.assertEquals(serialized["sub"]["name"], "name")
+        self.assertEqual(serialized["boolean"], True)
+        self.assertEqual(serialized["float"], 33.3)
+        self.assertEqual(serialized["integer"], 22)
+        self.assertEqual(serialized["string"], "string")
+        self.assertEqual(serialized["date"], "2018-01-18")
+        self.assertEqual(serialized["datetime"], "2018-01-18 13:14:15")
+        self.assertEqual(serialized["time"], "12:13:14")
+        self.assertEqual(serialized["sub"]["name"], "name")
 
     def test_as_serializable_minified(self):
         from datetime import date
@@ -371,14 +371,14 @@ class ModelAsSerializable(unittest.TestCase):
 
         serialized = my_model.as_serializable(minified=True)
         self.assertTrue(isinstance(serialized, dict))
-        self.assertEquals(serialized["a"], True)
-        self.assertEquals(serialized["b"], "2018-01-18")
-        self.assertEquals(serialized["c"], "2018-01-18 13:14:15")
-        self.assertEquals(serialized["d"], 33.3)
-        self.assertEquals(serialized["e"], 22)
-        self.assertEquals(serialized["f"], "string")
-        self.assertEquals(serialized["g"]["a"], "name")
-        self.assertEquals(serialized["h"], "12:13:14")
+        self.assertEqual(serialized["a"], True)
+        self.assertEqual(serialized["b"], "2018-01-18")
+        self.assertEqual(serialized["c"], "2018-01-18 13:14:15")
+        self.assertEqual(serialized["d"], 33.3)
+        self.assertEqual(serialized["e"], 22)
+        self.assertEqual(serialized["f"], "string")
+        self.assertEqual(serialized["g"]["a"], "name")
+        self.assertEqual(serialized["h"], "12:13:14")
 
     def test_as_serializable_filtered_default_true(self):
         from datetime import date
@@ -415,14 +415,14 @@ class ModelAsSerializable(unittest.TestCase):
 
         serialized = my_model.as_serializable(attribute_filter=attribute_filter)
         self.assertTrue(isinstance(serialized, dict))
-        self.assertEquals(serialized["boolean"], True)
+        self.assertEqual(serialized["boolean"], True)
         self.assertTrue("float" not in serialized)
-        self.assertEquals(serialized["integer"], 22)
+        self.assertEqual(serialized["integer"], 22)
         self.assertTrue("string" not in serialized)
-        self.assertEquals(serialized["date"], "2018-01-18")
-        self.assertEquals(serialized["datetime"], "2018-01-18 13:14:15")
-        self.assertEquals(serialized["time"], "12:13:14")
-        self.assertEquals(serialized["sub"]["name"], "name")
+        self.assertEqual(serialized["date"], "2018-01-18")
+        self.assertEqual(serialized["datetime"], "2018-01-18 13:14:15")
+        self.assertEqual(serialized["time"], "12:13:14")
+        self.assertEqual(serialized["sub"]["name"], "name")
 
     def test_as_serializable_filtered_default_false(self):
         from datetime import date
@@ -458,13 +458,13 @@ class ModelAsSerializable(unittest.TestCase):
         attribute_filter.string = True
 
         serialized = my_model.as_serializable(attribute_filter=attribute_filter)
-        self.assertEquals(serialized, {"float": 33.3, "string": "string"})
+        self.assertEqual(serialized, {"float": 33.3, "string": "string"})
 
         attribute_filter = AttributeFilter.from_model(MyModel(), False)
         attribute_filter.sub.name = True
 
         serialized = my_model.as_serializable(attribute_filter=attribute_filter)
-        self.assertEquals(serialized, {"sub": {"name": "name"}})
+        self.assertEqual(serialized, {"sub": {"name": "name"}})
 
     def test_as_serializable_filtered_only_child_of_type_model(self):
         from prestans.parser import AttributeFilter
@@ -482,7 +482,7 @@ class ModelAsSerializable(unittest.TestCase):
         parent_model.sub.name = "james"
 
         serialized = parent_model.as_serializable(attribute_filter=attribute_filter)
-        self.assertEquals(serialized, {"sub": {"name": "james"}})
+        self.assertEqual(serialized, {"sub": {"name": "james"}})
 
     def test_none_attributes_skips_further_checks(self):
         class Person(types.Model):
@@ -491,8 +491,8 @@ class ModelAsSerializable(unittest.TestCase):
 
         person = Person(first_name="Carol")
         serialized = person.as_serializable()
-        self.assertEquals(serialized["first_name"], "Carol")
-        self.assertEquals(serialized["last_name"], None)
+        self.assertEqual(serialized["first_name"], "Carol")
+        self.assertEqual(serialized["last_name"], None)
 
 
 
@@ -518,7 +518,7 @@ class ModelValidate(unittest.TestCase):
         class MyModel(types.Model):
             pass
 
-        self.assertEquals(MyModel(required=False).validate(None), None)
+        self.assertEqual(MyModel(required=False).validate(None), None)
 
     def test_sets_none_for_invisible_attributes(self):
         class MyModel(types.Model):
@@ -526,14 +526,14 @@ class ModelValidate(unittest.TestCase):
             invisible = types.String(default="invisible")
 
         my_model = MyModel()
-        self.assertEquals(my_model.visible, "visible")
-        self.assertEquals(my_model.invisible, "invisible")
+        self.assertEqual(my_model.visible, "visible")
+        self.assertEqual(my_model.invisible, "invisible")
 
         attribute_filter = AttributeFilter.from_model(MyModel(), default_value=False)
         attribute_filter.visible = True
 
         validated = my_model.validate({}, attribute_filter)
-        self.assertEquals(validated.visible, "visible")
+        self.assertEqual(validated.visible, "visible")
         self.assertIsNone(validated.invisible)
 
         attribute_filter.visible = False
@@ -541,7 +541,7 @@ class ModelValidate(unittest.TestCase):
 
         validated = my_model.validate({}, attribute_filter)
         self.assertIsNone(validated.visible)
-        self.assertEquals(validated.invisible, "invisible")
+        self.assertEqual(validated.invisible, "invisible")
 
     def test_rejects_bad_attribute_type(self):
 
@@ -563,8 +563,8 @@ class ModelValidate(unittest.TestCase):
         parent_model.child.age = 30
 
         validated = ParentModel().validate(parent_model.as_serializable())
-        self.assertEquals(validated.name, "Nathan")
-        self.assertEquals(validated.child.age, 30)
+        self.assertEqual(validated.name, "Nathan")
+        self.assertEqual(validated.child.age, 30)
 
     def test_child_data_collection_filtered(self):
         class ChildModel(types.Model):
@@ -589,10 +589,10 @@ class ModelValidate(unittest.TestCase):
         parent_filter.child.age = True
 
         validated = ParentModel().validate(parent_model.as_serializable(attribute_filter=parent_filter))
-        self.assertEquals(validated.name, "Nathan")
-        self.assertEquals(validated.percent, 33.3)
-        self.assertEquals(validated.child.name, "Steve")
-        self.assertEquals(validated.child.age, 30)
+        self.assertEqual(validated.name, "Nathan")
+        self.assertEqual(validated.percent, 33.3)
+        self.assertEqual(validated.child.name, "Steve")
+        self.assertEqual(validated.child.age, 30)
 
         parent_filter.name = False
         parent_filter.child.name = False
@@ -601,10 +601,10 @@ class ModelValidate(unittest.TestCase):
             parent_model.as_serializable(attribute_filter=parent_filter),
             attribute_filter=parent_filter
         )
-        self.assertEquals(validated.name, None)
-        self.assertEquals(validated.percent, 33.3)
-        self.assertEquals(validated.child.name, None)
-        self.assertEquals(validated.child.age, 30)
+        self.assertEqual(validated.name, None)
+        self.assertEqual(validated.percent, 33.3)
+        self.assertEqual(validated.child.name, None)
+        self.assertEqual(validated.child.age, 30)
 
     def test_minified_true(self):
         class Person(types.Model):
@@ -613,8 +613,8 @@ class ModelValidate(unittest.TestCase):
 
         person = Person(first_name="john", last_name="smith")
         person_validated = person.validate(person.as_serializable(minified=True), minified=True)
-        self.assertEquals(person_validated.as_serializable(), {"first_name": "john", "last_name": "smith"})
-        self.assertEquals(person_validated.as_serializable(minified=True), {"a_c": "john", "b_c": "smith"})
+        self.assertEqual(person_validated.as_serializable(), {"first_name": "john", "last_name": "smith"})
+        self.assertEqual(person_validated.as_serializable(minified=True), {"a_c": "john", "b_c": "smith"})
 
     def test_child_failing_to_validate_raises_validation_error(self):
         class Person(types.Model):

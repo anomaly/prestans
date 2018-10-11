@@ -11,57 +11,57 @@ class DataURLFileGenerateFilename(unittest.TestCase):
     def test_correct_length_and_type(self):
         filename = DataURLFile.generate_filename()
         self.assertIsInstance(filename, str)
-        self.assertEquals(len(filename), 32)
+        self.assertEqual(len(filename), 32)
 
     def test_different_each_time(self):
         filename_a = DataURLFile.generate_filename()
         filename_b = DataURLFile.generate_filename()
         filename_c = DataURLFile.generate_filename()
 
-        self.assertNotEquals(filename_a, filename_b)
-        self.assertNotEquals(filename_a, filename_c)
-        self.assertNotEquals(filename_b, filename_c)
+        self.assertNotEqual(filename_a, filename_b)
+        self.assertNotEqual(filename_a, filename_c)
+        self.assertNotEqual(filename_b, filename_c)
 
 
 class DataURLFileRequired(unittest.TestCase):
 
     def test_default_true(self):
         data_url_file = DataURLFile()
-        self.assertEquals(data_url_file.required, True)
+        self.assertEqual(data_url_file.required, True)
 
     def test_custom_false(self):
         data_url_file = DataURLFile(required=False)
-        self.assertEquals(data_url_file.required, False)
+        self.assertEqual(data_url_file.required, False)
 
     def test_custom_true(self):
         data_url_file = DataURLFile(required=True)
-        self.assertEquals(data_url_file.required, True)
+        self.assertEqual(data_url_file.required, True)
 
 
 class DataURLFileAllowedMimeTypes(unittest.TestCase):
 
     def test_default_empty_array(self):
         data_url_file = DataURLFile()
-        self.assertEquals(data_url_file.allowed_mime_types, [])
+        self.assertEqual(data_url_file.allowed_mime_types, [])
 
     def test_set_array(self):
         data_url_file = DataURLFile(allowed_mime_types=["image/png", "text/plain"])
-        self.assertEquals(data_url_file.allowed_mime_types, ["image/png", "text/plain"])
+        self.assertEqual(data_url_file.allowed_mime_types, ["image/png", "text/plain"])
 
     def test_set_single(self):
         data_url_file = DataURLFile(allowed_mime_types="image/png")
-        self.assertEquals(data_url_file.allowed_mime_types, ["image/png"])
+        self.assertEqual(data_url_file.allowed_mime_types, ["image/png"])
 
 
 class DataURLFileDescription(unittest.TestCase):
 
     def test_default(self):
         data_url_file = DataURLFile()
-        self.assertEquals(data_url_file.description, None)
+        self.assertEqual(data_url_file.description, None)
 
     def test_custom(self):
         data_url_file = DataURLFile(description="description")
-        self.assertEquals(data_url_file.description, "description")
+        self.assertEqual(data_url_file.description, "description")
 
 
 class DataURLFileBlueprint(unittest.TestCase):
@@ -69,18 +69,18 @@ class DataURLFileBlueprint(unittest.TestCase):
     def test_default(self):
         data_url_file = DataURLFile()
         blueprint = data_url_file.blueprint()
-        self.assertEquals(blueprint["type"], "data_url_file")
-        self.assertEquals(blueprint["constraints"]["required"], True)
-        self.assertEquals(blueprint["constraints"]["allowed_mime_types"], [])
-        self.assertEquals(blueprint["constraints"]["description"], None)
+        self.assertEqual(blueprint["type"], "data_url_file")
+        self.assertEqual(blueprint["constraints"]["required"], True)
+        self.assertEqual(blueprint["constraints"]["allowed_mime_types"], [])
+        self.assertEqual(blueprint["constraints"]["description"], None)
 
     def test_custom(self):
         data_url_file = DataURLFile(required=False, allowed_mime_types=["image/png"], description="description")
         blueprint = data_url_file.blueprint()
-        self.assertEquals(blueprint["type"], "data_url_file")
-        self.assertEquals(blueprint["constraints"]["required"], False)
-        self.assertEquals(blueprint["constraints"]["allowed_mime_types"], ["image/png"])
-        self.assertEquals(blueprint["constraints"]["description"], "description")
+        self.assertEqual(blueprint["type"], "data_url_file")
+        self.assertEqual(blueprint["constraints"]["required"], False)
+        self.assertEqual(blueprint["constraints"]["allowed_mime_types"], ["image/png"])
+        self.assertEqual(blueprint["constraints"]["description"], "description")
 
 
 class DataURLFileMimeType(unittest.TestCase):
@@ -89,7 +89,7 @@ class DataURLFileMimeType(unittest.TestCase):
         red_dot = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
         data_url_file = DataURLFile()
         validated = data_url_file.validate(red_dot)
-        self.assertEquals(validated.mime_type, "image/png")
+        self.assertEqual(validated.mime_type, "image/png")
 
 
 class DataURLFileFileContents(unittest.TestCase):
@@ -98,7 +98,7 @@ class DataURLFileFileContents(unittest.TestCase):
         red_dot = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
         data_url_file = DataURLFile()
         validated = data_url_file.validate(red_dot)
-        self.assertEquals(validated.file_contents, b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x05\x00\x00\x00\x05\x08\x06\x00\x00\x00\x8do&\xe5\x00\x00\x00\x1cIDAT\x08\xd7c\xf8\xff\xff?\xc3\x7f\x06 \x05\xc3 \x12\x84\xd01\xf1\x82X\xcd\x04\x00\x0e\xf55\xcb\xd1\x8e\x0e\x1f\x00\x00\x00\x00IEND\xaeB`\x82')
+        self.assertEqual(validated.file_contents, b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x05\x00\x00\x00\x05\x08\x06\x00\x00\x00\x8do&\xe5\x00\x00\x00\x1cIDAT\x08\xd7c\xf8\xff\xff?\xc3\x7f\x06 \x05\xc3 \x12\x84\xd01\xf1\x82X\xcd\x04\x00\x0e\xf55\xcb\xd1\x8e\x0e\x1f\x00\x00\x00\x00IEND\xaeB`\x82')
 
 
 class DataURLFileBase64Contents(unittest.TestCase):
@@ -108,7 +108,7 @@ class DataURLFileBase64Contents(unittest.TestCase):
         data_url_file = DataURLFile()
         validated = data_url_file.validate(red_dot)
         self.maxDiff = None
-        self.assertEquals(validated.base64_contents, b'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==')
+        self.assertEqual(validated.base64_contents, b'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==')
 
 
 class DataURLFileValidate(unittest.TestCase):
@@ -117,7 +117,7 @@ class DataURLFileValidate(unittest.TestCase):
         self.assertRaises(exception.RequiredAttributeError, DataURLFile(required=True).validate, None)
 
     def test_required_false_returns_none_when_given_none(self):
-        self.assertEquals(DataURLFile(required=False).validate(None), None)
+        self.assertEqual(DataURLFile(required=False).validate(None), None)
 
     def test_bad_type_raises_exception(self):
         self.assertRaises(exception.ParseFailedError, DataURLFile().validate, 1234)
@@ -157,4 +157,4 @@ class DataURLFileAsSerializable(unittest.TestCase):
         serialized = data_url_file.as_serializable(validated)
 
         self.maxDiff = None
-        self.assertEquals(serialized, red_dot)
+        self.assertEqual(serialized, red_dot)

@@ -46,13 +46,13 @@ class AppEngineAuthContextProviderTest(unittest.TestCase):
 
         # production: oauth missing
         auth = AppEngineAuthContextProvider()
-        self.assertEquals(auth.get_current_user(), 72)
+        self.assertEqual(auth.get_current_user(), 72)
         self.gae_mock.google.appengine.api.oauth.get_current_user.assert_called_with()
         self.gae_mock.google.appengine.api.users.get_current_user.assert_called_with()
 
         # production oauth found
         self.gae_mock.google.appengine.api.oauth.get_current_user.side_effect = None
-        self.assertEquals(auth.get_current_user(), 66)
+        self.assertEqual(auth.get_current_user(), 66)
         self.gae_mock.google.appengine.api.oauth.get_current_user.assert_called_with()
         self.gae_mock.google.appengine.api.users.get_current_user.assert_called_with()
 
@@ -62,7 +62,7 @@ class AppEngineAuthContextProviderTest(unittest.TestCase):
         prestans.ext.appengine._IS_DEVELOPMENT_SERVER = True
 
         auth = AppEngineAuthContextProvider()
-        self.assertEquals(auth.get_current_user(), 72)
+        self.assertEqual(auth.get_current_user(), 72)
         self.gae_mock.google.appengine.api.oauth.get_current_user.assert_not_called()
         self.gae_mock.google.appengine.api.users.get_current_user.assert_called_with()
 
@@ -93,10 +93,10 @@ class AppEngineMemcacheProviderTest(unittest.TestCase):
 
     def test_get(self):
         memcache = AppEngineMemcacheProvider()
-        self.assertEquals(memcache.get("key"), "value")
+        self.assertEqual(memcache.get("key"), "value")
         self.gae_mock.google.appengine.api.memcache.get.assert_called_with("key", None, False)
 
-        self.assertEquals(memcache.get("key", "namespace", True), "value")
+        self.assertEqual(memcache.get("key", "namespace", True), "value")
         self.gae_mock.google.appengine.api.memcache.get.assert_called_with("key", "namespace", True)
 
     def test_set(self):

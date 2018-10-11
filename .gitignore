@@ -44,3 +44,4 @@ nosetests.xml
 # Intellij Idea
 /.idea/workspace.xml
 
+.python-version

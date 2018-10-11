@@ -36,10 +36,10 @@ class Issue155(unittest.TestCase):
         app = test_app()
 
         resp = app.get("/permanent")
-        self.assertEquals(resp.status_int, STATUS.PERMANENT_REDIRECT)
+        self.assertEqual(resp.status_int, STATUS.PERMANENT_REDIRECT)
 
     def test_temporary_redirect(self):
         app = test_app()
 
         resp = app.get("/temporary")
-        self.assertEquals(resp.status_int, STATUS.TEMPORARY_REDIRECT)
+        self.assertEqual(resp.status_int, STATUS.TEMPORARY_REDIRECT)

@@ -16,13 +16,13 @@ class DateTimeUnitTest(unittest.TestCase):
         self.assertIsNone(default_none.default)
 
         default_now = DateTime(default=DateTime.NOW)
-        self.assertEquals(default_now.default, DateTime.NOW)
+        self.assertEqual(default_now.default, DateTime.NOW)
 
         default_now_utc = DateTime(default=DateTime.UTC_NOW)
-        self.assertEquals(default_now_utc.default, DateTime.UTC_NOW)
+        self.assertEqual(default_now_utc.default, DateTime.UTC_NOW)
 
         default_time = DateTime(default=datetime(11, 11, 11))
-        self.assertEquals(default_time.default, datetime(11, 11, 11))
+        self.assertEqual(default_time.default, datetime(11, 11, 11))
 
         self.assertRaises(TypeError, DateTime, default="string")
         self.assertRaises(TypeError, DateTime, default=23)
@@ -39,17 +39,17 @@ class DateTimeUnitTest(unittest.TestCase):
 
     def test_format(self):
         default_format = DateTime()
-        self.assertEquals(default_format.format, DateTime.DEFAULT_FORMAT)
+        self.assertEqual(default_format.format, DateTime.DEFAULT_FORMAT)
 
         custom_format = DateTime(format="%H:%M:%S %p")
-        self.assertEquals(custom_format.format, "%H:%M:%S %p")
+        self.assertEqual(custom_format.format, "%H:%M:%S %p")
 
     def test_description(self):
         datetime_type = DateTime()
         self.assertIsNone(datetime_type.description)
 
         datetime_type = DateTime(description="description")
-        self.assertEquals(datetime_type.description, "description")
+        self.assertEqual(datetime_type.description, "description")
 
     def test_timezone(self):
         timezone_default = DateTime()
@@ -74,13 +74,13 @@ class DateTimeUnitTest(unittest.TestCase):
     def test_blueprint(self):
         datetime_type = DateTime()
         blueprint = datetime_type.blueprint()
-        self.assertEquals(blueprint["type"], "datetime")
-        self.assertEquals(blueprint["constraints"]["default"], None)
-        self.assertEquals(blueprint["constraints"]["required"], True)
-        self.assertEquals(blueprint["constraints"]["format"], DateTime.DEFAULT_FORMAT)
-        self.assertEquals(blueprint["constraints"]["description"], None)
-        self.assertEquals(blueprint["constraints"]["timezone"], False)
-        self.assertEquals(blueprint["constraints"]["utc"], False)
+        self.assertEqual(blueprint["type"], "datetime")
+        self.assertEqual(blueprint["constraints"]["default"], None)
+        self.assertEqual(blueprint["constraints"]["required"], True)
+        self.assertEqual(blueprint["constraints"]["format"], DateTime.DEFAULT_FORMAT)
+        self.assertEqual(blueprint["constraints"]["description"], None)
+        self.assertEqual(blueprint["constraints"]["timezone"], False)
+        self.assertEqual(blueprint["constraints"]["utc"], False)
 
         datetime_type = DateTime(
             default=datetime(11, 11, 11),
@@ -91,18 +91,18 @@ class DateTimeUnitTest(unittest.TestCase):
             utc=True
         )
         blueprint = datetime_type.blueprint()
-        self.assertEquals(blueprint["type"], "datetime")
-        self.assertEquals(blueprint["constraints"]["default"], datetime(11, 11, 11))
-        self.assertEquals(blueprint["constraints"]["required"], False)
-        self.assertEquals(blueprint["constraints"]["format"], "%H:%M:%S %p")
-        self.assertEquals(blueprint["constraints"]["description"], "description")
-        self.assertEquals(blueprint["constraints"]["timezone"], True)
-        self.assertEquals(blueprint["constraints"]["utc"], True)
+        self.assertEqual(blueprint["type"], "datetime")
+        self.assertEqual(blueprint["constraints"]["default"], datetime(11, 11, 11))
+        self.assertEqual(blueprint["constraints"]["required"], False)
+        self.assertEqual(blueprint["constraints"]["format"], "%H:%M:%S %p")
+        self.assertEqual(blueprint["constraints"]["description"], "description")
+        self.assertEqual(blueprint["constraints"]["timezone"], True)
+        self.assertEqual(blueprint["constraints"]["utc"], True)
 
     def test_validate(self):
         # test that not required accepts None
         not_required = DateTime(required=False)
-        self.assertEquals(not_required.validate(None), None)
+        self.assertEqual(not_required.validate(None), None)
 
         # test that required throws exception for None
         required = DateTime(required=True)
@@ -110,14 +110,14 @@ class DateTimeUnitTest(unittest.TestCase):
 
         # test that required accepts time value
         default_time = DateTime(required=True, default=datetime(2018, 11, 11, 11, 11, 11))
-        self.assertEquals(default_time.validate(None), datetime(2018, 11, 11, 11, 11, 11))
+        self.assertEqual(default_time.validate(None), datetime(2018, 11, 11, 11, 11, 11))
 
         # test that required makes use of NOW constant
         with patch('prestans.types.datetime_prestans.datetime') as imported_datetime:
             imported_datetime.now.return_value = NOW
 
             default_now = DateTime(required=True, default=DateTime.NOW)
-            self.assertEquals(default_now.validate(None), NOW)
+            self.assertEqual(default_now.validate(None), NOW)
             imported_datetime.now.assert_called()
 
         # test that not required makes use of NOW constant
@@ -125,7 +125,7 @@ class DateTimeUnitTest(unittest.TestCase):
             imported_datetime.now.return_value = NOW
 
             default_now = DateTime(required=False, default=DateTime.NOW)
-            self.assertEquals(default_now.validate(None), NOW)
+            self.assertEqual(default_now.validate(None), NOW)
             imported_datetime.now.assert_called()
 
         # test that required makes use of UTC_NOW constant
@@ -133,7 +133,7 @@ class DateTimeUnitTest(unittest.TestCase):
             imported_datetime.utcnow.return_value = UTC_NOW
 
             default_utc_now = DateTime(required=True, default=DateTime.UTC_NOW)
-            self.assertEquals(default_utc_now.validate(None), UTC_NOW)
+            self.assertEqual(default_utc_now.validate(None), UTC_NOW)
             imported_datetime.utcnow.assert_called()
 
         # test that not required makes use of UTC_NOW constant
@@ -141,12 +141,12 @@ class DateTimeUnitTest(unittest.TestCase):
             imported_datetime.utcnow.return_value = UTC_NOW
 
             default_utc_now = DateTime(required=False, default=DateTime.UTC_NOW)
-            self.assertEquals(default_utc_now.validate(None), UTC_NOW)
+            self.assertEqual(default_utc_now.validate(None), UTC_NOW)
             imported_datetime.utcnow.assert_called()
 
         # test that default value is used when it is a datetime
         default_datetime = DateTime(required=False, default=datetime(2018, 1, 1, 10, 11, 12))
-        self.assertEquals(default_datetime.validate(None), datetime(2018, 1, 1, 10, 11, 12))
+        self.assertEqual(default_datetime.validate(None), datetime(2018, 1, 1, 10, 11, 12))
 
         # test that invalid type is rejected
         invalid_type = DateTime()
@@ -156,13 +156,13 @@ class DateTimeUnitTest(unittest.TestCase):
         self.assertRaises(exception.ParseFailedError, DateTime().validate, "invalid")
 
         # test that valid string can be parsed
-        self.assertEquals(DateTime().validate("2018-01-04 12:34:00"), datetime(2018, 1, 4, 12, 34, 00))
+        self.assertEqual(DateTime().validate("2018-01-04 12:34:00"), datetime(2018, 1, 4, 12, 34, 00))
 
     def test_as_serializable(self):
         default_format = DateTime()
         self.assertRaises(exception.InvalidTypeError, default_format.as_serializable, "string")
-        self.assertEquals(default_format.as_serializable(datetime(2018, 3, 20, 11, 12, 13)), "2018-03-20 11:12:13")
+        self.assertEqual(default_format.as_serializable(datetime(2018, 3, 20, 11, 12, 13)), "2018-03-20 11:12:13")
 
         custom_format = DateTime(format="%Y-%m-%d %H:%M:%S %p")
         self.assertRaises(exception.InvalidTypeError, custom_format.as_serializable, "string")
-        self.assertEquals(custom_format.as_serializable(datetime(2018, 4, 15, 10, 12, 14)), "2018-04-15 10:12:14 AM")
+        self.assertEqual(custom_format.as_serializable(datetime(2018, 4, 15, 10, 12, 14)), "2018-04-15 10:12:14 AM")

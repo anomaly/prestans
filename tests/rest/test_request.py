@@ -51,7 +51,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.GET)
+        self.assertEqual(request.method, VERB.GET)
 
     def test_head(self):
         request = Request(
@@ -61,7 +61,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.HEAD)
+        self.assertEqual(request.method, VERB.HEAD)
 
     def test_post(self):
         request = Request(
@@ -71,7 +71,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.POST)
+        self.assertEqual(request.method, VERB.POST)
 
     def test_put(self):
         request = Request(
@@ -81,7 +81,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.PUT)
+        self.assertEqual(request.method, VERB.PUT)
 
     def test_patch(self):
         request = Request(
@@ -91,7 +91,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.PATCH)
+        self.assertEqual(request.method, VERB.PATCH)
 
     def test_delete(self):
         request = Request(
@@ -101,7 +101,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON()],
             default_deserializer=JSON()
         )
-        self.assertEquals(request.method, VERB.DELETE)
+        self.assertEqual(request.method, VERB.DELETE)
 
     def test_options(self):
         request = Request(
@@ -111,7 +111,7 @@ class RESTRequestMethod(unittest.TestCase):
             deserializers=[JSON],
             default_deserializer=JSON
         )
-        self.assertEquals(request.method, VERB.OPTIONS)
+        self.assertEqual(request.method, VERB.OPTIONS)
 
 
 class RESTRequestLogger(unittest.TestCase):
@@ -124,7 +124,7 @@ class RESTRequestLogger(unittest.TestCase):
             deserializers=[JSON()],
             default_deserializer=JSON()
         )
-        self.assertEquals(request.logger, custom_logger)
+        self.assertEqual(request.logger, custom_logger)
 
 
 class RESTRequestParsedBody(unittest.TestCase):
@@ -157,8 +157,8 @@ class RESTRequestParsedBody(unittest.TestCase):
         request.body = b'{"first_name": "John", "last_name": "Smith"}'
         request.body_template = Person()
         self.assertTrue(isinstance(request.parsed_body, Person))
-        self.assertEquals(request.parsed_body.first_name, "John")
-        self.assertEquals(request.parsed_body.last_name, "Smith")
+        self.assertEqual(request.parsed_body.first_name, "John")
+        self.assertEqual(request.parsed_body.last_name, "Smith")
 
 
 class RESTRequestSupportedMimeTypes(unittest.TestCase):
@@ -173,7 +173,7 @@ class RESTRequestSupportedMimeTypes(unittest.TestCase):
             deserializers=[json_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.supported_mime_types, [json_dsz.content_type()])
+        self.assertEqual(request.supported_mime_types, [json_dsz.content_type()])
 
         request = Request(
             environ={"REQUEST_METHOD": VERB.POST},
@@ -182,7 +182,7 @@ class RESTRequestSupportedMimeTypes(unittest.TestCase):
             deserializers=[json_dsz, plist_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.supported_mime_types, [json_dsz.content_type(), plist_dsz.content_type()])
+        self.assertEqual(request.supported_mime_types, [json_dsz.content_type(), plist_dsz.content_type()])
 
     def test_supported_mime_types_str(self):
         json_dsz = JSON()
@@ -195,7 +195,7 @@ class RESTRequestSupportedMimeTypes(unittest.TestCase):
             deserializers=[json_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.supported_mime_types_str, json_dsz.content_type())
+        self.assertEqual(request.supported_mime_types_str, json_dsz.content_type())
 
         request = Request(
             environ={"REQUEST_METHOD": VERB.POST},
@@ -204,7 +204,7 @@ class RESTRequestSupportedMimeTypes(unittest.TestCase):
             deserializers=[json_dsz, plist_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.supported_mime_types_str, json_dsz.content_type()+","+plist_dsz.content_type())
+        self.assertEqual(request.supported_mime_types_str, json_dsz.content_type()+","+plist_dsz.content_type())
 
 
 class RESTRequestSelectedDeserializer(unittest.TestCase):
@@ -230,7 +230,7 @@ class RESTRequestDefaultDeserializer(unittest.TestCase):
             deserializers=[json_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.default_deserializer, json_dsz)
+        self.assertEqual(request.default_deserializer, json_dsz)
 
 
 class RESTRequestSetDeserializerByMimeType(unittest.TestCase):
@@ -247,9 +247,9 @@ class RESTRequestSetDeserializerByMimeType(unittest.TestCase):
         )
         self.assertIsNone(request.selected_deserializer)
         request.set_deserializer_by_mime_type("application/json")
-        self.assertEquals(request.selected_deserializer, json_dsz)
+        self.assertEqual(request.selected_deserializer, json_dsz)
         request.set_deserializer_by_mime_type("application/xml")
-        self.assertEquals(request.selected_deserializer, plist_dsz)
+        self.assertEqual(request.selected_deserializer, plist_dsz)
         self.assertRaises(exception.UnsupportedContentTypeError, request.set_deserializer_by_mime_type, "text/plain")
 
 
@@ -264,7 +264,7 @@ class RESTRequestAttributeFilter(unittest.TestCase):
             default_deserializer=JSON()
         )
         request.attribute_filter = attribute_filter
-        self.assertEquals(request.attribute_filter, attribute_filter)
+        self.assertEqual(request.attribute_filter, attribute_filter)
 
 
 class RESTRequestParameterSet(unittest.TestCase):
@@ -278,7 +278,7 @@ class RESTRequestParameterSet(unittest.TestCase):
             default_deserializer=JSON()
         )
         request.parameter_set = parameter_set
-        self.assertEquals(request.parameter_set, parameter_set)
+        self.assertEqual(request.parameter_set, parameter_set)
 
 
 class RESTRequestBodyTemplate(unittest.TestCase):
@@ -330,9 +330,9 @@ class RESTRequestRegisterDeserializers(unittest.TestCase):
             deserializers=[json_dsz],
             default_deserializer=json_dsz
         )
-        self.assertEquals(request.supported_mime_types, ["application/json"])
+        self.assertEqual(request.supported_mime_types, ["application/json"])
         request.register_deserializers(plist_dsz)
-        self.assertEquals(request.supported_mime_types, ["application/json", "application/xml"])
+        self.assertEqual(request.supported_mime_types, ["application/json", "application/xml"])
 
         self.assertRaises(TypeError, request.register_deserializers, "string")
 

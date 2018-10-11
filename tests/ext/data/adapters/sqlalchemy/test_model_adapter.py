@@ -73,8 +73,8 @@ class ModelAdapterUnitTest(unittest.TestCase):
     def test_init_and_getters(self):
 
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=Person)
-        self.assertEquals(model_adapter.rest_model_class, PersonREST)
-        self.assertEquals(model_adapter.persistent_model_class, Person)
+        self.assertEqual(model_adapter.rest_model_class, PersonREST)
+        self.assertEqual(model_adapter.persistent_model_class, Person)
 
     def test_init_raises_type_error_for_invalid_rest_model(self):
         self.assertRaises(TypeError, adapters.ModelAdapter, rest_model_class=Person, persistent_model_class=None)
@@ -87,10 +87,10 @@ class ModelAdapterUnitTest(unittest.TestCase):
         person.last_name = "Doe"
 
         person_rest = model_adapter.adapt_persistent_to_rest(person)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.first_name, person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.first_name, person_rest.first_name)
+        self.assertEqual(person.last_name, person_rest.last_name)
 
     def test_adapt_persistent_to_rest_with_filter(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=Person)
@@ -103,10 +103,10 @@ class ModelAdapterUnitTest(unittest.TestCase):
         attribute_filter.last_name = True
 
         person_rest = model_adapter.adapt_persistent_to_rest(person, attribute_filter)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
         self.assertIsNone(person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
+        self.assertEqual(person.last_name, person_rest.last_name)
 
     def test_adapt_persistent_to_rest_with_model_as_child(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=Person)
@@ -121,12 +121,12 @@ class ModelAdapterUnitTest(unittest.TestCase):
         attribute_filter.address.street = True
 
         person_rest = model_adapter.adapt_persistent_to_rest(person, attribute_filter)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.address.street, "123 Street Address")
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.address.street, "123 Street Address")
         self.assertIsNone(person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
-        self.assertEquals(person.address.street, person_rest.address.street)
+        self.assertEqual(person.last_name, person_rest.last_name)
+        self.assertEqual(person.address.street, person_rest.address.street)
 
     def test_adapt_persistent_to_rest_with_model_missing(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=Person)
@@ -137,10 +137,10 @@ class ModelAdapterUnitTest(unittest.TestCase):
         person.address = None
 
         person_rest = model_adapter.adapt_persistent_to_rest(person)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.first_name, person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.first_name, person_rest.first_name)
+        self.assertEqual(person.last_name, person_rest.last_name)
 
     def test_adapt_persistent_to_rest_with_basic_arrays_as_children(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=PersonWithBasicArrays)
@@ -154,19 +154,19 @@ class ModelAdapterUnitTest(unittest.TestCase):
         person.strings.append("string")
 
         person_rest = model_adapter.adapt_persistent_to_rest(person)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.booleans, [True])
-        self.assertEquals(person.floats, [1.1])
-        self.assertEquals(person.integers, [2])
-        self.assertEquals(person.strings, ["string"])
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.booleans, [True])
+        self.assertEqual(person.floats, [1.1])
+        self.assertEqual(person.integers, [2])
+        self.assertEqual(person.strings, ["string"])
 
-        self.assertEquals(person.first_name, person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
-        self.assertEquals(person.booleans, person_rest.booleans.as_serializable())
-        self.assertEquals(person.floats, person_rest.floats.as_serializable())
-        self.assertEquals(person.integers, person_rest.integers.as_serializable())
-        self.assertEquals(person.strings, person_rest.strings.as_serializable())
+        self.assertEqual(person.first_name, person_rest.first_name)
+        self.assertEqual(person.last_name, person_rest.last_name)
+        self.assertEqual(person.booleans, person_rest.booleans.as_serializable())
+        self.assertEqual(person.floats, person_rest.floats.as_serializable())
+        self.assertEqual(person.integers, person_rest.integers.as_serializable())
+        self.assertEqual(person.strings, person_rest.strings.as_serializable())
 
     def test_adapt_persistent_to_rest_with_model_array_as_child(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=PersonWithAddresses)
@@ -180,13 +180,13 @@ class ModelAdapterUnitTest(unittest.TestCase):
         person.addresses.append(address)
 
         person_rest = model_adapter.adapt_persistent_to_rest(person)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.addresses, [address])
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.addresses, [address])
 
-        self.assertEquals(person.first_name, person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
-        self.assertEquals([{"short_string": None, "street": "123 Street Address"}], person_rest.addresses.as_serializable())
+        self.assertEqual(person.first_name, person_rest.first_name)
+        self.assertEqual(person.last_name, person_rest.last_name)
+        self.assertEqual([{"short_string": None, "street": "123 Street Address"}], person_rest.addresses.as_serializable())
 
     def test_adapt_persistent_to_rest_with_model_array_as_child_filtered(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=PersonWithAddresses)
@@ -204,13 +204,13 @@ class ModelAdapterUnitTest(unittest.TestCase):
         attribute_filter.addresses.street = True
 
         person_rest = model_adapter.adapt_persistent_to_rest(person, attribute_filter)
-        self.assertEquals(person.first_name, "John")
-        self.assertEquals(person.last_name, "Doe")
-        self.assertEquals(person.addresses, [address])
+        self.assertEqual(person.first_name, "John")
+        self.assertEqual(person.last_name, "Doe")
+        self.assertEqual(person.addresses, [address])
 
         self.assertIsNone(person_rest.first_name)
-        self.assertEquals(person.last_name, person_rest.last_name)
-        self.assertEquals([{"short_string": None, "street": "123 Street Address"}], person_rest.addresses.as_serializable())
+        self.assertEqual(person.last_name, person_rest.last_name)
+        self.assertEqual([{"short_string": None, "street": "123 Street Address"}], person_rest.addresses.as_serializable())
 
     def test_adapt_persistent_to_rest_inconsistent_data_exception_raised_model(self):
         model_adapter = adapters.ModelAdapter(rest_model_class=PersonREST, persistent_model_class=Person)

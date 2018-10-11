@@ -35,10 +35,10 @@ class SerializerJSONUnitTest(unittest.TestCase):
         self.assertRaises(exception.SerializationFailedError, JSON().dumps, PythonObject)
 
     def test_handler_body_type(self):
-        self.assertEquals(JSON().handler_body_type(), DataCollection)
+        self.assertEqual(JSON().handler_body_type(), DataCollection)
 
     def test_content_type(self):
-        self.assertEquals(JSON().content_type(), "application/json")
+        self.assertEqual(JSON().content_type(), "application/json")
 
 
 class SerializerPListUnitTest(unittest.TestCase):
@@ -68,7 +68,7 @@ class SerializerPListUnitTest(unittest.TestCase):
         self.assertRaises(exception.SerializationFailedError, XMLPlist().dumps, PythonObject)
 
     def test_handler_body_type(self):
-        self.assertEquals(XMLPlist().handler_body_type(), DataCollection)
+        self.assertEqual(XMLPlist().handler_body_type(), DataCollection)
 
     def test_content_type(self):
-        self.assertEquals(XMLPlist().content_type(), "application/xml")
+        self.assertEqual(XMLPlist().content_type(), "application/xml")

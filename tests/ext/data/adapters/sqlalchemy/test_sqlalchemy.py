@@ -34,16 +34,16 @@ class SQLAlchemyDataAdapterAdaptPersistentInstance(unittest.TestCase):
 
         persistent_model = PersistentModel()
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, RESTModel, attribute_filter)
-        self.assertEquals(adapted_model.string, "string")
+        self.assertEqual(adapted_model.string, "string")
 
         attribute_filter.boolean = True
         attribute_filter.float = True
         attribute_filter.integer = True
 
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, RESTModel, attribute_filter)
-        self.assertEquals(adapted_model.boolean, False)
-        self.assertEquals(adapted_model.float, 33.3)
-        self.assertEquals(adapted_model.integer, 33)
+        self.assertEqual(adapted_model.boolean, False)
+        self.assertEqual(adapted_model.float, 33.3)
+        self.assertEqual(adapted_model.integer, 33)
 
     def test_single_child_of_type_data_collection(self):
 
@@ -101,10 +101,10 @@ class SQLAlchemyDataAdapterAdaptPersistentInstance(unittest.TestCase):
         persistent_model = ParentPersistent()
 
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, ParentREST, attribute_filter)
-        self.assertEquals(adapted_model.child.boolean, False)
-        self.assertEquals(adapted_model.child.float, 33.3)
-        self.assertEquals(adapted_model.child.integer, 33)
-        self.assertEquals(adapted_model.child.string, "string")
+        self.assertEqual(adapted_model.child.boolean, False)
+        self.assertEqual(adapted_model.child.float, 33.3)
+        self.assertEqual(adapted_model.child.integer, 33)
+        self.assertEqual(adapted_model.child.string, "string")
 
     def test_children_of_type_data_type_and_data_collection(self):
 
@@ -174,30 +174,30 @@ class SQLAlchemyDataAdapterAdaptPersistentInstance(unittest.TestCase):
         persistent_model = ParentPersistent()
 
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, ParentREST, attribute_filter)
-        self.assertEquals(adapted_model.boolean, False)
-        self.assertEquals(adapted_model.float, 33.3)
-        self.assertEquals(adapted_model.integer, 33)
-        self.assertEquals(adapted_model.string, "string1")
+        self.assertEqual(adapted_model.boolean, False)
+        self.assertEqual(adapted_model.float, 33.3)
+        self.assertEqual(adapted_model.integer, 33)
+        self.assertEqual(adapted_model.string, "string1")
         self.assertTrue(isinstance(adapted_model.child, ChildREST))
-        self.assertEquals(adapted_model.child.boolean, True)
-        self.assertEquals(adapted_model.child.float, 44.4)
-        self.assertEquals(adapted_model.child.integer, 44)
-        self.assertEquals(adapted_model.child.string, None)
+        self.assertEqual(adapted_model.child.boolean, True)
+        self.assertEqual(adapted_model.child.float, 44.4)
+        self.assertEqual(adapted_model.child.integer, 44)
+        self.assertEqual(adapted_model.child.string, None)
 
         attribute_filter.child.string = True
 
         self.assertTrue(attribute_filter.child.string)
 
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, ParentREST, attribute_filter)
-        self.assertEquals(adapted_model.boolean, False)
-        self.assertEquals(adapted_model.float, 33.3)
-        self.assertEquals(adapted_model.integer, 33)
-        self.assertEquals(adapted_model.string, "string1")
+        self.assertEqual(adapted_model.boolean, False)
+        self.assertEqual(adapted_model.float, 33.3)
+        self.assertEqual(adapted_model.integer, 33)
+        self.assertEqual(adapted_model.string, "string1")
         self.assertTrue(isinstance(adapted_model.child, ChildREST))
-        self.assertEquals(adapted_model.child.boolean, True)
-        self.assertEquals(adapted_model.child.float, 44.4)
-        self.assertEquals(adapted_model.child.integer, 44)
-        self.assertEquals(adapted_model.child.string, "string2")
+        self.assertEqual(adapted_model.child.boolean, True)
+        self.assertEqual(adapted_model.child.float, 44.4)
+        self.assertEqual(adapted_model.child.integer, 44)
+        self.assertEqual(adapted_model.child.string, "string2")
 
 
 class SQLAlchemyDataAdapterAdaptPersistentCollection(unittest.TestCase):

@@ -125,7 +125,7 @@ class Request(webob.Request):
             raise AssertionError("body_template cannot be set for GET requests")
 
         if value is None:
-            self.logger.warn("body_template is None, parsing will be ignored")
+            self.logger.warning("body_template is None, parsing will be ignored")
             return
 
         if not isinstance(value, DataCollection):

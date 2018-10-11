@@ -21,7 +21,7 @@ class StringUnitTest(unittest.TestCase):
         self.assertIsNone(default_default.default)
 
         default_value = String(required=True, default="orange")
-        self.assertEquals(default_value.default, "orange")
+        self.assertEqual(default_value.default, "orange")
 
     def test_min_less_than_max(self):
         self.assertRaises(ValueError, String, min_length=2, max_length=1)
@@ -31,7 +31,7 @@ class StringUnitTest(unittest.TestCase):
 
     def test_min_length(self):
         string = String(min_length=5, max_length=7)
-        self.assertEquals(string.min_length, 5)
+        self.assertEqual(string.min_length, 5)
         self.assertRaises(exception.MinimumLengthError, string.validate, "1234")
         self.assertEqual(string.validate("12345"), "12345")
 
@@ -40,14 +40,14 @@ class StringUnitTest(unittest.TestCase):
 
     def test_max_length(self):
         string = String(min_length=5, max_length=7)
-        self.assertEquals(string.max_length, 7)
+        self.assertEqual(string.max_length, 7)
         self.assertRaises(exception.MaximumLengthError, string.validate, "123456789")
         self.assertEqual(string.validate("1234567"), "1234567")
 
     def test_format(self):
         format_string = "[0-9]{2}[a-z]{5}[0-9]{3}"
         string = String(format=format_string)
-        self.assertEquals(string.format, format_string)
+        self.assertEqual(string.format, format_string)
         self.assertRaises(exception.InvalidFormatError, string.validate, "cat")
         self.assertRaises(exception.InvalidFormatError, string.validate, "ab45678as")
         self.assertEqual(string.validate("12abcde123"), "12abcde123")
@@ -56,7 +56,7 @@ class StringUnitTest(unittest.TestCase):
     def test_choices(self):
         choices = ["apple", "banana"]
         string = String(choices=choices)
-        self.assertEquals(string.choices, choices)
+        self.assertEqual(string.choices, choices)
         self.assertRaises(exception.InvalidChoiceError, string.validate, "orange")
         self.assertRaises(exception.InvalidChoiceError, string.validate, "grape")
 
@@ -69,7 +69,7 @@ class StringUnitTest(unittest.TestCase):
 
         description = "Description"
         string = String(description=description)
-        self.assertEquals(string.description, description)
+        self.assertEqual(string.description, description)
 
     def test_trim(self):
         string = String()
@@ -80,10 +80,10 @@ class StringUnitTest(unittest.TestCase):
 
     def test_utf_encoding(self):
         string = String()
-        self.assertEquals(string.utf_encoding, "utf-8")
+        self.assertEqual(string.utf_encoding, "utf-8")
 
         string = String(utf_encoding="utf-16")
-        self.assertEquals(string.utf_encoding, "utf-16")
+        self.assertEqual(string.utf_encoding, "utf-16")
 
     def test_blueprint(self):
         string = String(
@@ -99,15 +99,15 @@ class StringUnitTest(unittest.TestCase):
         )
 
         blueprint = string.blueprint()
-        self.assertEquals(blueprint["type"], "string")
-        self.assertEquals(blueprint["constraints"]["default"], string.default)
-        self.assertEquals(blueprint["constraints"]["min_length"], string.min_length)
-        self.assertEquals(blueprint["constraints"]["max_length"], string.max_length)
-        self.assertEquals(blueprint["constraints"]["required"], string.required)
-        self.assertEquals(blueprint["constraints"]["format"], string.format)
-        self.assertEquals(blueprint["constraints"]["utf_encoding"], string.utf_encoding)
-        self.assertEquals(blueprint["constraints"]["description"], string.description)
-        self.assertEquals(blueprint["constraints"]["trim"], string.trim)
+        self.assertEqual(blueprint["type"], "string")
+        self.assertEqual(blueprint["constraints"]["default"], string.default)
+        self.assertEqual(blueprint["constraints"]["min_length"], string.min_length)
+        self.assertEqual(blueprint["constraints"]["max_length"], string.max_length)
+        self.assertEqual(blueprint["constraints"]["required"], string.required)
+        self.assertEqual(blueprint["constraints"]["format"], string.format)
+        self.assertEqual(blueprint["constraints"]["utf_encoding"], string.utf_encoding)
+        self.assertEqual(blueprint["constraints"]["description"], string.description)
+        self.assertEqual(blueprint["constraints"]["trim"], string.trim)
 
     def test_validate(self):
 
@@ -132,17 +132,17 @@ class StringUnitTest(unittest.TestCase):
         self.assertEqual(String(required=True, default="orange").validate("apple"), "apple")
 
         # test default not required
-        self.assertEquals(String(required=False, default="orange").validate(None), "orange")
-        self.assertEquals(String(required=False, default="orange").validate("apple"), "apple")
+        self.assertEqual(String(required=False, default="orange").validate(None), "orange")
+        self.assertEqual(String(required=False, default="orange").validate("apple"), "apple")
 
         # test unicode encode
-        self.assertEquals(String().validate(u"unicode"), u"unicode")
+        self.assertEqual(String().validate(u"unicode"), u"unicode")
 
         # test str parse
-        self.assertEquals(String().validate("string"), "string")
+        self.assertEqual(String().validate("string"), "string")
 
         # test int
-        self.assertEquals(String().validate(1234), "1234")
+        self.assertEqual(String().validate(1234), "1234")
 
         # check custom str which is broken
         class Custom(object):

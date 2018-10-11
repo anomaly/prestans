@@ -66,8 +66,7 @@ setup(
     maintainer_email='support@anomaly.net.au',
     platforms=['any'],
     entry_points={'console_scripts': ['pride = prestans.bin.pride:main']},
-    # scripts=['prestans/bin/pride'],
-    packages=find_packages(),
+    # packages=find_packages(include=['prestans'], exclude=["tests"]),
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -84,6 +83,7 @@ setup(
         'jinja2',
         'pytest',
         'pytest-cov',
+        'pytest-runner',
         'mock',
         'tox',
         'tox-pyenv',

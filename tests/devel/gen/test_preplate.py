@@ -14,11 +14,11 @@ class PreplateTest(unittest.TestCase):
             filter_namespace="project.namespace.filters",
             output_directory="project/namespace/models"
         )
-        self.assertEquals(preplate.template_type, "closure.model")
-        self.assertEquals(preplate.model_file, "project/models.py")
-        self.assertEquals(preplate.namespace, "project.namespace.models")
-        self.assertEquals(preplate.filter_namespace, "project.namespace.filters")
-        self.assertEquals(preplate.output_directory, "project/namespace/models")
+        self.assertEqual(preplate.template_type, "closure.model")
+        self.assertEqual(preplate.model_file, "project/models.py")
+        self.assertEqual(preplate.namespace, "project.namespace.models")
+        self.assertEqual(preplate.filter_namespace, "project.namespace.filters")
+        self.assertEqual(preplate.output_directory, "project/namespace/models")
 
         from jinja2 import Environment
         self.assertTrue(isinstance(preplate.template_engine, Environment))
@@ -32,7 +32,7 @@ class PreplateTest(unittest.TestCase):
             filter_namespace="project.namespace.filters",
             output_directory="namespace/models"
         )
-        self.assertEquals(preplate.run(), 1)
+        self.assertEqual(preplate.run(), 1)
 
     @patch("prestans.devel.gen.closure.Model.run", return_value=0)
     @patch("prestans.devel.gen.closure.Model.__init__", return_value=None)
@@ -44,7 +44,7 @@ class PreplateTest(unittest.TestCase):
             filter_namespace="namespace.filters",
             output_directory="namespace/models"
         )
-        self.assertEquals(preplate.run(), 0)
+        self.assertEqual(preplate.run(), 0)
         model_init.assert_called_with(
             template_engine=preplate.template_engine,
             model_file=preplate.model_file,
@@ -64,7 +64,7 @@ class PreplateTest(unittest.TestCase):
             filter_namespace="namespace.filters",
             output_directory="namespace/filter"
         )
-        self.assertEquals(preplate.run(), 0)
+        self.assertEqual(preplate.run(), 0)
         filter_init.assert_called_with(
             template_engine=preplate.template_engine,
             model_file=preplate.model_file,

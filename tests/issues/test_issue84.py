@@ -50,7 +50,7 @@ class Issue84(unittest.TestCase):
         attribute_filter.first_name = True
 
         adapted_users = sqlalchemy.adapt_persistent_collection(users, UserREST, attribute_filter)
-        self.assertEquals(adapted_users[0].first_name, "James")
+        self.assertEqual(adapted_users[0].first_name, "James")
         self.assertIsNone(adapted_users[0].last_name)
 
     def test_correct_adaption_instance(self):
@@ -63,7 +63,7 @@ class Issue84(unittest.TestCase):
         attribute_filter.first_name = True
 
         adapted_user = sqlalchemy.adapt_persistent_instance(user, UserREST, attribute_filter)
-        self.assertEquals(adapted_user.first_name, "James")
+        self.assertEqual(adapted_user.first_name, "James")
         self.assertIsNone(adapted_user.last_name)
 
     def test_incorrect_adaption_raises_exception_collection(self):

@@ -37,6 +37,6 @@ class Issue125(unittest.TestCase):
         person = Person()
 
         person_rest = adapters.adapt_persistent_instance(person, PersonREST)
-        self.assertEquals(person_rest.first_name, person.first_name)
-        self.assertEquals(person_rest.last_name, person.last_name)
+        self.assertEqual(person_rest.first_name, person.first_name)
+        self.assertEqual(person_rest.last_name, person.last_name)
         self.assertIsNone(person_rest.class_method)

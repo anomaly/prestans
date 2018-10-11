@@ -9,11 +9,11 @@ class ArrayUnitTest(unittest.TestCase):
     def test_len(self):
         array = types.Array(element_template=types.Integer())
 
-        self.assertEquals(len(array), 0)
+        self.assertEqual(len(array), 0)
         array.append(1)
-        self.assertEquals(len(array), 1)
+        self.assertEqual(len(array), 1)
         array.append(2)
-        self.assertEquals(len(array), 2)
+        self.assertEqual(len(array), 2)
 
 
 class ArrayIter(unittest.TestCase):
@@ -28,7 +28,7 @@ class ArrayIter(unittest.TestCase):
 
         index = 0
         for element in array:
-            self.assertEquals(element, elements[index])
+            self.assertEqual(element, elements[index])
             index += 1
 
 
@@ -39,7 +39,7 @@ class ArrayGetItem(unittest.TestCase):
         self.assertRaises(IndexError, array.__getitem__, 0)
 
         array.append(1)
-        self.assertEquals(array[0], 1)
+        self.assertEqual(array[0], 1)
 
 
 class ArrayContains(unittest.TestCase):
@@ -65,14 +65,14 @@ class ArrayMaxLength(unittest.TestCase):
         self.assertIsNone(types.Array(element_template=types.Model()).max_length)
 
     def test_custom(self):
-        self.assertEquals(types.Array(element_template=types.Boolean(), max_length=1).max_length, 1)
-        self.assertEquals(types.Array(element_template=types.Float(), max_length=2).max_length, 2)
-        self.assertEquals(types.Array(element_template=types.Integer(), max_length=3).max_length, 3)
-        self.assertEquals(types.Array(element_template=types.String(), max_length=4).max_length, 4)
-        self.assertEquals(types.Array(element_template=types.Date(), max_length=5).max_length, 5)
-        self.assertEquals(types.Array(element_template=types.DateTime(), max_length=6).max_length, 6)
-        self.assertEquals(types.Array(element_template=types.Time(), max_length=7).max_length, 7)
-        self.assertEquals(types.Array(element_template=types.Model(), max_length=8).max_length, 8)
+        self.assertEqual(types.Array(element_template=types.Boolean(), max_length=1).max_length, 1)
+        self.assertEqual(types.Array(element_template=types.Float(), max_length=2).max_length, 2)
+        self.assertEqual(types.Array(element_template=types.Integer(), max_length=3).max_length, 3)
+        self.assertEqual(types.Array(element_template=types.String(), max_length=4).max_length, 4)
+        self.assertEqual(types.Array(element_template=types.Date(), max_length=5).max_length, 5)
+        self.assertEqual(types.Array(element_template=types.DateTime(), max_length=6).max_length, 6)
+        self.assertEqual(types.Array(element_template=types.Time(), max_length=7).max_length, 7)
+        self.assertEqual(types.Array(element_template=types.Model(), max_length=8).max_length, 8)
 
 
 class ArrayMinLength(unittest.TestCase):
@@ -88,14 +88,14 @@ class ArrayMinLength(unittest.TestCase):
         self.assertIsNone(types.Array(element_template=types.Model()).min_length)
 
     def test_custom(self):
-        self.assertEquals(types.Array(element_template=types.Boolean(), min_length=1).min_length, 1)
-        self.assertEquals(types.Array(element_template=types.Float(), min_length=2).min_length, 2)
-        self.assertEquals(types.Array(element_template=types.Integer(), min_length=3).min_length, 3)
-        self.assertEquals(types.Array(element_template=types.String(), min_length=4).min_length, 4)
-        self.assertEquals(types.Array(element_template=types.Date(), min_length=5).min_length, 5)
-        self.assertEquals(types.Array(element_template=types.DateTime(), min_length=6).min_length, 6)
-        self.assertEquals(types.Array(element_template=types.Time(), min_length=7).min_length, 7)
-        self.assertEquals(types.Array(element_template=types.Model(), min_length=8).min_length, 8)
+        self.assertEqual(types.Array(element_template=types.Boolean(), min_length=1).min_length, 1)
+        self.assertEqual(types.Array(element_template=types.Float(), min_length=2).min_length, 2)
+        self.assertEqual(types.Array(element_template=types.Integer(), min_length=3).min_length, 3)
+        self.assertEqual(types.Array(element_template=types.String(), min_length=4).min_length, 4)
+        self.assertEqual(types.Array(element_template=types.Date(), min_length=5).min_length, 5)
+        self.assertEqual(types.Array(element_template=types.DateTime(), min_length=6).min_length, 6)
+        self.assertEqual(types.Array(element_template=types.Time(), min_length=7).min_length, 7)
+        self.assertEqual(types.Array(element_template=types.Model(), min_length=8).min_length, 8)
 
 
 class ArrayDescription(unittest.TestCase):
@@ -112,25 +112,25 @@ class ArrayDescription(unittest.TestCase):
 
     def test_custom(self):
         boolean_array = types.Array(element_template=types.Boolean(), description="boolean")
-        self.assertEquals(boolean_array.description, "boolean")
+        self.assertEqual(boolean_array.description, "boolean")
 
         float_array = types.Array(element_template=types.Float(), description="float")
-        self.assertEquals(float_array.description, "float")
+        self.assertEqual(float_array.description, "float")
 
         integer_array = types.Array(element_template=types.Integer(), description="integer")
-        self.assertEquals(integer_array.description, "integer")
+        self.assertEqual(integer_array.description, "integer")
 
         string_array = types.Array(element_template=types.String(), description="string")
-        self.assertEquals(string_array.description, "string")
+        self.assertEqual(string_array.description, "string")
 
         date_array = types.Array(element_template=types.Date(), description="date")
-        self.assertEquals(date_array.description, "date")
+        self.assertEqual(date_array.description, "date")
 
         datetime_array = types.Array(element_template=types.DateTime(), description="datetime")
-        self.assertEquals(datetime_array.description, "datetime")
+        self.assertEqual(datetime_array.description, "datetime")
 
         time_array = types.Array(element_template=types.Date(), description="time")
-        self.assertEquals(time_array.description, "time")
+        self.assertEqual(time_array.description, "time")
 
 
 class ArrayIsScalar(unittest.TestCase):
@@ -156,19 +156,19 @@ class ArrayIsScalar(unittest.TestCase):
         self.assertRaises(TypeError, types.Array, element_template="string")
 
         array = types.Array(element_template=float_element_template)
-        self.assertEquals(array.element_template, float_element_template)
+        self.assertEqual(array.element_template, float_element_template)
         array.element_template = string_element_template
-        self.assertEquals(array.element_template, string_element_template)
+        self.assertEqual(array.element_template, string_element_template)
 
     def test_blueprint(self):
         array_default = types.Array(element_template=types.String())
         blueprint_default = array_default.blueprint()
-        self.assertEquals(blueprint_default["type"], "array")
-        self.assertEquals(blueprint_default["constraints"]["required"], True)
-        self.assertEquals(blueprint_default["constraints"]["min_length"], None)
-        self.assertEquals(blueprint_default["constraints"]["max_length"], None)
-        self.assertEquals(blueprint_default["constraints"]["element_template"], types.String().blueprint())
-        self.assertEquals(blueprint_default["constraints"]["description"], None)
+        self.assertEqual(blueprint_default["type"], "array")
+        self.assertEqual(blueprint_default["constraints"]["required"], True)
+        self.assertEqual(blueprint_default["constraints"]["min_length"], None)
+        self.assertEqual(blueprint_default["constraints"]["max_length"], None)
+        self.assertEqual(blueprint_default["constraints"]["element_template"], types.String().blueprint())
+        self.assertEqual(blueprint_default["constraints"]["description"], None)
 
         array_custom = types.Array(
             required=False,
@@ -178,12 +178,12 @@ class ArrayIsScalar(unittest.TestCase):
             description="description"
         )
         blueprint_custom = array_custom.blueprint()
-        self.assertEquals(blueprint_custom["type"], "array")
-        self.assertEquals(blueprint_custom["constraints"]["required"], False)
-        self.assertEquals(blueprint_custom["constraints"]["min_length"], 1)
-        self.assertEquals(blueprint_custom["constraints"]["max_length"], 10)
-        self.assertEquals(blueprint_custom["constraints"]["element_template"], types.String(default="cat").blueprint())
-        self.assertEquals(blueprint_custom["constraints"]["description"], "description")
+        self.assertEqual(blueprint_custom["type"], "array")
+        self.assertEqual(blueprint_custom["constraints"]["required"], False)
+        self.assertEqual(blueprint_custom["constraints"]["min_length"], 1)
+        self.assertEqual(blueprint_custom["constraints"]["max_length"], 10)
+        self.assertEqual(blueprint_custom["constraints"]["element_template"], types.String(default="cat").blueprint())
+        self.assertEqual(blueprint_custom["constraints"]["description"], "description")
 
 
 class ArrayRemove(unittest.TestCase):
@@ -192,25 +192,25 @@ class ArrayRemove(unittest.TestCase):
         array = types.Array(element_template=types.String())
         array.append("dog")
         array.append("cat")
-        self.assertEquals(len(array), 2)
+        self.assertEqual(len(array), 2)
         array.remove("dog")
-        self.assertEquals(len(array), 1)
+        self.assertEqual(len(array), 1)
         array.remove("cat")
-        self.assertEquals(len(array), 0)
+        self.assertEqual(len(array), 0)
 
 
 class ArrayAppend(unittest.TestCase):
 
     def test_append_data_type(self):
         array = types.Array(element_template=types.String())
-        self.assertEquals(len(array), 0)
+        self.assertEqual(len(array), 0)
 
         array.append("dog")
-        self.assertEquals(len(array), 1)
+        self.assertEqual(len(array), 1)
         self.assertTrue("dog" in array)
 
         array.append(["cat", "rat"])
-        self.assertEquals(len(array), 3)
+        self.assertEqual(len(array), 3)
         self.assertTrue("cat" in array)
         self.assertTrue("rat"in array)
 
@@ -219,14 +219,14 @@ class ArrayAppend(unittest.TestCase):
             name = types.String()
 
         array = types.Array(element_template=MyModel())
-        self.assertEquals(len(array), 0)
+        self.assertEqual(len(array), 0)
 
         self.assertRaises(TypeError, array.append, "string")
-        self.assertEquals(len(array), 0)
+        self.assertEqual(len(array), 0)
 
         my_model = MyModel(name="alice")
         validated = array.validate([my_model.as_serializable()])
-        self.assertEquals(validated.as_serializable(), [{"name": "alice"}])
+        self.assertEqual(validated.as_serializable(), [{"name": "alice"}])
 
 
 class ArrayValidate(unittest.TestCase):
@@ -263,30 +263,30 @@ class ArrayValidate(unittest.TestCase):
         persons.append(Person(first_name="John", last_name="Smith"))
 
         persons_validated = persons.validate(persons.as_serializable(minified=True), minified=True)
-        self.assertEquals(persons_validated.as_serializable(minified=True), [{"a_c": "John", "b_c": "Smith"}])
-        self.assertEquals(persons_validated.as_serializable(), [{"first_name": "John", "last_name": "Smith"}])
+        self.assertEqual(persons_validated.as_serializable(minified=True), [{"a_c": "John", "b_c": "Smith"}])
+        self.assertEqual(persons_validated.as_serializable(), [{"first_name": "John", "last_name": "Smith"}])
 
 
 class ArrayAsSerializable(unittest.TestCase):
 
     def test_data_type(self):
         array_empty = types.Array(element_template=types.String())
-        self.assertEquals(array_empty.as_serializable(), [])
+        self.assertEqual(array_empty.as_serializable(), [])
 
         array_strings = types.Array(element_template=types.String())
         array_strings.append("cat")
         array_strings.append("dog")
-        self.assertEquals(array_strings.as_serializable(), ["cat", "dog"])
+        self.assertEqual(array_strings.as_serializable(), ["cat", "dog"])
 
     def test_data_structure(self):
         from datetime import date
         array_empty = types.Array(element_template=types.Date())
-        self.assertEquals(array_empty.as_serializable(), [])
+        self.assertEqual(array_empty.as_serializable(), [])
 
         array_dates = types.Array(element_template=types.Date())
         array_dates.append(date(2018, 1, 1))
         array_dates.append("2018-01-02")
-        self.assertEquals(array_dates.as_serializable(), ["2018-01-01", "2018-01-02"])
+        self.assertEqual(array_dates.as_serializable(), ["2018-01-01", "2018-01-02"])
 
     def test_data_collection(self):
         class MyModel(types.Model):
@@ -296,7 +296,7 @@ class ArrayAsSerializable(unittest.TestCase):
         array_model.append(MyModel(name="bob"))
         array_model.append(MyModel(name="carol"))
 
-        self.assertEquals(
+        self.assertEqual(
             array_model.as_serializable(),
             [
                 {"name": "alice"},
@@ -326,7 +326,7 @@ class ArrayAsSerializable(unittest.TestCase):
         model_b.sub_model.name = "carol"
         array_sub_model.append(model_b)
 
-        self.assertEquals(
+        self.assertEqual(
             array_sub_model.as_serializable(),
             [
                 {"name": "alice", "sub_model": {"name": "bob"}},
@@ -346,7 +346,7 @@ class ArrayAsSerializable(unittest.TestCase):
         array_sub_array = types.Array(element_template=MyModel())
         array_sub_array.append(my_model)
 
-        self.assertEquals(
+        self.assertEqual(
             array_sub_array.as_serializable(),
             [
                 {"name": "alice", "tags": ["a", "b", "c"]}
@@ -369,7 +369,7 @@ class ArrayAsSerializable(unittest.TestCase):
         array_sub_array = types.Array(element_template=ParentModel())
         array_sub_array.append(my_model)
 
-        self.assertEquals(
+        self.assertEqual(
             array_sub_array.as_serializable(),
             [
                 {"name": "alice", "people": [{"name": "bob"}]}
@@ -402,7 +402,7 @@ class ArrayAttributeRewriteMap(unittest.TestCase):
             dog = types.String()
 
         array = types.Array(element_template=MyModel())
-        self.assertEquals(array.attribute_rewrite_map(), MyModel().attribute_rewrite_map())
+        self.assertEqual(array.attribute_rewrite_map(), MyModel().attribute_rewrite_map())
 
 
 class ArrayAttributeRewriteReverseMap(unittest.TestCase):
@@ -424,7 +424,7 @@ class ArrayAttributeRewriteReverseMap(unittest.TestCase):
             dog = types.String()
 
         array = types.Array(element_template=MyModel())
-        self.assertEquals(array.attribute_rewrite_reverse_map(), MyModel().attribute_rewrite_reverse_map())
+        self.assertEqual(array.attribute_rewrite_reverse_map(), MyModel().attribute_rewrite_reverse_map())
 
 
 class ArrayGetAttributeFilter(unittest.TestCase):

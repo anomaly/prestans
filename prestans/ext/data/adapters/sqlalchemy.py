@@ -53,7 +53,7 @@ class ModelAdapter(adapters.ModelAdapter):
     def __init__(self, rest_model_class, persistent_model_class):
         import logging
         logger = logging.getLogger("prestans")
-        logger.warn("direct use of %s has been deprecated please use %s instead" % (
+        logger.warning("direct use of %s has been deprecated please use %s instead" % (
             self.__module__ + "." + self.__class__.__name__,
             adapters.ModelAdapter.__module__ + "." + adapters.ModelAdapter.__name__
         ))

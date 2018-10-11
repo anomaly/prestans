@@ -13,7 +13,7 @@ class ErrorResponseTest(unittest.TestCase):
         json_serializer = JSON()
 
         error_response = ErrorResponse(raised_exception, json_serializer)
-        self.assertEquals(error_response._exception, raised_exception)
+        self.assertEqual(error_response._exception, raised_exception)
 
     def test_call_default(self):
         raised_exception = exception.NoEndpointError()
@@ -26,7 +26,7 @@ class ErrorResponseTest(unittest.TestCase):
 
         environ = {}
 
-        self.assertEquals(
+        self.assertEqual(
             error_response(environ, start_response),
             [b'{"code": 404, "message": "API does not provide this end-point", "trace": []}']
         )
@@ -55,4 +55,4 @@ class ErrorResponseTest(unittest.TestCase):
 
         environ = {}
 
-        self.assertEquals(error_response(environ, start_response), [b'{"custom_message": "custom"}'])
+        self.assertEqual(error_response(environ, start_response), [b'{"custom_message": "custom"}'])

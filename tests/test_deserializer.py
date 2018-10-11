@@ -28,7 +28,7 @@ class DeserializerJSONUnitTest(unittest.TestCase):
         self.assertRaises(exception.DeSerializationFailedError, JSON().loads, "string")
 
     def test_content_type(self):
-        self.assertEquals(JSON().content_type(), "application/json")
+        self.assertEqual(JSON().content_type(), "application/json")
 
 
 class DeserializerPListUnitTest(unittest.TestCase):
@@ -48,4 +48,4 @@ class DeserializerPListUnitTest(unittest.TestCase):
         self.assertRaises(exception.DeSerializationFailedError, XMLPlist().loads, "string")
 
     def test_content_type(self):
-        self.assertEquals(XMLPlist().content_type(), "application/xml")
+        self.assertEqual(XMLPlist().content_type(), "application/xml")

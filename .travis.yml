@@ -3,6 +3,12 @@ matrix:
   include:
     - os: linux
       sudo: required
+      python: pypy
+    - os: linux
+      sudo: required
+      python: "pypy3.5-6.0.0"
+    - os: linux
+      sudo: required
       python: 2.7
     - os: linux
       sudo: required
@@ -10,6 +16,9 @@ matrix:
     - os: linux
       sudo: required
       python: 3.6
+    - os: linux
+      sudo: required
+      python: 3.7
 install:
   - pip install .
 script: make test

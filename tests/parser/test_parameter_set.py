@@ -38,21 +38,21 @@ class ParameterSetBlueprint(unittest.TestCase):
 
         parameter_set = MyParameterSet()
         blueprint = parameter_set.blueprint()
-        self.assertEquals(blueprint["type"], "tests.parser.test_parameter_set.MyParameterSet")
+        self.assertEqual(blueprint["type"], "tests.parser.test_parameter_set.MyParameterSet")
 
         name_blueprint = blueprint["fields"]["name"]
-        self.assertEquals(name_blueprint["type"], "string")
-        self.assertEquals(name_blueprint["constraints"]["default"], "Brad")
-        self.assertEquals(name_blueprint["constraints"]["min_length"], 3)
-        self.assertEquals(name_blueprint["constraints"]["max_length"], 32)
-        self.assertEquals(name_blueprint["constraints"]["required"], False)
-        self.assertEquals(name_blueprint["constraints"]["format"], "[a-zA-Z]{3, 32}")
-        self.assertEquals(name_blueprint["constraints"]["utf_encoding"], "utf-16")
-        self.assertEquals(name_blueprint["constraints"]["description"], "name for param set")
-        self.assertEquals(name_blueprint["constraints"]["trim"], False)
+        self.assertEqual(name_blueprint["type"], "string")
+        self.assertEqual(name_blueprint["constraints"]["default"], "Brad")
+        self.assertEqual(name_blueprint["constraints"]["min_length"], 3)
+        self.assertEqual(name_blueprint["constraints"]["max_length"], 32)
+        self.assertEqual(name_blueprint["constraints"]["required"], False)
+        self.assertEqual(name_blueprint["constraints"]["format"], "[a-zA-Z]{3, 32}")
+        self.assertEqual(name_blueprint["constraints"]["utf_encoding"], "utf-16")
+        self.assertEqual(name_blueprint["constraints"]["description"], "name for param set")
+        self.assertEqual(name_blueprint["constraints"]["trim"], False)
 
         tags_blueprint = blueprint["fields"]["tags"]
-        self.assertEquals(tags_blueprint["type"], "array")
+        self.assertEqual(tags_blueprint["type"], "array")
         # todo: fill this out with more checks
 
 

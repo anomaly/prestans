@@ -92,9 +92,9 @@ class Issue155(unittest.TestCase):
         resp = app.post_json(url="/no-auth", params=BODY, status="*")
         resp_body = json.loads(resp.body if isinstance(resp.body, str) else resp.body.decode())
 
-        self.assertEquals(resp.status_int, STATUS.OK)
-        self.assertEquals(resp_body["first_name"], BODY["first_name"])
-        self.assertEquals(resp_body["last_name"], BODY["last_name"])
+        self.assertEqual(resp.status_int, STATUS.OK)
+        self.assertEqual(resp_body["first_name"], BODY["first_name"])
+        self.assertEqual(resp_body["last_name"], BODY["last_name"])
 
     @patch("prestans.rest.request.Request.parsed_body", new_callable=PropertyMock)
     @patch("prestans.rest.request.Request.parse_body")

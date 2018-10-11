@@ -17,7 +17,7 @@ class ResponseInit(unittest.TestCase):
             serializers=[],
             default_serializer=None
         )
-        self.assertEquals(response.logger, logger)
+        self.assertEqual(response.logger, logger)
 
     def test_serializers(self):
         logger = logging.basicConfig()
@@ -28,8 +28,8 @@ class ResponseInit(unittest.TestCase):
             serializers=[JSON()],
             default_serializer=None
         )
-        self.assertEquals(response.supported_mime_types, ["application/json"])
-        self.assertEquals(response.supported_mime_types_str, "application/json")
+        self.assertEqual(response.supported_mime_types, ["application/json"])
+        self.assertEqual(response.supported_mime_types_str, "application/json")
 
         response = Response(
             charset="utf=8",
@@ -37,8 +37,8 @@ class ResponseInit(unittest.TestCase):
             serializers=[JSON(), XMLPlist()],
             default_serializer=None
         )
-        self.assertEquals(response.supported_mime_types, ["application/json", "application/xml"])
-        self.assertEquals(response.supported_mime_types_str, "application/json,application/xml")
+        self.assertEqual(response.supported_mime_types, ["application/json", "application/xml"])
+        self.assertEqual(response.supported_mime_types_str, "application/json,application/xml")
 
     def test_default_serializer(self):
         json_ser = JSON()
@@ -49,7 +49,7 @@ class ResponseInit(unittest.TestCase):
             serializers=[json_ser],
             default_serializer=json_ser
         )
-        self.assertEquals(response.default_serializer, json_ser)
+        self.assertEqual(response.default_serializer, json_ser)
 
     def test_prestans_version(self):
         response = Response(
@@ -60,7 +60,7 @@ class ResponseInit(unittest.TestCase):
         )
         from prestans import __version__
         self.assertTrue("Prestans-Version" in response.headers)
-        self.assertEquals(response.headers["Prestans-Version"], __version__)
+        self.assertEqual(response.headers["Prestans-Version"], __version__)
 
 
 class ResponseMinify(unittest.TestCase):

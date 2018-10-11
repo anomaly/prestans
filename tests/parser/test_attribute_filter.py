@@ -90,13 +90,13 @@ class AttributeFilterTest(unittest.TestCase):
     def test_keys_empty(self):
         empty_dict = AttributeFilter()
         empty_dict_keys = empty_dict.keys()
-        self.assertEquals(empty_dict_keys, [])
+        self.assertEqual(empty_dict_keys, [])
 
     def test_keys_dict(self):
         # test created from dict
         from_dict = AttributeFilter({"a": True, "b": False, "c": True})
         from_dict_keys = from_dict.keys()
-        self.assertEquals(from_dict_keys, ["a", "b", "c"])
+        self.assertEqual(from_dict_keys, ["a", "b", "c"])
 
     def test_keys_from_model(self):
         # test created from model
@@ -105,7 +105,7 @@ class AttributeFilterTest(unittest.TestCase):
             tags = types.Array(element_template=types.String())
 
         from_model = AttributeFilter.from_model(model_instance=MyModel())
-        self.assertEquals(from_model.keys(), ["name", "tags"])
+        self.assertEqual(from_model.keys(), ["name", "tags"])
 
 
 class AttributeFilterContains(unittest.TestCase):
@@ -313,7 +313,7 @@ class AttributeFilterAsDict(unittest.TestCase):
             }
         }
         filter_a = AttributeFilter(dict_a)
-        self.assertEquals(filter_a.as_dict(), dict_a)
+        self.assertEqual(filter_a.as_dict(), dict_a)
 
         dict_b = {
             "a": False,
@@ -324,7 +324,7 @@ class AttributeFilterAsDict(unittest.TestCase):
             "c": False
         }
         filter_b = AttributeFilter(dict_b)
-        self.assertEquals(filter_b.as_dict(), dict_b)
+        self.assertEqual(filter_b.as_dict(), dict_b)
 
 
 class AttributeFilterInitFromDictionary(unittest.TestCase):
