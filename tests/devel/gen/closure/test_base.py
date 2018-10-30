@@ -11,12 +11,12 @@ class BaseTest(unittest.TestCase):
 
         base = Base(
             template_engine=None,
-            model_file="models.py",
+            models_definition="models.py",
             namespace="namespace.models",
             output_directory="namespace/models"
         )
         self.assertIsNone(base._template_engine)
-        self.assertEqual(base._model_file, "models.py")
+        self.assertEqual(base._models_definition, "models.py")
         self.assertEqual(base._namespace, "namespace.models")
         self.assertEqual(base._output_directory, "namespace/models")
         self.assertEqual(base._dependencies, [])
@@ -25,7 +25,7 @@ class BaseTest(unittest.TestCase):
     def test_add_filter_dependency(self):
         base = Base(
             template_engine=None,
-            model_file="models.py",
+            models_definition="models.py",
             namespace="namespace.filters",
             output_directory="namespace/filters"
         )
@@ -58,7 +58,7 @@ class BaseTest(unittest.TestCase):
     def test_add_model_dependency(self):
         base = Base(
             template_engine=None,
-            model_file="models.py",
+            models_definition="models.py",
             namespace="namespace.models",
             output_directory="namespace/models"
         )
@@ -103,7 +103,7 @@ class BaseTest(unittest.TestCase):
     def test_add_attribute_string(self):
         base = Base(
             template_engine=None,
-            model_file="models.py",
+            models_definition="models.py",
             namespace="namespace.models",
             output_directory="namespace/models"
         )

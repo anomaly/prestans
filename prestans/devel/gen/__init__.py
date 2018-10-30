@@ -39,21 +39,27 @@ import prestans.types
 
 class Inspector(object):
 
-    def __init__(self, model_file):
-        self._model_file = model_file
+    def __init__(self, models_definition):
+        self._models_definition = models_definition
+
+        self._is_file = os.path.isfile(self._models_definition)
 
     def inspect(self):
 
         blueprints = list()
 
-        try:
-            sys.path.append(os.path.dirname(self._model_file))
-            model_python_file = os.path.split(self._model_file)[1:][0]
-            namespace = model_python_file.split(".")[0]
-            models = __import__(namespace, globals(), locals(), [])
-        except ImportError as import_error:
-            print ("\nFailed to process %s, %s" % (self._model_file, import_error))
-            sys.exit(1)
+        if self._is_file:
+            try:
+                sys.path.append(os.path.dirname(self._models_definition))
+                model_python_file = os.path.split(self._models_definition)[1:][0]
+                namespace = model_python_file.split(".")[0]
+                models = __import__(namespace, globals(), locals(), [])
+            except ImportError as import_error:
+                print ("\nFailed to process %s, %s" % (self._models_definition, import_error))
+                sys.exit(1)
+        else:
+            import importlib
+            models = importlib.import_module(name=self._models_definition)
 
         for name, type_instance in iter(models.__dict__.items()):
             if name.startswith('__') or inspect.ismethod(type_instance) or not inspect.isclass(type_instance) or\
@@ -70,10 +76,10 @@ class Inspector(object):
 
 class Preplate(object):
 
-    def __init__(self, template_type, model_file, namespace, filter_namespace, output_directory):
+    def __init__(self, template_type, models_definition, namespace, filter_namespace, output_directory):
         
         self._template_type = template_type
-        self._model_file = model_file
+        self._models_definition = models_definition
         self._namespace = namespace
         self._filter_namespace = filter_namespace
         self._output_directory = output_directory
@@ -91,8 +97,8 @@ class Preplate(object):
         return self._template_type
 
     @property
-    def model_file(self):
-        return self._model_file
+    def models_definition(self):
+        return self._models_definition
 
     @property
     def namespace(self):
@@ -117,7 +123,7 @@ class Preplate(object):
             from prestans.devel.gen.closure import Model
             template = Model(
                 template_engine=self._template_engine,
-                model_file=self._model_file,
+                models_definition=self.models_definition,
                 namespace=self._namespace,
                 filter_namespace=self._filter_namespace,
                 output_directory=self._output_directory
@@ -126,7 +132,7 @@ class Preplate(object):
             from prestans.devel.gen.closure import Filter
             template = Filter(
                 template_engine=self._template_engine,
-                model_file=self._model_file,
+                models_definition=self.models_definition,
                 namespace=self._namespace,
                 output_directory=self._output_directory
             )

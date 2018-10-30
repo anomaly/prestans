@@ -404,9 +404,9 @@ class AttributeMetaData(object):
 
 class Base(object):
 
-    def __init__(self, template_engine, model_file, namespace, output_directory):
+    def __init__(self, template_engine, models_definition, namespace, output_directory):
         self._template_engine = template_engine
-        self._model_file = model_file
+        self._models_definition = models_definition
         self._namespace = namespace
         self._output_directory = output_directory
         self._dependencies = list()
@@ -455,15 +455,15 @@ class Base(object):
 
 class Model(Base):
 
-    def __init__(self, template_engine, model_file, namespace, filter_namespace, output_directory):
+    def __init__(self, template_engine, models_definition, namespace, filter_namespace, output_directory):
     
-        Base.__init__(self, template_engine, model_file, namespace, output_directory)
+        Base.__init__(self, template_engine, models_definition, namespace, output_directory)
         self._filter_namespace = filter_namespace
         self._template = self._template_engine.get_template("closure/model/model.jinja")
 
     def run(self):
 
-        inspector = prestans.devel.gen.Inspector(model_file=self._model_file)
+        inspector = prestans.devel.gen.Inspector(models_definition=self._models_definition)
         blueprints = inspector.inspect()
 
         for model_blueprint in blueprints:
@@ -507,14 +507,14 @@ class Model(Base):
 
 class Filter(Base):
 
-    def __init__(self, template_engine, model_file, namespace, output_directory):
+    def __init__(self, template_engine, models_definition, namespace, output_directory):
 
-        Base.__init__(self, template_engine, model_file, namespace, output_directory)
+        Base.__init__(self, template_engine, models_definition, namespace, output_directory)
         self._template = self._template_engine.get_template("closure/filter/filter.jinja")
 
     def run(self):
 
-        inspector = prestans.devel.gen.Inspector(model_file=self._model_file)
+        inspector = prestans.devel.gen.Inspector(models_definition=self._models_definition)
         blueprints = inspector.inspect()
 
         for model_blueprint in blueprints:
