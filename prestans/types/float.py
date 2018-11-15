@@ -30,10 +30,10 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 from prestans import exception
-from prestans.types import DataType
+from prestans.types import ScalarType
 
 
-class Float(DataType):
+class Float(ScalarType):
 
     def __init__(self, default=None, minimum=None, maximum=None, required=True,
                  choices=None, description=None):

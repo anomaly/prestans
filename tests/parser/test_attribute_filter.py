@@ -35,14 +35,14 @@ class AttributeFilterTest(unittest.TestCase):
         self.assertRaises(TypeError, AttributeFilter.from_model, model_instance="string")
 
         # check that array scalar returns filter todo: work out how to further test this
-        array_scalar = AttributeFilter.from_model(types.Array(element_template=types.String()))
+        array_scalar = AttributeFilter.from_model(types.Array(element_template=types.ElementTemplate(types.String)))
         self.assertTrue(isinstance(array_scalar, AttributeFilter))
 
         # check that a model is constructed correctly and default values work
         class MyModel(types.Model):
             name = types.String()
             age = types.Integer()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         default = AttributeFilter.from_model(model_instance=MyModel())
         self.assertFalse(default.name)
@@ -102,7 +102,7 @@ class AttributeFilterTest(unittest.TestCase):
         # test created from model
         class MyModel(types.Model):
             name = types.String()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         from_model = AttributeFilter.from_model(model_instance=MyModel())
         self.assertEqual(from_model.keys(), ["name", "tags"])
@@ -120,7 +120,7 @@ class AttributeFilterContains(unittest.TestCase):
     def test_from_model(self):
         class MyModel(types.Model):
             name = types.String()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         from_model = AttributeFilter.from_model(model_instance=MyModel())
         self.assertTrue("name" in from_model)
@@ -136,7 +136,7 @@ class AttributeFilterIsFilterAtKey(unittest.TestCase):
             name = types.String()
 
         class ModelWithSub(types.Model):
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
             sub_model = SubModel()
 
         attribute_filter = AttributeFilter.from_model(model_instance=ModelWithSub())
@@ -334,7 +334,7 @@ class AttributeFilterInitFromDictionary(unittest.TestCase):
 
         class MyModel(types.Model):
             name = types.String()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         self.assertRaises(TypeError, AttributeFilter, {"name": True}, template_model="string")
         self.assertRaises(TypeError, AttributeFilter, {"name": "string"})
@@ -383,17 +383,17 @@ class AttributeFilterSetAttr(unittest.TestCase):
         self.assertRaises(TypeError, attribute_filter.__setattr__, "missing", None)
 
     def test_from_model_boolean_array(self):
-        boolean_array = types.Array(element_template=types.Boolean())
+        boolean_array = types.Array(element_template=types.ElementTemplate(types.Boolean))
         AttributeFilter.from_model(model_instance=boolean_array, default_value=True)
 
     def test_from_model_float_array(self):
-        float_array = types.Array(element_template=types.Float())
+        float_array = types.Array(element_template=types.ElementTemplate(types.Float))
         AttributeFilter.from_model(model_instance=float_array, default_value=True)
 
     def test_from_model_integer_array(self):
-        integer_array = types.Array(element_template=types.Integer())
+        integer_array = types.Array(element_template=types.ElementTemplate(types.Integer))
         AttributeFilter.from_model(model_instance=integer_array, default_value=True)
 
     def test_from_model_string_array(self):
-        string_array = types.Array(element_template=types.String())
+        string_array = types.Array(element_template=types.ElementTemplate(types.String))
         AttributeFilter.from_model(model_instance=string_array, default_value=True)

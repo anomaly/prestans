@@ -123,21 +123,21 @@ class VerbConfigTest(unittest.TestCase):
         pass
 
     def test_boolean_array(self):
-        boolean_array = types.Array(element_template=types.Boolean())
+        boolean_array = types.Array(element_template=types.ElementTemplate(types.Boolean))
         verb_config = VerbConfig(response_template=boolean_array)
         self.assertEqual(verb_config.response_template, boolean_array)
 
     def test_float_array(self):
-        float_array = types.Array(element_template=types.Float())
+        float_array = types.Array(element_template=types.ElementTemplate(types.Float))
         verb_config = VerbConfig(response_template=float_array)
         self.assertEqual(verb_config.response_template, float_array)
 
     def test_integer_array(self):
-        integer_array = types.Array(element_template=types.Integer())
+        integer_array = types.Array(element_template=types.ElementTemplate(types.Integer))
         verb_config = VerbConfig(response_template=integer_array)
         self.assertEqual(verb_config.response_template, integer_array)
 
     def test_string_array(self):
-        string_array = types.Array(element_template=types.String())
+        string_array = types.Array(element_template=types.ElementTemplate(types.String))
         verb_config = VerbConfig(response_template=string_array)
         self.assertEqual(verb_config.response_template, string_array)

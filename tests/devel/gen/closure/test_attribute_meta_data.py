@@ -343,7 +343,7 @@ class AttributeMetaDataTest(unittest.TestCase):
         self.assertEqual(data_url_file_meta.model_template, "User")
 
     def test_array_basic_type(self):
-        array = types.Array(element_template=types.String(default="default"))
+        array = types.Array(element_template=types.ElementTemplate(types.String, default="default"))
 
         blueprint = array.blueprint()
         blueprint["map_name"] = "b_a"
@@ -368,7 +368,7 @@ class AttributeMetaDataTest(unittest.TestCase):
         array = types.Array(
             min_length=1,
             max_length=10,
-            element_template=User()
+            element_template=types.ElementTemplate(User)
         )
 
         blueprint = array.blueprint()

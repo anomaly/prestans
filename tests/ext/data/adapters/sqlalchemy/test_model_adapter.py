@@ -54,12 +54,12 @@ class PersonREST(types.Model):
 
     address = AddressREST(required=False)
 
-    addresses = types.Array(element_template=AddressREST())
+    addresses = types.Array(element_template=types.ElementTemplate(AddressREST))
 
-    booleans = types.Array(element_template=types.Boolean())
-    floats = types.Array(element_template=types.Float())
-    integers = types.Array(element_template=types.Integer())
-    strings = types.Array(element_template=types.String())
+    booleans = types.Array(element_template=types.ElementTemplate(types.Boolean))
+    floats = types.Array(element_template=types.ElementTemplate(types.Float))
+    integers = types.Array(element_template=types.ElementTemplate(types.Integer))
+    strings = types.Array(element_template=types.ElementTemplate(types.String))
 
 
 class ModelAdapterUnitTest(unittest.TestCase):

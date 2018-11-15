@@ -102,13 +102,10 @@ class ModelAdapter(object):
                 # iterator uses the .append method exposed by prestans arrays to validate
                 # and populate the collection in the instance.
                 for collection_element in persistent_attr_value:
-                    if isinstance(rest_attr.element_template, types.Boolean) or \
-                       isinstance(rest_attr.element_template, types.Float) or \
-                       isinstance(rest_attr.element_template, types.Integer) or \
-                       isinstance(rest_attr.element_template, types.String):
+                    if rest_attr.element_template.is_scalar:
                         rest_model_array_handle.append(collection_element)
                     else:
-                        element_adapter = registry.get_adapter_for_rest_model(rest_attr.element_template)
+                        element_adapter = registry.get_adapter_for_rest_model(rest_attr.element_template.class_ref)
 
                         # check if there is a sub model filter
                         sub_attribute_filter = None
@@ -204,7 +201,7 @@ def adapt_persistent_collection(persistent_collection, target_rest_class=None, a
 
     # if the persistent_collection is empty then return a blank array
     if persistent_collection_length == 0:
-        return types.Array(element_template=target_rest_class())
+        return types.Array(element_template=types.ElementTemplate(target_rest_class))
 
     # try and get the adapter and the REST class for the persistent object
     if target_rest_class is None:
@@ -220,7 +217,7 @@ def adapt_persistent_collection(persistent_collection, target_rest_class=None, a
             target_rest_class
         )
 
-    adapted_models = types.Array(element_template=adapter_instance.rest_model_class())
+    adapted_models = types.Array(element_template=types.ElementTemplate(adapter_instance.rest_model_class))
 
     for persistent_object in persistent_collection:
         adapted_models.append(adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter))

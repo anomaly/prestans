@@ -32,10 +32,10 @@
 import re
 
 from prestans import exception
-from prestans.types import DataType
+from prestans.types import ScalarType
 
 
-class String(DataType):
+class String(ScalarType):
 
     def __init__(self, default=None, min_length=None, max_length=None,
                  required=True, format=None, choices=None, utf_encoding='utf-8',

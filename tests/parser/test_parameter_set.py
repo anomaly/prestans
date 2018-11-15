@@ -16,7 +16,7 @@ class ParameterSetBlueprint(unittest.TestCase):
             name = types.String()
 
         class BadArray(ParameterSet):
-            tags = types.Array(element_template=MyModel())
+            tags = types.Array(element_template=types.ElementTemplate(MyModel))
 
         self.assertRaises(TypeError, BadAttribute().blueprint)
         self.assertRaises(TypeError, BadArray().blueprint)
@@ -34,7 +34,7 @@ class ParameterSetBlueprint(unittest.TestCase):
                 description="name for param set",
                 trim=False
             )
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         parameter_set = MyParameterSet()
         blueprint = parameter_set.blueprint()
@@ -75,7 +75,7 @@ class ParameterSetValidate(unittest.TestCase):
             name = types.String()
 
         class ModelArray(ParameterSet):
-            model_array = types.Array(element_template=MyModel())
+            model_array = types.Array(element_template=types.ElementTemplate(MyModel))
 
         self.assertRaises(TypeError, ModelArray().validate, request)
 
@@ -84,6 +84,6 @@ class ParameterSetValidate(unittest.TestCase):
         request = Request({})
 
         class BooleanArray(ParameterSet):
-            bool_array = types.Array(element_template=types.Boolean())
+            bool_array = types.Array(element_template=types.ElementTemplate(types.Boolean))
 
         self.assertRaises(TypeError, BooleanArray().validate, request)

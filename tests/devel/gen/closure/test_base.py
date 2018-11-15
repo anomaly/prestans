@@ -40,7 +40,7 @@ class BaseTest(unittest.TestCase):
         base.add_filter_dependency(AttributeMetaData("user", user_blueprint))
         self.assertEqual(base._dependencies, ["namespace.filters.User"])
 
-        users_blueprint = types.Array(element_template=User()).blueprint()
+        users_blueprint = types.Array(element_template=types.ElementTemplate(User)).blueprint()
         users_blueprint["map_name"] = "b"
 
         base.add_filter_dependency(AttributeMetaData("users", users_blueprint))
@@ -49,7 +49,7 @@ class BaseTest(unittest.TestCase):
         class Log(types.Model):
             message = types.String()
 
-        logs_blueprint = types.Array(element_template=Log()).blueprint()
+        logs_blueprint = types.Array(element_template=types.ElementTemplate(Log)).blueprint()
         logs_blueprint["map_name"] = "c"
 
         base.add_filter_dependency(AttributeMetaData("logs", logs_blueprint))
@@ -79,13 +79,13 @@ class BaseTest(unittest.TestCase):
         base.add_model_dependency(AttributeMetaData("first_name", string_blueprint))
         self.assertEqual(base._dependencies, ["namespace.models.User", "prestans.types.String"])
 
-        array_basic = types.Array(element_template=types.String()).blueprint()
+        array_basic = types.Array(element_template=types.ElementTemplate(types.String)).blueprint()
         array_basic["map_name"] = "c"
 
         base.add_model_dependency(AttributeMetaData("tags", array_basic))
         self.assertEqual(base._dependencies, ["namespace.models.User", "prestans.types.String"])
 
-        array_model = types.Array(element_template=User()).blueprint()
+        array_model = types.Array(element_template=types.ElementTemplate(User)).blueprint()
         array_model["map_name"] = "d"
 
         base.add_model_dependency(AttributeMetaData("users", array_model))
@@ -124,7 +124,7 @@ class BaseTest(unittest.TestCase):
         base.add_attribute_string(AttributeMetaData("model", model_blueprint))
         self.assertEqual(base.attribute_string, "this.string_ || this.model_.anyFieldsEnabled()")
 
-        array_blueprint = types.Array(element_template=MyModel()).blueprint()
+        array_blueprint = types.Array(element_template=types.ElementTemplate(MyModel)).blueprint()
         array_blueprint["map_name"] = "c"
 
         base.add_attribute_string(AttributeMetaData("array", array_blueprint))

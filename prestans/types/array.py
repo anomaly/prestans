@@ -30,6 +30,9 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 from prestans import exception
+
+from prestans.types import ElementTemplate
+
 from prestans.types import DataCollection
 from prestans.types import DataStructure
 from prestans.types import DataType
@@ -43,10 +46,12 @@ from prestans.types import Date
 from prestans.types import DateTime
 from prestans.types import Time
 
+import inspect
+
 
 class Array(DataCollection):
 
-    def __init__(self, required=True,element_template=None,
+    def __init__(self, required=True, element_template=None,
                  min_length=None, max_length=None, description=None):
         """
         :param required:
@@ -59,23 +64,14 @@ class Array(DataCollection):
         :param description:
         :type description: str
         """
-
-        if not isinstance(element_template, DataType):
-            msg = "Array element_template must a DataType subclass; %s given" % element_template.__class__.__name__
-            raise TypeError(msg)
-
-        self._element_template = element_template  # type: DataType
-
-        # force required to be True if basic type in  use
-        if isinstance(element_template, DataType) and \
-           not isinstance(element_template, DataCollection) and \
-           not isinstance(element_template, DataStructure):
-            element_template._required = True
+        if not isinstance(element_template, ElementTemplate):
+            raise TypeError("element_template must be an instance of %s" % ElementTemplate.__name__)
 
         self._required = required
         self._min_length = min_length
         self._max_length = max_length
         self._description = description
+        self._element_template = element_template  # type: ElementTemplate
 
         self._array_elements = list()
 
@@ -98,10 +94,18 @@ class Array(DataCollection):
 
     @property
     def max_length(self):
+        """
+        :return:
+        :rtype: int or None
+        """
         return self._max_length
 
     @property
     def min_length(self):
+        """
+        :return:
+        :rtype: int or None
+        """
         return self._min_length
 
     @property
@@ -110,8 +114,11 @@ class Array(DataCollection):
 
     @property
     def is_scalar(self):
-        return isinstance(self._element_template, Float) or isinstance(self._element_template, Boolean) or \
-               isinstance(self._element_template, Integer) or isinstance(self._element_template, String)
+        """
+        :return:
+        :rtype: bool
+        """
+        return self.element_template.is_scalar
 
     @property
     def element_template(self):
@@ -130,7 +137,7 @@ class Array(DataCollection):
         constraints['required'] = self._required
         constraints['min_length'] = self._min_length
         constraints['max_length'] = self._max_length
-        constraints['element_template'] = self._element_template.blueprint()
+        constraints['element_template'] = self.element_template.blueprint
         constraints['description'] = self._description
 
         blueprint['constraints'] = constraints
@@ -153,8 +160,8 @@ class Array(DataCollection):
         if not self._required and not value:
             return None
 
-        _validated_value = self.__class__(
-            element_template=self._element_template,
+        _validated_array = self.__class__(
+            element_template=self.element_template,
             min_length=self._min_length,
             max_length=self._max_length
         )
@@ -163,21 +170,16 @@ class Array(DataCollection):
             raise TypeError(value)
 
         for array_element in value:
+            validated_array_element = self.element_template.validate(array_element, attribute_filter, minified)
+            _validated_array.append(validated_array_element)
 
-            if isinstance(self._element_template, DataCollection):
-                validated_array_element = self._element_template.validate(array_element, attribute_filter, minified)
-            else:
-                validated_array_element = self._element_template.validate(array_element)
-
-            _validated_value.append(validated_array_element)
-
-        if self._min_length is not None and len(_validated_value) < self._min_length:
+        if self._min_length is not None and len(_validated_array) < self._min_length:
             raise exception.LessThanMinimumError(value, self._min_length)
 
-        if self._max_length is not None and len(_validated_value) > self._max_length:
+        if self._max_length is not None and len(_validated_array) > self._max_length:
             raise exception.MoreThanMaximumError(value, self._max_length)
 
-        return _validated_value
+        return _validated_array
 
     def append(self, value):
 
@@ -187,60 +189,41 @@ class Array(DataCollection):
                 self.append(element)
             return
 
-        # check for basic types supported by array
-        if isinstance(self._element_template, Boolean) or \
-           isinstance(self._element_template, Float) or \
-           isinstance(self._element_template, Integer) or \
-           isinstance(self._element_template, String):
-            value = self._element_template.__class__().validate(value)
-        elif isinstance(self._element_template, Date) or \
-             isinstance(self._element_template, DateTime) or \
-             isinstance(self._element_template, Time):
-            value = self._element_template.__class__().validate(value)
-        elif not isinstance(value, self._element_template.__class__):
+        # scalar or data structure types should be validated before appending
+        # for example a data represented by a string needs to be turned into a datetime.date
+        if self.element_template.is_scalar or self.element_template.is_data_structure:
+            value = self.element_template.validate(value)
+        elif not isinstance(value, self.element_template.class_ref):
             msg = "prestans array elements must be of type %s; given %s" % (
-                self._element_template.__class__.__name__, value.__class__.__name__
+                self.element_template.class_ref.__name__,
+                value.__class__.__name__
             )
             raise TypeError(msg)
 
         self._array_elements.append(value)
 
     def as_serializable(self, attribute_filter=None, minified=False):
+        """
+        :param attribute_filter:
+        :param minified:
+        :type minified: bool
+        :return:
+        :rtype: list
+        """
 
         _result_array = list()
 
         for array_element in self._array_elements:
-
-            if isinstance(self._element_template, DataCollection):
-                serialized_value = array_element.as_serializable(attribute_filter, minified)
-                _result_array.append(serialized_value)
-            elif isinstance(self._element_template, DataStructure):
-                serialized_value = self._element_template.as_serializable(array_element)
-                _result_array.append(serialized_value)
-            elif isinstance(self._element_template, DataType):
-                _result_array.append(array_element)
+            serialized_value = self.element_template.as_serializable(array_element, attribute_filter, minified)
+            _result_array.append(serialized_value)
 
         return _result_array
 
     def attribute_rewrite_map(self):
-        if isinstance(self._element_template, DataCollection):
-            return self._element_template.attribute_rewrite_map()
-        else:
-            return None
+        return self.element_template.attribute_rewrite_map()
 
     def attribute_rewrite_reverse_map(self):
-        if isinstance(self._element_template, DataCollection):
-            return self._element_template.attribute_rewrite_reverse_map()
-        else:
-            return None
+        return self.element_template.attribute_rewrite_reverse_map()
 
     def get_attribute_filter(self, default_value=False):
-
-        attribute_filter = None
-
-        if isinstance(self._element_template, DataCollection):
-            attribute_filter = self._element_template.get_attribute_filter(default_value)
-        elif isinstance(self._element_template, DataType) or isinstance(self._element_template, DataStructure):
-            attribute_filter = default_value
-
-        return attribute_filter
+        return self.element_template.get_attribute_filter(default_value)

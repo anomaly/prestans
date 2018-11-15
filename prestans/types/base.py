@@ -40,6 +40,17 @@ class DataType(object):
         raise NotImplementedError
 
 
+class ScalarType(DataType):
+    """
+    Wrapper on python scalar types
+    """
+    def blueprint(self):
+        raise NotImplementedError
+
+    def validate(self, value):
+        raise NotImplementedError
+
+
 class DataStructure(DataType):
     """
     Wrappers on Python types generally represented as structures e.g DateTime

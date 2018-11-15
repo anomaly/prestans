@@ -68,21 +68,19 @@ class ParameterSet(object):
         for attribute_name, type_instance in self.getmembers():
 
             # must be one of the following types
-            if not isinstance(type_instance, String) and \
+            if not isinstance(type_instance, Integer) and \
                not isinstance(type_instance, Float) and \
-               not isinstance(type_instance, Integer) and \
+               not isinstance(type_instance, String) and \
                not isinstance(type_instance, Date) and \
                not isinstance(type_instance, DateTime) and \
                not isinstance(type_instance, Array):
-                raise TypeError("%s should be instance of\
-                 prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
+                raise TypeError("%s should be instance of prestans.types.String/Integer/Float/Date/DateTime/Array" % attribute_name)
 
             if isinstance(type_instance, Array):
-                if not isinstance(type_instance.element_template, String) and \
-                   not isinstance(type_instance.element_template, Float) and \
-                   not isinstance(type_instance.element_template, Integer):
-                    raise TypeError("%s should be instance of \
-                        prestans.types.String/Integer/Float/Array" % attribute_name)
+                if type_instance.element_template.class_ref != Float and \
+                   type_instance.element_template.class_ref != Integer and \
+                   type_instance.element_template.class_ref != String:
+                    raise TypeError("%s should be instance of prestans.types.String/Integer/Float/Array" % attribute_name)
 
             fields[attribute_name] = type_instance.blueprint()
 

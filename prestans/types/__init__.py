@@ -29,9 +29,10 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-from prestans.types.base import DataCollection
-from prestans.types.base import DataStructure
 from prestans.types.base import DataType
+from prestans.types.base import ScalarType
+from prestans.types.base import DataStructure
+from prestans.types.base import DataCollection
 
 from prestans.types.boolean import Boolean
 from prestans.types.float import Float
@@ -42,6 +43,7 @@ from prestans.types.date import Date
 from prestans.types.datetime_prestans import DateTime
 from prestans.types.time_prestans import Time
 
+from prestans.types.element_template import ElementTemplate
 from prestans.types.array import Array
 from prestans.types.model import Model
 from prestans.types.data_url_file import DataURLFile

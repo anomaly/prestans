@@ -48,7 +48,7 @@ class ModelUnitTest(unittest.TestCase):
         class ModelWithArray(types.Model):
             name = types.String()
             age = types.Integer()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         self.assertEqual(ModelWithArray().attribute_count(), 3)
 
@@ -65,7 +65,7 @@ class ModelUnitTest(unittest.TestCase):
         class ModelWithSubAndArray(types.Model):
             name = types.String()
             age = types.Integer()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
             sub = SubModel()
 
         self.assertEqual(ModelWithSubAndArray().attribute_count(), 4)
@@ -133,7 +133,7 @@ class ModelUnitTest(unittest.TestCase):
     def test_get_attribute_keys(self):
         class MyModel(types.Model):
             name = types.String()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
 
         my_model = MyModel()
         self.assertEqual(my_model.get_attribute_keys(), ["name", "tags"])
@@ -196,9 +196,9 @@ class ModelUnitTest(unittest.TestCase):
         class MyModel(types.Model):
             name = types.String()
             birthday = types.Date()
-            tags = types.Array(element_template=types.String())
+            tags = types.Array(element_template=types.ElementTemplate(types.String))
             sub = SubModel()
-            sub_array = types.Array(element_template=SubModel())
+            sub_array = types.Array(element_template=types.ElementTemplate(SubModel))
         my_model = MyModel()
         self.assertTrue("name" in my_model)
         self.assertTrue("birthday" in my_model)
