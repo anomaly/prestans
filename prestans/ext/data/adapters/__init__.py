@@ -68,6 +68,10 @@ class ModelAdapter(object):
 
         for attribute_key in rest_model_instance.get_attribute_keys():
 
+            # attribute is not visible don't bother processing
+            if isinstance(attribute_filter, parser.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_key):
+                continue
+
             rest_attr = getattr(self.rest_model_class, attribute_key)
 
             # don't bother processing if the persistent model doesn't have this attribute
@@ -87,10 +91,6 @@ class ModelAdapter(object):
             elif inspect.ismethod(getattr(persistent_object, attribute_key)):
                 import logging
                 logging.error("ignoring method: "+attribute_key)
-                continue
-            # attribute is not visible don't bother processing
-            elif isinstance(attribute_filter, parser.AttributeFilter) and \
-                    not attribute_filter.is_attribute_visible(attribute_key):
                 continue
 
             # handles prestans array population from SQLAlchemy relationships
