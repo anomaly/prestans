@@ -146,6 +146,17 @@ class SQLAlchemyDataAdapterAdaptPersistentInstance(unittest.TestCase):
         ))
 
         attribute_filter = AttributeFilter.from_model(ParentREST(), False)
+
+        self.assertFalse(attribute_filter.as_immutable().p_boolean)
+        self.assertFalse(attribute_filter.as_immutable().p_float)
+        self.assertFalse(attribute_filter.as_immutable().p_integer)
+        self.assertFalse(attribute_filter.as_immutable().p_string)
+        self.assertFalse(attribute_filter.as_immutable().is_attribute_visible("child"))
+        self.assertFalse(attribute_filter.as_immutable().child.c_boolean)
+        self.assertFalse(attribute_filter.as_immutable().child.c_float)
+        self.assertFalse(attribute_filter.as_immutable().child.c_integer)
+        self.assertFalse(attribute_filter.as_immutable().child.c_string)
+
         attribute_filter.p_boolean = True
         attribute_filter.p_float = True
         attribute_filter.p_integer = False
@@ -166,13 +177,17 @@ class SQLAlchemyDataAdapterAdaptPersistentInstance(unittest.TestCase):
         self.assertFalse(attribute_filter.child.is_attribute_visible("c_string"))
         self.assertFalse(attribute_filter.child.c_string)
 
-        persistent_model = ParentPersistent()
-
+        self.assertTrue(attribute_filter.as_immutable().p_boolean)
+        self.assertTrue(attribute_filter.as_immutable().p_float)
         self.assertFalse(attribute_filter.as_immutable().p_integer)
         self.assertTrue(attribute_filter.as_immutable().p_string)
+        self.assertTrue(attribute_filter.as_immutable().is_attribute_visible("child"))
+        self.assertTrue(attribute_filter.as_immutable().child.c_boolean)
+        self.assertTrue(attribute_filter.as_immutable().child.c_float)
         self.assertTrue(attribute_filter.as_immutable().child.c_integer)
         self.assertFalse(attribute_filter.as_immutable().child.c_string)
 
+        persistent_model = ParentPersistent()
         adapted_model = sqlalchemy.adapt_persistent_instance(persistent_model, ParentREST, attribute_filter)
         self.assertEqual(adapted_model.p_boolean, False)
         self.assertEqual(adapted_model.p_float, 33.3)

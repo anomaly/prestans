@@ -72,14 +72,9 @@ class ModelAdapter(object):
         for attribute_key in rest_model_instance.get_attribute_keys():
 
             # attribute is not visible don't bother processing
-            if isinstance(attribute_filter, parser.AttributeFilterImmutable) and not attribute_filter.is_attribute_visible(attribute_key):
-                import logging
-                logging.error("skipped: %s" % attribute_key)
+            if isinstance(attribute_filter, (parser.AttributeFilter, parser.AttributeFilterImmutable)) and \
+               not attribute_filter.is_attribute_visible(attribute_key):
                 continue
-            else:
-                import logging
-                logging.error(type(attribute_filter))
-                logging.error("did not skip: %s" % attribute_key)
 
             rest_attr = getattr(self.rest_model_class, attribute_key)
 
@@ -139,7 +134,7 @@ class ModelAdapter(object):
 
                         # check if there is a sub model filter
                         sub_attribute_filter = None
-                        if isinstance(attribute_filter, parser.AttributeFilter) and \
+                        if isinstance(attribute_filter, (parser.AttributeFilter, parser.AttributeFilterImmutable)) and \
                                 attribute_key in attribute_filter:
                             sub_attribute_filter = getattr(attribute_filter, attribute_key)
 
