@@ -1,3 +1,4 @@
+from mock import patch
 import unittest
 
 from prestans import exception
@@ -397,3 +398,13 @@ class AttributeFilterSetAttr(unittest.TestCase):
     def test_from_model_string_array(self):
         string_array = types.Array(element_template=types.String())
         AttributeFilter.from_model(model_instance=string_array, default_value=True)
+
+
+class AttributeFilterImmutable(unittest.TestCase):
+
+    def test_created_with_correct_filter(self):
+        from prestans.parser.attribute_filter_immutable import AttributeFilterImmutable
+
+        mutable_filter = AttributeFilter()
+        immutable_filter = mutable_filter.as_immutable()
+        self.assertTrue(isinstance(immutable_filter, AttributeFilterImmutable))

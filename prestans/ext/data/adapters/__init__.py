@@ -63,14 +63,23 @@ class ModelAdapter(object):
         """
         adapts a persistent model to a rest model by inspecting
         """
+        # convert filter to immutable if it isn't already
+        if isinstance(attribute_filter, parser.AttributeFilter):
+            attribute_filter = attribute_filter.as_immutable()
 
         rest_model_instance = self.rest_model_class()
 
         for attribute_key in rest_model_instance.get_attribute_keys():
 
             # attribute is not visible don't bother processing
-            if isinstance(attribute_filter, parser.AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_key):
+            if isinstance(attribute_filter, parser.AttributeFilterImmutable) and not attribute_filter.is_attribute_visible(attribute_key):
+                import logging
+                logging.error("skipped: %s" % attribute_key)
                 continue
+            else:
+                import logging
+                logging.error(type(attribute_filter))
+                logging.error("did not skip: %s" % attribute_key)
 
             rest_attr = getattr(self.rest_model_class, attribute_key)
 
@@ -102,10 +111,7 @@ class ModelAdapter(object):
                 # iterator uses the .append method exposed by prestans arrays to validate
                 # and populate the collection in the instance.
                 for collection_element in persistent_attr_value:
-                    if isinstance(rest_attr.element_template, types.Boolean) or \
-                       isinstance(rest_attr.element_template, types.Float) or \
-                       isinstance(rest_attr.element_template, types.Integer) or \
-                       isinstance(rest_attr.element_template, types.String):
+                    if rest_attr.is_scalar:
                         rest_model_array_handle.append(collection_element)
                     else:
                         element_adapter = registry.get_adapter_for_rest_model(rest_attr.element_template)
@@ -185,6 +191,10 @@ def adapt_persistent_instance(persistent_object, target_rest_class=None, attribu
     if attribute_filter is not None and isinstance(attribute_filter, parser.AttributeFilter):
         parser.AttributeFilter.from_model(target_rest_class).conforms_to_template_filter(attribute_filter)
 
+    # convert filter to immutable if it isn't already
+    if isinstance(attribute_filter, parser.AttributeFilter):
+        attribute_filter = attribute_filter.as_immutable()
+
     return adapter_instance.adapt_persistent_to_rest(persistent_object, attribute_filter)
 
 
@@ -219,6 +229,14 @@ def adapt_persistent_collection(persistent_collection, target_rest_class=None, a
             persistent_collection[0],
             target_rest_class
         )
+
+    # would raise an exception if the attribute_filter differs from the target_rest_class
+    if attribute_filter is not None and isinstance(attribute_filter, parser.AttributeFilter):
+        parser.AttributeFilter.from_model(target_rest_class).conforms_to_template_filter(attribute_filter)
+
+    # convert filter to immutable if it isn't already
+    if isinstance(attribute_filter, parser.AttributeFilter):
+        attribute_filter = attribute_filter.as_immutable()
 
     adapted_models = types.Array(element_template=adapter_instance.rest_model_class())
 

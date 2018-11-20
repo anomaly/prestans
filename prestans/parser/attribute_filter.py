@@ -325,3 +325,11 @@ class AttributeFilter(object):
 
         raise TypeError("%s name in %s must be of type Boolean or AttributeFilter, given %s" %
                         (key, self.__class__.__name__, value.__class__.__name__))
+
+    def as_immutable(self):
+        """
+        :return: immutable version of this attribute filter
+        :rtype: AttributeFilterImmutable
+        """
+        from prestans.parser.attribute_filter_immutable import AttributeFilterImmutable
+        return AttributeFilterImmutable(attribute_filter=self)

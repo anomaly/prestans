@@ -440,8 +440,7 @@ class Model(DataCollection):
 
             serialized_attribute_name = attribute_name
 
-            if isinstance(attribute_filter, AttributeFilter) and \
-               not attribute_filter.is_attribute_visible(attribute_name):
+            if isinstance(attribute_filter, AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
             # support minification

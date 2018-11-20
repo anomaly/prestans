@@ -495,7 +495,6 @@ class ModelAsSerializable(unittest.TestCase):
         self.assertEqual(serialized["last_name"], None)
 
 
-
 class ModelValidate(unittest.TestCase):
     def test_required_rejects_none(self):
 
@@ -568,43 +567,43 @@ class ModelValidate(unittest.TestCase):
 
     def test_child_data_collection_filtered(self):
         class ChildModel(types.Model):
-            name = types.String()
-            age = types.Integer()
+            child_name = types.String()
+            child_age = types.Integer()
 
         class ParentModel(types.Model):
-            name = types.String()
+            parent_name = types.String()
+            parent_percent = types.Float()
             child = ChildModel()
-            percent = types.Float()
 
         parent_model = ParentModel()
-        parent_model.name = "Nathan"
-        parent_model.percent = 33.3
-        parent_model.child.name = "Steve"
-        parent_model.child.age = 30
+        parent_model.parent_name = "Nathan"
+        parent_model.parent_percent = 33.3
+        parent_model.child.child_name = "Steve"
+        parent_model.child.child_age = 30
 
         parent_filter = AttributeFilter.from_model(ParentModel(default=False))
-        parent_filter.name = True
-        parent_filter.percent = True
-        parent_filter.child.name = True
-        parent_filter.child.age = True
+        parent_filter.parent_name = True
+        parent_filter.parent_percent = True
+        parent_filter.child.child_name = True
+        parent_filter.child.child_age = True
 
         validated = ParentModel().validate(parent_model.as_serializable(attribute_filter=parent_filter))
-        self.assertEqual(validated.name, "Nathan")
-        self.assertEqual(validated.percent, 33.3)
-        self.assertEqual(validated.child.name, "Steve")
-        self.assertEqual(validated.child.age, 30)
+        self.assertEqual(validated.parent_name, "Nathan")
+        self.assertEqual(validated.parent_percent, 33.3)
+        self.assertEqual(validated.child.child_name, "Steve")
+        self.assertEqual(validated.child.child_age, 30)
 
-        parent_filter.name = False
-        parent_filter.child.name = False
+        parent_filter.parent_name = False
+        parent_filter.child.child_name = False
 
         validated = ParentModel().validate(
             parent_model.as_serializable(attribute_filter=parent_filter),
             attribute_filter=parent_filter
         )
-        self.assertEqual(validated.name, None)
-        self.assertEqual(validated.percent, 33.3)
-        self.assertEqual(validated.child.name, None)
-        self.assertEqual(validated.child.age, 30)
+        self.assertEqual(validated.parent_name, None)
+        self.assertEqual(validated.parent_percent, 33.3)
+        self.assertEqual(validated.child.child_name, None)
+        self.assertEqual(validated.child.child_age, 30)
 
     def test_minified_true(self):
         class Person(types.Model):

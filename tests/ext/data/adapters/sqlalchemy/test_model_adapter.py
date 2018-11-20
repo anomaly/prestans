@@ -124,6 +124,10 @@ class ModelAdapterUnitTest(unittest.TestCase):
         self.assertEqual(person.first_name, "John")
         self.assertEqual(person.last_name, "Doe")
         self.assertEqual(person.address.street, "123 Street Address")
+
+        import logging
+        logging.error(person_rest.first_name)
+
         self.assertIsNone(person_rest.first_name)
         self.assertEqual(person.last_name, person_rest.last_name)
         self.assertEqual(person.address.street, person_rest.address.street)
