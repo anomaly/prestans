@@ -237,7 +237,6 @@ class ArrayValidate(unittest.TestCase):
 
     def test_validate_non_list_type_raises_type_error(self):
         array = types.Array(required=True, element_template=types.String())
-        self.assertRaises(TypeError, array.validate, None)
         self.assertRaises(TypeError, array.validate, "string")
         self.assertRaises(TypeError, array.validate, 1)
 

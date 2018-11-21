@@ -128,7 +128,7 @@ class ModelUnitTest(unittest.TestCase):
         self.assertEqual(my_model.string, "default")
         my_model = MyModel(string="string")
         self.assertEqual(my_model.string, "string")
-        self.assertIsNone(my_model.nothing)
+        self.assertEqual(my_model.nothing, None)
 
     def test_get_attribute_keys(self):
         class MyModel(types.Model):
@@ -525,6 +525,10 @@ class ModelValidate(unittest.TestCase):
             invisible = types.String(default="invisible")
 
         my_model = MyModel()
+        import logging
+        logging.error(my_model.visible)
+        logging.error(my_model.invisible)
+
         self.assertEqual(my_model.visible, "visible")
         self.assertEqual(my_model.invisible, "invisible")
 
@@ -533,7 +537,7 @@ class ModelValidate(unittest.TestCase):
 
         validated = my_model.validate({}, attribute_filter)
         self.assertEqual(validated.visible, "visible")
-        self.assertIsNone(validated.invisible)
+        self.assertEqual(validated.invisible, None)
 
         attribute_filter.visible = False
         attribute_filter.invisible = True
@@ -542,6 +546,7 @@ class ModelValidate(unittest.TestCase):
         self.assertIsNone(validated.visible)
         self.assertEqual(validated.invisible, "invisible")
 
+    @unittest.skip(reason="these are ignored instead of raising TypeError since prestans 2.5.0")
     def test_rejects_bad_attribute_type(self):
 
         class MyModel(types.Model):

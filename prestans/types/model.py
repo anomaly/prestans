@@ -34,7 +34,6 @@ import inspect
 import string
 
 from prestans import exception
-# from prestans.parser import AttributeFilter
 from prestans.types import DataCollection
 from prestans.types import DataStructure
 from prestans.types import DataType
@@ -42,7 +41,7 @@ from prestans.types import DataType
 
 class Model(DataCollection):
 
-    def __init__(self, required=True, default=None, description=None, **kwargs):
+    def __init__(self, required=True, description=None, **kwargs):
         """
         If you are using the Model constructor to provide Meta data, you can provide it
         a default dictionary to initialise instance to initialise it from
@@ -58,6 +57,8 @@ class Model(DataCollection):
         self._required = required
         self._description = description
 
+        self._templates = {}
+        self._attributes = {}
         self._create_instance_attributes(kwargs)
 
     def getmembers(self):
@@ -105,35 +106,56 @@ class Model(DataCollection):
         blueprint['fields'] = fields
         return blueprint
 
+    def __getattribute__(self, key):
+        value = object.__getattribute__(self, key)
+
+        if key[0:1] == "_":
+            return value
+
+        attributes = self.__dict__["_attributes"]
+        templates = self.__dict__["_templates"]
+
+        if value is not None and key not in templates:
+            return value
+
+        validator = templates.get(key)
+        # grab the value from local attribute dictionary for prestans types
+        if validator is not None:
+            value = attributes.get(key)
+
+        # if attribute is a data collection and no value found we need to copy the template
+        if isinstance(validator, DataCollection) and value is None:
+            copied = copy.deepcopy(validator)
+
+            self._attributes[key] = copied
+            value = copied
+
+        return value
+
     def __setattr__(self, key, value):
 
         if key[0:1] == "_":
             self.__dict__[key] = value
             return
 
-        validator = None
-        for attribute_name, type_instance in self.getmembers():
-            if attribute_name == key:
-                validator = type_instance
+        validator = self._templates.get(key)
+        if validator is None:
+            raise KeyError("No key named: %s in instance of type: %s" % (key, self.__class__.__name__))
 
-        if validator is not None:
+        try:
+            # if given an instance of data collection we can directly set it
+            if isinstance(validator, DataCollection) and validator.__class__ == value.__class__:
+                self._attributes[key] = value
+            else:
+                self._attributes[key] = validator.validate(value)
 
-            try:
-                if validator.__class__ == value.__class__:
-                    self.__dict__[key] = value
-                else:
-                    self.__dict__[key] = validator.validate(value)
-
-            except exception.DataValidationException as exp:
-                raise exception.ValidationError(
-                    message=str(exp),
-                    attribute_name=key,
-                    value=value,
-                    blueprint=validator.blueprint()
-                )
-            return
-
-        raise KeyError("No key named: %s in instance of type: %s" % (key, self.__class__.__name__))
+        except exception.DataValidationException as exp:
+            raise exception.ValidationError(
+                message=str(exp),
+                attribute_name=key,
+                value=value,
+                blueprint=validator.blueprint()
+            )
 
     def _create_instance_attributes(self, arguments):
         """
@@ -145,29 +167,19 @@ class Model(DataCollection):
 
         DataType instances are initialized to None or default value.
         """
-
         for attribute_name, type_instance in self.getmembers():
-
-            if isinstance(type_instance, DataCollection):
-                self.__dict__[attribute_name] = copy.deepcopy(type_instance)
-                continue
-
-            if type_instance is None:
-                self.__dict__[attribute_name] = None
-                continue
-
             if isinstance(type_instance, DataType):
+                self._templates[attribute_name] = type_instance
+
+                value = None
+                if attribute_name in arguments:
+                    value = arguments[attribute_name]
 
                 try:
-                    value = None
-
-                    if attribute_name in arguments:
-                        value = arguments[attribute_name]
-
-                    self.__dict__[attribute_name] = type_instance.validate(value)
-
-                except exception.DataValidationException as exp:
-                    self.__dict__[attribute_name] = None
+                    self._attributes[attribute_name] = type_instance.validate(value)
+                # we can safely ignore required warnings during initialization
+                except exception.RequiredAttributeError:
+                    self._attributes[attribute_name] = None
 
     def get_attribute_keys(self):
         """
@@ -229,15 +241,17 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
-        for attribute_name, type_instance in self.getmembers():
+        from prestans.parser import AttributeFilter
+        from prestans.parser import AttributeFilterImmutable
 
-            if attribute_filter and not attribute_filter.is_attribute_visible(attribute_name):
-                _model_instance.__dict__[attribute_name] = None
-
-                continue
-
+        for attribute_name, type_instance in iter(self._templates.items()):
             if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
+
+            if isinstance(attribute_filter, (AttributeFilter, AttributeFilterImmutable)) and \
+               not attribute_filter.is_attribute_visible(attribute_name):
+                _model_instance._attributes[attribute_name] = None
+                continue
 
             validation_input = None
 
@@ -265,7 +279,7 @@ class Model(DataCollection):
                 else:
                     validated_object = type_instance.validate(validation_input)
 
-                _model_instance.__dict__[attribute_name] = validated_object
+                _model_instance._attributes[attribute_name] = validated_object
 
             except exception.DataValidationException as exp:
                 raise exception.ValidationError(
@@ -431,6 +445,7 @@ class Model(DataCollection):
         :type minified: bool
         """
         from prestans.parser import AttributeFilter
+        from prestans.parser import AttributeFilterImmutable
 
         model_dictionary = dict()
 
@@ -440,14 +455,15 @@ class Model(DataCollection):
 
             serialized_attribute_name = attribute_name
 
-            if isinstance(attribute_filter, AttributeFilter) and not attribute_filter.is_attribute_visible(attribute_name):
+            if isinstance(attribute_filter, (AttributeFilter, AttributeFilterImmutable)) and \
+               not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
             # support minification
             if minified is True:
                 serialized_attribute_name = rewrite_map[attribute_name]
 
-            if attribute_name not in self.__dict__ or self.__dict__[attribute_name] is None:
+            if attribute_name not in self._attributes or self._attributes[attribute_name] is None:
                 model_dictionary[serialized_attribute_name] = None
                 continue
 
@@ -457,15 +473,14 @@ class Model(DataCollection):
                 if isinstance(attribute_filter, AttributeFilter) and attribute_name in attribute_filter:
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
-                model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name]. \
-                    as_serializable(sub_attribute_filter, minified)
+                model_dictionary[serialized_attribute_name] = self._attributes[attribute_name].as_serializable(sub_attribute_filter, minified)
 
             elif isinstance(type_instance, DataStructure):
-                python_value = self.__dict__[attribute_name]
+                python_value = self._attributes[attribute_name]
                 serializable_value = type_instance.as_serializable(python_value)
                 model_dictionary[serialized_attribute_name] = serializable_value
 
             elif isinstance(type_instance, DataType):
-                model_dictionary[serialized_attribute_name] = self.__dict__[attribute_name]
+                model_dictionary[serialized_attribute_name] = self._attributes[attribute_name]
 
         return model_dictionary

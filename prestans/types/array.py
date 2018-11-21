@@ -157,8 +157,10 @@ class Array(DataCollection):
         :return:
         """
 
-        if not self._required and not value:
+        if not self._required and value is None:
             return None
+        elif self._required and value is None:
+            raise exception.RequiredAttributeError()
 
         _validated_value = self.__class__(
             element_template=self._element_template,
