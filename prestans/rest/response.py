@@ -303,7 +303,7 @@ class Response(webob.Response):
 
             # body should be of type DataCollection try; attempt calling
             # as_serializable with available attribute_filter
-            serializable_body = self._app_iter.as_serializable(self.attribute_filter, self.minify)
+            serializable_body = self._app_iter.as_serializable(self.attribute_filter.as_immutable(), self.minify)
 
             #: attempt serializing via registered serializer
             stringified_body = self._selected_serializer.dumps(serializable_body)

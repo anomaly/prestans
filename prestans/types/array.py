@@ -218,6 +218,11 @@ class Array(DataCollection):
 
         _result_array = list()
 
+        # convert filter to immutable if it isn't already
+        from prestans.parser import AttributeFilter
+        if isinstance(attribute_filter, AttributeFilter):
+            attribute_filter = attribute_filter.as_immutable()
+
         for array_element in self._array_elements:
 
             if isinstance(self._element_template, DataCollection):

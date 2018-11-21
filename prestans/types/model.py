@@ -451,6 +451,10 @@ class Model(DataCollection):
 
         rewrite_map = self.attribute_rewrite_map()
 
+        # convert filter to immutable if it isn't already
+        if isinstance(attribute_filter, AttributeFilter):
+            attribute_filter = attribute_filter.as_immutable()
+
         for attribute_name, type_instance in self.getmembers():
 
             serialized_attribute_name = attribute_name
@@ -470,7 +474,7 @@ class Model(DataCollection):
             if isinstance(type_instance, DataCollection):
 
                 sub_attribute_filter = None
-                if isinstance(attribute_filter, AttributeFilter) and attribute_name in attribute_filter:
+                if isinstance(attribute_filter, (AttributeFilter, AttributeFilterImmutable)) and attribute_name in attribute_filter:
                     sub_attribute_filter = getattr(attribute_filter, attribute_name)
 
                 model_dictionary[serialized_attribute_name] = self._attributes[attribute_name].as_serializable(sub_attribute_filter, minified)
