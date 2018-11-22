@@ -67,7 +67,7 @@ setup(
     platforms=['any'],
     entry_points={'console_scripts': ['pride = prestans.bin.pride:main']},
     packages=find_packages(
-        include=['prestans.*'],
+        include=['prestans', 'prestans.*'],
         exclude=["tests"]
     ),
     classifiers=[
