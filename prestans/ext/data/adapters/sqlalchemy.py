@@ -29,7 +29,10 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-__all__ = ['ModelAdapter']
+__all__ = [
+    'adapt_persistent_instance',
+    'adapt_persistent_collection'
+]
 
 from prestans.ext.data import adapters
 

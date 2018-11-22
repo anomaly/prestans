@@ -17,15 +17,22 @@ coverage:
 
 .PHONY: dist
 dist:
+	if [ -a dist ]; then rm -rf dist/*; fi;
 	python setup.py sdist bdist_wheel
+
+.PHONY: release-test
+release-test:
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 .PHONY: release
 release:
-	python setup.py sdist bdist_wheel upload
+	twine upload dist/*
 
 .PHONY: clean
 clean:
 	python setup.py clean
+	if [ -a .cache ]; then rm -rf .cache; fi;
+	if [ -a .pytest_cache ]; then rm -rf .pytest_cache; fi;
 	if [ -a .eggs ]; then rm -rf .eggs; fi;
 	if [ -a build ]; then rm -rf build; fi;
 	if [ -a dist ]; then rm -rf dist; fi;

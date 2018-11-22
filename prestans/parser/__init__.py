@@ -1,4 +1,10 @@
-__all__ = ['Config', 'VerbConfig', 'AttributeFilter', 'ParameterSet']
+__all__ = [
+    'Config',
+    'VerbConfig',
+    'AttributeFilter',
+    'AttributeFilterImmutable',
+    'ParameterSet'
+]
 
 from prestans.parser.attribute_filter import AttributeFilter
 from prestans.parser.attribute_filter_immutable import AttributeFilterImmutable
