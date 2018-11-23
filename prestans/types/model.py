@@ -244,7 +244,7 @@ class Model(DataCollection):
         from prestans.parser import AttributeFilter
         from prestans.parser import AttributeFilterImmutable
 
-        for attribute_name, type_instance in iter(self._templates.items()):
+        for attribute_name, type_instance in self.getmembers():
             if not isinstance(type_instance, DataType):
                 raise TypeError("%s must be a DataType subclass" % attribute_name)
 
@@ -446,6 +446,7 @@ class Model(DataCollection):
         """
         from prestans.parser import AttributeFilter
         from prestans.parser import AttributeFilterImmutable
+        from prestans.types import Array
 
         model_dictionary = dict()
 
@@ -457,18 +458,20 @@ class Model(DataCollection):
 
         for attribute_name, type_instance in self.getmembers():
 
-            serialized_attribute_name = attribute_name
-
             if isinstance(attribute_filter, (AttributeFilter, AttributeFilterImmutable)) and \
                not attribute_filter.is_attribute_visible(attribute_name):
                 continue
 
             # support minification
+            serialized_attribute_name = attribute_name
             if minified is True:
                 serialized_attribute_name = rewrite_map[attribute_name]
 
             if attribute_name not in self._attributes or self._attributes[attribute_name] is None:
-                model_dictionary[serialized_attribute_name] = None
+                if isinstance(type_instance, Array):
+                    model_dictionary[serialized_attribute_name] = []
+                else:
+                    model_dictionary[serialized_attribute_name] = None
                 continue
 
             if isinstance(type_instance, DataCollection):

@@ -147,8 +147,12 @@ class Request(webob.Request):
             # parse the body using the deserializer
             unserialized_body = self.selected_deserializer.loads(self.body)
 
-            # valiate the body using the template and attribute_filter
-            self._parsed_body = self._body_template.validate(unserialized_body, self.attribute_filter, self.is_minified)
+            # validate the body using the template and attribute_filter
+            self._parsed_body = self._body_template.validate(
+                unserialized_body,
+                self.attribute_filter,
+                self.is_minified
+            )
 
     def register_deserializers(self, deserializers):
 
