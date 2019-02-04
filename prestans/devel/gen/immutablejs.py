@@ -417,9 +417,9 @@ class Base(object):
 
         dependency = None
         if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
-            dependency = "%s.%s" % (self._namespace, attribute.element_template)
+            dependency = attribute.element_template
         elif attribute.blueprint_type == 'model':
-            dependency = "%s.%s" % (self._namespace, attribute.model_template)
+            dependency = attribute.model_template
 
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)

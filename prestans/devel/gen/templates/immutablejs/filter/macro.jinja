@@ -1,37 +1,35 @@
 {% macro enableMethod(namespace, name, attribute) -%}
 enable{{attribute.cc}}() {
 {% if attribute.blueprint_type == 'model' %}
-    return this.set('{{ attribute.name }}', new {{attribute.model_template}}(true));
+        return this.set('{{ attribute.name }}', new {{attribute.model_template}}(true));
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-    return this.set('{{ attribute.name }}', new {{attribute.element_template}}(true));
+        return this.set('{{ attribute.name }}', new {{attribute.element_template}}(true));
 {% else %}
-    return this.set('{{ attribute.name }}', true);
+        return this.set('{{ attribute.name }}', true);
 {% endif %}
-}
+    }
 {%- endmacro %}
 
 {% macro disableMethod(namespace, name, attribute) -%}
 disable{{attribute.cc}}() {
 {% if attribute.blueprint_type == 'model' %}
-    return this.set('{{ attribute.name }}', new {{attribute.model_template}}(true));
+        return this.set('{{ attribute.name }}', new {{attribute.model_template}}(true));
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-    return this.set('{{ attribute.name }}', new {{attribute.element_template}}(true));
+        return this.set('{{ attribute.name }}', new {{attribute.element_template}}(true));
 {% else %}
-    return this.set('{{ attribute.name }}', true);
+        return this.set('{{ attribute.name }}', true);
 {% endif %}
-}
+    }
 {%- endmacro %}
 
 {% macro getMethod(namespace, name, attribute) -%}
 get{{attribute.cc}}() {
-    return this.get('{{ attribute.name }}');
-{% endif %}
-}
+        return this.get('{{ attribute.name }}');
+    }
 {%- endmacro %}
 
 {% macro setMethod(namespace, name, attribute) -%}
-set{{attribute.cc}}() {
-    return this.set('{{ attribute.name }}', attribute.name);
-{% endif %}
-}
+set{{attribute.cc}}({{attribute.name}}) {
+        return this.set('{{ attribute.name }}', {{attribute.name}});
+    }
 {%- endmacro %}
