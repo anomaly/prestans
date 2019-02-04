@@ -77,7 +77,7 @@ class Inspector(object):
 class Preplate(object):
 
     def __init__(self, template_type, models_definition, namespace, filter_namespace, output_directory):
-        
+
         self._template_type = template_type
         self._models_definition = models_definition
         self._namespace = namespace
@@ -136,8 +136,25 @@ class Preplate(object):
                 namespace=self._namespace,
                 output_directory=self._output_directory
             )
+        elif self._template_type == "immutablejs.model":
+            from prestans.devel.gen.immutablejs import Model
+            template = Model(
+                template_engine=self._template_engine,
+                models_definition=self.models_definition,
+                namespace=self._namespace,
+                filter_namespace=self._filter_namespace,
+                output_directory=self._output_directory
+            )
+        elif self._template_type == "immutablejs.filter":
+            from prestans.devel.gen.immutablejs import Filter
+            template = Filter(
+                template_engine=self._template_engine,
+                models_definition=self.models_definition,
+                namespace=self._namespace,
+                output_directory=self._output_directory
+            )
 
         if template is None:
             return 1
-        
+
         return template.run()
