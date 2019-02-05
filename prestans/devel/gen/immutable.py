@@ -427,14 +427,11 @@ class Base(object):
     # todo: move this to Model class
     def add_model_dependency(self, attribute):
 
+        dependency = None
         if attribute.blueprint_type == 'array' and attribute.element_template_is_model:
-            dependency = "%s.%s" % (self._namespace, attribute.element_template)
-        elif attribute.blueprint_type == 'array':
-            dependency = "%s.%s" % ("prestans.types", attribute.element_template.client_class_name)
+            dependency = attribute.element_template
         elif attribute.blueprint_type == 'model':
-            dependency = "%s.%s" % (self._namespace, attribute.model_template)
-        else:
-            dependency = "prestans.types.%s" % attribute.client_class_name
+            dependency = attribute.model_template
 
         if dependency is not None and dependency not in self._dependencies:
             self._dependencies.append(dependency)
@@ -459,7 +456,7 @@ class Model(Base):
 
         Base.__init__(self, template_engine, models_definition, namespace, output_directory)
         self._filter_namespace = filter_namespace
-        self._template = self._template_engine.get_template("immutablejs/model/model.jinja")
+        self._template = self._template_engine.get_template("immutable/model/model.jinja")
 
     def run(self):
 
@@ -510,7 +507,7 @@ class Filter(Base):
     def __init__(self, template_engine, models_definition, namespace, output_directory):
 
         Base.__init__(self, template_engine, models_definition, namespace, output_directory)
-        self._template = self._template_engine.get_template("immutablejs/filter/filter.jinja")
+        self._template = self._template_engine.get_template("immutable/filter/filter.jinja")
 
     def run(self):
 

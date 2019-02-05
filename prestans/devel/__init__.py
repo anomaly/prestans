@@ -83,7 +83,7 @@ class ArgParserFactory(object):
         gen_parser.add_argument(
             "-t",
             "--template",
-            choices=['closure.model', 'closure.filter', 'immutablejs.model', 'immutablejs.filter'],
+            choices=['closure.model', 'closure.filter', 'immutable.model', 'immutable.filter'],
             default='closure.model',
             required=True,
             dest="template",
