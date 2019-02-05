@@ -1,0 +1,11 @@
+{% macro getMethod(namespace, name, attribute) -%}
+get{{attribute.cc}}() {
+        return this.get('{{ attribute.name }}');
+    }
+{%- endmacro %}
+
+{% macro setMethod(namespace, name, attribute) -%}
+set{{attribute.cc}}({{attribute.name}}) {
+        return this.set('{{ attribute.name }}', {{attribute.name}});
+    }
+{%- endmacro %}

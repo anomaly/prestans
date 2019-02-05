@@ -72,7 +72,7 @@ class ArgParserFactory(object):
     def _add_generate_sub_commands(self):
         """
         Sub commands for generating models for usage by clients.
-        Currently supports Google Closure.
+        Currently supports Google Closure, and ImmutableJS.
         """
 
         gen_parser = self._subparsers_handle.add_parser(
@@ -83,7 +83,7 @@ class ArgParserFactory(object):
         gen_parser.add_argument(
             "-t",
             "--template",
-            choices=['closure.model', 'closure.filter'],
+            choices=['closure.model', 'closure.filter', 'immutable.model', 'immutable.filter'],
             default='closure.model',
             required=True,
             dest="template",
