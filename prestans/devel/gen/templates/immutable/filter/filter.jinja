@@ -11,7 +11,7 @@ const buildJS = value => {{ '({' }}
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
     {{attribute.name}}: new {{attribute.model_template}}(value){% if not loop.last %},{% endif %}
-{% elif attribute.blueprint_type == 'array' or attribute.element_template_is_model%}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model%}
     {{attribute.name}}: new {{attribute.element_template}}(value){% if not loop.last %},{% endif %}
 {% else %}
     {{attribute.name}}: value{% if not loop.last %},{% endif %}
@@ -24,8 +24,9 @@ const defaultValue = false;
 
 export default class {{name}} extends Record(buildJS(defaultValue)) {
     constructor(opt_initialValue) {
-        if (typeof opt_initialValue !== 'boolean') opt_initialValue = defaultValue;
-        super(buildJS(opt_initialValue));
+        let value = opt_initialValue
+        if (typeof opt_initialValue !== 'boolean') value = defaultValue;
+        super(buildJS(value));
     }
 
 {% for attribute in attributes %}
