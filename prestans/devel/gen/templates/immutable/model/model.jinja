@@ -33,11 +33,11 @@ export default class {{name}} extends Record({
         super({
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
-            {{attribute.name}}: new {{attribute.model_template}}({{attribute.name}}){% if not loop.last %},{% endif %}
+            {{attribute.name}}: {{attribute.name}} && new {{attribute.model_template}}({{attribute.name}}){% if not loop.last %},{% endif %}
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-            {{attribute.name}}: createListFromJSON({{attribute.element_template}}, {{attribute.name}}){% if not loop.last %},{% endif %}
+            {{attribute.name}}: {{attribute.name}} && createListFromJSON({{attribute.element_template}}, {{attribute.name}}){% if not loop.last %},{% endif %}
 {% elif attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
-            {{attribute.name}}: new List({{attribute.name}}){% if not loop.last %},{% endif %}
+            {{attribute.name}}: {{attribute.name}} && new List({{attribute.name}}){% if not loop.last %},{% endif %}
 {% else %}
             {{attribute.name}}{% if not loop.last %},{% endif %}
 {% endif %}
