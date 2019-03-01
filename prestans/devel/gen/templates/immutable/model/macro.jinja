@@ -3,6 +3,7 @@
 const {{ attribute.cc }}Schema = yup
 {% if attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
     .array()
+    .ensure()
     .of(yup
         {{ generateSchemaOptions(attribute.element_template, "        ") }}    )
 {% else %}
@@ -14,6 +15,7 @@ const {{ attribute.cc }}Schema = yup
 {% macro generateSchemaOptions(attribute, append) -%}
 {% if attribute.blueprint_type == 'string' %}
 .string()
+.ensure()
 {% elif attribute.blueprint_type == 'boolean' %}
 .boolean()
 {% elif attribute.blueprint_type == 'integer' %}
