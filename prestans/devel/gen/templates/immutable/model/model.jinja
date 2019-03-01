@@ -4,7 +4,7 @@
  */
 import { {% if attributes|selectattr("blueprint_type", "==", "array")|first %}List, {% endif %}Record } from 'immutable';
 import { {% if attributes|selectattr("blueprint_type", "==", "array")|selectattr("element_template_is_model", "==", True)|first %}createListFromJSON, {% endif %}filterByKey } from 'prestans-fetch';
-{% if attribute|selectattr("blueprint_type", "!=", ["model", "array"])|first or attribute|selectattr("blueprint_type", "==", "array")|selectattr("element_template_is_model", "==", False) %}import * as yup from 'yup';
+{% if attributes|selectattr("blueprint_type", "!=", "model")|selectattr("blueprint_type", "!=", "array")|first or attributes|selectattr("blueprint_type", "==", "array")|selectattr("element_template_is_model", "!=", True)|first %}import * as yup from 'yup';
 {% endif %}
 import Filter from '{{filter_namespace}}{{name}}';
 {% for dependency in dependencies %}
