@@ -20,7 +20,7 @@ const {{ attribute.cc }}Schema = yup
 .number()
 {{ append }}.integer()
 {% elif attribute.blueprint_type == 'float' %}
-number()
+.number()
 {% elif attribute.blueprint_type == 'datetime' %}
 .date()
 {% elif attribute.blueprint_type == 'date' %}
@@ -67,7 +67,7 @@ set{{ attribute.cc }}({{ attribute.name }} = {{ attribute.default }}) {
         if ({{ attribute.name }} === null) {
             return this.set('{{ attribute.name }}', {{ attribute.name }})
         }
-        return {{ attribute.name }} instanceof {{ attribute.cc }} ? this.set('{{ attribute.name }}', {{ attribute.name }}) : this;
+        return {{ attribute.name }} instanceof {{ attribute.model_template }} ? this.set('{{ attribute.name }}', {{ attribute.name }}) : this;
 {% elif attribute.blueprint_type == 'array' %}
 {% if attribute.element_template_is_model %}
         return {{ attribute.name }} instanceof List ? this.set('{{ attribute.name }}', {{ attribute.name }}) : this;
