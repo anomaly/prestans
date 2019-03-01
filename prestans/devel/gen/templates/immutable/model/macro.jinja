@@ -1,3 +1,60 @@
+{% macro generateSchema(attribute) -%}
+{% if (attribute.blueprint_type != 'model' and attribute.blueprint_type != 'array') or (attribute.blueprint_type == 'array' and not attribute.element_template_is_model) %}
+const {{ attribute.cc }}Schema = yup
+{% if attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
+    .array()
+    .of(yup
+        {{ generateSchemaOptions(attribute.element_template, "        ") }}    )
+{% else %}
+    {{ generateSchemaOptions(attribute, "    ") }}
+{% endif %}
+{% endif %}
+{%- endmacro %}
+
+{% macro generateSchemaOptions(attribute, append) -%}
+{% if attribute.blueprint_type == 'string' %}
+.string()
+{% elif attribute.blueprint_type == 'boolean' %}
+.boolean()
+{% elif attribute.blueprint_type == 'integer' %}
+.number()
+{{ append }}.integer()
+{% elif attribute.blueprint_type == 'float' %}
+number()
+{% elif attribute.blueprint_type == 'datetime' %}
+.date()
+{% elif attribute.blueprint_type == 'date' %}
+.date()
+{% elif attribute.blueprint_type == 'time' %}
+.date()
+{% elif attribute.blueprint_type == 'data_url_file' %}
+.string()
+{% endif %}
+{% if attribute.min_length != 'null' %}
+{{ append }}.min({{ attribute.min_length }})
+{% endif %}
+{% if attribute.max_length != 'null' %}
+{{ append }}.max({{ attribute.max_length }})
+{% endif %}
+{% if attribute.format != 'null' %}
+{{ append }}.matches(/{{ attribute.format[1:-1] }}/)
+{% endif %}
+{% if attribute.choices != 'null' %}
+{{ append }}.oneOf({{attribute.choices}})
+{% endif %}
+{% if attribute.trim == 'true' %}
+{{ append }}.trim()
+{% endif %}
+{% if attribute.default != 'null' %}
+{{ append }}.default({{attribute.default}})
+{% endif %}
+{% if attribute.required == 'true' %}
+{{ append }}.required()
+{% else %}
+{{ append }}.notRequired()
+{% endif %}
+{%- endmacro %}
+
 {% macro getMethod(namespace, name, attribute) -%}
 get{{attribute.cc}}() {
         return this.get('{{ attribute.name }}');
@@ -5,7 +62,20 @@ get{{attribute.cc}}() {
 {%- endmacro %}
 
 {% macro setMethod(namespace, name, attribute) -%}
-set{{attribute.cc}}({{attribute.name}}) {
-        return this.set('{{ attribute.name }}', {{attribute.name}});
+set{{ attribute.cc }}({{ attribute.name }} = {{ attribute.default }}) {
+{% if attribute.blueprint_type == 'model' %}
+        if ({{ attribute.name }} === null) {
+            return this.set('{{ attribute.name }}', {{ attribute.name }})
+        }
+        return {{ attribute.name }} instanceof {{ attribute.cc }} ? this.set('{{ attribute.name }}', {{ attribute.name }}) : this;
+{% elif attribute.blueprint_type == 'array' %}
+{% if attribute.element_template_is_model %}
+        return {{ attribute.name }} instanceof List ? this.set('{{ attribute.name }}', {{ attribute.name }}) : this;
+{% else %}
+        return ({{ attribute.cc }}Schema.isValidSync({{ attribute.name }})) ? this.set('{{ attribute.name }}', new List({{attribute.cc}}Schema.cast({{attribute.name}}))) : this;
+{% endif %}
+{% else %}
+        return ({{ attribute.cc }}Schema.isValidSync({{ attribute.name }})) ? this.set('{{ attribute.name }}', {{ attribute.cc }}Schema.cast({{ attribute.name }})) : this;
+{% endif %}
     }
 {%- endmacro %}
