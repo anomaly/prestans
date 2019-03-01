@@ -19,12 +19,24 @@ import {{dependency}} from './{{dependency}}';
 {% endfor %}
 const defaultValues = {
 {% for attribute in attributes %}
+{% if attribute.default != 'null' %}
 {% if attribute.blueprint_type == 'model' %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
 {% elif attribute.blueprint_type == 'array' %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
 {% else %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
+{% endif %}
+{% else %}
+{% if attribute.blueprint_type == 'model' %}
+    {{attribute.name}}: null{% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'array' %}
+    {{attribute.name}}: []{% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'string' %}
+    {{attribute.name}}: ''{% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'integer' or attribute.blueprint_type == 'number' %}
+    {{attribute.name}}: 0{% if not loop.last %},{% endif %}
+{% endif %}
 {% endif %}
 
 {% endfor %}

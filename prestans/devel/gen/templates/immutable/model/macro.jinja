@@ -15,7 +15,7 @@ const {{ attribute.cc }}Schema = yup
 {% macro generateSchemaOptions(attribute, append) -%}
 {% if attribute.blueprint_type == 'string' %}
 .string()
-.ensure()
+{{ append }}.ensure()
 {% elif attribute.blueprint_type == 'boolean' %}
 .boolean()
 {% elif attribute.blueprint_type == 'integer' %}
