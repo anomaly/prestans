@@ -5,9 +5,12 @@ const {{ attribute.cc }}Schema = yup
     .array()
     .ensure()
     .of(yup
-        {{ generateSchemaOptions(attribute.element_template, "        ") }}    )
+        {{ generateSchemaOptions(attribute.element_template, "        ") }}
+    );
+
 {% else %}
-    {{ generateSchemaOptions(attribute, "    ") }}
+    {{ generateSchemaOptions(attribute, "    ") -}};
+
 {% endif %}
 {% endif %}
 {%- endmacro %}
@@ -50,11 +53,11 @@ const {{ attribute.cc }}Schema = yup
 {% if attribute.default != 'null' %}
 {{ append }}.default({{attribute.default}})
 {% endif %}
-{% if attribute.required == 'true' %}
+{%- if attribute.required == 'true' -%}
 {{ append }}.required()
-{% else %}
+{%- else -%}
 {{ append }}.notRequired()
-{% endif %}
+{%- endif -%}
 {%- endmacro %}
 
 {% macro getMethod(namespace, name, attribute) -%}
