@@ -17,7 +17,7 @@ import {{dependency}} from './{{dependency}}';
 
 {%- endif %}
 {% endfor %}
-const defaultValues = {
+const DEFAULT_VALUES = {
 {% for attribute in attributes %}
 {% if attribute.default != 'null' %}
 {% if attribute.blueprint_type == 'model' %}
@@ -41,13 +41,14 @@ const defaultValues = {
 
 {% endfor %}
 };
-export default class {{name}} extends Record(defaultValues) {
+
+export default class {{name}} extends Record(DEFAULT_VALUES) {
     constructor({
 {% for attribute in attributes %}
         {{attribute.name}}{% if not loop.last %},{% endif %}
 
 {% endfor %}
-    } = defaultValues) {
+    } = DEFAULT_VALUES) {
         super({
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
