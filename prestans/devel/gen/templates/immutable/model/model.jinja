@@ -17,38 +17,72 @@ import {{dependency}} from './{{dependency}}';
 
 {%- endif %}
 {% endfor %}
+const MINIFIED_SCHEMA = yup
+    .object()
+    .shape({
+{% for attribute in attributes %}
+        {{attribute.map_name}}: yup.mixed(){% if not loop.last %},{% endif %}
+
+{% endfor %}
+    })
+{% for attribute in attributes %}
+    .from('{{attribute.name}}', '{{attribute.map_name}}'){% if loop.last %};{% endif %}
+
+{% endfor %}
+
+const REVERSE_MINIFIED_SCHEMA = yup
+    .object()
+    .shape({
+{% for attribute in attributes %}
+        {{attribute.name}}: yup.mixed(){% if not loop.last %},{% endif %}
+
+{% endfor %}
+    })
+{% for attribute in attributes %}
+    .from('{{attribute.map_name}}', '{{attribute.name}}'){% if loop.last %};{% endif %}
+
+{% endfor %}
+
 const DEFAULT_VALUES = {
 {% for attribute in attributes %}
-{% if attribute.default != 'null' %}
+{%- if attribute.default != 'null' -%}
 {% if attribute.blueprint_type == 'model' %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
+
 {% elif attribute.blueprint_type == 'array' %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
+
 {% else %}
     {{attribute.name}}: {{attribute.default}}{% if not loop.last %},{% endif %}
+
 {% endif %}
 {% else %}
 {% if attribute.blueprint_type == 'model' %}
     {{attribute.name}}: null{% if not loop.last %},{% endif %}
+
 {% elif attribute.blueprint_type == 'array' %}
     {{attribute.name}}: []{% if not loop.last %},{% endif %}
+
 {% elif attribute.blueprint_type == 'string' %}
     {{attribute.name}}: ''{% if not loop.last %},{% endif %}
+
 {% elif attribute.blueprint_type == 'integer' or attribute.blueprint_type == 'number' %}
     {{attribute.name}}: 0{% if not loop.last %},{% endif %}
-{% endif %}
-{% endif %}
 
+{% endif %}
+{%- endif -%}
 {% endfor %}
 };
 
 export default class {{name}} extends Record(DEFAULT_VALUES) {
-    constructor({
+    constructor(json = DEFAULT_VALUES, minified = false) {
+        const {
 {% for attribute in attributes %}
-        {{attribute.name}}{% if not loop.last %},{% endif %}
+            {{attribute.name}}{% if not loop.last %},{% endif %}
 
 {% endfor %}
-    } = DEFAULT_VALUES) {
+        } = !minified ? json : REVERSE_MINIFIED_SCHEMA.cast(json);
+
         super({
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
@@ -63,6 +97,8 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
 
 {% endfor %}
         });
+
+        this.minified = minified;
     }
 
 {% for attribute in attributes %}
@@ -78,10 +114,11 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
     }
 
     getJSONObject(filter) {
-        return this.applyFilter(filter).toJS();
+        const json = this.applyFilter(filter).toJS();
+        return !this.minified ? json : MINIFIED_SCHEMA.cast(json)
     }
 
     getJSONString(filter) {
-        return JSON.stringify(this.applyFilter(filter));
+        return JSON.stringify(this.getJSONObject(filter));
     }
 }

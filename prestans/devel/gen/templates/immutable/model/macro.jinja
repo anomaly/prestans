@@ -4,8 +4,9 @@ const {{ attribute.cc }}Schema = yup
 {% if attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
     .array()
     .ensure()
-    .of(yup
-        {{ generateSchemaOptions(attribute.element_template, "        ") }}
+    .of(
+        yup
+            {{ generateSchemaOptions(attribute.element_template, "            ") }}
     );
 
 {% else %}
