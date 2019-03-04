@@ -434,7 +434,7 @@ class Base(object):
             dependency = attribute.model_template
 
         if dependency is not None and dependency not in self._dependencies:
-            self._dependencies.append(dependency)
+            self._dependencies.append([dependency, attribute])
 
     # todo: move this to Filter class
     def add_attribute_string(self, attribute):
@@ -477,7 +477,7 @@ class Model(Base):
 
                 self.add_model_dependency(attribute)
 
-            self._dependencies.sort()
+            self._dependencies.sort(key = lambda x : x[0])
 
             # write out template
             filename = '%s.js' % model_name
