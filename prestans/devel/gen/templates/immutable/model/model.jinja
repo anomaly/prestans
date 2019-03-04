@@ -82,6 +82,9 @@ const DEFAULT_VALUES = {
 {% elif attribute.blueprint_type == 'integer' or attribute.blueprint_type == 'number' %}
     {{attribute.name}}: 0{% if not loop.last %},{% endif %}
 
+{% else %}
+    {{attribute.name}}: null{% if not loop.last %},{% endif %}
+
 {% endif %}
 {%- endif -%}
 {% endfor %}
