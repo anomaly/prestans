@@ -35,6 +35,7 @@ const {{ attribute.cc }}Schema = yup
 .date()
 {% elif attribute.blueprint_type == 'data_url_file' %}
 .string()
+{{ append }}.ensure()
 {% endif %}
 {% if attribute.min_length != 'null' %}
 {{ append }}.min({{ attribute.min_length }})
