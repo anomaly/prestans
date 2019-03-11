@@ -1,6 +1,6 @@
 {% macro generateSchema(attribute) -%}
 {% if (attribute.blueprint_type != 'model' and attribute.blueprint_type != 'array') or (attribute.blueprint_type == 'array' and not attribute.element_template_is_model) %}
-const {{ attribute.cc }}Schema = yup
+export const {{ attribute.cc }}Schema = yup
 {% if attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
     .array()
     .ensure()
