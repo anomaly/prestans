@@ -25,7 +25,7 @@ const defaultValue = false;
 
 export default class {{name}} extends Record(buildJS(defaultValue)) {
     constructor(opt_initialValue) {
-        let value = opt_initialValue
+        let value = opt_initialValue;
         if (typeof opt_initialValue !== 'boolean') value = defaultValue;
         super(buildJS(value));
     }
