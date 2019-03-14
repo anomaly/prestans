@@ -21,9 +21,15 @@ export const MINIFIED_SCHEMA = yup
     .shape({
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
-        {{attribute.map_name}}: {{attribute.model_template|upper}}_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+        {{attribute.map_name}}: yup.lazy(value => value === undefined
+            ? yup.mixed().nullable()
+            : {{attribute.model_template|upper}}_MINIFIED_SCHEMA
+        ){% if not loop.last %},{% endif %}
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-        {{attribute.map_name}}: yup.array().of({{attribute.element_template|upper}}_MINIFIED_SCHEMA){% if not loop.last %},{% endif %}
+        {{attribute.map_name}}: yup.lazy(value => value === undefined
+            ? yup.mixed().nullable()
+            : yup.array().of({{attribute.element_template|upper}}_MINIFIED_SCHEMA)
+        ){% if not loop.last %},{% endif %}
 {% else %}
         {{attribute.map_name}}: yup.mixed().nullable(){% if not loop.last %},{% endif %}
 {% endif %}
@@ -41,9 +47,15 @@ export const REVERSE_MINIFIED_SCHEMA = yup
     .shape({
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
-        {{attribute.name}}: {{attribute.model_template|upper}}_REVERSE_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+        {{attribute.name}}: yup.lazy(value => value === undefined
+            ? yup.mixed().nullable()
+            : {{attribute.model_template|upper}}_REVERSE_MINIFIED_SCHEMA
+        ){% if not loop.last %},{% endif %}
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
-        {{attribute.name}}: yup.array().of({{attribute.element_template|upper}}_REVERSE_MINIFIED_SCHEMA){% if not loop.last %},{% endif %}
+        {{attribute.name}}: yup.lazy(value => value === undefined
+            ? yup.mixed().nullable()
+            : yup.array().of({{attribute.element_template|upper}}_REVERSE_MINIFIED_SCHEMA)
+        ){% if not loop.last %},{% endif %}
 {% else %}
         {{attribute.name}}: yup.mixed().nullable(){% if not loop.last %},{% endif %}
 {% endif %}
