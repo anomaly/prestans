@@ -125,8 +125,6 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
 
 {% endfor %}
         });
-
-        this.minified = minified;
     }
 
 {% for attribute in attributes %}
@@ -141,13 +139,13 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
         return filter && filter instanceof Filter ? filterByKey(this, filter) : this;
     }
 
-    getJSONObject(filter = null) {
+    getJSONObject(filter = null, minified = false) {
         const json = this.applyFilter(filter).toJS();
-        return !this.minified ? json : MINIFIED_SCHEMA.cast(json)
+        return minified ? json : MINIFIED_SCHEMA.cast(json)
     }
 
-    getJSONString(filter = null) {
-        return JSON.stringify(this.getJSONObject(filter));
+    getJSONString(filter = null, minified = false) {
+        return JSON.stringify(this.getJSONObject(filter, minified));
     }
 }
 {{''}}
