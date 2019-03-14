@@ -125,16 +125,16 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
     {{model.setMethod(namespace, name, attribute)}}
 
 {% endfor %}
-    applyFilter(filter) {
+    applyFilter(filter = null) {
         return filter && filter instanceof Filter ? filterByKey(this, filter) : this;
     }
 
-    getJSONObject(filter) {
+    getJSONObject(filter = null) {
         const json = this.applyFilter(filter).toJS();
         return !this.minified ? json : MINIFIED_SCHEMA.cast(json)
     }
 
-    getJSONString(filter) {
+    getJSONString(filter = null) {
         return JSON.stringify(this.getJSONObject(filter));
     }
 }

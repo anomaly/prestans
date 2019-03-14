@@ -4,8 +4,49 @@
  */
 import { Record } from 'immutable';
 import { filterByKey } from 'prestans-fetch';
+import * as yup from 'yup';
 {% for dependency in dependencies %}
-import {{dependency}} from './{{dependency}}';
+import {{dependency}}, { MINIFIED_SCHEMA as {{dependency|upper}}_MINIFIED_SCHEMA, REVERSE_MINIFIED_SCHEMA as {{dependency|upper}}_REVERSE_MINIFIED_SCHEMA } from './{{dependency}}';
+{% endfor %}
+
+export const MINIFIED_SCHEMA = yup
+    .object()
+    .shape({
+{% for attribute in attributes %}
+{% if attribute.blueprint_type == 'model' %}
+        {{attribute.map_name}}: {{attribute.model_template|upper}}_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+        {{attribute.map_name}}: {{attribute.element_template|upper}}_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+{% else %}
+        {{attribute.map_name}}: yup.boolean().nullable(){% if not loop.last %},{% endif %}
+{% endif %}
+
+{% endfor %}
+    })
+    .nullable()
+{% for attribute in attributes %}
+    .from('{{attribute.name}}', '{{attribute.map_name}}'){% if loop.last %};{% endif %}
+
+{% endfor %}
+
+export const REVERSE_MINIFIED_SCHEMA = yup
+    .object()
+    .shape({
+{% for attribute in attributes %}
+{% if attribute.blueprint_type == 'model' %}
+        {{attribute.name}}: {{attribute.model_template|upper}}_REVERSE_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+        {{attribute.name}}: {{attribute.element_template|upper}}_REVERSE_MINIFIED_SCHEMA{% if not loop.last %},{% endif %}
+{% else %}
+        {{attribute.name}}: yup.boolean().nullable(){% if not loop.last %},{% endif %}
+{% endif %}
+
+{% endfor %}
+    })
+    .nullable()
+{% for attribute in attributes %}
+    .from('{{attribute.map_name}}', '{{attribute.name}}'){% if loop.last %};{% endif %}
+
 {% endfor %}
 
 const buildJS = value => {{ '({' }}
@@ -50,12 +91,13 @@ export default class {{name}} extends Record(buildJS(defaultValue)) {
         return filterByKey(this, this);
     }
 
-    getJSONObject() {
-        return this.applyFilter().toJS();
+    getJSONObject(minified = false) {
+        const json = this.applyFilter().toJS();
+        return !minified ? json : MINIFIED_SCHEMA.cast(json)
     }
 
-    getJSONString() {
-        return JSON.stringify(this.applyFilter());
+    getJSONString(minified = false) {
+        return JSON.stringify(this.getJSONObject(minified));
     }
 }
 {{''}}
