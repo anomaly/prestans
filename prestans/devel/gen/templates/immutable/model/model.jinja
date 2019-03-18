@@ -68,6 +68,121 @@ export const REVERSE_MINIFIED_SCHEMA = yup
 
 {% endfor %}
 
+export const Meta = {
+{% for attribute in attributes %}
+{% if attribute.blueprint_type == "string" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAX_LENGTH: {{attribute.max_length}},
+        MIN_LENGTH: {{attribute.min_length}},
+        FORMAT: {{attribute.format}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "boolean" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "integer" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAXIMUM: {{attribute.maximum}},
+        MININUM: {{attribute.minimum}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "float" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        MAXIMUM: {{attribute.maximum}},
+        MININUM: {{attribute.minimum}},
+        CHOICES: {{attribute.choices}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "datetime" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}},
+        TIMEZONE: {{attribute.timezone}},
+        UTC: {{attribute.utc}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "date" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "time" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        DEFAULT: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "data_url_file" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}},
+        ALLOWED_MIME_TYPES: {{attribute.default}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "model" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% if attribute.blueprint_type == "array" %}
+    {{attribute.cc}}: {
+        REQUIRED: {{attribute.required}}
+{% if loop.last %}
+    }
+{% else %}
+    },
+{% endif %}
+{% endif %}
+{% endfor %}
+};
+
 const DEFAULT_VALUES = {
 {% for attribute in attributes %}
 {%- if attribute.default != 'null' -%}
