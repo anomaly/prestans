@@ -141,7 +141,7 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
 
     getJSONObject(filter = null, minified = false) {
         const json = this.applyFilter(filter).toJS();
-        return minified ? json : MINIFIED_SCHEMA.cast(json)
+        return !minified ? json : MINIFIED_SCHEMA.cast(json)
     }
 
     getJSONString(filter = null, minified = false) {
