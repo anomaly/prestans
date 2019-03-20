@@ -61,7 +61,9 @@ export const REVERSE_MINIFIED_SCHEMA = yup
 
 {% endfor %}
 
-const buildJS = value => {{ '({' }}
+const defaultValue = false;
+
+const buildJS = (value = defaultValue) => {{ '({' }}
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
     {{attribute.name}}: new {{attribute.model_template}}(value){% if not loop.last %},{% endif %}
@@ -74,13 +76,39 @@ const buildJS = value => {{ '({' }}
 {% endfor %}
 {{ '});' }}
 
-const defaultValue = false;
+const buildJSWithModifications = (value = defaultValue, opt_modifications = null) =>
+    opt_modifications
+        ? {{ '{' }}
+{% for attribute in attributes %}
+{% if attribute.blueprint_type == 'model' %}
+            {{attribute.name}}: new {{attribute.model_template}}(
+                value,
+                opt_modifications.hasOwnProperty('{{attribute.name}}')
+                    ? opt_modifications.{{attribute.name}}
+                    : null
+            ){% if not loop.last %},{% endif %}
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model%}
+            {{attribute.name}}: new {{attribute.element_template}}(
+                value,
+                opt_modifications.hasOwnProperty('{{attribute.name}}')
+                    ? opt_modifications.{{attribute.name}}
+                    : null
+            ){% if not loop.last %},{% endif %}
+{% else %}
+            {{attribute.name}}: opt_modifications.hasOwnProperty('{{attribute.name}}')
+                ? opt_modifications.{{attribute.name}}
+                : value{% if not loop.last %},{% endif %}
+{% endif %}
+
+{% endfor %}
+        {{ '}' }}
+    : buildJS(value);
 
 export default class {{name}} extends Record(buildJS(defaultValue)) {
-    constructor(opt_initialValue) {
+    constructor(opt_initialValue = defaultValue, opt_modifications = null) {
         let value = opt_initialValue;
         if (typeof opt_initialValue !== 'boolean') value = defaultValue;
-        super(buildJS(value));
+        super(buildJSWithModifications(value, opt_modifications));
     }
 
 {% for attribute in attributes %}
