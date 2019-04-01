@@ -259,7 +259,11 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
         ? this.withMutations(temp => {
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
-            if (filter.get{{ attribute.cc }}()) temp.set{{ attribute.cc }}(temp.get{{ attribute.cc}}().merge(model.get{{ attribute.cc}}(), filter.get{{ attribute.cc }}()));
+            if (filter.get{{ attribute.cc }}())
+                temp.set{{ attribute.cc }}(temp.get{{ attribute.cc}}()
+                    ? temp.get{{ attribute.cc}}().merge(model.get{{ attribute.cc}}(), filter.get{{ attribute.cc }}())
+                    : model.get{{ attribute.cc}}()
+                );
 {% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
             if (filter.get{{ attribute.cc }}()) temp.set{{ attribute.cc }}(model.get{{ attribute.cc}}());
 {% else %}
