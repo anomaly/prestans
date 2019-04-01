@@ -29,7 +29,19 @@ get{{attribute.cc}}() {
 {%- endmacro %}
 
 {% macro setMethod(namespace, name, attribute) -%}
-set{{attribute.cc}}({{attribute.name}}) {
-        return this.set('{{ attribute.name }}', {{attribute.name}});
+set{{ attribute.cc }}({{ attribute.name }}) {
+{% if attribute.blueprint_type == 'model' %}
+        return {{ attribute.name }} instanceof {{ attribute.model_template }}
+            ? this.set('{{ attribute.name }}', {{ attribute.name }})
+            : this;
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+        return {{ attribute.name }} instanceof {{ attribute.element_template }}
+            ? this.set('{{ attribute.name }}', {{ attribute.name }})
+            : this;
+{% else %}
+        return (typeof {{ attribute.name }} === 'boolean')
+            ? this.set('{{ attribute.name }}', {{ attribute.name }})
+            : this;
+{% endif %}
     }
 {%- endmacro %}
