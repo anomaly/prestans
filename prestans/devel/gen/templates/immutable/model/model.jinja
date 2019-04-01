@@ -254,6 +254,23 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
         return filter && filter instanceof Filter ? filterByKey(this, filter) : this;
     }
 
+    merge(model = null, filter = null) {
+        return (model && filter)
+        ? this.withMutations(temp => {
+{% for attribute in attributes %}
+{% if attribute.blueprint_type == 'model' %}
+            if (filter.get{{ attribute.cc }}()) temp.set{{ attribute.cc }}(temp.get{{ attribute.cc}}.merge(model.get{{ attribute.cc}}(), filter.get{{ attribute.cc }}()));
+{% elif attribute.blueprint_type == 'array' and attribute.element_template_is_model %}
+            if (filter.get{{ attribute.cc }}()) temp.set{{ attribute.cc }}(model.get{{ attribute.cc}}());
+{% else %}
+            if (filter.get{{ attribute.cc }}()) temp.set{{ attribute.cc }}(model.get{{ attribute.cc}}());
+{% endif %}
+{% endfor %}
+        })
+        :
+        this;
+    }
+
     getJSONObject(filter = null, minified = false) {
         const json = this.applyFilter(filter).toJS();
         return !minified ? json : MINIFIED_SCHEMA.cast(json)
