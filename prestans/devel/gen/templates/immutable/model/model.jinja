@@ -255,7 +255,7 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
     }
 
     merge(model = null, filter = null) {
-        return (model && filter)
+        return (model && filter && model instanceof {{name}} && filter instanceof Filter)
         ? this.withMutations(temp => {
 {% for attribute in attributes %}
 {% if attribute.blueprint_type == 'model' %}
