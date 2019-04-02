@@ -58,7 +58,6 @@ export const {{ attribute.cc }}Schema = yup
 {%- if attribute.required == 'true' -%}
 {{ append }}.required()
 {%- else -%}
-{{ append }}.nullable()
 {{ append }}.notRequired()
 {%- endif -%}
 {%- endmacro %}
