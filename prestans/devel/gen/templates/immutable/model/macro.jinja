@@ -22,17 +22,23 @@ export const {{ attribute.cc }}Schema = yup
 {{ append }}.ensure()
 {% elif attribute.blueprint_type == 'boolean' %}
 .boolean()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'integer' %}
 .number()
 {{ append }}.integer()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'float' %}
 .number()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'datetime' %}
 .date()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'date' %}
 .date()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'time' %}
 .date()
+{{ append }}.nullable()
 {% elif attribute.blueprint_type == 'data_url_file' %}
 .string()
 {{ append }}.ensure()

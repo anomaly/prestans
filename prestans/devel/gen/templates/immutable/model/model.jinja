@@ -235,7 +235,7 @@ export default class {{name}} extends Record(DEFAULT_VALUES) {
 {% elif attribute.blueprint_type == 'array' and not attribute.element_template_is_model %}
             {{attribute.name}}: {{attribute.name}} && new List({{attribute.cc}}Schema.cast({{attribute.name}})){% if not loop.last %},{% endif %}
 {% else %}
-            {{attribute.name}}: {{attribute.name}} ? {{attribute.cc}}Schema.cast({{attribute.name}}) : DEFAULT_VALUES.{{attribute.name}}{% if not loop.last %},{% endif %}
+            {{attribute.name}}: {{attribute.name}} !== undefined ? {{attribute.cc}}Schema.cast({{attribute.name}}) : DEFAULT_VALUES.{{attribute.name}}{% if not loop.last %},{% endif %}
 {% endif %}
 
 {% endfor %}
