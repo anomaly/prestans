@@ -201,7 +201,7 @@ const DEFAULT_VALUES = {
     {{attribute.name}}: null{% if not loop.last %},{% endif %}
 
 {% elif attribute.blueprint_type == 'array' %}
-    {{attribute.name}}: []{% if not loop.last %},{% endif %}
+    {{attribute.name}}: List(){% if not loop.last %},{% endif %}
 
 {% elif attribute.blueprint_type == 'string' %}
     {{attribute.name}}: ''{% if not loop.last %},{% endif %}
