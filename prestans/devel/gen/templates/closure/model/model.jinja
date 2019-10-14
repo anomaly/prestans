@@ -30,13 +30,13 @@ goog.require('{{dependency}}');
     //Setup base model
     prestans.types.Model.call(this);
 
-    if(!goog.isDef(opt_raiseValidateException))
+    if(opt_raiseValidateException === undefined)
         opt_raiseValidateException = true;
 
-    if(goog.isDef(opt_minified) && goog.isBoolean(opt_minified) && opt_minified && goog.isDefAndNotNull(opt_json)) {
+    if(opt_minified !== undefined && typeof opt_minified === 'boolean' && opt_minified && opt_json != null) {
 {% for attribute in attributes %}{{model.minifiedAttributeWithJson(namespace, name, attribute)}}{% endfor %}
     }
-    else if(goog.isDefAndNotNull(opt_json)) {
+    else if(opt_json != null) {
 {% for attribute in attributes %}{{model.attributeWithJson(namespace, name, attribute)}}{% endfor %}
     }
     else {
@@ -266,22 +266,22 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_filter) {
 
     {% if filter_namespace != None %}//check that filter is of correct type
-    if(goog.isDefAndNotNull(opt_filter) && !(opt_filter instanceof {{filter_namespace}}.{{name}}))
+    if(opt_filter != null && !(opt_filter instanceof {{filter_namespace}}.{{name}}))
         throw "Incorrect filter for this model";
     {% endif %}
 
     var jsonifiedObject_ = {};
     
-    if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
+    if(minified !== undefined && typeof minified === 'boolean' && minified) {
     {% for attribute in attributes %}
     {% if attribute.blueprint_type == 'model' %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}().anyFieldsEnabled()) {
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}().anyFieldsEnabled()) {
             if(this.get{{attribute.cc}}() == null)
                 jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = null;
             else
                 jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true, opt_filter.get{{attribute.cc}}());
         }
-        else if(!goog.isDef(opt_filter)) {
+        else if(opt_filter === undefined) {
             if(this.get{{attribute.cc}}() == null)
                 jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = null;
             else
@@ -289,25 +289,25 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
         }
     {% elif attribute.blueprint_type == 'array' %}
     {% if attribute.element_template_is_model %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}().anyFieldsEnabled())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}().anyFieldsEnabled())
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true, opt_filter.get{{attribute.cc}}());
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
     {% else %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}().getJSONObject(true);
     {% endif %}
     {% elif attribute.blueprint_type == 'datetime' or attribute.blueprint_type == 'date' or attribute.blueprint_type == 'time' %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject();
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.{{attribute.ccif}}_.getJSONObject();
     {% else %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}();
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_[{{namespace}}.{{name}}.REWRITE_MAP["{{attribute.name}}"]] = this.get{{attribute.cc}}();
     {% endif %}
     {% endfor %}
@@ -315,13 +315,13 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
     else {
     {% for attribute in attributes %}
     {% if attribute.blueprint_type == 'model' %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}().anyFieldsEnabled()) {
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}().anyFieldsEnabled()) {
             if(this.get{{attribute.cc}}() == null)
                 jsonifiedObject_["{{attribute.name}}"] = null;
             else
                 jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false, opt_filter.get{{attribute.cc}}());
         }
-        else if(!goog.isDef(opt_filter)) {
+        else if(opt_filter === undefined) {
             if(this.get{{attribute.cc}}() == null)
                 jsonifiedObject_["{{attribute.name}}"] = null;
             else
@@ -329,25 +329,25 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Model);
         }
     {% elif attribute.blueprint_type == 'array' %}
     {% if attribute.element_template_is_model %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}().anyFieldsEnabled())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}().anyFieldsEnabled())
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false, opt_filter.get{{attribute.cc}}());
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
     {% else %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}().getJSONObject(false);
     {% endif %}
     {% elif attribute.blueprint_type == 'datetime' or attribute.blueprint_type == 'date' or attribute.blueprint_type == 'time' %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_["{{attribute.name}}"] = this.{{attribute.ccif}}_.getJSONObject();
     {% else %}
-        if(goog.isDef(opt_filter) && opt_filter.get{{attribute.cc}}())
+        if(opt_filter !== undefined && opt_filter.get{{attribute.cc}}())
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}();
-        else if(!goog.isDef(opt_filter))
+        else if(opt_filter === undefined)
             jsonifiedObject_["{{attribute.name}}"] = this.get{{attribute.cc}}();
     {% endif %}
     {% endfor %}

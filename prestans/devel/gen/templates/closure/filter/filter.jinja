@@ -22,7 +22,7 @@ goog.require('{{dependency}}');
  */
 {{namespace}}.{{name}} = function(opt_defaultValue) {
 
-    if(!goog.isBoolean(opt_defaultValue))
+    if(typeof opt_defaultValue !== 'boolean')
         opt_defaultValue = false;
 
 {% for attribute in attributes %}
@@ -84,12 +84,12 @@ goog.inherits({{namespace}}.{{name}}, prestans.types.Filter);
  */
 {{namespace}}.{{name}}.prototype.getJSONObject = function(minified, opt_complete) {
 
-    if(!goog.isBoolean(opt_complete))
+    if(typeof opt_complete !== 'boolean')
         opt_complete = false;
 
     var jsonifiedObject_ = {};
     
-    if(goog.isDef(minified) && goog.isBoolean(minified) && minified) {
+    if(minified !== undefined && typeof minified === 'boolean' && minified) {
     {% for attribute in attributes %}
     {{filter.minifiedAttribute(namespace, name, attribute)}}
     {% endfor %}
