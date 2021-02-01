@@ -1,9 +1,10 @@
-> As of January 2021 `prestans` is no longer under active development. The intention behind `prestans` was to bring lightweight, well understood development of RESTful services in Python. That gap has now been filled with many more frameworks with better performance and more modern approaches. Our team thanks you for using prestans in your projects, but recommends you to move to other frameworks.
-
 Prestans 2.0
 ============
 
 A WSGI compliant REST micro-framework.
+
+    As of January 2021 prestans is no longer under active development. The intention behind prestans was to bring lightweight, well understood development of RESTful services in Python. That gap has now been filled with many more frameworks with better performance and more modern approaches. Our team thanks you for using prestans in your projects, but recommends you to move to other frameworks.
+
     
 .. image:: https://badge.fury.io/py/prestans.svg
     :target: https://pypi.python.org/pypi/prestans/
